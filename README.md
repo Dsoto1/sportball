@@ -52,7 +52,15 @@ Rookie assist (on by default) slows pitches a little and widens the timing
 window while you bat. The bat finds the ball's height on its own. Lay off
 pitches far off the plate, since they cost contact quality or can't be
 reached. The small yellow marker on the zone shows what your stick is
-adding.
+adding, and the arrow on the field shows where it sends an on-time swing
+(blue and long = in the air, brown and short = on the ground). Swinging
+early pulls the ball left of the arrow, late pushes it right.
+
+After every swing the callout tells you how it went and why, for example
+"SOLID contact · a hair late (9 ms) · on the edge of the zone". Hitting the
+sweet spot (perfect timing on a pitch over the middle) flashes at the
+plate and calls out **BARRELED!**, or **CRUSHED!** with a power swing. For
+home runs: power swing, hold up for lift, perfect timing, middle pitch.
 
 On defense you steer the fielder who can reach the ball first; a white
 ring marks where a fly ball will land. Press a throw button any time, even

@@ -273,10 +273,29 @@ func _process_pitch_flight(_delta: float) -> void:
 	# The ball always reaches the plate before the result plays out.
 	if _contact != null and flight >= travel:
 		_view.show_pitch_marker(_pitch)
+		_view.set_aim_preview(false)
+		var call_text := ""
 		if _contact.outcome == ContactResult.Outcome.IN_PLAY:
 			_start_ball_in_play()
+			if _outcome != null:
+				call_text = String(_outcome.kind).replace("_", " ").to_upper()
 		else:
-			_apply_call()
+			call_text = _apply_call()
+		if _contact.swing_type != SwingIntent.Type.NONE:
+			_show_contact_feedback(call_text)
+
+
+## The moment the ball meets the bat (or doesn't): what kind of contact it
+## was and why, the burst, and the crack.
+func _show_contact_feedback(call_text: String) -> void:
+	var f := ContactFeedback.describe(_contact, tuning)
+	var head: String = f["headline"]
+	if head == "":
+		head = call_text
+	elif call_text != "":
+		head = "%s %s" % [head, call_text]
+	_hud.show_callout(head, f["detail"], 2.2)
+	_view.contact_feedback(_pitch.location, f["tier"])
 
 
 func _resolve_swing(swing: SwingIntent) -> void:
@@ -284,12 +303,9 @@ func _resolve_swing(swing: SwingIntent) -> void:
 	_log({"swing": SwingIntent.Type.keys()[swing.type], "timing_ms": roundi(swing.timing_offset * 1000.0), "stick": swing.stick})
 	if swing.type != SwingIntent.Type.NONE:
 		_view.swing_bat()
-		var ms := roundi(swing.timing_offset * 1000.0)
-		var when := "PERFECT" if absi(ms) <= 15 else ("EARLY %d ms" % -ms if ms < 0 else "LATE %d ms" % ms)
-		_hud.show_callout("", when, 1.0)
 
 
-func _apply_call() -> void:
+func _apply_call() -> String:
 	var call := ContactResolver.call_for(_pitch, _contact) as MatchState.PitchCall
 	var text: String = {
 		MatchState.PitchCall.BALL: "BALL",
@@ -300,6 +316,7 @@ func _apply_call() -> void:
 	_hud.show_callout(text, _timing_detail(), 1.0)
 	state.apply_pitch_call(call)
 	_set_phase(Phase.CALL)
+	return text
 
 
 # --- Ball in play ---------------------------------------------------------
@@ -512,6 +529,7 @@ func _show_stick_marker() -> Vector2:
 	var stick := Input.get_vector(&"aim_left", &"aim_right", &"aim_down", &"aim_up")
 	var half := Vector2(tuning.zone_half_width, (tuning.zone_top - tuning.zone_bottom) * 0.5)
 	_view.set_cursor(PitchResolver.zone_center(tuning) + stick * half, 0.05, 0.0, Color(1.0, 0.85, 0.2))
+	_view.set_aim_preview(true, stick.x * tuning.stick_spray, stick.y)
 	return stick
 
 

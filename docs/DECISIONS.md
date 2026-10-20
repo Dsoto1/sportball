@@ -178,3 +178,15 @@ Decision: After the owner's first playtest (MacBook: "it just slings balls one a
 Reason: The first human test showed the hitting loop was unreadable. The brief's 2-minute goal ("understand how to pitch and hit") was failing.
 
 Affected systems: MatchDirector (pacing, assist, prompts), MatchView (bat, windup, ring, camera), ActorView (catcher crouch), PitchIntent, SwingIntent, ContactResolver, PitchResolver, tuning, input map, README.
+
+## 2026-10-20 - Hit Feedback and Aim Preview
+
+Decision:
+- **Contact feedback:** when the pitch reaches the plate, the callout names the contact tier (`ContactFeedback`: weak / OK / solid / sweet spot) and why: timing relative to that swing's window ("PERFECT", "a hair late", "late 60 ms"), the pitch location (middle, edge, chased) and, in play, exit velocity and launch angle.
+- **Big callout:** a sweet-spot hit (quality >= 0.9) gets BARRELED!, or CRUSHED! on a power swing, and a burst at the plate. It stays rare per the UI brief.
+- **Contact sound:** a bat crack synthesized in code (`ContactSound`: filtered noise, brighter for better contact). It uses no third-party audio, so the manifest stays empty.
+- **Aim preview:** while batting, an arrow from the plate shows where the stick sends an on-time swing. Long and blue means lift, short and brown means a chop. The arrow does not include timing, which still pulls or pushes the ball.
+
+Reason: Owner asked how to aim and how to find the sweet spot for homers; nothing on screen taught either.
+
+Affected systems: new `ui/hud/contact_feedback.gd`, new `presentation/audio/contact_sound.gd`, MatchView (aim arrow, flash, sound), MatchDirector (feedback at contact), README, tests.

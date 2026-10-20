@@ -45,6 +45,13 @@ var _bat_swing_start := -1.0
 var _view_clock := 0.0
 var _timing_ring: MeshInstance3D
 var _windup := -1.0
+var _aim: Node3D
+var _aim_shaft: MeshInstance3D
+var _aim_head: MeshInstance3D
+var _flash: MeshInstance3D
+var _flash_start := -10.0
+var _flash_size := 0.0
+var _contact_sound: ContactSound
 var _animator := PlayAnimator.new()
 var _last_actor_pos := {}
 var _rundown_focus := Vector3.ZERO
@@ -71,6 +78,7 @@ func setup(p_tuning: BaseballTuning) -> void:
 		_fielders.append(actor)
 	_build_zone()
 	_build_bat()
+	_build_aim_and_flash()
 	_build_debug()
 
 
@@ -109,6 +117,7 @@ func reset_for_pitch(state: MatchState) -> void:
 	batter.position = BATTER_SPOT
 	batter.face(BATTER_SPOT + Vector3.RIGHT)  # square to the plate
 	set_bat(true)
+	set_aim_preview(false)
 	_windup = -1.0
 	_timing_ring.visible = false
 	for base in [1, 2, 3]:
@@ -130,6 +139,42 @@ func reset_for_pitch(state: MatchState) -> void:
 func set_bat(visible_now: bool) -> void:
 	_bat_pivot.visible = visible_now
 	_bat_swing_start = -1.0
+
+
+## Aim preview while batting: an arrow from home plate in the direction the
+## stick sends the ball, long and sky-blue for lift, short and brown for a
+## chop. spray_deg as in FieldLayout (+ = right field); lift = stick y.
+func set_aim_preview(show: bool, spray_deg: float = 0.0, lift: float = 0.0) -> void:
+	_aim.visible = show
+	if not show:
+		return
+	var dir := FieldLayout.direction_for_spray(spray_deg)
+	_aim.position = Vector3(0.0, 0.06, -1.0)
+	_aim.look_at(_aim.position + dir, Vector3.UP)
+	var length := lerpf(14.0, 55.0, (clampf(lift, -1.0, 1.0) + 1.0) * 0.5)
+	_aim_shaft.scale = Vector3(1.0, 1.0, length)
+	_aim_shaft.position = Vector3(0.0, 0.0, -length * 0.5)
+	_aim_head.position = Vector3(0.0, 0.0, -length - 1.2)
+	var color := Color(1.0, 1.0, 1.0, 0.5)
+	if lift > 0.3:
+		color = Color(0.45, 0.8, 1.0, 0.6)  # in the air
+	elif lift < -0.3:
+		color = Color(0.85, 0.55, 0.25, 0.6)  # on the ground
+	(_aim_shaft.material_override as StandardMaterial3D).albedo_color = color
+	(_aim_head.material_override as StandardMaterial3D).albedo_color = color
+
+
+## Contact feedback at the plate: a burst (solid contact and better) and
+## the crack of the bat. tier: ContactFeedback.Tier.
+func contact_feedback(location: Vector2, tier: int) -> void:
+	_contact_sound.play_tier(tier)
+	if tier < ContactFeedback.Tier.SOLID:
+		return
+	_flash.position = Vector3(location.x, location.y, 0.1)
+	_flash_size = 0.9 if tier == ContactFeedback.Tier.SWEET else 0.45
+	var color := Color(1.0, 0.9, 0.3, 0.9) if tier == ContactFeedback.Tier.SWEET else Color(1, 1, 1, 0.8)
+	(_flash.material_override as StandardMaterial3D).albedo_color = color
+	_flash_start = _view_clock
 
 
 ## Plays the swing (on contact and on a miss alike).
@@ -188,6 +233,7 @@ const COVER_PREFERENCE := {1: [&"1b", &"p", &"2b"], 2: [&"2b", &"ss"], 3: [&"3b"
 func show_play(bip: BallInPlay, t: float, play: LivePlay, outcome: PlayOutcome, live: LiveFielding = null, selected_runner: StringName = &"") -> void:
 	_zone.visible = false
 	_bat_pivot.visible = false
+	_aim.visible = false
 	_timing_ring.visible = false
 	_windup = -1.0
 	var fielding := bip.fielding
@@ -341,6 +387,10 @@ func _process(delta: float) -> void:
 	if _camera == null:
 		return
 	_view_clock += delta
+	var flash_age := _view_clock - _flash_start
+	_flash.visible = flash_age < 0.18
+	if _flash.visible:
+		_flash.scale = Vector3.ONE * _flash_size * (0.4 + flash_age / 0.18)
 	_camera.fov = lerpf(_camera.fov, CAMERA_FOV[_camera_mode], 1.0 - exp(-delta * 6.0))
 	_update_bat()
 	_update_windup(delta)
@@ -390,6 +440,34 @@ func _update_windup(delta: float) -> void:
 	actor.animate(ActorView.Pose.THROW, delta, 0.0, false, _windup)
 	_ball.position = actor.hand_position()
 	_update_shadow()
+
+
+func _build_aim_and_flash() -> void:
+	_aim = Node3D.new()
+	_aim.name = "AimPreview"
+	add_child(_aim)
+	_aim_shaft = MeshInstance3D.new()
+	var shaft := BoxMesh.new()
+	shaft.size = Vector3(0.35, 0.02, 1.0)
+	_aim_shaft.mesh = shaft
+	_aim_shaft.material_override = _unshaded(Color(1, 1, 1, 0.5))
+	_aim.add_child(_aim_shaft)
+	_aim_head = MeshInstance3D.new()
+	var head := CylinderMesh.new()
+	head.top_radius = 0.0
+	head.bottom_radius = 1.0
+	head.height = 2.4
+	_aim_head.mesh = head
+	_aim_head.rotation_degrees.x = -90.0  # point along -Z
+	_aim_head.scale = Vector3(1.0, 1.0, 0.05)  # flat on the ground
+	_aim_head.material_override = _unshaded(Color(1, 1, 1, 0.5))
+	_aim.add_child(_aim_head)
+	_aim.visible = false
+	_flash = _sphere(1.0, Color(1, 1, 1, 0.8), false)
+	_flash.visible = false
+	_contact_sound = ContactSound.new()
+	_contact_sound.name = "ContactSound"
+	add_child(_contact_sound)
 
 
 func _build_bat() -> void:
