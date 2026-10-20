@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PitchFamilyDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/pitch_family_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"changeup"
+display_name = "Changeup"
+speed = 34.5
+break_amount = Vector2(0.10, -0.20)
+deception = 0.4
+scatter_scale = 1.1
