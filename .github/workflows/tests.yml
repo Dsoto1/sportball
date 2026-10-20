@@ -1,0 +1,25 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  godot-tests:
+    runs-on: ubuntu-latest
+    env:
+      GODOT_VERSION: 4.7.2-stable
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download Godot
+        run: |
+          curl -sSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_linux.x86_64.zip"
+          unzip -q godot.zip -d "$RUNNER_TEMP/godot"
+          echo "GODOT=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}_linux.x86_64" >> "$GITHUB_ENV"
+      - name: Unit and scenario tests
+        run: ./tools/run_tests.sh
+      - name: Playtest bot (drives the real scene headless)
+        run: |
+          out="$("$GODOT" --headless --path . --fixed-fps 60 -s res://tools/playtest_bot.gd -- 900 2>&1)"
+          echo "$out" | grep -E "^\[(bot|match)\]"
+          if grep -qE "SCRIPT ERROR|Parse Error" <<<"$out"; then echo "Script errors during playtest"; exit 1; fi
