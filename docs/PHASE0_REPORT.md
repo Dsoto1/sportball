@@ -72,8 +72,8 @@ bot, screenshots and reading the timings.
    Cutoff and cover choices are fixed tables (for example the pitcher
    covers first when the first baseman cuts). Triples are now very rare
    (~0 in 100 sims); `runner_take_base_margin` and `cutoff_min_throw` are
-   the knobs. Still missing: per-runner human control
-   (advance/retreat moves all runners), and visible rundown animation
+   the knobs. Per-runner orders: hold a base button with advance/retreat.
+   Still missing: visible rundown animation
    (fielders slide; there is no chase pose). A rundown that runs past
    `max_play_time` ends with a tag.
 3. **No triples or inside-the-park home runs.** Runners only take a base
@@ -121,7 +121,7 @@ bot, screenshots and reading the timings.
 ## Suggested next increments (still Phase 0/1, no new systems)
 
 1. Tune steered fielding with people; add throw accuracy/bobble.
-2. Per-runner human control and rundown presentation.
+2. Rundown presentation (chase poses, tag animation).
 3. Timestamped swing input, a hit pause and a bat swing placeholder.
 4. Retune dive frequency, extra-base aggression and infield depth with the
    sim and launch-angle reports.

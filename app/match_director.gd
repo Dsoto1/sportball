@@ -314,7 +314,11 @@ func _process_ball_in_play() -> void:
 	var t := _phase_time
 	if _play != null and _outcome == null:
 		_step_play(t)
-	_view.show_play(_bip, t, _play, _outcome, _live)
+	var selected: StringName = &""
+	if user_is_batting() and _play != null and _outcome == null and _held_base() > 0:
+		var r := _play.runner_for_base(_held_base())
+		selected = r.id if r != null else &""
+	_view.show_play(_bip, t, _play, _outcome, _live, selected)
 	_view.set_field_focus(_field_focus(t))
 	if _outcome == null:
 		return
@@ -331,7 +335,8 @@ func _step_play(t: float) -> void:
 	var offense := {}
 	var move := Input.get_vector(&"aim_left", &"aim_right", &"aim_down", &"aim_up")
 	if user_is_batting():
-		offense = {"advance": Input.is_action_just_pressed(&"runner_advance"), "retreat": Input.is_action_just_pressed(&"runner_retreat")}
+		# Hold a base button to order just that runner; otherwise all of them.
+		offense = {"advance": Input.is_action_just_pressed(&"runner_advance"), "retreat": Input.is_action_just_pressed(&"runner_retreat"), "base": _held_base()}
 	else:
 		for base in [1, 2, 3, 4]:
 			if Input.is_action_just_pressed(StringName("throw_base_%d" % base)):
@@ -358,6 +363,14 @@ func _step_play(t: float) -> void:
 	if _play.is_done():
 		_play_done_at = _play.time
 		_finish_play(_play.outcome())
+
+
+## Base button held down (1..4), or 0.
+func _held_base() -> int:
+	for base in [1, 2, 3, 4]:
+		if Input.is_action_pressed(StringName("throw_base_%d" % base)):
+			return base
+	return 0
 
 
 func _drain_play_events() -> void:
@@ -467,7 +480,7 @@ func _hud_prompt_suffix() -> String:
 			if _outcome != null:
 				base = "Skip: J / A"
 			elif user_is_batting():
-				base = "Runners: advance E / RB   retreat Q / LB"
+				base = "Runners: advance E / RB   retreat Q / LB   (hold 1-4 / B Y X A for one runner)"
 			else:
 				base = "Run: WASD / L-stick   Dive: Shift / RT   Switch: F / LT   Throw (again to relay) 1st-2nd-3rd-home: 1-4 / B Y X A"
 	return "%s\n[%s]   Tab/Back: switch side   F1: debug   F5: restart" % [base, role]

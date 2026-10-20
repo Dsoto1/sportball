@@ -34,7 +34,8 @@ choose throws in the bottom half. Tab / Back switches teams.
 | Switch to fielder nearest the ball | F | LT |
 | Throw to 1st / 2nd / 3rd / home | 1 / 2 / 3 / 4 | B / Y / X / A |
 | With the ball: run at a runner / to a bag | WASD or arrows | Left stick |
-| Batting, ball in play: all runners advance / retreat | E / Q | RB / LB |
+| Batting, ball in play: runners advance / retreat | E / Q | RB / LB |
+| ...only the runner on (or heading to) a base: hold that base | 1 / 2 / 3 / 4 | B / Y / X / A |
 | Skip to next pitch after a play | J | A |
 | Switch team | Tab | Back |
 | Debug overlay | F1 | R-stick click |
@@ -55,8 +56,11 @@ more than 0.6 s, the AI takes over. Once you have the ball, the stick
 moves the fielder holding it: run a runner down in a rundown, or step on
 a bag yourself.
 
-When you are batting, runners decide for themselves until you press
-advance or retreat. After that, they do what you said.
+When you are batting, runners decide for themselves until you give them
+an order. Advance or retreat on its own orders everyone. Hold a base
+button first to order just the runner on, heading to, or just off that
+base; a yellow ring shows who that is. Runners you have ordered do what
+you said, and the rest stay AI-run.
 
 Bindings live in `project.godot` as semantic actions. To change them, edit
 the table in `tools/generate_input_map.gd` and run

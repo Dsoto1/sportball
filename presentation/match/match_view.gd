@@ -130,7 +130,7 @@ const CUTOFF_PREFERENCE := {1: [&"2b", &"2b"], 2: [&"ss", &"2b"], 3: [&"ss", &"s
 const COVER_PREFERENCE := {1: [&"1b", &"p", &"2b"], 2: [&"2b", &"ss"], 3: [&"3b", &"ss"], 4: [&"c", &"p"]}
 
 
-func show_play(bip: BallInPlay, t: float, play: LivePlay, outcome: PlayOutcome, live: LiveFielding = null) -> void:
+func show_play(bip: BallInPlay, t: float, play: LivePlay, outcome: PlayOutcome, live: LiveFielding = null, selected_runner: StringName = &"") -> void:
 	_zone.visible = false
 	var fielding := bip.fielding
 	var secured := play != null and play.ball != LivePlay.Ball.LOOSE
@@ -189,6 +189,10 @@ func show_play(bip: BallInPlay, t: float, play: LivePlay, outcome: PlayOutcome, 
 			var actor: ActorView = _runners.get(r.id)
 			if actor == null:
 				continue
+			if r.id == selected_runner:
+				# The runner the held base button would order.
+				_control_ring.visible = true
+				_control_ring.position = play.runner_position(r) + Vector3.UP * 0.05
 			actor.visible = r.state != LivePlay.State.OUT and r.state != LivePlay.State.SCORED
 			actor.position = play.runner_position(r)
 			actor.face(play.runner_position(r).move_toward(FieldLayout.base_position(r.target), 1.0) + Vector3(0.0, 0.0, 0.001))

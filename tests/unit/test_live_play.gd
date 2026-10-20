@@ -207,3 +207,35 @@ func test_cutoff_keeps_trail_runner_honest() -> void:
 	play.step(tuning().sim_play_step, {"throw": 4})
 	var outcome := _run(play)
 	check_eq(outcome.final_bases[0], &"r1", "runner stays at first")
+
+
+func test_base_button_orders_one_runner() -> void:
+	# Fly ball in the air: both runners are frozen near their bags.
+	var play := _play(_bases(&"r1", &"r2"), 0, _fielded(Vector3(0, 0, -86), 3.4, true), [36.0, 32.0, 0.0])
+	_step_until(play, 0.5)
+	play.step(tuning().sim_play_step, {}, {"advance": true, "base": 2})
+	check_eq(play.runner(&"r2").target, 3, "runner on second goes")
+	check_eq(play.runner(&"r1").target, 1, "runner on first stays")
+	check(play.runner(&"r2").human, "ordered runner is the player's")
+	check(not play.runner(&"r1").human, "the other is still AI-run")
+	_step_until(play, 1.2)
+	play.step(tuning().sim_play_step, {}, {"retreat": true, "base": 3})
+	check_eq(play.runner(&"r2").target, 2, "runner heading to third sent back")
+
+
+func test_runner_for_base_lookup() -> void:
+	var play := _play(_bases(&"r1", &"", &"r3"), 0, _fielded(Vector3(-9, 0, -34), 1.0))
+	check_eq(play.runner_for_base(1).id, &"r1", "standing on first")
+	check_eq(play.runner_for_base(3).id, &"r3", "standing on third")
+	check_eq(play.runner_for_base(1).id, &"r1", "batter is not on first yet")
+	check(play.runner_for_base(2) == null, "nobody at second")
+	_step_until(play, 0.8)
+	check_eq(play.runner_for_base(2).id, &"r1", "forced runner heading to second")
+
+
+func test_no_base_orders_everyone() -> void:
+	var play := _play(_bases(&"r1", &"r2"), 0, _fielded(Vector3(0, 0, -86), 3.4, true), [36.0, 32.0, 0.0])
+	_step_until(play, 0.5)
+	play.step(tuning().sim_play_step, {}, {"advance": true})
+	check_eq(play.runner(&"r2").target, 3, "lead runner goes")
+	check_eq(play.runner(&"r1").target, 2, "trail runner goes")

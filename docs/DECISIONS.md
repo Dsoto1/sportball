@@ -148,3 +148,11 @@ Decision: `14_ASSET_SOURCES.md` is the approved discovery guide. It sets a tiere
 Reason: Owner-provided guide; reduces search time and license risk.
 
 Affected systems: asset pipeline, manifest, agent rules. No assets imported yet.
+
+## 2026-10-20 - Per-Runner Orders
+
+Decision: On offense, holding a base button (the same 1-4 / B Y X A used for throws) while pressing `runner_advance` / `runner_retreat` orders only the runner associated with that base. That is the runner standing on it, else the one heading to it, else the one who just left it (`LivePlay.runner_for_base`). With no base held, the order goes to every runner as before. Only runners who receive an order stop being AI-steered; a retreat order to a runner on a bag means "stay". The view rings the runner a held base would pick.
+
+Reason: Owner request; reuses the existing base buttons so there are no new verbs to learn.
+
+Affected systems: LivePlay (offense intents), MatchDirector, MatchView, playtest bot, README, tests.

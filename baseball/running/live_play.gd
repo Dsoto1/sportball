@@ -282,28 +282,68 @@ func _go_ground() -> void:
 			r.go_time = maxf(r.go_time, time + tuning.runner_read_delay)
 
 
+## offense: {advance, retreat, base}. base 0 (or absent) orders every
+## runner; 1..4 orders only the runner on, heading to, or just off that base.
+## A runner given an order is no longer steered by the AI.
 func _apply_offense(offense: Dictionary) -> void:
-	if offense.get("advance", false):
+	var advance: bool = offense.get("advance", false)
+	var retreat: bool = offense.get("retreat", false)
+	if not advance and not retreat:
+		return
+	var base: int = offense.get("base", 0)
+	var picked := runner_for_base(base) if base > 0 else null
+	if base > 0 and picked == null:
+		return
+	if advance:
 		# Lead runner first so trailing runners never pass them.
 		for r in _ordered(true):
-			var next := r.target + 1
-			if r.state == State.WAITING:
-				next = r.start_base + 1
-			elif r.state == State.RUNNING and r.target * BASE < r.s:
-				next = ceili((r.s + 0.01) / BASE)  # turn around and go forward
-			next = mini(next, HOME_PLATE)
-			if next != r.target and not _blocked(r, next):
-				_set_target(r, next, 0.0)
-			r.human = true
-	if offense.get("retreat", false):
+			if picked == null or r == picked:
+				_order_advance(r)
+	if retreat:
 		for r in _ordered(false):
-			if r.state != State.RUNNING or forced_now(r, r.target):
-				r.human = true
+			if picked == null or r == picked:
+				_order_retreat(r)
+
+
+## The runner a base button refers to: standing on it, else heading to it,
+## else the one who just left it.
+func runner_for_base(base: int) -> Runner:
+	for pass_kind in 3:
+		for r in runners:
+			if r.state == State.OUT or r.state == State.SCORED:
 				continue
-			var back := floori((r.s - 0.01) / BASE)
-			if back >= 1 and back != r.target and not _blocked(r, back):
-				_set_target(r, back, tuning.runner_reverse_time)
-			r.human = true
+			match pass_kind:
+				0:
+					if (r.state == State.ON_BASE or r.state == State.WAITING) and r.target == base:
+						return r
+				1:
+					if r.state == State.RUNNING and r.target == base:
+						return r
+				2:
+					if r.state == State.RUNNING and floori((r.s - 0.01) / BASE) == base:
+						return r
+	return null
+
+
+func _order_advance(r: Runner) -> void:
+	var next := r.target + 1
+	if r.state == State.WAITING:
+		next = r.start_base + 1
+	elif r.state == State.RUNNING and r.target * BASE < r.s:
+		next = ceili((r.s + 0.01) / BASE)  # turn around and go forward
+	next = mini(next, HOME_PLATE)
+	if next != r.target and not _blocked(r, next):
+		_set_target(r, next, 0.0)
+	r.human = true
+
+
+func _order_retreat(r: Runner) -> void:
+	r.human = true  # on a bag this means "stay"
+	if r.state != State.RUNNING or forced_now(r, r.target):
+		return
+	var back := floori((r.s - 0.01) / BASE)
+	if back >= 1 and back != r.target and not _blocked(r, back):
+		_set_target(r, back, tuning.runner_reverse_time)
 
 
 func _ai_runner(r: Runner) -> void:
