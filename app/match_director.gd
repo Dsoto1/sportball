@@ -11,6 +11,8 @@ enum Phase { PRE_PITCH, METER, PITCH_FLIGHT, CALL, BALL_IN_PLAY, GAME_OVER }
 const AI_PRE_PITCH_DELAY := 0.9
 const CALL_PAUSE := 0.8
 const PLAY_SETTLE_PAUSE := 0.9
+# How long a human fielder can hold the ball before the AI throw is used.
+const THROW_DECISION_WINDOW := 0.6
 # Cursor speed in the plate plane, meters per second.
 const CURSOR_SPEED := 1.5
 const UNDECIDED := -2
@@ -33,6 +35,9 @@ var _pitch: PitchResult
 var _ai_swing: SwingIntent
 var _contact: ContactResult
 var _bip: BallInPlay
+var _live: LiveFielding
+var _live_accumulator := 0.0
+var _dive_requested := false
 var _throw_choice := -1
 var _throw_base := UNDECIDED
 var _outcome: PlayOutcome
@@ -80,6 +85,14 @@ func current_pitch() -> PitchResult:
 
 func meter_value() -> float:
 	return _meter
+
+
+func ball_in_play() -> BallInPlay:
+	return _bip
+
+
+func live_fielding() -> LiveFielding:
+	return _live
 
 
 ## Tool hook: place the aim/bat cursor directly (bots, tests).
@@ -250,13 +263,16 @@ func _start_ball_in_play() -> void:
 	_view.show_debug_play(_bip)
 	_view.set_camera_mode(MatchView.CameraMode.FIELD)
 	_view.set_cursor(Vector2.ZERO, 0.0, 0.0, Color.WHITE)
+	_live = null
+	_live_accumulator = 0.0
+	_dive_requested = false
 	if _bip.is_home_run():
 		_decide_throw(AiDefense.NO_THROW)
-	if user_is_batting():
-		_hud.show_prompt(_hud_prompt_suffix())
-	else:
-		_hud.show_prompt("Throw: 1 2 3 4 / B Y X A  (1st, 2nd, 3rd, home) — no input = auto throw")
+	elif not user_is_batting() and _bip.fielding.has_fielder():
+		# The human steers whoever the projection says gets there first.
+		_live = LiveFielding.new(_bip.trajectory, _bip.fielders, _bip.fielding, tuning, _bip.fielding.fielder_index)
 	_set_phase(Phase.BALL_IN_PLAY)
+	_hud.show_prompt(_hud_prompt_suffix())
 
 
 func _process_ball_in_play() -> void:
@@ -265,18 +281,52 @@ func _process_ball_in_play() -> void:
 		for base in [1, 2, 3, 4]:
 			if Input.is_action_just_pressed(StringName("throw_base_%d" % base)):
 				_throw_choice = base
-	if _throw_base == UNDECIDED and (not _bip.fielding.has_fielder() or t >= _bip.fielding.ready_time):
-		var base := _bip.ai_throw_target()
-		if not user_is_batting() and _throw_choice != -1:
-			base = _throw_choice
-		_decide_throw(base)
-	_view.show_play(_bip, t, _throw_base if _throw_base != UNDECIDED else -1, _outcome)
+	if _live != null and not _live.is_secured():
+		_step_live_fielding(t)
+	if _throw_base == UNDECIDED:
+		if _live != null:
+			if _live.is_secured():
+				var ready := _bip.fielding.ready_time
+				if t >= ready and (_throw_choice != -1 or t >= ready + THROW_DECISION_WINDOW):
+					# Holding the ball costs time: the throw leaves when decided.
+					_bip.fielding.ready_time = maxf(ready, t)
+					_decide_throw(_throw_choice if _throw_choice != -1 else _bip.ai_throw_target())
+		elif not _bip.fielding.has_fielder() or t >= _bip.fielding.ready_time:
+			_decide_throw(_bip.ai_throw_target())
+	_view.show_play(_bip, t, _throw_base if _throw_base != UNDECIDED else -1, _outcome, _live)
+	_view.set_field_focus(_field_focus(t))
 	if _outcome == null:
 		return
 	var skip := Input.is_action_just_pressed(&"swing_contact") or Input.is_action_just_pressed(&"pitch_primary")
 	if t >= _settle_time + PLAY_SETTLE_PAUSE or (skip and t > _bip.fielding.ready_time + 0.3):
 		state.apply_play(_outcome)
 		_enter_pre_pitch()
+
+
+func _step_live_fielding(t: float) -> void:
+	if Input.is_action_just_pressed(&"switch_fielder"):
+		_live.switch_to_nearest()
+	if Input.is_action_just_pressed(&"dive"):
+		_dive_requested = true
+	var move := Input.get_vector(&"aim_left", &"aim_right", &"aim_down", &"aim_up")
+	# Fixed steps keep the authoritative result independent of frame rate.
+	_live_accumulator = t - _live.time
+	while _live_accumulator >= tuning.sim_step and not _live.is_secured():
+		_live.step(tuning.sim_step, move, _dive_requested)
+		_dive_requested = false
+		_live_accumulator -= tuning.sim_step
+	if _live.is_secured():
+		_bip.set_fielding(_live.result)
+		_log({"fielded": _live.result.fielder_id, "time": snappedf(_live.result.secure_time, 0.01), "in_air": _live.result.caught_in_air, "dive": _live.result.is_dive, "missed_dives": _live.dives_missed})
+
+
+func _field_focus(t: float) -> Vector3:
+	var ball := _bip.trajectory.position_at(minf(t, _bip.fielding.secure_time if _live == null else t))
+	var focus := Vector3(ball.x, 0.0, ball.z)
+	if _live != null:
+		var controlled := _live.positions[_live.controlled] if _live.controlled >= 0 else focus
+		focus = focus.lerp(controlled, 0.5)
+	return focus.lerp(Vector3(0.0, 0.0, -30.0), 0.35)
 
 
 func _decide_throw(base: int) -> void:
@@ -359,7 +409,10 @@ func _hud_prompt_suffix() -> String:
 			else:
 				base = "Aim: WASD / L-stick    Pitch: Q E / LB RB    Start meter: Space / A"
 		Phase.BALL_IN_PLAY:
-			base = "Skip: J / A"
+			if _outcome != null:
+				base = "Skip: J / A"
+			elif not user_is_batting():
+				base = "Run: WASD / L-stick   Dive: Shift / RT   Switch: F / LT   Throw 1st-2nd-3rd-home: 1-4 / B Y X A"
 	return "%s\n[%s]   Tab/Back: switch side   F1: debug   F5: restart" % [base, role]
 
 

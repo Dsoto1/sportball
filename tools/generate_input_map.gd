@@ -21,6 +21,8 @@ const BINDINGS := {
 	&"throw_base_2": [["key", KEY_2], ["button", JOY_BUTTON_Y]],
 	&"throw_base_3": [["key", KEY_3], ["button", JOY_BUTTON_X]],
 	&"throw_base_4": [["key", KEY_4], ["button", JOY_BUTTON_A]],
+	&"dive": [["key", KEY_SHIFT], ["key", KEY_L], ["axis", JOY_AXIS_TRIGGER_RIGHT, 1.0]],
+	&"switch_fielder": [["key", KEY_F], ["axis", JOY_AXIS_TRIGGER_LEFT, 1.0]],
 	&"switch_side": [["key", KEY_TAB], ["button", JOY_BUTTON_BACK]],
 	&"toggle_debug": [["key", KEY_F1], ["button", JOY_BUTTON_RIGHT_STICK]],
 	&"restart_match": [["key", KEY_F5], ["button", JOY_BUTTON_START]],

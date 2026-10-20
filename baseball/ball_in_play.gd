@@ -2,8 +2,10 @@ class_name BallInPlay
 extends RefCounted
 ## One ball in play from contact to outcome, split in two stages so a human
 ## defender can choose the throw between them:
-##   create(): trajectory -> fielder intercept -> runner commitments
+##   create(): trajectory -> projected fielder intercept -> runner commitments
 ##   resolve(throw_base): single throw -> outs, runs, final bases
+## When a human steers a fielder, the projection is replaced by the result
+## of LiveFielding via set_fielding() before resolve().
 
 var contact: ContactResult
 var trajectory: BallTrajectory
@@ -29,6 +31,15 @@ static func create(p_contact: ContactResult, state: MatchState, p_tuning: Baseba
 	if not bip.is_home_run():
 		bip.plans = RunnerResolver.plan(bip.bases_before, bip.batter_id, bip.fielding, bip.outs_before, p_tuning)
 	return bip
+
+
+## Replaces the projected fielding with what actually happened on the field
+## and lets runners re-read the play (e.g. a fly the projection called a
+## catch was dropped).
+func set_fielding(actual: FieldingResult) -> void:
+	fielding = actual
+	if not is_home_run():
+		plans = RunnerResolver.plan(bases_before, batter_id, fielding, outs_before, tuning)
 
 
 func is_home_run() -> bool:

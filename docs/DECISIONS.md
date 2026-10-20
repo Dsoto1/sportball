@@ -40,13 +40,19 @@ Reason: Keeps the outcome fully authoritative and testable while still leaving a
 
 Affected systems: fielding, base running, AI, MatchDirector. Relay throws, double plays, rundowns and mid-play runner decisions need this model extended (see Phase 0 report).
 
-## 2026-10-20 - Fielder Routes Are Automatic in Phase 0
+## 2026-10-20 - Fielder Routes Are Automatic in Phase 0 (superseded)
 
-Decision: Fielders take the optimal intercept route; the human chooses the throw target. No manual fielder movement yet.
+Decision: Fielders take the optimal intercept route; the human chooses the throw target.
 
-Reason: Proves the authoritative loop first. This conflicts with "do not automate the fun out of defense" and is the top Phase 0 follow-up.
+Superseded the same day by "Human Steers the Fielder".
 
-Affected systems: fielding, input, MatchDirector.
+## 2026-10-20 - Human Steers the Fielder
+
+Decision: On defense the player steers one fielder (initially whoever the projection says reaches the ball first; `switch_fielder` hands control to the fielder nearest the ball). `LiveFielding` steps all fielders at the fixed sim step from movement intents: the controlled fielder follows the stick, AI teammates run projected routes. Catching is automatic when the ball is within reach and low enough; `dive` extends reach once, and a missed dive leaves the fielder down for `dive_recovery`. While a fielder is controlled, AI teammates cannot catch on the fly (they only back up), so the player's route decides fly balls. Runners re-read the play from the actual fielding result. A human may hold the ball up to 0.6 s before the AI throw is used; holding delays the throw. A landing-spot ring shows where a fly will come down.
+
+Reason: Owner decision. Keeps defense skill-based ("do not automate the fun out of defense") while trajectory, catch, throw and base rules stay authoritative and deterministic for a given input sequence.
+
+Affected systems: fielding, BallInPlay, input (`dive`, `switch_fielder`), MatchDirector, MatchView, playtest bot. AI-vs-AI simulation still uses the instant projection (equivalent to all-AI LiveFielding; covered by tests).
 
 ## 2026-10-20 - Input Map Generated From a Table
 

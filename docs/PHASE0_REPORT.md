@@ -55,10 +55,13 @@ These are ranked by how much they undercut the pillars. I could not
 playtest with a human. Everything here comes from the sims, the playtest
 bot, screenshots and reading the timings.
 
-1. **Defense is automated.** Fielders always run the optimal intercept
-   route; the human only picks the throw. This directly contradicts "do not
-   automate the fun out of defense." It is the most important next step,
-   and it needs a decision (below).
+1. **Steered fielding is new and untuned.** *(Update: the player now
+   steers the fielder; see DECISIONS.)* AI fielders run perfect routes, so a
+   human is held to an AI standard. A crude bot steering at the landing
+   spot made far fewer catches than the AI (8 fly catches in 29 plays) and
+   gave up 17 runs. Expect to tune fielder speed, reach, the landing hint
+   and the first-step feel with real players. There are no jumping catches
+   at the wall yet, and auto-switching only happens on request.
 2. **Only one throw per play.** That means no double plays, relays,
    cutoffs or rundowns. Runners also commit at contact and never react to
    where the ball actually goes. Defense therefore has no second act.
@@ -84,15 +87,9 @@ bot, screenshots and reading the timings.
 
 ## Decisions needed (they affect architecture or feel)
 
-1. **Fielding control model.** Choose one:
-   - (a) The human steers the nearest fielder. This is the classic arcade
-     model. It requires a *live* fielding result driven by player input
-     instead of the precomputed intercept, though trajectory, throws and
-     runner rules stay authoritative.
-   - (b) Keep auto-routes but add timing inputs (dive/jump/catch press
-     windows).
-
-   Recommendation: (a), with (b)'s catch-timing press layered on top.
+1. ~~**Fielding control model.**~~ Decided: the human steers the fielder,
+   and it is implemented (`baseball/fielding/live_fielding.gd`). A
+   catch-timing press could still be layered on top.
 2. **Batting input model.** Choose one:
    - The current approach: aim a cursor at the pitch plus swing timing. It
      is deep, but the read may be too hard (weak point 6).
@@ -104,12 +101,11 @@ bot, screenshots and reading the timings.
    standard walk-off and extra innings. Decide which pace and spectacle rules
    the league adds (shot clock, tie-break format, etc.) before Phase 1
    locks MatchState.
-4. **`visual_reference_concept.png`** is referenced by the brief but was not
-   provided. Add it to the repo (via Git LFS) before Phase 2 art work.
+4. ~~**Visual reference.**~~ Added as `docs/visual_reference_concept.jpg`.
 
 ## Suggested next increments (still Phase 0/1, no new systems)
 
-1. Player-controlled fielder (decision 1) plus throw accuracy/bobble.
+1. Tune steered fielding with people; add throw accuracy/bobble.
 2. Multi-throw plays: double plays, relays and live runner decisions
    (`runner_advance` / `runner_retreat`).
 3. Timestamped swing input, a hit pause and a bat swing placeholder.

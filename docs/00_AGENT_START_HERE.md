@@ -24,7 +24,7 @@ Inspirations are creative shorthand only. Do not clone protected teams, characte
 14. `DECISIONS.md`
 15. `PHASE0_REPORT.md` (current state and weak spots)
 
-Review `visual_reference_concept.png` (not yet in the repository) as directional mood reference, not literal final UI.
+Review `visual_reference_concept.jpg` as directional mood reference, not literal final UI.
 
 ## Locked Starting Decisions
 

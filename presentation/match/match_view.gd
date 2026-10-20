@@ -12,7 +12,7 @@ const BATTER_SPOT := Vector3(-0.85, 0.0, 0.15)
 const CAMERA_SPOTS := {
 	CameraMode.BAT: [Vector3(0.3, 3.2, 6.5), Vector3(0.0, 0.8, -18.0)],
 	CameraMode.PITCH: [Vector3(0.4, 2.7, -24.5), Vector3(0.0, 0.9, 0.0)],
-	CameraMode.FIELD: [Vector3(0.0, 42.0, 26.0), Vector3(0.0, 0.0, -42.0)],
+	CameraMode.FIELD: [Vector3(0.0, 30.0, 40.0), Vector3.ZERO],  # offset from the field focus
 }
 
 var tuning: BaseballTuning
@@ -33,6 +33,9 @@ var _trajectory_line: MeshInstance3D
 var _landing_marker: MeshInstance3D
 var _intercept_marker: MeshInstance3D
 var _pitch_marker: MeshInstance3D
+var _control_ring: MeshInstance3D
+var _landing_hint: MeshInstance3D
+var _field_focus := Vector3(0.0, 0.0, -42.0)
 
 
 func setup(p_tuning: BaseballTuning) -> void:
@@ -61,6 +64,11 @@ func set_camera_mode(mode: CameraMode) -> void:
 	_camera_mode = mode
 
 
+## Point the ball-in-play camera tracks.
+func set_field_focus(point: Vector3) -> void:
+	_field_focus = point
+
+
 func set_debug_visible(value: bool) -> void:
 	debug_visible = value
 	_debug_root.visible = value
@@ -86,6 +94,9 @@ func reset_for_pitch(state: MatchState) -> void:
 	_ball.position = Vector3(tuning.release_side, tuning.release_height, -tuning.release_distance)
 	_update_shadow()
 	_pitch_marker.visible = false
+	_control_ring.visible = false
+	_landing_hint.visible = false
+	_field_focus = Vector3(0.0, 0.0, -42.0)
 	_zone.visible = true
 
 
@@ -112,12 +123,14 @@ func set_cursor(at: Vector2, outer_radius: float, inner_radius: float, color: Co
 
 
 ## Draws a ball in play at contact-relative time t. throw_base/outcome may
-## be unknown (-1 / null) until the defense has decided.
-func show_play(bip: BallInPlay, t: float, throw_base: int, outcome: PlayOutcome) -> void:
+## be unknown (-1 / null) until the defense has decided. With a
+## LiveFielding, fielder positions come from it instead of the projection.
+func show_play(bip: BallInPlay, t: float, throw_base: int, outcome: PlayOutcome, live: LiveFielding = null) -> void:
 	_zone.visible = false
 	var fielding := bip.fielding
+	var settled := live == null or live.is_secured()
 	# Ball
-	if not fielding.has_fielder() or t < fielding.secure_time:
+	if not settled or not fielding.has_fielder() or t < fielding.secure_time:
 		_ball.position = bip.trajectory.position_at(t)
 	elif throw_base > 0:
 		var release := fielding.ready_time + tuning.throw_release_time
@@ -133,11 +146,20 @@ func show_play(bip: BallInPlay, t: float, throw_base: int, outcome: PlayOutcome)
 	# Fielders: the authoritative fielder runs to the intercept; a teammate
 	# covers the throw base; others drift toward the ball (cosmetic).
 	var cover := _cover_index(throw_base, fielding.fielder_index)
+	_control_ring.visible = live != null and not live.is_secured() and live.controlled >= 0
+	# Gameplay aid for the human fielder: where a fly ball will come down.
+	_landing_hint.visible = live != null and not settled and bip.trajectory.is_airborne_at(t)
+	_landing_hint.position = bip.trajectory.landing_point + Vector3.UP * 0.06
 	for i in _fielders.size():
 		var start := tuning.fielder_spots[i]
 		var actor := _fielders[i]
 		actor.set_crouch(false)
-		if i == fielding.fielder_index:
+		if live != null:
+			actor.position = live.positions[i]
+			actor.face(_ball.position)
+			if i == live.controlled:
+				_control_ring.position = live.positions[i] + Vector3.UP * 0.05
+		elif i == fielding.fielder_index:
 			var u := clampf((t - tuning.fielder_reaction) / maxf(fielding.secure_time - tuning.fielder_reaction, 0.01), 0.0, 1.0)
 			var goal := Vector3(fielding.secure_point.x, 0.0, fielding.secure_point.z)
 			actor.position = start.lerp(goal.move_toward(start, tuning.catch_reach), u)
@@ -160,10 +182,14 @@ func show_play(bip: BallInPlay, t: float, throw_base: int, outcome: PlayOutcome)
 			for out in outcome.outs:
 				if out["runner_id"] == p.runner_id and t >= out["time"]:
 					actor.visible = false
-	if fielding.caught_in_air and t >= fielding.secure_time:
-		var batter: ActorView = _runners.get(bip.batter_id)
-		if batter != null:
+	var batter: ActorView = _runners.get(bip.batter_id)
+	if batter != null:
+		if settled and fielding.caught_in_air and t >= fielding.secure_time:
 			batter.visible = false
+		elif not settled and not bip.plans.any(func(p: RunnerPlan) -> bool: return p.is_batter):
+			# Projection expects a catch; the batter still runs until it happens.
+			var run := maxf(t - tuning.batter_start_delay, 0.0) * tuning.runner_speed
+			batter.position = Vector3.ZERO.move_toward(FieldLayout.base_position(FieldLayout.FIRST), run)
 	if bip.is_home_run():
 		var hr_plans: Array = outcome.advances if outcome != null else []
 		for advance in hr_plans:
@@ -206,9 +232,12 @@ func _process(delta: float) -> void:
 	var spot: Array = CAMERA_SPOTS[_camera_mode]
 	var weight := 1.0 - exp(-delta * 6.0)
 	var goal: Vector3 = spot[0]
+	var target: Vector3 = spot[1]
+	if _camera_mode == CameraMode.FIELD:
+		goal += _field_focus
+		target += _field_focus
 	_camera.position = _camera.position.lerp(goal, weight)
 	var forward := -_camera.global_transform.basis.z
-	var target: Vector3 = spot[1]
 	var wanted := (target - _camera.position).normalized()
 	var look := forward.slerp(wanted, weight)
 	_camera.look_at(_camera.position + look, Vector3.UP)
@@ -252,6 +281,11 @@ func _clear_runners() -> void:
 
 func _update_shadow() -> void:
 	_ball_shadow.position = Vector3(_ball.position.x, 0.03, _ball.position.z)
+	# Readability: the ball grows with camera distance (presentation only).
+	if _camera != null:
+		var grow := clampf(_camera.position.distance_to(_ball.position) / 14.0, 1.0, 5.0)
+		_ball.scale = Vector3.ONE * grow
+		_ball_shadow.scale = Vector3(grow, 1.0, grow)
 
 
 func _build_zone() -> void:
@@ -275,6 +309,16 @@ func _build_zone() -> void:
 		bar.position = spec[1]
 		bar.material_override = _unshaded(color)
 		_zone.add_child(bar)
+	_control_ring = _ring(Color(1.0, 0.85, 0.2))
+	_control_ring.rotation_degrees.x = 0.0
+	_control_ring.scale = Vector3.ONE * 1.1
+	_control_ring.visible = false
+	add_child(_control_ring)
+	_landing_hint = _ring(Color(1.0, 1.0, 1.0, 0.7))
+	_landing_hint.rotation_degrees.x = 0.0
+	_landing_hint.scale = Vector3.ONE * tuning.catch_reach * 1.5
+	_landing_hint.visible = false
+	add_child(_landing_hint)
 	_cursor = _ring(Color(1.0, 0.85, 0.2))
 	_cursor_inner = _ring(Color(1.0, 0.95, 0.6))
 	_zone.add_child(_cursor)

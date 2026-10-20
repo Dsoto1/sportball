@@ -28,14 +28,19 @@ choose throws in the bottom half. Tab / Back switches teams.
 | Power swing (harder, smaller window) | K or right click | X |
 | Pick pitch | Q / E | LB / RB |
 | Start meter, then release | Space, J or left click | A |
+| Run with the fielder (yellow ring) | WASD or arrows | Left stick |
+| Dive | Shift or L | RT |
+| Switch to fielder nearest the ball | F | LT |
 | Throw to 1st / 2nd / 3rd / home | 1 / 2 / 3 / 4 | B / Y / X / A |
 | Skip to next pitch after a play | J | A |
 | Switch team | Tab | Back |
 | Debug overlay | F1 | R-stick click |
 | New match | F5 | Start |
 
-If you don't pick a throw before the fielder has the ball, the AI throw is
-used. Fielders run their routes automatically in Phase 0 (see the report).
+On defense you steer the fielder who can reach the ball first; a white
+ring marks where a fly ball will land. Press a throw button any time
+(even before the catch). If you hold the ball for more than 0.6 s, the AI
+throw is used.
 
 Bindings live in `project.godot` as semantic actions. To change them, edit
 the table in `tools/generate_input_map.gd` and run
@@ -61,7 +66,7 @@ resources in `data/pitches/`.
 ```sh
 godot --headless --path . -s res://tools/sim_report.gd -- 100 1           # AI-vs-AI rates over 100 matches
 godot --headless --path . -s res://tools/launch_angle_report.gd           # hit rate by launch angle
-godot --headless --path . --fixed-fps 60 -s res://tools/playtest_bot.gd -- 900   # drive the real scene with fake input
+godot --headless --path . --fixed-fps 60 -s res://tools/playtest_bot.gd -- 900   # drive the real scene with fake input (append `"" home` to field first)
 ```
 
 `playtest_bot.gd` can also save screenshots when run with a display:

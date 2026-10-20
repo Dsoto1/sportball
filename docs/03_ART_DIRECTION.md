@@ -53,4 +53,4 @@ Team identity should dominate. Stadium and UI palettes support teams rather than
 
 ## Reference Image
 
-visual_reference_concept.png establishes energy, character exaggeration, stadium spectacle, broadcast graphics, and roster personality. It is a mood board, not final composition or UI specification.
+`visual_reference_concept.jpg` establishes energy, character exaggeration, stadium spectacle, broadcast graphics, and roster personality. It is a mood board, not final composition or UI specification. Team, city and character names shown in it are placeholders, not approved content.
