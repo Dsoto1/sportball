@@ -156,3 +156,11 @@ Decision: On offense, holding a base button (the same 1-4 / B Y X A used for thr
 Reason: Owner request; reuses the existing base buttons so there are no new verbs to learn.
 
 Affected systems: LivePlay (offense intents), MatchDirector, MatchView, playtest bot, README, tests.
+
+## 2026-10-20 - Procedural Placeholder Animation
+
+Decision: Until the canonical rig exists (Phase 2), bodies are animated procedurally. `ActorView` has a small rig (body lean, bob, sideways sway, one arm with a glove) and poses: IDLE, RUN, TURN, CHASE, TAG, THROW, DOWN, SLIDE. `PlayAnimator` is a pure, testable presentation reader of `LivePlay`: it picks each runner's and the holder's pose from reversals, rundown events, holder movement, tag-out and throw events, and close plays at a bag. It also picks the actor who just threw. `MatchView` applies the poses, draws a held ball in the holder's glove, keeps out runners visible while they go down, and pulls the field camera in during a rundown. Nothing feeds back into the play.
+
+Reason: Owner request for rundown animation; keeps "AnimationTree/state machines must not contain baseball rules" by making the animator a read-only consumer.
+
+Affected systems: ActorView, new `presentation/match/play_animator.gd`, MatchView (pose pass, rundown camera), tests.

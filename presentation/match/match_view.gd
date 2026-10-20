@@ -36,6 +36,10 @@ var _pitch_marker: MeshInstance3D
 var _control_ring: MeshInstance3D
 var _landing_hint: MeshInstance3D
 var _field_focus := Vector3(0.0, 0.0, -42.0)
+var _animator := PlayAnimator.new()
+var _last_actor_pos := {}
+var _rundown_focus := Vector3.ZERO
+var _rundown_zoom := false
 
 
 func setup(p_tuning: BaseballTuning) -> void:
@@ -78,7 +82,11 @@ func set_debug_visible(value: bool) -> void:
 func reset_for_pitch(state: MatchState) -> void:
 	var fielding_color := HOME_COLOR if state.fielding_team() == MatchState.HOME else AWAY_COLOR
 	var batting_color := AWAY_COLOR if state.batting_team() == MatchState.AWAY else HOME_COLOR
+	_animator = PlayAnimator.new()
+	_last_actor_pos.clear()
+	_rundown_zoom = false
 	for i in _fielders.size():
+		_fielders[i].reset_pose()
 		_fielders[i].set_look(fielding_color, String(tuning.fielder_ids[i]).to_upper())
 		_fielders[i].position = tuning.fielder_spots[i]
 		_fielders[i].face(Vector3.ZERO)
@@ -208,6 +216,53 @@ func show_play(bip: BallInPlay, t: float, play: LivePlay, outcome: PlayOutcome, 
 			trot.start_time = tuning.batter_start_delay
 			trot.arrival_time = RunnerResolver.arrival_between(trot.start_base, trot.target_base, trot.start_time, tuning)
 			actor.position = trot.position_at(t)
+			actor.animate(ActorView.Pose.RUN, get_process_delta_time(), tuning.runner_speed * 0.7)
+	_animate_play(play, fielding, holder, covers, cutoff)
+
+
+## Poses every body for this frame and puts a held ball in the glove.
+func _animate_play(play: LivePlay, fielding: FieldingResult, holder: int, covers: Dictionary, cutoff: int) -> void:
+	var delta := maxf(get_process_delta_time(), 1.0 / 240.0)
+	if play == null:
+		return
+	_animator.update(play)
+	var thrower := _actor_for_cover(_animator.thrower_cover, fielding, covers, cutoff)
+	for i in _fielders.size():
+		var actor := _fielders[i]
+		var moved: float = actor.position.distance_to(_last_actor_pos.get(actor, actor.position)) / delta
+		_last_actor_pos[actor] = actor.position
+		if i == thrower:
+			actor.animate(ActorView.Pose.THROW, delta, 0.0, false, _animator.thrower_progress)
+		elif i == holder:
+			actor.animate(_animator.holder_pose, delta, _animator.holder_speed)
+		else:
+			actor.animate(ActorView.Pose.RUN if moved > 0.8 else ActorView.Pose.IDLE, delta, moved)
+	if holder >= 0 and play.ball == LivePlay.Ball.HELD:
+		_ball.position = _fielders[holder].hand_position()
+		_update_shadow()
+	for r in play.runners:
+		var actor: ActorView = _runners.get(r.id)
+		if actor == null:
+			continue
+		var cue := _animator.runner_cue(play, r)
+		actor.visible = cue["visible"]
+		actor.animate(cue["pose"], delta, cue["speed"], cue["juke"])
+	_rundown_zoom = _animator.rundown_active()
+	if _rundown_zoom:
+		var r := play.runner(_animator.rundown_runner)
+		var ball := _ball.position
+		_rundown_focus = play.runner_position(r).lerp(Vector3(ball.x, 0.0, ball.z), 0.5)
+
+
+func _actor_for_cover(cover: int, fielding: FieldingResult, covers: Dictionary, cutoff: int) -> int:
+	match cover:
+		-2:
+			return -1
+		-1:
+			return fielding.fielder_index
+		LivePlay.CUTOFF:
+			return cutoff
+	return covers.get(cover, -1)
 
 
 func show_debug_play(bip: BallInPlay) -> void:
@@ -240,8 +295,12 @@ func _process(delta: float) -> void:
 	var goal: Vector3 = spot[0]
 	var target: Vector3 = spot[1]
 	if _camera_mode == CameraMode.FIELD:
-		goal += _field_focus
-		target += _field_focus
+		# A rundown pulls the camera in tight on the runner and the ball.
+		var focus := _rundown_focus if _rundown_zoom else _field_focus
+		if _rundown_zoom:
+			goal *= 0.45
+		goal += focus
+		target += focus
 	_camera.position = _camera.position.lerp(goal, weight)
 	var forward := -_camera.global_transform.basis.z
 	var wanted := (target - _camera.position).normalized()

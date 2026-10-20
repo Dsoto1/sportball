@@ -73,9 +73,12 @@ bot, screenshots and reading the timings.
    covers first when the first baseman cuts). Triples are now very rare
    (~0 in 100 sims); `runner_take_base_margin` and `cutoff_min_throw` are
    the knobs. Per-runner orders: hold a base button with advance/retreat.
-   Still missing: visible rundown animation
-   (fielders slide; there is no chase pose). A rundown that runs past
-   `max_play_time` ends with a tag.
+   Rundowns are animated with a procedural capsule rig: lean, run bob,
+   plant-and-turn, juke, chase with the ball raised, tag swipe, throw,
+   slide, and runners going down when out. The camera pulls in on a
+   rundown. These are placeholder poses, not real animation; they read at
+   close range but are subtle from the high field camera. A rundown that
+   runs past `max_play_time` ends with a tag.
 3. **No triples or inside-the-park home runs.** Runners only take a base
    when they beat a *perfect* throw by 0.35 s. Wall balls get cut off fast,
    and there is no throw inaccuracy or bobble to punish defenders.
@@ -121,7 +124,7 @@ bot, screenshots and reading the timings.
 ## Suggested next increments (still Phase 0/1, no new systems)
 
 1. Tune steered fielding with people; add throw accuracy/bobble.
-2. Rundown presentation (chase poses, tag animation).
+2. Replace the procedural poses with real rigged animation (Phase 2).
 3. Timestamped swing input, a hit pause and a bat swing placeholder.
 4. Retune dive frequency, extra-base aggression and infield depth with the
    sim and launch-angle reports.
