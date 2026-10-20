@@ -5,9 +5,7 @@ extends RefCounted
 ## plan(): every runner commits to a target base the moment the ball is
 ## read. They take an extra base only if they beat the projected throw to
 ## it by a safety margin; forced runners must advance.
-## resolve(): the defense makes one throw. A runner heading to that base is
-## out if the ball beats them (plus tag time when not forced). Third-out
-## rules decide which runs count.
+## Throws, outs and third-out run rules are resolved by ThrowPlay.
 
 
 static func plan(bases: Array[StringName], batter_id: StringName, fielding: FieldingResult, outs_before: int, tuning: BaseballTuning) -> Array[RunnerPlan]:
@@ -54,55 +52,19 @@ static func plan(bases: Array[StringName], batter_id: StringName, fielding: Fiel
 	return plans
 
 
+## Resolves a play with a fixed list of throw targets (each from the base
+## the previous throw went to). Interactive play drives ThrowPlay leg by leg.
+static func resolve_throws(plans: Array[RunnerPlan], batter_id: StringName, fielding: FieldingResult, throws: Array[int], outs_before: int, launch_angle: float, tuning: BaseballTuning) -> PlayOutcome:
+	var play := ThrowPlay.new(plans, batter_id, fielding, outs_before, launch_angle, tuning)
+	for base in throws:
+		if base > 0 and base != play.holder_base() and play.can_throw():
+			play.throw_to(base)
+	return play.outcome()
+
+
 static func resolve(plans: Array[RunnerPlan], batter_id: StringName, fielding: FieldingResult, throw_base: int, outs_before: int, launch_angle: float, tuning: BaseballTuning) -> PlayOutcome:
-	var outcome := PlayOutcome.new()
-	outcome.batter_id = batter_id
-	var outs := outs_before
-	if fielding.caught_in_air:
-		outcome.outs.append({"runner_id": batter_id, "base": FieldLayout.HOME, "kind": PlayOutcome.OUT_CATCH, "time": fielding.secure_time})
-		outs += 1
-
-	var out_plan: RunnerPlan = null
-	var out_time := INF
-	var out_kind := &""
-	if throw_base > 0 and outs < MatchState.OUTS_PER_HALF:
-		outcome.throw_base = throw_base
-		outcome.throw_arrival = ThrowModel.arrival_at_base(fielding, throw_base, tuning)
-		var targeting := plans.filter(func(p: RunnerPlan) -> bool: return p.is_moving() and p.target_base == throw_base)
-		targeting.sort_custom(func(a: RunnerPlan, b: RunnerPlan) -> bool: return a.arrival_time < b.arrival_time)
-		for p: RunnerPlan in targeting:
-			var needed := outcome.throw_arrival + (0.0 if p.forced else tuning.tag_time)
-			if needed < p.arrival_time:
-				out_plan = p
-				out_time = needed
-				out_kind = PlayOutcome.OUT_FORCE if p.forced else PlayOutcome.OUT_TAG
-				break
-	if out_plan != null:
-		outcome.outs.append({"runner_id": out_plan.runner_id, "base": out_plan.target_base, "kind": out_kind, "time": out_time})
-		outs += 1
-
-	var inning_over := outs >= MatchState.OUTS_PER_HALF
-	var last_out_kind: StringName = outcome.outs[-1]["kind"] if not outcome.outs.is_empty() else &""
-	var last_out_time: float = outcome.outs[-1]["time"] if not outcome.outs.is_empty() else INF
-	var scoring := plans.filter(func(p: RunnerPlan) -> bool: return p.target_base == FieldLayout.SCORED and p != out_plan)
-	scoring.sort_custom(func(a: RunnerPlan, b: RunnerPlan) -> bool: return a.arrival_time < b.arrival_time)
-	for p: RunnerPlan in scoring:
-		if inning_over:
-			# No run scores on a third out that is a force or the batter's catch;
-			# on a tag out, only runners who crossed before the tag count.
-			if last_out_kind != PlayOutcome.OUT_TAG or p.arrival_time >= last_out_time:
-				continue
-		outcome.runs.append(p.runner_id)
-
-	for p in plans:
-		var safe := p != out_plan
-		outcome.advances.append({"runner_id": p.runner_id, "from": p.start_base, "to": p.target_base, "safe": safe})
-		if safe and p.target_base >= FieldLayout.FIRST and p.target_base <= FieldLayout.THIRD:
-			outcome.final_bases[p.target_base - 1] = p.runner_id
-		if p.is_batter:
-			outcome.batter_base = p.target_base if safe else 0
-	outcome.kind = _classify(outcome, fielding, out_plan, launch_angle)
-	return outcome
+	var throws: Array[int] = [throw_base]
+	return resolve_throws(plans, batter_id, fielding, throws, outs_before, launch_angle, tuning)
 
 
 ## Outcome for a ball that left the park: everyone scores.
@@ -154,24 +116,3 @@ static func _choose_target(p: RunnerPlan, min_target: int, limit: int, fielding:
 		else:
 			break
 	return target
-
-
-static func _classify(outcome: PlayOutcome, fielding: FieldingResult, out_plan: RunnerPlan, launch_angle: float) -> StringName:
-	if fielding.caught_in_air:
-		if launch_angle >= 50.0:
-			return PlayOutcome.KIND_POP_OUT
-		if launch_angle < 15.0:
-			return PlayOutcome.KIND_LINE_OUT
-		return PlayOutcome.KIND_FLY_OUT
-	if outcome.batter_base == 0:
-		return PlayOutcome.KIND_GROUND_OUT
-	if out_plan != null:
-		return PlayOutcome.KIND_FIELDERS_CHOICE
-	match outcome.batter_base:
-		1:
-			return PlayOutcome.KIND_SINGLE
-		2:
-			return PlayOutcome.KIND_DOUBLE
-		3:
-			return PlayOutcome.KIND_TRIPLE
-	return PlayOutcome.KIND_INSIDE_PARK_HR

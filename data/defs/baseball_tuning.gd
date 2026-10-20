@@ -125,6 +125,11 @@ extends Resource
 ## Extra seconds per meter squared: long throws lose carry and need an arc.
 @export var throw_long_penalty: float = 0.00012
 @export var throw_arc_height: float = 2.0
+## Catch-to-release time for a fielder receiving a throw and throwing on
+## (the double-play pivot).
+@export var relay_release_time: float = 0.45
+## A fielder this close to the target base runs it there instead of throwing.
+@export var unassisted_distance: float = 5.0
 
 @export_group("Base Running")
 @export var runner_speed: float = 8.0

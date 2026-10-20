@@ -46,6 +46,24 @@ func is_home_run() -> bool:
 	return trajectory.result == BallTrajectory.Result.HOME_RUN
 
 
+## Throw sequence for the defense once the ball is secured.
+func start_throws() -> ThrowPlay:
+	return ThrowPlay.new(plans, batter_id, fielding, outs_before, contact.launch_angle, tuning)
+
+
+## Resolves the whole play with the AI making every throw decision.
+func resolve_ai() -> PlayOutcome:
+	if is_home_run():
+		return RunnerResolver.home_run(bases_before, batter_id)
+	var play := start_throws()
+	while true:
+		var base := AiDefense.next_throw(play)
+		if base == AiDefense.NO_THROW:
+			break
+		play.throw_to(base)
+	return play.outcome()
+
+
 func ai_throw_target() -> int:
 	if is_home_run():
 		return AiDefense.NO_THROW
@@ -66,8 +84,8 @@ func settle_time(outcome: PlayOutcome) -> float:
 			trot = maxf(trot, RunnerResolver.arrival_between(advance["from"], FieldLayout.SCORED, tuning.batter_start_delay, tuning))
 		return maxf(trajectory.end_time(), trot)
 	var t := fielding.secure_time
-	if outcome.throw_arrival != INF:
-		t = maxf(t, outcome.throw_arrival)
+	for leg in outcome.throws:
+		t = maxf(t, leg["arrival"])
 	for p in plans:
 		t = maxf(t, p.arrival_time)
 	return t

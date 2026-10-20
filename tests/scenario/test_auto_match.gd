@@ -47,3 +47,5 @@ func test_outcome_rates_are_baseball_shaped() -> void:
 	check(runs_per_team > 1.0 and runs_per_team < 9.0, "runs per team per game %.2f" % runs_per_team)
 	check(totals["home_runs"] > 0, "home runs happen")
 	check(totals["ground_outs"] > 0 and totals["air_outs"] > 0, "both ground and air outs")
+	var dp_per_team: float = totals["double_plays"] / (2.0 * SEEDS)
+	check(dp_per_team > 0.2 and dp_per_team < 2.0, "double plays per team per game %.2f" % dp_per_team)

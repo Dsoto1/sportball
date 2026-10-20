@@ -38,7 +38,7 @@ Decision: `BallInPlay.create()` computes trajectory, the first fielder to reach 
 
 Reason: Keeps the outcome fully authoritative and testable while still leaving a real-time decision (the throw) to a human defender.
 
-Affected systems: fielding, base running, AI, MatchDirector. Relay throws, double plays, rundowns and mid-play runner decisions need this model extended (see Phase 0 report).
+Affected systems: fielding, base running, AI, MatchDirector. Superseded in part by "Multi-Throw Plays" (the single throw became a chain).
 
 ## 2026-10-20 - Fielder Routes Are Automatic in Phase 0 (superseded)
 
@@ -101,3 +101,13 @@ Decision: Human swings are captured in `MatchDirector._input` and stamped with `
 Reason: Per-frame polling read every swing 0–1 frame late (bias ~8 ms, worst ~17 ms at 60 fps), about a third of the ±52 ms power window. The new path is unbiased with ±½ frame jitter. Godot 4.7.2 input events carry no timestamps, so this is the floor without a native input extension.
 
 Affected systems: MatchDirector (input, pitch flight clock), new `app/swing_timing.gd`, BaseballTuning, playtest bot (sends real InputEventAction for swings), tests.
+
+## 2026-10-20 - Multi-Throw Plays
+
+Decision: After the ball is secured, `ThrowPlay` resolves the defense one leg at a time, up to 3 legs. Each leg goes to a base. The first runner heading there is out if the ball beats them, with a tag required unless the force still holds. The receiver can throw again after `relay_release_time`, plus tag time if they just tagged. A fielder within `unassisted_distance` of the target base takes it there himself. A force holds only while every runner behind in the force chain is alive, so after the batter is out at first, second needs a tag. The third-out rules apply to the third out in time order. Runners still commit when the ball is read and do not react to throws.
+
+The AI picks each leg by trying every base on a copy of the play with one throw of look-ahead, scoring outs against runs with a small preference for retiring lead runners. Humans press base buttons; presses are buffered, so a double play can be called before the catch. With no input, the AI throw is used after the decision window. Outcomes gain `double_play` and `triple_play` kinds and a `throws` list.
+
+Reason: Double plays and relays are core baseball. The leg-by-leg model keeps the human in the decision while the outcome stays authoritative and testable.
+
+Affected systems: new `baseball/running/throw_play.gd`; RunnerResolver (now wraps ThrowPlay), AiDefense, BallInPlay (`start_throws`, `resolve_ai`), PlayOutcome, AutoMatch, MatchDirector, MatchView (animated legs, base covers), tuning, tests.

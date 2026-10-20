@@ -15,7 +15,6 @@ const PLAY_SETTLE_PAUSE := 0.9
 const THROW_DECISION_WINDOW := 0.6
 # Cursor speed in the plate plane, meters per second.
 const CURSOR_SPEED := 1.5
-const UNDECIDED := -2
 
 var content: ContentLibrary
 var tuning: BaseballTuning
@@ -39,7 +38,7 @@ var _live: LiveFielding
 var _live_accumulator := 0.0
 var _dive_requested := false
 var _throw_choice := -1
-var _throw_base := UNDECIDED
+var _play: ThrowPlay
 var _outcome: PlayOutcome
 var _settle_time := 0.0
 var _event_cursor := 0
@@ -290,7 +289,7 @@ func _apply_call() -> void:
 func _start_ball_in_play() -> void:
 	_bip = BallInPlay.create(_contact, state, tuning)
 	_throw_choice = -1
-	_throw_base = UNDECIDED
+	_play = null
 	_outcome = null
 	_view.show_debug_play(_bip)
 	_view.set_camera_mode(MatchView.CameraMode.FIELD)
@@ -299,7 +298,7 @@ func _start_ball_in_play() -> void:
 	_live_accumulator = 0.0
 	_dive_requested = false
 	if _bip.is_home_run():
-		_decide_throw(AiDefense.NO_THROW)
+		_finish_play(RunnerResolver.home_run(_bip.bases_before, _bip.batter_id))
 	elif not user_is_batting() and _bip.fielding.has_fielder():
 		# The human steers whoever the projection says gets there first.
 		_live = LiveFielding.new(_bip.trajectory, _bip.fielders, _bip.fielding, tuning, _bip.fielding.fielder_index)
@@ -312,27 +311,63 @@ func _process_ball_in_play() -> void:
 	if not user_is_batting():
 		for base in [1, 2, 3, 4]:
 			if Input.is_action_just_pressed(StringName("throw_base_%d" % base)):
-				_throw_choice = base
+				_throw_choice = base  # buffered: used for the next throw
 	if _live != null and not _live.is_secured():
 		_step_live_fielding(t)
-	if _throw_base == UNDECIDED:
-		if _live != null:
-			if _live.is_secured():
-				var ready := _bip.fielding.ready_time
-				if t >= ready and (_throw_choice != -1 or t >= ready + THROW_DECISION_WINDOW):
-					# Holding the ball costs time: the throw leaves when decided.
-					_bip.fielding.ready_time = maxf(ready, t)
-					_decide_throw(_throw_choice if _throw_choice != -1 else _bip.ai_throw_target())
-		elif not _bip.fielding.has_fielder() or t >= _bip.fielding.ready_time:
-			_decide_throw(_bip.ai_throw_target())
-	_view.show_play(_bip, t, _throw_base if _throw_base != UNDECIDED else -1, _outcome, _live)
+	if _outcome == null:
+		var secured := _live.is_secured() if _live != null else t >= _bip.fielding.ready_time
+		if secured:
+			if _play == null:
+				_play = _bip.start_throws()
+			_advance_throws(t)
+	_view.show_play(_bip, t, _play, _outcome, _live)
 	_view.set_field_focus(_field_focus(t))
 	if _outcome == null:
 		return
 	var skip := Input.is_action_just_pressed(&"swing_contact") or Input.is_action_just_pressed(&"pitch_primary")
-	if t >= _settle_time + PLAY_SETTLE_PAUSE or (skip and t > _bip.fielding.ready_time + 0.3):
+	if t >= _settle_time + PLAY_SETTLE_PAUSE or (skip and t > _play_end_time() + 0.3):
 		state.apply_play(_outcome)
 		_enter_pre_pitch()
+
+
+## Throws one leg at a time. A human picks each base (buttons are buffered,
+## so a double play can be called before the first catch); with no input
+## for THROW_DECISION_WINDOW the AI throw is used. Holding costs time.
+func _advance_throws(t: float) -> void:
+	if not _play.can_throw():
+		_finish_play(_play.outcome())
+		return
+	var earliest := _play.next_release_time()
+	if t < earliest:
+		return
+	var suggestion := AiDefense.next_throw(_play)
+	if user_is_batting():
+		if suggestion == AiDefense.NO_THROW:
+			_finish_play(_play.outcome())
+		else:
+			_throw_leg(suggestion, earliest)
+		return
+	if _throw_choice != -1:
+		var base := _throw_choice
+		_throw_choice = -1
+		if base != _play.holder_base():
+			_throw_leg(base, t)
+		return
+	if suggestion == AiDefense.NO_THROW:
+		_finish_play(_play.outcome())
+	elif t >= earliest + THROW_DECISION_WINDOW:
+		_throw_leg(suggestion, t)
+
+
+func _throw_leg(base: int, not_before: float) -> void:
+	var leg := _play.throw_to(base, not_before)
+	_log({"throw": base, "release": snappedf(leg["release"], 0.01), "arrival": snappedf(leg["arrival"], 0.01), "out": leg["out_runner"], "kind": leg["out_kind"]})
+	if leg["out_runner"] != &"":
+		_hud.show_callout("OUT!", "at %s" % FieldLayout.base_name(base), 1.2)
+
+
+func _play_end_time() -> float:
+	return _play.last_arrival() if _play != null else _bip.fielding.secure_time
 
 
 func _step_live_fielding(t: float) -> void:
@@ -361,14 +396,15 @@ func _field_focus(t: float) -> Vector3:
 	return focus.lerp(Vector3(0.0, 0.0, -30.0), 0.35)
 
 
-func _decide_throw(base: int) -> void:
-	_throw_base = base
-	_outcome = _bip.resolve(base)
+func _finish_play(outcome: PlayOutcome) -> void:
+	_outcome = outcome
 	_settle_time = _bip.settle_time(_outcome)
-	_log({"throw": base, "outcome": _outcome.kind, "runs": _outcome.runs.size(), "outs": _outcome.outs.size()})
+	_log({"outcome": _outcome.kind, "throws": _outcome.throws.map(func(leg: Dictionary) -> int: return leg["base"]), "runs": _outcome.runs.size(), "outs": _outcome.outs.size()})
 	var detail := "%.1f m/s  %d°  %.0f m" % [_contact.exit_velocity, roundi(_contact.launch_angle), _bip.trajectory.distance()]
 	var text := String(_outcome.kind).replace("_", " ").to_upper()
-	if _bip.fielding.is_dive and _bip.fielding.caught_in_air:
+	if _outcome.kind == PlayOutcome.KIND_DOUBLE_PLAY or _outcome.kind == PlayOutcome.KIND_TRIPLE_PLAY:
+		text += "!"
+	elif _bip.fielding.is_dive and _bip.fielding.caught_in_air:
 		text = "DIVING CATCH!"
 	_hud.show_callout(text, detail, 2.0)
 	_hud.show_prompt(_hud_prompt_suffix())
@@ -422,7 +458,7 @@ func _update_debug() -> void:
 		_debug.set_section("fielding", f)
 		_debug.set_section("runners", _bip.plans.map(func(p: RunnerPlan) -> Dictionary: return p.to_dict()))
 		if _outcome != null:
-			_debug.set_section("outcome", {"kind": _outcome.kind, "throw_base": _outcome.throw_base, "throw_arrival": snappedf(_outcome.throw_arrival, 0.01), "runs": _outcome.runs, "outs": _outcome.outs})
+			_debug.set_section("outcome", {"kind": _outcome.kind, "throws": _outcome.throws.map(func(leg: Dictionary) -> String: return "%s@%.2f%s" % [FieldLayout.base_name(leg["base"]), leg["arrival"], (" OUT " + String(leg["out_runner"])) if leg["out_runner"] != &"" else ""]), "runs": _outcome.runs, "outs": _outcome.outs.size()})
 
 
 func _timing_detail() -> String:
@@ -444,7 +480,7 @@ func _hud_prompt_suffix() -> String:
 			if _outcome != null:
 				base = "Skip: J / A"
 			elif not user_is_batting():
-				base = "Run: WASD / L-stick   Dive: Shift / RT   Switch: F / LT   Throw 1st-2nd-3rd-home: 1-4 / B Y X A"
+				base = "Run: WASD / L-stick   Dive: Shift / RT   Switch: F / LT   Throw (again to relay) 1st-2nd-3rd-home: 1-4 / B Y X A"
 	return "%s\n[%s]   Tab/Back: switch side   F1: debug   F5: restart" % [base, role]
 
 

@@ -122,30 +122,24 @@ func set_cursor(at: Vector2, outer_radius: float, inner_radius: float, color: Co
 	(_cursor_inner.material_override as StandardMaterial3D).albedo_color = color.lightened(0.4)
 
 
-## Draws a ball in play at contact-relative time t. throw_base/outcome may
-## be unknown (-1 / null) until the defense has decided. With a
-## LiveFielding, fielder positions come from it instead of the projection.
-func show_play(bip: BallInPlay, t: float, throw_base: int, outcome: PlayOutcome, live: LiveFielding = null) -> void:
+## Draws a ball in play at contact-relative time t. The throw play and
+## outcome may be null until the defense has the ball / has finished. With
+## a LiveFielding, fielder positions come from it instead of the projection.
+func show_play(bip: BallInPlay, t: float, play: ThrowPlay, outcome: PlayOutcome, live: LiveFielding = null) -> void:
 	_zone.visible = false
 	var fielding := bip.fielding
 	var settled := live == null or live.is_secured()
+	var legs: Array = play.legs if play != null else (outcome.throws if outcome != null else [])
+	var outs: Array = outcome.outs if outcome != null else (play.outs if play != null else [])
 	# Ball
 	if not settled or not fielding.has_fielder() or t < fielding.secure_time:
 		_ball.position = bip.trajectory.position_at(t)
-	elif throw_base > 0:
-		var release := fielding.ready_time + tuning.throw_release_time
-		var arrival := ThrowModel.arrival_at_base(fielding, throw_base, tuning)
-		if t < release:
-			_ball.position = fielding.secure_point + Vector3.UP * 1.3
-		else:
-			var u := clampf((t - release) / maxf(arrival - release, 0.01), 0.0, 1.0)
-			_ball.position = ThrowModel.position_at(fielding.secure_point, FieldLayout.base_position(throw_base), u, tuning)
 	else:
-		_ball.position = fielding.secure_point + Vector3.UP * 1.3
+		_ball.position = _ball_on_throws(fielding, legs, t)
 	_update_shadow()
-	# Fielders: the authoritative fielder runs to the intercept; a teammate
-	# covers the throw base; others drift toward the ball (cosmetic).
-	var cover := _cover_index(throw_base, fielding.fielder_index)
+	# Fielders: the authoritative fielder runs to the intercept; teammates
+	# cover each base a throw goes to; others drift toward the ball (cosmetic).
+	var covers := _cover_assignments(legs, fielding.fielder_index)
 	_control_ring.visible = live != null and not live.is_secured() and live.controlled >= 0
 	# Gameplay aid for the human fielder: where a fly ball will come down.
 	_landing_hint.visible = live != null and not settled and bip.trajectory.is_airborne_at(t)
@@ -154,7 +148,16 @@ func show_play(bip: BallInPlay, t: float, throw_base: int, outcome: PlayOutcome,
 		var start := tuning.fielder_spots[i]
 		var actor := _fielders[i]
 		actor.set_crouch(false)
-		if live != null:
+		if covers.has(i):
+			var from := live.positions[i] if live != null else start
+			var since := maxf(t - (fielding.secure_time if live != null else tuning.fielder_reaction), 0.0)
+			actor.position = from.move_toward(FieldLayout.base_position(covers[i]), since * tuning.fielder_speed)
+			actor.face(_ball.position)
+		elif i == fielding.fielder_index and not legs.is_empty() and legs[0]["unassisted"] and t >= legs[0]["release"]:
+			var leg: Dictionary = legs[0]
+			var u := clampf((t - leg["release"]) / maxf(leg["arrival"] - leg["release"], 0.01), 0.0, 1.0)
+			actor.position = (leg["from"] as Vector3).lerp(FieldLayout.base_position(leg["base"]), u)
+		elif live != null:
 			actor.position = live.positions[i]
 			actor.face(_ball.position)
 			if i == live.controlled:
@@ -164,9 +167,6 @@ func show_play(bip: BallInPlay, t: float, throw_base: int, outcome: PlayOutcome,
 			var goal := Vector3(fielding.secure_point.x, 0.0, fielding.secure_point.z)
 			actor.position = start.lerp(goal.move_toward(start, tuning.catch_reach), u)
 			actor.face(_ball.position)
-		elif i == cover:
-			actor.position = start.move_toward(FieldLayout.base_position(throw_base), maxf(t - tuning.fielder_reaction, 0.0) * tuning.fielder_speed)
-			actor.face(fielding.secure_point)
 		else:
 			var drift := Vector3(_ball.position.x, 0.0, _ball.position.z)
 			actor.position = start.move_toward(drift, maxf(t - tuning.fielder_reaction, 0.0) * tuning.fielder_speed * 0.35)
@@ -178,10 +178,9 @@ func show_play(bip: BallInPlay, t: float, throw_base: int, outcome: PlayOutcome,
 			continue
 		actor.position = p.position_at(t)
 		actor.face(FieldLayout.base_position(p.target_base))
-		if outcome != null:
-			for out in outcome.outs:
-				if out["runner_id"] == p.runner_id and t >= out["time"]:
-					actor.visible = false
+		for out in outs:
+			if out["runner_id"] == p.runner_id and t >= out["time"]:
+				actor.visible = false
 	var batter: ActorView = _runners.get(bip.batter_id)
 	if batter != null:
 		if settled and fielding.caught_in_air and t >= fielding.secure_time:
@@ -249,20 +248,41 @@ func _snap_camera() -> void:
 	_camera.look_at(spot[1], Vector3.UP)
 
 
-func _cover_index(throw_base: int, fielder_index: int) -> int:
-	if throw_base <= 0:
-		return -1
-	var target := FieldLayout.base_position(throw_base)
-	var best := -1
-	var best_d := INF
-	for i in tuning.fielder_spots.size():
-		if i == fielder_index:
+## Ball position while the defense throws it around (held between legs).
+func _ball_on_throws(fielding: FieldingResult, legs: Array, t: float) -> Vector3:
+	var held := fielding.secure_point + Vector3.UP * 1.3
+	for leg: Dictionary in legs:
+		if t < leg["release"]:
+			return held
+		var to := FieldLayout.base_position(leg["base"])
+		if t < leg["arrival"]:
+			var u := clampf((t - leg["release"]) / maxf(leg["arrival"] - leg["release"], 0.01), 0.0, 1.0)
+			if leg["unassisted"]:
+				return (leg["from"] as Vector3).lerp(to, u) + Vector3.UP * 1.3
+			return ThrowModel.position_at(leg["from"], to, u, tuning)
+		held = to + Vector3.UP * 1.3
+	return held
+
+
+## Nearest free fielder for each base a throw goes to: {fielder_index: base}.
+func _cover_assignments(legs: Array, fielder_index: int) -> Dictionary:
+	var covers := {}
+	for leg: Dictionary in legs:
+		if leg["unassisted"]:
 			continue
-		var d := tuning.fielder_spots[i].distance_to(target)
-		if d < best_d:
-			best_d = d
-			best = i
-	return best
+		var target := FieldLayout.base_position(leg["base"])
+		var best := -1
+		var best_d := INF
+		for i in tuning.fielder_spots.size():
+			if i == fielder_index or covers.has(i):
+				continue
+			var d := tuning.fielder_spots[i].distance_to(target)
+			if d < best_d:
+				best_d = d
+				best = i
+		if best >= 0:
+			covers[best] = leg["base"]
+	return covers
 
 
 func _runner_actor(id: StringName, color: Color) -> ActorView:

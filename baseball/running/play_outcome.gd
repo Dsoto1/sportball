@@ -12,6 +12,8 @@ const KIND_LINE_OUT := &"line_out"
 const KIND_POP_OUT := &"pop_out"
 const KIND_GROUND_OUT := &"ground_out"
 const KIND_FIELDERS_CHOICE := &"fielders_choice"
+const KIND_DOUBLE_PLAY := &"double_play"
+const KIND_TRIPLE_PLAY := &"triple_play"
 
 const OUT_CATCH := &"catch"
 const OUT_FORCE := &"force"
@@ -27,8 +29,11 @@ var outs: Array[Dictionary] = []
 var final_bases: Array[StringName] = [&"", &"", &""]
 ## Base the batter finished on: 0 if out, 1..3, or 4 if they scored.
 var batter_base: int = 0
+## First throw of the play (kept for quick checks); every leg is in throws.
 var throw_base: int = -1
 var throw_arrival: float = INF
+## ThrowPlay legs: {from, base, release, arrival, unassisted, out_runner, out_kind, out_time}
+var throws: Array[Dictionary] = []
 ## Runner movements for presentation/logging: {runner_id, from, to, safe}
 var advances: Array[Dictionary] = []
 

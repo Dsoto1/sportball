@@ -58,7 +58,7 @@ func play_pitch() -> void:
 		state.apply_pitch_call(ContactResolver.call_for(pitch, contact))
 		return
 	var bip := BallInPlay.create(contact, state, tuning)
-	var outcome := bip.resolve(bip.ai_throw_target())
+	var outcome := bip.resolve_ai()
 	_count_outcome(bip, outcome)
 	state.apply_play(outcome)
 

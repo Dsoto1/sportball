@@ -44,9 +44,10 @@ reached. The small yellow marker on the zone shows what your stick is
 adding.
 
 On defense you steer the fielder who can reach the ball first; a white
-ring marks where a fly ball will land. Press a throw button any time
-(even before the catch). If you hold the ball for more than 0.6 s, the AI
-throw is used.
+ring marks where a fly ball will land. Press a throw button any time, even
+before the catch. Press another one to have the receiver throw on (for
+example 2 then 1 to turn a 6-4-3 double play). If you hold the ball for
+more than 0.6 s, the AI throw is used.
 
 Bindings live in `project.godot` as semantic actions. To change them, edit
 the table in `tools/generate_input_map.gd` and run
