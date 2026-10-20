@@ -23,6 +23,8 @@ var dives_missed: int = 0
 ## Rookie assist for the human fielder: a little quicker, a little more
 ## reach, and with the stick at rest he runs to the ball on his own.
 var assist := false
+## Times control passed automatically to a better-placed fielder.
+var auto_switches: int = 0
 
 var _targets: PackedVector3Array = PackedVector3Array()
 var _target_times: PackedFloat32Array = PackedFloat32Array()
@@ -77,6 +79,8 @@ func step(dt: float, move: Vector2 = Vector2.ZERO, dive: bool = false) -> void:
 			# Run the projected route; once that moment has passed, chase the ball.
 			var goal := _targets[i] if time < _target_times[i] else Vector3(ball.x, 0.0, ball.z)
 			positions[i] = positions[i].move_toward(goal, f.speed * dt)
+	if not airborne:
+		_auto_switch(ball)
 	if ball.y > tuning.catch_max_height:
 		return
 	var best := -1
@@ -112,6 +116,26 @@ func switch_to_nearest() -> void:
 	controlled = best
 
 
+## A ball on the ground that has got past the human's fielder hands control
+## to a teammate who is much closer to it (a grounder through the infield).
+func _auto_switch(ball: Vector3) -> void:
+	if controlled < 0 or time < down_until:
+		return
+	var mine := _gap(positions[controlled], ball)
+	if mine < tuning.auto_switch_min_gap:
+		return
+	var best := controlled
+	var best_gap := mine * tuning.auto_switch_ratio
+	for i in fielders.size():
+		var gap := _gap(positions[i], ball)
+		if i != controlled and gap < best_gap:
+			best = i
+			best_gap = gap
+	if best != controlled:
+		controlled = best
+		auto_switches += 1
+
+
 func _dive(i: int, ball: Vector3, airborne: bool, move: Vector2) -> void:
 	var f := fielders[i]
 	if _gap(positions[i], ball) <= f.reach + f.dive_reach and ball.y <= tuning.catch_max_height:
@@ -134,7 +158,7 @@ func _secure(i: int, ball: Vector3, airborne: bool, dive: bool) -> void:
 	result.secure_point = Vector3(ball.x, 0.0, ball.z)
 	result.caught_in_air = airborne
 	result.is_dive = dive
-	result.ready_time = time + (tuning.dive_recovery if dive else 0.0)
+	result.ready_time = time + (tuning.dive_recovery if dive else 0.0) + trajectory.pickup_delay(time, tuning)
 	result.candidates = projection.candidates.duplicate()
 	positions[i] = Vector3(positions[i].x, 0.0, positions[i].z)
 

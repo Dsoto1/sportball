@@ -9,7 +9,7 @@ var content: ContentLibrary
 var stats := {
 	"pitches": 0, "in_zone": 0, "swings": 0, "whiffs": 0, "fouls": 0, "balls_in_play": 0,
 	"hits": 0, "home_runs": 0, "strikeouts": 0, "walks": 0, "dives": 0, "air_outs": 0,
-	"ground_outs": 0, "double_plays": 0, "plate_appearances": 0, "exit_velocity_sum": 0.0,
+	"ground_outs": 0, "double_plays": 0, "errors": 0, "dive_misses": 0, "plate_appearances": 0, "exit_velocity_sum": 0.0,
 }
 var outcome_counts := {}
 
@@ -58,7 +58,7 @@ func play_pitch() -> void:
 		state.apply_pitch_call(ContactResolver.call_for(pitch, contact))
 		return
 	var bip := BallInPlay.create(contact, state, tuning)
-	var outcome := bip.resolve_ai()
+	var outcome := bip.resolve_ai(rng)
 	_count_outcome(bip, outcome)
 	state.apply_play(outcome)
 
@@ -85,9 +85,11 @@ func _count_outcome(bip: BallInPlay, outcome: PlayOutcome) -> void:
 		stats["home_runs"] += 1
 	if bip.fielding.is_dive:
 		stats["dives"] += 1
-	if bip.fielding.caught_in_air:
+	if bip.fielding.caught_in_air and not outcome.errors.any(func(e: Dictionary) -> bool: return e["type"] == "dive_miss"):
 		stats["air_outs"] += 1
 	if outcome.kind == PlayOutcome.KIND_GROUND_OUT:
 		stats["ground_outs"] += 1
 	if outcome.outs.size() >= 2:
 		stats["double_plays"] += 1
+	for e in outcome.errors:
+		stats["dive_misses" if e["type"] == "dive_miss" else "errors"] += 1

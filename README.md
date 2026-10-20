@@ -68,7 +68,8 @@ home runs: power swing, hold up for lift, perfect timing, middle pitch.
 
 On defense, Rookie assist also makes your fielder a little quicker with
 more reach, and if you let go of the stick he runs to the ball himself.
-You steer the fielder who can reach the ball first; a white
+If a grounder gets past your fielder, control jumps to the teammate
+closest to it. You steer the fielder who can reach the ball first; a white
 ring marks where a fly ball will land. Press a throw button any time, even
 before the catch. Press another one to have the receiver throw on (for
 example 2 then 1 to turn a 6-4-3 double play). Long throws from the
@@ -77,6 +78,11 @@ a different one while the ball is on its way to him. If you hold the ball for
 more than 0.6 s, the AI takes over. Once you have the ball, the stick
 moves the fielder holding it: run a runner down in a rundown, or step on
 a bag yourself.
+
+Fielders are not perfect: grounders get bobbled, throws sail, and about
+a third of dives that reach the ball still don't hold it. Runners take an
+extra base when that happens, and a ball off the wall takes a moment to
+play. Rookie assist halves your fielders' errors.
 
 When you are batting, runners decide for themselves until you give them
 an order. Advance or retreat on its own orders everyone. Hold a base

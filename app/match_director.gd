@@ -11,6 +11,8 @@ enum Phase { PRE_PITCH, METER, PITCH_FLIGHT, CALL, BALL_IN_PLAY, GAME_OVER }
 const AI_PRE_PITCH_DELAY := 1.8
 # The last part of the pre-pitch is the pitcher's visible windup.
 const WINDUP_TIME := 0.7
+## Hit pause by contact tier (seconds the play clock holds after contact).
+const HIT_STOP := {ContactFeedback.Tier.SOLID: 0.05, ContactFeedback.Tier.SWEET: 0.11}
 const CALL_PAUSE := 0.8
 const PLAY_SETTLE_PAUSE := 0.9
 # How long a human fielder can hold the ball before the AI throw is used.
@@ -29,6 +31,8 @@ var _hud: MatchHud
 var _debug: DebugOverlay
 var _phase := Phase.PRE_PITCH
 var _phase_time := 0.0
+## Hit pause: the play clock holds for this long after solid contact.
+var _hit_stop := 0.0
 var _cursor := Vector2.ZERO
 var _selected_pitch := 0
 var _meter := 0.0
@@ -132,7 +136,10 @@ func _process(delta: float) -> void:
 	if state == null:
 		return
 	_tick_clock(delta)
-	_phase_time += delta
+	if _phase == Phase.BALL_IN_PLAY and _hit_stop > 0.0:
+		_hit_stop -= delta  # the ball hangs off the bat for a beat
+	else:
+		_phase_time += delta
 	_handle_global_input()
 	match _phase:
 		Phase.PRE_PITCH:
@@ -297,6 +304,8 @@ func _show_contact_feedback(call_text: String) -> void:
 		head = "%s %s" % [head, call_text]
 	_hud.show_callout(head, f["detail"], 2.2)
 	_view.contact_feedback(_pitch.location, f["tier"])
+	if _phase == Phase.BALL_IN_PLAY:
+		_hit_stop = HIT_STOP.get(f["tier"], 0.0)
 
 
 func _resolve_swing(swing: SwingIntent) -> void:
@@ -342,8 +351,10 @@ func _start_ball_in_play() -> void:
 			# The human steers whoever the projection says gets there first.
 			_live = LiveFielding.new(_bip.trajectory, _bip.fielders, _bip.fielding, tuning, _bip.fielding.fielder_index)
 			_live.assist = tuning.rookie_assist
-		_play = _bip.start_live(not human_fields)
+		_play = _bip.start_live(not human_fields, rng)
 		_play.human_defense = not user_is_batting()
+		if _play.human_defense and tuning.rookie_assist:
+			_play.error_scale = tuning.assist_error_scale
 	_set_phase(Phase.BALL_IN_PLAY)
 	_hud.show_prompt(_hud_prompt_suffix())
 
@@ -422,6 +433,11 @@ func _drain_play_events() -> void:
 				_log({"out": e["runner"], "kind": e["kind"], "base": e["base"], "time": snappedf(_play.time, 0.01)})
 			"rundown":
 				_hud.show_callout("RUNDOWN!", "", 1.0)
+			"error":
+				var labels := {"bobble": ["BOBBLED!", "can't find the handle"], "wild_throw": ["WILD THROW!", "it gets away at %s" % FieldLayout.base_name(e["base"])], "dive_miss": ["IT GETS BY HIM!", "the dive comes up empty"]}
+				var text: Array = labels.get(e["kind"], ["ERROR", ""])
+				_hud.show_callout(text[0], text[1], 1.2)
+				_log({"error": e["kind"], "base": e["base"], "time": snappedf(_play.time, 0.01)})
 			"throw":
 				_log({"throw": e["base"], "time": snappedf(_play.time, 0.01)})
 
@@ -431,7 +447,9 @@ func _field_focus(t: float) -> Vector3:
 	var focus := Vector3(ball.x, 0.0, ball.z)
 	if _live != null and not _live.is_secured() and _live.controlled >= 0:
 		focus = focus.lerp(_live.positions[_live.controlled], 0.5)
-	return focus.lerp(Vector3(0.0, 0.0, -30.0), 0.35)
+	focus = focus.lerp(Vector3(0.0, 0.0, -30.0), 0.35)
+	focus.y = ball.y  # the camera tilts up to keep a fly ball in frame
+	return focus
 
 
 func _finish_play(outcome: PlayOutcome) -> void:
@@ -441,7 +459,7 @@ func _finish_play(outcome: PlayOutcome) -> void:
 	var text := String(_outcome.kind).replace("_", " ").to_upper()
 	if _outcome.kind == PlayOutcome.KIND_DOUBLE_PLAY or _outcome.kind == PlayOutcome.KIND_TRIPLE_PLAY:
 		text += "!"
-	elif _bip.fielding.is_dive and _bip.fielding.caught_in_air:
+	elif _play != null and _play.fielding != null and _play.fielding.is_dive and _play.fielding.caught_in_air:
 		text = "DIVING CATCH!"
 	_hud.show_callout(text, detail, 2.0)
 	_hud.show_prompt(_hud_prompt_suffix())

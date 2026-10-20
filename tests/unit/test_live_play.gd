@@ -239,3 +239,69 @@ func test_no_base_orders_everyone() -> void:
 	play.step(tuning().sim_play_step, {}, {"advance": true})
 	check_eq(play.runner(&"r2").target, 3, "lead runner goes")
 	check_eq(play.runner(&"r1").target, 2, "trail runner goes")
+
+
+# --- Errors ----------------------------------------------------------------
+
+## A LivePlay with errors enabled; `chances` overrides tuning error values.
+func _error_play(bases: Array[StringName], f: FieldingResult, chances: Dictionary, flight: Array = GROUNDER) -> LivePlay:
+	var t: BaseballTuning = tuning().duplicate()
+	for key in ["bobble_chance", "bobble_chance_per_speed", "dive_drop_chance", "throw_error_chance", "throw_error_per_meter"]:
+		t.set(key, 0.0)
+	for key in chances:
+		t.set(key, chances[key])
+	var traj := BallTrajectory.simulate(flight[0], flight[1], flight[2], t)
+	var play := LivePlay.new(bases, &"bat", 0, flight[1], traj, f, t, true)
+	play.rng = MatchRng.new(7)
+	return play
+
+
+func test_no_rng_means_no_errors() -> void:
+	var play := _play(_bases(), 0, _fielded(Vector3(-9, 0, -34), 1.0))
+	var outcome := _run(play)
+	check(outcome.errors.is_empty(), "error-free without an rng")
+
+
+func test_zero_chances_play_clean_with_rng() -> void:
+	var outcome := _run(_error_play(_bases(), _fielded(Vector3(-9, 0, -34), 1.0), {}))
+	check_eq(outcome.kind, PlayOutcome.KIND_GROUND_OUT)
+	check(outcome.errors.is_empty(), "no errors at zero chance")
+
+
+func test_bobble_lets_batter_reach_on_error() -> void:
+	var play := _error_play(_bases(), _fielded(Vector3(-9, 0, -34), 1.0), {"bobble_chance": 1.0, "bobble_time": 1.5})
+	var outcome := _run(play)
+	check_eq(outcome.errors.size(), 1, "one bobble")
+	check_eq(outcome.errors[0]["type"], "bobble")
+	check_eq(outcome.kind, PlayOutcome.KIND_REACHED_ON_ERROR)
+	check(not outcome.is_hit(), "an error is not a hit")
+	check(_has_event(play, "error"), "error event for presentation")
+
+
+func test_wild_throw_to_first_gives_batter_second() -> void:
+	var play := _error_play(_bases(), _fielded(Vector3(-9, 0, -34), 1.0), {"throw_error_chance": 1.0, "wild_throw_past_min": 30.0, "wild_throw_past_max": 30.0})
+	var outcome := _run(play)
+	check(outcome.errors.any(func(e: Dictionary) -> bool: return e["type"] == "wild_throw" and e["on_batter"]), "wild throw on the batter")
+	check(outcome.outs.is_empty(), "nobody out")
+	check_eq(outcome.kind, PlayOutcome.KIND_REACHED_ON_ERROR)
+	check(outcome.batter_base >= FieldLayout.SECOND, "batter takes second on the throw (got %d)" % outcome.batter_base)
+
+
+func test_failed_dive_turns_catch_into_hit() -> void:
+	var f := _fielded(Vector3(-30, 0, -75), 3.0, true)
+	f.is_dive = true
+	f.ready_time = 3.0 + tuning().dive_recovery
+	var play := _error_play(_bases(), f, {"dive_drop_chance": 1.0}, [36.0, 22.0, -20.0])
+	var outcome := _run(play)
+	check(outcome.outs.is_empty(), "no catch")
+	check(outcome.is_hit(), "a missed dive is a hit, not an error (got %s)" % outcome.kind)
+	check(not play.fielding.caught_in_air, "play's fielding records the drop")
+
+
+func test_misplayed_ball_rolls_to_fielder() -> void:
+	var play := _error_play(_bases(), _fielded(Vector3(-9, 0, -34), 1.0), {"bobble_chance": 1.0})
+	_step_until(play, 1.1)
+	var early := play.ball_position()
+	check(early.y < 0.5, "ball on the ground while it gets away")
+	_step_until(play, 2.0)
+	check(play.ball_position().y > 1.0, "back in the glove after the bobble")

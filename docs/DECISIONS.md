@@ -201,3 +201,23 @@ Decision:
 Reason: The Phase 0 report's remaining weak spots: no hitter-side read, human fielding held to AI-perfect routes, and flat contact.
 
 Affected systems: PitchFamilyDef and pitch data, MatchView (trail, punch), LiveFielding (assist), MatchDirector, tuning, README, tests.
+
+## 2026-10-20 - Phase 0 Close-out: Errors, Failed Dives, Wall Caroms, Auto-switch, Hit Pause
+
+Decision:
+- **Errors are authoritative and seeded:** `LivePlay` rolls them with the match `MatchRng` (with no rng, the play is error-free, which keeps unit tests and old sims exact).
+  - A ground ball can be bobbled (`bobble_chance` plus a per-m/s term).
+  - Any throw can sail (`throw_error_chance` plus a per-meter term). It lands to one side and past the target, and the backup's retrieval time scales with how far it got away.
+  - Standing runners, and runners mid-stride, read a misplay and take the next base if it is there.
+- **Failed dives:** a dive that reaches the ball fails `dive_drop_chance` (30%) of the time, and the ball gets past the fielder. It is scored as a hit, not an error.
+- **Scoring:** the batter safe because of a bobble or a wild throw to first is `reached_on_error`, which is not a hit. Errors are listed on `PlayOutcome.errors`.
+- **Wall caroms:** a ball fielded after it came off the wall costs `wall_carom_delay` (0.8 s). Runners' reads see it through `ready_time`. This is the source of triples (0.7% of balls in play).
+- **Rookie assist** halves error chances for a human fielder (`assist_error_scale`).
+- **Auto-switch:** on a ball on the ground, control passes to a teammate once the human's fielder is 8 m or more away and the teammate is within half that distance. The manual switch stays.
+- **Hit pause and follow camera (presentation only):**
+  - The play clock holds 50 ms on solid contact and 110 ms on a barrel.
+  - The field camera pulls back on deep plays and tilts up with the ball's height.
+
+Reason: The remaining Phase 0 weak spots (no triples, no defensive failure, free dives, a human stranded by a grounder through the hole, flat contact). This closes Phase 0.
+
+Affected systems: LivePlay, PlayOutcome, BallInPlay, AutoMatch, BallTrajectory, FieldingResolver, LiveFielding, MatchDirector, MatchView, tuning, sim report, tests.

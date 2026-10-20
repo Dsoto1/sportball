@@ -27,104 +27,65 @@ runner/base resolution → reset.
   candidates, runner plans and recent domain events.
 - **Reproducibility**: the gameplay seed is printed and can be passed back
   in with `--seed=`. Every intent and outcome is logged as a `[play]` line.
-- **Tests**: 56 headless tests (rules, pitch/contact math, trajectory against
+- **Tests**: 103 headless tests (rules, pitch/contact math, trajectory against
   the analytic projectile formula, intercepts, force/tag/third-out rules, AI
   throw choice, and 70+ full AI-vs-AI matches for completion,
   reproducibility and outcome rates). `tools/playtest_bot.gd` drives the
   real scene with simulated input through a full 6-inning match.
 
-## Numbers (100 AI-vs-AI matches, `tools/sim_report.gd -- 100 1`, timing-first batting)
+## Numbers (100 AI-vs-AI matches, `tools/sim_report.gd -- 100 1`, errors on)
 
 | Metric | Value | Rough target |
 |---|---|---|
-| Runs / team / 6 innings | 2.65 | 2.5–3.5 |
-| Hits / PA | .259 | .23–.27 |
-| K% / BB% | 16.1% / 8.3% | 18–23% / 7–9% |
-| HR / PA | 3.1% | 2.5–3.5% (arcade: higher is fine) |
-| Pitches / game (both teams) | 210 | — |
-| Diving catches | 7% of balls in play | "rare enough to stay exciting" |
-| Double plays / team / 6 inn | 0.48 | ~0.6 |
-| Triples / doubles (% of balls in play) | ~0% / 8.6% | ~0.5% / ~6.5% |
+| Runs / team / 6 innings | 2.55 | 2.5–3.5 |
+| Hits / PA | .261 | .23–.27 |
+| K% / BB% | 16.5% / 7.7% | 18–23% / 7–9% |
+| HR / PA | 2.3% | 2.5–3.5% (arcade: higher is fine) |
+| Pitches / game (both teams) | 203 | — |
+| Dives | 6.9% of balls in play, 30% of in-reach dives fail | "rare enough to stay exciting" |
+| Errors / team / 6 inn | 0.52 (bobbles + wild throws) | ~0.4–0.6 |
+| Double plays / team / 6 inn | 0.51 | ~0.6 |
+| Triples / doubles (% of balls in play) | 0.7% / 8.8% | ~0.5% / ~6.5% |
 
 Hit rate by launch angle (`tools/launch_angle_report.gd`): grounders
 (−10–10°) 25–32%, liners (10–20°) 79%, 20–30° 42%, high flies (40°+) 0%.
 That is the right shape.
 
-## Weak feel — read before expanding scope
+## Phase 0 status
 
-These are ranked by how much they undercut the pillars. I could not
-playtest with a human. Everything here comes from the sims, the playtest
-bot, screenshots and reading the timings.
+Phase 0 is feature-complete. Every weak spot from the first report has been
+worked; what is left needs people playing it, not more systems.
 
-1. **Steered fielding is new and untuned.** *(Update: the player now
-   steers the fielder; see DECISIONS.)* AI fielders run perfect routes, so a
-   human is held to an AI standard. A crude bot steering at the landing
-   spot made far fewer catches than the AI (8 fly catches in 29 plays) and
-   gave up 17 runs. Expect to tune fielder speed, reach, the landing hint
-   and the first-step feel with real players. There are no jumping catches
-   at the wall yet, and auto-switching only happens on request.
-2. **Live running is new and AI-tuned only.** *(Update: runners decide
-   live and rundowns exist; see DECISIONS.)* Runners freeze on balls in the
-   air (except with two outs), retouch after catches, take bases on throws,
-   retreat, and get hung up in rundowns. The defense throws, runs the ball
-   to a bag, chases runners, and covers close in. Long outfield throws go
-   through a cutoff man who relays, can be redirected or holds the ball.
-   Cutoff and cover choices are fixed tables (for example the pitcher
-   covers first when the first baseman cuts). Triples are now very rare
-   (~0 in 100 sims); `runner_take_base_margin` and `cutoff_min_throw` are
-   the knobs. Per-runner orders: hold a base button with advance/retreat.
-   Rundowns are animated with a procedural capsule rig: lean, run bob,
-   plant-and-turn, juke, chase with the ball raised, tag swipe, throw,
-   slide, and runners going down when out. The camera pulls in on a
-   rundown. These are placeholder poses, not real animation; they read at
-   close range but are subtle from the high field camera. A rundown that
-   runs past `max_play_time` ends with a tag.
-3. **No triples or inside-the-park home runs.** Runners only take a base
-   when they beat a *perfect* throw by 0.35 s. Wall balls get cut off fast,
-   and there is no throw inaccuracy or bobble to punish defenders.
-4. **Dives may be too common** at ~3 per game. They are free apart from
-   0.7 s of recovery, with no failure chance. "DIVING CATCH!" will stop
-   feeling special. Failed dives should be possible (and content).
-5. **Swing timing: residual half-frame jitter.** *(Update: fixed as far
-   as Godot allows; see DECISIONS.)* Swings are now stamped on input
-   delivery with a microsecond clock, and the half-frame delivery bias is
-   removed. The pitch flies on the same clock. Godot gives events no OS
-   timestamp, so ±½ frame of jitter remains (±8 ms at 60 fps, ±3.5 ms at
-   144 fps, about 16% of the power window at 60 fps). Display latency is a
-   constant offset, handled by `swing_latency_calibration` (0 until a
-   calibration screen exists). Removing the jitter entirely would need an
-   OS-level input extension.
-6. **The batting read is untested with people.** *(Update: batting is now
-   timing-first; see DECISIONS.)* Pitches take 0.43–0.54 s. The only
-   location skill left is take-or-swing: corners and chases cost quality,
-   and pitches beyond reach whiff. Pitch types now have a trail tell (colour and length). The AI batter
-   still reads location with noise. Windows and penalties were
-   tuned against the AI only.
-7. **No contact feedback.** There is no bat, no swing animation, no hit
-   pause and no camera punch. The batter teleports to home plate on
-   contact. Contact can be correct while still feeling flat.
-8. **The batting camera works but is cramped.** The crouched catcher still
-   intrudes at the bottom of the frame, and the strike zone is small on
-   screen. The ball-in-play camera is a single fixed high angle.
+| Weak spot (first report) | Now |
+|---|---|
+| Steered fielding held to AI-perfect routes | Rookie assist: +12% speed, +0.35 m reach, auto-route with the stick at rest. Control auto-switches to a teammate when a grounder gets past your fielder (F/LT still switches by hand). |
+| Live running AI-tuned only | Live decisions, rundowns, cutoffs, per-runner orders, procedural rundown poses. |
+| No triples, no throw inaccuracy or bobbles | Bobbles, wild throws and wall caroms (0.8 s pickup). Runners take extra bases on a misplay, even mid-stride. Triples 0.7% of balls in play. |
+| Dives free and too common | 30% of dives that reach the ball still fail and the ball gets past ("IT GETS BY HIM!"). That is a hit, not an error. |
+| Swing timing jitter | Microsecond input stamps and half-frame correction. ±½ frame remains (an engine limit). |
+| No pitch read | Pitch tells: trail colour and length per pitch type. |
+| No contact feedback | Visible bat and swing, windup, timing ring, aim preview, sweet-spot flash, synthesized crack, callouts with the reason, camera punch, and a hit pause (50 ms solid, 110 ms barrel). |
+| Cramped batting camera, fixed field camera | Telephoto batting camera with a lower catcher. The field camera follows the ball, pulls back on deep plays, tilts up for fly balls and zooms in on rundowns. |
 
-## Decisions needed (they affect architecture or feel)
+## What only playtesting can settle
 
-1. ~~**Fielding control model.**~~ Decided: the human steers the fielder,
-   and it is implemented (`baseball/fielding/live_fielding.gd`). A
-   catch-timing press could still be layered on top.
-2. ~~**Batting input model.**~~ Decided: timing-first, and it is
-   implemented. The bat finds the pitch's height; the stick at the swing
-   sets left/right field (±15°) and lift/chop (±20°).
-3. **Original rules package.** The prototype uses 6 innings, standard counts,
+1. **Assist strength.** Batting (×0.85 pitch speed, ×1.3 window) and
+   fielding values were tuned against bots. Decide whether rookies should
+   win against the AI.
+2. **Error rate feel.** 0.5 per team per game is about real-baseball
+   rates. Arcade players may find errors frustrating when they happen to
+   them; `assist_error_scale` already halves them for a human fielder.
+3. **Procedural poses** read at close range but are subtle from the field
+   camera. Real animation is Phase 2.
+4. **Remaining ±½-frame swing jitter** matters most for power swings at
+   60 fps. Report it if it feels random.
+
+## Decisions needed before Phase 1
+
+1. **Original rules package.** The prototype uses 6 innings, standard counts,
    standard walk-off and extra innings. Decide which pace and spectacle rules
    the league adds (shot clock, tie-break format, etc.) before Phase 1
    locks MatchState.
-4. ~~**Visual reference.**~~ Added as `docs/visual_reference_concept.jpg`.
-
-## Suggested next increments (still Phase 0/1, no new systems)
-
-1. Tune steered fielding with people; add throw accuracy/bobble.
-2. Replace the procedural poses with real rigged animation (Phase 2).
-3. Timestamped swing input, a hit pause and a bat swing placeholder.
-4. Retune dive frequency, extra-base aggression and infield depth with the
-   sim and launch-angle reports.
+2. **Team names and identity** for the two Phase 1 teams.
+3. **Approval to propose CC0 readability assets** (logged in the asset
+   manifest before import).

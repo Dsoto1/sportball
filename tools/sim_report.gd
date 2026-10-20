@@ -33,6 +33,7 @@ func _initialize() -> void:
 	print("BIP: %d   avg EV: %.1f m/s   air outs: %d   ground outs: %d   dives: %d   multi-out plays: %d" % [
 		totals["balls_in_play"], totals["exit_velocity_sum"] / bip, totals["air_outs"], totals["ground_outs"],
 		totals["dives"], totals["double_plays"]])
+	print("errors: %d (%.2f/team/game)   missed dives: %d" % [totals["errors"], totals["errors"] / (2.0 * matches), totals["dive_misses"]])
 	var keys := outcomes.keys()
 	keys.sort()
 	for key in keys:

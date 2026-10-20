@@ -103,3 +103,18 @@ func test_throw_arrival_grows_with_distance() -> void:
 	var far := ThrowModel.arrival_at_base(f, 4, tuning())
 	check(far > near, "home is farther from short center than second")
 	check_near(near, 1.0 + tuning().throw_release_time + 5.0 / tuning().throw_speed + 25.0 * tuning().throw_long_penalty, 0.001, "near throw time")
+
+
+func test_ball_off_the_wall_costs_pickup_time() -> void:
+	var found := false
+	for la in range(10, 30):
+		var traj := BallTrajectory.simulate(47.0, float(la), -30.0, tuning())
+		if traj.result != BallTrajectory.Result.IN_PLAY or not traj.hit_fence:
+			continue
+		found = true
+		check(traj.fence_time < INF, "fence time recorded")
+		var f := FieldingResolver.resolve(traj, FielderState.default_defense(tuning()), tuning())
+		if f.secure_time >= traj.fence_time:
+			check_near(f.ready_time - f.secure_time, tuning().wall_carom_delay, 0.001, "carom delay at la %d" % la)
+		break
+	check(found, "some ball comes off the wall")

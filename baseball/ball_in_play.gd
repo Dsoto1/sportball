@@ -33,15 +33,18 @@ func is_home_run() -> bool:
 	return trajectory.result == BallTrajectory.Result.HOME_RUN
 
 
-func start_live(auto_secure: bool = true) -> LivePlay:
-	return LivePlay.new(bases_before, batter_id, outs_before, contact.launch_angle, trajectory, fielding, tuning, auto_secure)
+## rng enables fielding errors; without one the play is error-free.
+func start_live(auto_secure: bool = true, rng: MatchRng = null) -> LivePlay:
+	var play := LivePlay.new(bases_before, batter_id, outs_before, contact.launch_angle, trajectory, fielding, tuning, auto_secure)
+	play.rng = rng
+	return play
 
 
 ## Resolves the whole play with the AI on both sides.
-func resolve_ai() -> PlayOutcome:
+func resolve_ai(rng: MatchRng = null) -> PlayOutcome:
 	if is_home_run():
 		return RunnerResolver.home_run(bases_before, batter_id)
-	return start_live().run_ai(tuning.sim_play_step)
+	return start_live(true, rng).run_ai(tuning.sim_play_step)
 
 
 ## Seconds the home run trot takes (presentation pacing).

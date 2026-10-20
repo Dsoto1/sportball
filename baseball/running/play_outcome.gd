@@ -14,6 +14,8 @@ const KIND_GROUND_OUT := &"ground_out"
 const KIND_FIELDERS_CHOICE := &"fielders_choice"
 const KIND_DOUBLE_PLAY := &"double_play"
 const KIND_TRIPLE_PLAY := &"triple_play"
+## Batter safe only because of a bobble or a wild throw to first: not a hit.
+const KIND_REACHED_ON_ERROR := &"reached_on_error"
 
 const OUT_CATCH := &"catch"
 const OUT_FORCE := &"force"
@@ -38,6 +40,8 @@ var throw_arrival: float = INF
 var throws: Array[Dictionary] = []
 ## Runner movements for presentation/logging: {runner_id, from, to, safe}
 var advances: Array[Dictionary] = []
+## Misplays: {type: "bobble"|"wild_throw"|"dive_miss", base, on_batter}
+var errors: Array[Dictionary] = []
 
 
 func is_hit() -> bool:

@@ -426,10 +426,14 @@ func _process(delta: float) -> void:
 	if _camera_mode == CameraMode.FIELD:
 		# A rundown pulls the camera in tight on the runner and the ball.
 		var focus := _rundown_focus if _rundown_zoom else _field_focus
+		var flat := Vector3(focus.x, 0.0, focus.z)
 		if _rundown_zoom:
 			goal *= 0.45
-		goal += focus
-		target += focus
+		else:
+			# Pull back a little as the play goes deep.
+			goal *= lerpf(0.85, 1.15, clampf(flat.length() / 100.0, 0.0, 1.0))
+		goal += flat
+		target += flat + Vector3.UP * clampf(focus.y, 0.0, 30.0) * 0.6
 	_camera.position = _camera.position.lerp(goal, weight)
 	if kick > 0.0:
 		_camera.position += Vector3(_shake_rng.randf_range(-1, 1), _shake_rng.randf_range(-1, 1), 0.0) * 0.06 * kick

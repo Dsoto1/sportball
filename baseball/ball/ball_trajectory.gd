@@ -17,6 +17,8 @@ var first_bounce_time: float = INF
 var landing_point: Vector3 = Vector3.ZERO
 var apex_height: float = 0.0
 var hit_fence: bool = false
+## Time the ball first came off the wall; INF if it never reached it.
+var fence_time: float = INF
 
 var _fence_point: Vector3
 var _fence_velocity: Vector3
@@ -69,10 +71,17 @@ static func simulate(exit_velocity: float, launch_angle: float, spray_angle: flo
 				break
 			p = traj._fence_point
 			v = traj._fence_velocity
+			traj.fence_time = minf(traj.fence_time, t)
 		traj._append(t, p)
 	if traj.first_bounce_time == INF and traj.result != Result.HOME_RUN:
 		traj.landing_point = traj.points[traj.points.size() - 1]
 	return traj
+
+
+## Extra time a fielder needs to pick the ball up at `t`: a ball off the
+## wall has to be played off the carom.
+func pickup_delay(t: float, tuning: BaseballTuning) -> float:
+	return tuning.wall_carom_delay if t >= fence_time else 0.0
 
 
 func end_time() -> float:

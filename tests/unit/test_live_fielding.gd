@@ -98,7 +98,9 @@ func test_dive_extends_reach_and_miss_costs_time() -> void:
 
 func test_switch_picks_nearest_other_fielder() -> void:
 	var s := _setup(30.0, -6.0, -15.0)
-	var live := LiveFielding.new(s["traj"], s["fielders"], s["projection"], tuning(), _index(&"rf"))
+	var manual: BaseballTuning = tuning().duplicate()
+	manual.auto_switch_min_gap = INF  # only the button switches here
+	var live := LiveFielding.new(s["traj"], s["fielders"], s["projection"], manual, _index(&"rf"))
 	for i in 60:
 		live.step(tuning().sim_step)
 	live.switch_to_nearest()
@@ -139,3 +141,22 @@ func test_stick_input_overrides_the_assist() -> void:
 	while not live.is_secured() and live.time < 30.0:
 		live.step(tuning().sim_step, Vector2(0.0, -1.0))  # run the wrong way on purpose
 	check(not live.result.caught_in_air, "the player can still misplay it")
+
+
+func test_grounder_through_the_hole_switches_to_outfielder() -> void:
+	# A hard grounder past a third baseman who never moves: the left fielder takes over.
+	var s := _setup(40.0, -3.0, -32.0)
+	var live := LiveFielding.new(s["traj"], s["fielders"], s["projection"], tuning(), _index(&"3b"))
+	while not live.is_secured() and live.time < 15.0:
+		live.step(tuning().sim_step)
+	check(live.auto_switches >= 1, "control passed on")
+	check(live.controlled != _index(&"3b"), "no longer the third baseman")
+	check(live.is_secured(), "someone fields it")
+
+
+func test_no_auto_switch_while_still_close() -> void:
+	var s := _setup(36.0, 32.0, 0.0)
+	var traj: BallTrajectory = s["traj"]
+	var live := LiveFielding.new(traj, s["fielders"], s["projection"], tuning(), _index(&"cf"))
+	_steer_to(live, traj.landing_point)
+	check_eq(live.auto_switches, 0, "a fielder on the ball keeps control")

@@ -22,7 +22,7 @@ static func resolve(traj: BallTrajectory, fielders: Array[FielderState], tuning:
 	if result.has_fielder():
 		result.caught_in_air = traj.is_airborne_at(result.secure_time)
 		result.secure_point.y = 0.0
-		result.ready_time = result.secure_time + (tuning.dive_recovery if result.is_dive else 0.0)
+		result.ready_time = result.secure_time + (tuning.dive_recovery if result.is_dive else 0.0) + traj.pickup_delay(result.secure_time, tuning)
 	return result
 
 

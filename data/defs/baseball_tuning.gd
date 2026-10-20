@@ -109,6 +109,8 @@ extends Resource
 @export var fence_line: float = 92.0
 @export var fence_height: float = 3.2
 @export var fence_restitution: float = 0.3
+## A ball played off the wall costs the fielder this long to pick up.
+@export var wall_carom_delay: float = 0.8
 
 @export_group("Fielding")
 @export var fielder_ids: Array[StringName] = [&"p", &"c", &"1b", &"2b", &"ss", &"3b", &"lf", &"cf", &"rf"]
@@ -130,6 +132,10 @@ extends Resource
 @export var dive_reach: float = 1.4
 @export var dive_recovery: float = 0.7
 @export var catch_max_height: float = 2.6
+## Control passes to a teammate on a ball on the ground once the human's
+## fielder is this far from it and the teammate is within this share of that.
+@export var auto_switch_min_gap: float = 8.0
+@export var auto_switch_ratio: float = 0.5
 @export var throw_release_time: float = 0.6
 @export var throw_speed: float = 31.0
 ## Extra seconds per meter squared: long throws lose carry and need an arc.
@@ -146,6 +152,31 @@ extends Resource
 @export var cutoff_release_time: float = 0.3
 ## A fielder this close to the target base runs it there instead of throwing.
 @export var unassisted_distance: float = 5.0
+
+@export_group("Errors")
+## Chance a ground ball is bobbled, plus more per m/s of ball speed.
+@export var bobble_chance: float = 0.008
+@export var bobble_chance_per_speed: float = 0.0006
+## A bobbled ball ends up this far along its path; the fielder loses this long.
+@export var bobble_roll: float = 1.8
+@export var bobble_time: float = 0.75
+## Chance a dive that reaches the ball fails to hold it (the ball gets past).
+@export var dive_drop_chance: float = 0.3
+@export var dive_miss_roll: float = 7.0
+@export var dive_miss_delay: float = 1.3
+## Chance a throw sails, plus more per meter of throw.
+@export var throw_error_chance: float = 0.006
+@export var throw_error_per_meter: float = 0.0003
+## Where a wild throw ends up: up to this far to one side, and this far
+## past the target (into foul ground or the gap, where a backup gets it).
+@export var wild_throw_side: float = 5.0
+@export var wild_throw_past_min: float = 6.0
+@export var wild_throw_past_max: float = 22.0
+## Backup's pickup time plus his run, as a share of the distance it got away.
+@export var wild_throw_pickup: float = 0.4
+@export var wild_throw_run_share: float = 0.6
+## Error chances for a human fielder under Rookie assist are scaled by this.
+@export var assist_error_scale: float = 0.5
 
 @export_group("Base Running")
 @export var runner_speed: float = 8.0

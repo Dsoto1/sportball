@@ -13,6 +13,11 @@ extends RefCounted
 ## runner who is off a base), doubled off (a runner who has not retouched
 ## after a catch is out if the ball beats them back), ties go to the runner,
 ## third-out run rules by time.
+##
+## Errors (only when an rng is given): a ground ball can be bobbled, a dive
+## that reaches the ball can still fail to hold it (the ball gets past), and
+## any throw can sail. Runners standing on a base read a misplay and may take
+## the next one.
 
 enum State { WAITING, RUNNING, ON_BASE, OUT, SCORED }
 enum Ball { LOOSE, HELD, FLIGHT }
@@ -76,6 +81,12 @@ var legs: Array[Dictionary] = []
 var events: Array[Dictionary] = []
 var auto_secure := true
 var human_defense := false
+## Gameplay randomness for errors; null plays error-free (tests, old sims).
+var rng: MatchRng = null
+## Multiplier on every error chance (Rookie assist lowers it for a human).
+var error_scale := 1.0
+## Misplays so far: {type: "bobble"|"wild_throw"|"dive_miss", on_batter, base}
+var errors: Array[Dictionary] = []
 
 var _went := false
 var _ground_targets := {}
@@ -84,6 +95,12 @@ var _pending_throw := -1
 var _last_human_input := -INF
 var _settled_since := INF
 var _done := false
+## While the ball is held after a misplay it rolls from here into the
+## fielder's hands; standing runners may run on it until _scramble_until.
+var _loose_from := Vector3.ZERO
+var _loose_start := 0.0
+var _loose_until := -INF
+var _scramble_until := -INF
 
 
 func _init(bases: Array[StringName], p_batter_id: StringName, p_outs_before: int, p_launch_angle: float,
@@ -158,6 +175,10 @@ func ball_position() -> Vector3:
 				return holder_pos + Vector3.UP * 1.3
 			var u := clampf((time - flight["release"]) / maxf(flight["arrival"] - flight["release"], 0.01), 0.0, 1.0)
 			return ThrowModel.position_at(flight["from"], flight["to"], u, tuning)
+	if time < _loose_until:
+		# A misplayed ball skipping away before the fielder picks it up.
+		var u := clampf((time - _loose_start) / maxf(_loose_until - _loose_start, 0.01), 0.0, 1.0)
+		return _loose_from.lerp(holder_pos, u) + Vector3.UP * 0.12
 	return holder_pos + Vector3.UP * 1.3
 
 
@@ -213,7 +234,14 @@ func secure(f: FieldingResult) -> void:
 	holder_cover = -1
 	busy_until = f.ready_time
 	windup = tuning.throw_release_time
-	if f.caught_in_air:
+	if f.caught_in_air and f.is_dive and _roll(tuning.dive_drop_chance):
+		# The dive gets a glove on it but the ball squirts past.
+		fielding = _copy(f)
+		fielding.caught_in_air = false
+		_misplay("dive_miss", tuning.dive_miss_roll, tuning.dive_miss_delay)
+	elif not f.caught_in_air and _roll(tuning.bobble_chance + tuning.bobble_chance_per_speed * _ball_speed(f.secure_time)):
+		_misplay("bobble", tuning.bobble_roll, tuning.bobble_time)
+	if fielding.caught_in_air:
 		var batter := runner(batter_id)
 		_record_out(batter, FieldLayout.HOME, PlayOutcome.OUT_CATCH)
 		events.append({"type": "catch"})
@@ -356,15 +384,23 @@ func _ai_runner(r: Runner) -> void:
 		if next > HOME_PLATE or r.must_retouch or _blocked(r, next) or inning_over():
 			return
 		var tagging := fielding != null and fielding.caught_in_air and ball == Ball.HELD and holder_cover == -1
-		if not tagging and not (ball == Ball.FLIGHT and flight["base"] != next):
+		var scramble := time < _scramble_until
+		if not tagging and not scramble and not (ball == Ball.FLIGHT and flight["base"] != next):
 			return
 		var slack := ball_eta(next) - runner_eta(r, next) - _tag_margin()
-		if slack > tuning.runner_take_base_margin:
+		if slack > (tuning.runner_safety_margin if scramble else tuning.runner_take_base_margin):
 			_set_target(r, next, tuning.runner_read_delay)
 			events.append({"type": "advance", "runner": r.id, "base": next})
 	elif r.state == State.RUNNING:
 		var cur := r.target
 		var dir := signf(cur * BASE - r.s)
+		if time < _scramble_until and dir > 0.0 and cur < HOME_PLATE and not _blocked(r, cur + 1) and not inning_over():
+			# The ball got away: keep going past the base if it is there to take.
+			var slack_on := ball_eta(cur + 1) - runner_eta(r, cur + 1) - tuning.base_turn_penalty - _tag_margin()
+			if slack_on > tuning.runner_safety_margin:
+				_set_target(r, cur + 1, 0.0)
+				events.append({"type": "advance", "runner": r.id, "base": cur + 1})
+				return
 		if dir == 0.0 or (r.must_retouch and cur == r.start_base) or forced_now(r, cur):
 			return
 		var slack_cur := ball_eta(cur) - runner_eta(r, cur) - _tag_margin()
@@ -545,7 +581,16 @@ func _throw(base: int) -> void:
 		covers[CUTOFF] = to
 		cutoff_active = true
 		relay_target = base
-	flight = {"from": holder_pos, "to": to, "base": aim, "release": release, "arrival": arrival}
+	var flat := Vector2(to.x - holder_pos.x, to.z - holder_pos.z).length()
+	var wild := _roll(tuning.throw_error_chance + tuning.throw_error_per_meter * flat)
+	if wild:
+		# It sails: off to one side and past the target.
+		var along := Vector3(to.x - holder_pos.x, 0.0, to.z - holder_pos.z).normalized()
+		var side := along.cross(Vector3.UP) * (1.0 if rng.chance(0.5) else -1.0)
+		var off := side * rng.randf_range(0.0, tuning.wild_throw_side) + along * rng.randf_range(tuning.wild_throw_past_min, tuning.wild_throw_past_max)
+		flight = {"from": holder_pos, "to": to + off, "base": aim, "release": release, "arrival": arrival, "wild": true, "missed_by": off.length()}
+	else:
+		flight = {"from": holder_pos, "to": to, "base": aim, "release": release, "arrival": arrival}
 	legs.append(flight.duplicate())
 	ball = Ball.FLIGHT
 	events.append({"type": "throw", "base": aim, "relay_to": base if route["cutoff"] else -1})
@@ -570,6 +615,14 @@ func _catch_throw() -> void:
 	holder_pos = flight["to"]
 	covers[base] = holder_pos
 	busy_until = time
+	if flight.get("wild", false):
+		# The cover chases it down off the bag; runners can take a base.
+		# A backup chases it down where it stopped.
+		busy_until = time + tuning.wild_throw_pickup + tuning.wild_throw_run_share * flight["missed_by"] / tuning.fielder_speed
+		_scramble_until = busy_until + tuning.runner_take_base_margin
+		var batter := runner(batter_id)
+		errors.append({"type": "wild_throw", "base": base, "on_batter": base == FieldLayout.FIRST and batter.state == State.RUNNING and batter.target == FieldLayout.FIRST})
+		events.append({"type": "error", "kind": "wild_throw", "base": base})
 	if base == CUTOFF:
 		windup = tuning.cutoff_release_time
 		events.append({"type": "cutoff", "relay_to": relay_target})
@@ -609,6 +662,42 @@ func _throw_time(base: int) -> float:
 		return windup + ThrowModel.flight_time(holder_pos, covers[base], tuning)
 	var cut: Vector3 = route["to"]
 	return windup + ThrowModel.flight_time(holder_pos, cut, tuning) + tuning.cutoff_release_time + ThrowModel.flight_time(cut, covers[base], tuning)
+
+
+func _roll(probability: float) -> bool:
+	return rng != null and rng.chance(probability * error_scale)
+
+
+## The fielder who just got the ball fumbles it: it ends up `roll` meters
+## further along its path and he is busy for `delay` seconds.
+func _misplay(kind: String, roll: float, delay: float) -> void:
+	var along := trajectory.position_at(fielding.secure_time + 0.1) - trajectory.position_at(fielding.secure_time)
+	along.y = 0.0
+	_loose_from = holder_pos
+	_loose_start = time
+	holder_pos += along.normalized() * roll if along.length() > 0.001 else Vector3.ZERO
+	busy_until = maxf(busy_until, time) + delay
+	_loose_until = busy_until
+	_scramble_until = busy_until + tuning.runner_take_base_margin
+	errors.append({"type": kind, "base": -1, "on_batter": kind == "bobble"})
+	events.append({"type": "error", "kind": kind, "base": -1})
+
+
+func _ball_speed(t: float) -> float:
+	return (trajectory.position_at(t + 0.05) - trajectory.position_at(t)).length() / 0.05
+
+
+static func _copy(f: FieldingResult) -> FieldingResult:
+	var c := FieldingResult.new()
+	c.fielder_index = f.fielder_index
+	c.fielder_id = f.fielder_id
+	c.secure_time = f.secure_time
+	c.ready_time = f.ready_time
+	c.secure_point = f.secure_point
+	c.caught_in_air = f.caught_in_air
+	c.is_dive = f.is_dive
+	c.candidates = f.candidates.duplicate()
+	return c
 
 
 func _tag_margin() -> float:
@@ -691,6 +780,7 @@ func outcome() -> PlayOutcome:
 	result.batter_id = batter_id
 	result.outs = outs.duplicate(true)
 	result.throws = legs.duplicate(true)
+	result.errors = errors.duplicate(true)
 	if not legs.is_empty():
 		result.throw_base = legs[0]["base"]
 		result.throw_arrival = legs[0]["arrival"]
@@ -737,6 +827,8 @@ func _classify(result: PlayOutcome) -> StringName:
 	var hit_base := result.batter_base if result.batter_base > 0 else batter.reached
 	if hit_base == 0:
 		return PlayOutcome.KIND_GROUND_OUT
+	if result.batter_base > 0 and errors.any(func(e: Dictionary) -> bool: return e["on_batter"]):
+		return PlayOutcome.KIND_REACHED_ON_ERROR
 	if not result.outs.is_empty() and result.batter_base == FieldLayout.FIRST:
 		return PlayOutcome.KIND_FIELDERS_CHOICE
 	match hit_base:
