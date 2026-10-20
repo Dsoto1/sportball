@@ -71,3 +71,11 @@ Decision: Right-handed placeholder batters only; anonymous placeholder lineups (
 Reason: Keep Phase 0 to the core loop. Each is a small, reversible addition.
 
 Affected systems: batting, pitching, MatchState.
+
+## 2026-10-20 - No Mobile Optimization
+
+Decision: Do not optimize for mobile hardware or touch input. Target desktop (Windows PC first) with the Forward+ renderer; scalable quality tiers apply to modest desktop hardware only.
+
+Reason: Owner direction. Mobile constraints would limit rendering, crowd density and control design without serving the target platform.
+
+Affected systems: rendering, performance budgets, input, UI layout.
