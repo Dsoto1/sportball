@@ -125,6 +125,8 @@ func set_cursor(at: Vector2, outer_radius: float, inner_radius: float, color: Co
 ## Draws a ball in play at contact-relative time t from the LivePlay
 ## (runners, ball, holder, covers). play is null for a home run, which is
 ## drawn from the outcome. live is the LiveFielding while a human fields.
+## Cutoff man by relay target: left side / right side of the field.
+const CUTOFF_PREFERENCE := {1: [&"2b", &"2b"], 2: [&"ss", &"2b"], 3: [&"ss", &"ss"], 4: [&"3b", &"1b"]}
 const COVER_PREFERENCE := {1: [&"1b", &"p", &"2b"], 2: [&"2b", &"ss"], 3: [&"3b", &"ss"], 4: [&"c", &"p"]}
 
 
@@ -138,10 +140,19 @@ func show_play(bip: BallInPlay, t: float, play: LivePlay, outcome: PlayOutcome, 
 	# Gameplay aid for the human fielder: where a fly ball will come down.
 	_landing_hint.visible = live != null and not live.is_secured() and bip.trajectory.is_airborne_at(t)
 	_landing_hint.position = bip.trajectory.landing_point + Vector3.UP * 0.06
-	var covers := _cover_assignments(fielding.fielder_index)
+	var cutoff := -1
+	if play != null and play.cutoff_active:
+		cutoff = _cutoff_fielder(play.relay_target, fielding)
+	var covers := _cover_assignments(fielding.fielder_index, cutoff)
 	var holder := -1
 	if secured:
-		holder = fielding.fielder_index if play.holder_cover == -1 else covers.get(play.holder_cover, -1)
+		match play.holder_cover:
+			-1:
+				holder = fielding.fielder_index
+			LivePlay.CUTOFF:
+				holder = cutoff
+			_:
+				holder = covers.get(play.holder_cover, -1)
 	for i in _fielders.size():
 		var start := tuning.fielder_spots[i]
 		var actor := _fielders[i]
@@ -149,6 +160,9 @@ func show_play(bip: BallInPlay, t: float, play: LivePlay, outcome: PlayOutcome, 
 		var since := maxf(t - tuning.fielder_reaction, 0.0)
 		if i == holder:
 			actor.position = play.holder_pos
+			actor.face(_ball.position)
+		elif i == cutoff:
+			actor.position = actor.position.move_toward(play.covers[LivePlay.CUTOFF], tuning.fielder_speed * 0.05)
 			actor.face(_ball.position)
 		elif secured and covers.values().has(i):
 			actor.position = actor.position.move_toward(play.covers[covers.find_key(i)], tuning.fielder_speed * 0.05)
@@ -237,10 +251,20 @@ func _snap_camera() -> void:
 	_camera.look_at(spot[1], Vector3.UP)
 
 
+func _cutoff_fielder(target: int, fielding: FieldingResult) -> int:
+	var side := 0 if fielding.secure_point.x < 0.0 else 1
+	var options: Array = CUTOFF_PREFERENCE.get(target, [&"ss", &"2b"])
+	for id: StringName in [options[side], options[1 - side], &"p"]:
+		var i := tuning.fielder_ids.find(id)
+		if i >= 0 and i != fielding.fielder_index:
+			return i
+	return -1
+
+
 ## Which fielder covers each base this play: {base: fielder_index}.
-func _cover_assignments(fielder_index: int) -> Dictionary:
+func _cover_assignments(fielder_index: int, cutoff: int = -1) -> Dictionary:
 	var covers := {}
-	var used := {fielder_index: true}
+	var used := {fielder_index: true, cutoff: true}
 	for base in [1, 2, 3, 4]:
 		for id: StringName in COVER_PREFERENCE[base]:
 			var i := tuning.fielder_ids.find(id)

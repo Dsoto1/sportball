@@ -128,6 +128,12 @@ extends Resource
 ## Catch-to-release time for a fielder receiving a throw and throwing on
 ## (the double-play pivot).
 @export var relay_release_time: float = 0.45
+## Outfield throws at least this long go through a cutoff man.
+@export var cutoff_min_throw: float = 45.0
+## Where the cutoff lines up: this far from the target base (at most halfway).
+@export var cutoff_distance_from_base: float = 30.0
+## Cutoff man's catch-and-relay time (quicker than a full pivot).
+@export var cutoff_release_time: float = 0.3
 ## A fielder this close to the target base runs it there instead of throwing.
 @export var unassisted_distance: float = 5.0
 

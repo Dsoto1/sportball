@@ -21,6 +21,8 @@ const BASE := FieldLayout.BASE_DISTANCE
 const HOME_PLATE := 4
 ## Holder counts as on the bag within this distance of it.
 const ON_BAG := 0.8
+## covers[CUTOFF] is the cutoff man's spot; flight base CUTOFF means a throw to him.
+const CUTOFF := 0
 
 
 class Runner:
@@ -56,13 +58,17 @@ var runners: Array[Runner] = []
 var time := 0.0
 var ball := Ball.LOOSE
 var holder_pos := Vector3.ZERO
-## Base whose cover holds the ball; -1 while the fielder who got it has it.
+## Base whose cover holds the ball; -1 while the fielder who got it has
+## it; CUTOFF while the cutoff man has it.
 var holder_cover := -1
 var busy_until := 0.0
 var windup := 0.0
 var flight := {}
-## Cover positions by base 1..4 (index 0 unused; 4 = home plate).
+## Cover positions by base 1..4 (4 = home plate); index 0 is the cutoff man.
 var covers: Array[Vector3] = []
+## Base the throw to the cutoff man was meant for (-1 when no relay is on).
+var relay_target := -1
+var cutoff_active := false
 var outs: Array[Dictionary] = []
 ## Throws made: {from, base, release, arrival}
 var legs: Array[Dictionary] = []
@@ -178,7 +184,8 @@ func ball_eta(base: int) -> float:
 			var land: float = flight["arrival"] - time
 			if to_base == base:
 				return maxf(land, 0.0)
-			return maxf(land, 0.0) + tuning.relay_release_time + ThrowModel.flight_time(flight["to"], covers[base], tuning)
+			var pivot := tuning.cutoff_release_time if to_base == CUTOFF else tuning.relay_release_time
+			return maxf(land, 0.0) + pivot + ThrowModel.flight_time(flight["to"], covers[base], tuning)
 	var wait := maxf(busy_until - time, 0.0)
 	return wait + minf(_run_time(base), _throw_time(base))
 
@@ -383,15 +390,16 @@ func _resolve_arrivals() -> void:
 # --- Defense ------------------------------------------------------------------
 
 func _apply_defense(dt: float, defense: Dictionary) -> void:
+	if human_defense and defense.get("throw", -1) > 0 and ball != Ball.LOOSE:
+		# Buffered even mid-throw: pressing a base while the ball is on its way
+		# to the cutoff man redirects his relay.
+		_pending_throw = defense["throw"]
+		_last_human_input = time
 	if ball != Ball.HELD:
 		return
 	var action := {}
 	if human_defense:
-		var throw_base: int = defense.get("throw", -1)
 		var move: Vector2 = defense.get("move", Vector2.ZERO)
-		if throw_base > 0:
-			_pending_throw = throw_base
-			_last_human_input = time
 		if move.length() > 0.2:
 			_last_human_input = time
 			action = {"kind": "move", "dir": move}
@@ -488,13 +496,31 @@ func _hold_base() -> int:
 func _throw(base: int) -> void:
 	if _holder_on_bag() == base or base < 1 or base > HOME_PLATE:
 		return
-	var to := covers[base]
+	var route := _route(base)
+	var to: Vector3 = route["to"]
 	var release := maxf(time, busy_until) + windup
 	var arrival := release + ThrowModel.flight_time(holder_pos, to, tuning)
-	flight = {"from": holder_pos, "to": to, "base": base, "release": release, "arrival": arrival}
+	var aim := CUTOFF if route["cutoff"] else base
+	if route["cutoff"]:
+		covers[CUTOFF] = to
+		cutoff_active = true
+		relay_target = base
+	flight = {"from": holder_pos, "to": to, "base": aim, "release": release, "arrival": arrival}
 	legs.append(flight.duplicate())
 	ball = Ball.FLIGHT
-	events.append({"type": "throw", "base": base})
+	events.append({"type": "throw", "base": aim, "relay_to": base if route["cutoff"] else -1})
+
+
+## Long throws from the outfield go through a cutoff man lined up between
+## the thrower and the base: {cutoff: bool, to: Vector3}.
+func _route(base: int) -> Dictionary:
+	var bag := covers[base]
+	var flat := Vector2(bag.x - holder_pos.x, bag.z - holder_pos.z).length()
+	if holder_cover != -1 or flat < tuning.cutoff_min_throw:
+		return {"cutoff": false, "to": bag}
+	var from_base := minf(tuning.cutoff_distance_from_base, flat * 0.5)
+	var spot := bag.move_toward(Vector3(holder_pos.x, 0.0, holder_pos.z), from_base)
+	return {"cutoff": true, "to": spot}
 
 
 func _catch_throw() -> void:
@@ -504,12 +530,21 @@ func _catch_throw() -> void:
 	holder_pos = flight["to"]
 	covers[base] = holder_pos
 	busy_until = time
-	windup = tuning.relay_release_time
+	if base == CUTOFF:
+		windup = tuning.cutoff_release_time
+		events.append({"type": "cutoff", "relay_to": relay_target})
+		# A human's relay goes through to the original base unless they
+		# pressed another one while the ball was coming in.
+		if human_defense and _pending_throw <= 0:
+			_pending_throw = relay_target
+	else:
+		windup = tuning.relay_release_time
+		relay_target = -1
 
 
 func _move_holder(goal: Vector3, dt: float) -> void:
 	holder_pos = holder_pos.move_toward(Vector3(goal.x, 0.0, goal.z), tuning.fielder_speed * dt)
-	if holder_cover > 0:
+	if holder_cover >= 0:
 		covers[holder_cover] = holder_pos
 	windup = tuning.relay_release_time
 
@@ -529,7 +564,11 @@ func _run_time(base: int) -> float:
 func _throw_time(base: int) -> float:
 	if _holder_on_bag() == base:
 		return 0.0
-	return windup + ThrowModel.flight_time(holder_pos, covers[base], tuning)
+	var route := _route(base)
+	if not route["cutoff"]:
+		return windup + ThrowModel.flight_time(holder_pos, covers[base], tuning)
+	var cut: Vector3 = route["to"]
+	return windup + ThrowModel.flight_time(holder_pos, cut, tuning) + tuning.cutoff_release_time + ThrowModel.flight_time(cut, covers[base], tuning)
 
 
 func _tag_margin() -> float:

@@ -43,8 +43,8 @@ runner/base resolution → reset.
 | HR / PA | 3.1% | 2.5–3.5% (arcade: higher is fine) |
 | Pitches / game (both teams) | 210 | — |
 | Diving catches | 7% of balls in play | "rare enough to stay exciting" |
-| Double plays / team / 6 inn | 0.46 | ~0.6 |
-| Triples / doubles (% of balls in play) | 0.3% / 9.8% | ~0.5% / ~6.5% |
+| Double plays / team / 6 inn | 0.48 | ~0.6 |
+| Triples / doubles (% of balls in play) | ~0% / 8.6% | ~0.5% / ~6.5% |
 
 Hit rate by launch angle (`tools/launch_angle_report.gd`): grounders
 (−10–10°) 25–32%, liners (10–20°) 79%, 20–30° 42%, high flies (40°+) 0%.
@@ -67,8 +67,12 @@ bot, screenshots and reading the timings.
    live and rundowns exist; see DECISIONS.)* Runners freeze on balls in the
    air (except with two outs), retouch after catches, take bases on throws,
    retreat, and get hung up in rundowns. The defense throws, runs the ball
-   to a bag, chases runners, and covers close in. Still missing: cutoff men
-   (outfield throws go straight to a base), per-runner human control
+   to a bag, chases runners, and covers close in. Long outfield throws go
+   through a cutoff man who relays, can be redirected or holds the ball.
+   Cutoff and cover choices are fixed tables (for example the pitcher
+   covers first when the first baseman cuts). Triples are now very rare
+   (~0 in 100 sims); `runner_take_base_margin` and `cutoff_min_throw` are
+   the knobs. Still missing: per-runner human control
    (advance/retreat moves all runners), and visible rundown animation
    (fielders slide; there is no chase pose). A rundown that runs past
    `max_play_time` ends with a tag.
@@ -117,7 +121,7 @@ bot, screenshots and reading the timings.
 ## Suggested next increments (still Phase 0/1, no new systems)
 
 1. Tune steered fielding with people; add throw accuracy/bobble.
-2. Cutoff men, per-runner human control, and rundown presentation.
+2. Per-runner human control and rundown presentation.
 3. Timestamped swing input, a hit pause and a bat swing placeholder.
 4. Retune dive frequency, extra-base aggression and infield depth with the
    sim and launch-angle reports.

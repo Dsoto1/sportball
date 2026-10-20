@@ -91,8 +91,11 @@ func test_runner_who_stays_retouches_safely() -> void:
 	check_eq(outcome.final_bases[0], &"r1", "runner back on first")
 
 
-func test_sac_fly_and_trail_runner_moves_up_on_the_throw() -> void:
-	var play := _play(_bases(&"r1", &"", &"r3"), 0, _fielded(Vector3(0, 0, -95), 4.0, true), [40.0, 35.0, 0.0])
+func test_sac_fly_and_trail_runner_moves_up_on_a_direct_throw() -> void:
+	var no_cutoff := tuning().duplicate() as BaseballTuning
+	no_cutoff.cutoff_min_throw = 1000.0  # a direct throw home, nobody cutting it off
+	var traj := BallTrajectory.simulate(40.0, 35.0, 0.0, no_cutoff)
+	var play := LivePlay.new(_bases(&"r1", &"", &"r3"), &"bat", 0, 35.0, traj, _fielded(Vector3(0, 0, -95), 4.0, true), no_cutoff, true)
 	play.human_defense = true
 	while play.runner(&"r1").state != LivePlay.State.ON_BASE and play.time < 8.0:
 		play.step(tuning().sim_play_step)
@@ -159,3 +162,48 @@ func test_live_play_is_deterministic() -> void:
 	check_eq(a.kind, b.kind, "kind")
 	check_eq(a.runs, b.runs, "runs")
 	check_eq(a.final_bases, b.final_bases, "bases")
+
+
+func _deep_fly_play(bases: Array[StringName]) -> LivePlay:
+	var play := _play(bases, 0, _fielded(Vector3(0, 0, -95), 4.0, true), [40.0, 35.0, 0.0])
+	play.human_defense = true
+	while play.ball != LivePlay.Ball.HELD and play.time < 8.0:
+		play.step(tuning().sim_play_step)
+	return play
+
+
+func test_long_throw_home_goes_through_cutoff() -> void:
+	var play := _deep_fly_play(_bases(&"", &"", &"r3"))
+	play.step(tuning().sim_play_step, {"throw": 4})
+	_run(play)
+	check(play.legs.size() >= 2, "two legs")
+	check_eq(play.legs[0]["base"], LivePlay.CUTOFF, "first to the cutoff man")
+	check_eq(play.legs[1]["base"], 4, "then relayed home")
+	var spot: Vector3 = play.legs[0]["to"]
+	check_near(spot.length(), tuning().cutoff_distance_from_base, 0.5, "lined up in front of the plate")
+	check(absf(spot.x) < 0.5, "on the line from center field")
+
+
+func test_human_can_redirect_the_cutoff() -> void:
+	var play := _deep_fly_play(_bases(&"r1", &"", &"r3"))
+	play.step(tuning().sim_play_step, {"throw": 4})
+	play.step(tuning().sim_play_step, {"throw": 2})  # cut it: go to second instead
+	_run(play)
+	check_eq(play.legs[0]["base"], LivePlay.CUTOFF, "to the cutoff")
+	check_eq(play.legs[1]["base"], 2, "redirected to second")
+
+
+func test_ai_hits_cutoff_and_holds_on_a_single() -> void:
+	var outcome := _run(_play(_bases(), 0, _fielded(Vector3(-45, 0, -62), 2.2), [36.0, 18.0, -30.0]))
+	check_eq(outcome.kind, PlayOutcome.KIND_SINGLE)
+	check(not outcome.throws.is_empty() and outcome.throws[0]["base"] == LivePlay.CUTOFF, "ball goes in to the cutoff")
+	check_eq(outcome.throws.size(), 1, "cutoff holds it")
+
+
+func test_cutoff_keeps_trail_runner_honest() -> void:
+	# Same deep fly: a direct throw home lets the runner on first take second;
+	# through the cutoff the ball is never far enough away.
+	var play := _deep_fly_play(_bases(&"r1", &"", &""))
+	play.step(tuning().sim_play_step, {"throw": 4})
+	var outcome := _run(play)
+	check_eq(outcome.final_bases[0], &"r1", "runner stays at first")

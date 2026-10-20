@@ -132,3 +132,11 @@ Humans: on defense, the stick moves the ball holder and the base buttons throw (
 Reason: Owner request. Live decisions and rundowns need position and time, not a fixed list of commitments.
 
 Affected systems: new `baseball/running/live_play.gd`; BallInPlay (`start_live`, `resolve_ai`), RunnerResolver (read only), PlayOutcome (`doubled_off`), MatchDirector (one fixed-step loop for LiveFielding and LivePlay, intents, event callouts), MatchView (draws from LivePlay), input (`runner_advance`, `runner_retreat`), tuning, tests.
+
+## 2026-10-20 - Cutoff Men
+
+Decision: A throw at least `cutoff_min_throw` (45 m) long from the fielder who made the play goes to a cutoff man. He lines up between the thrower and the target base, `cutoff_distance_from_base` (30 m) from it and at most halfway. He catches the ball and, after `cutoff_release_time` (0.3 s), relays to the original base. The AI cutoff re-decides: relay, throw elsewhere, or hold. A human's relay goes through unless they press another base while the ball is on its way in. Runners judge the ball through the cutoff, so a long throw home no longer hands trailing runners a free base. AI hold throws from the outfield use the cutoff, which then holds. Presentation picks the cutoff from a table (home: 3B or 1B by field side; third: SS; second: SS or 2B; first: 2B), and covers are reassigned around him.
+
+Reason: Owner request. Removes the long-throw exploit, which had produced too many extra bases, and adds a defensive decision.
+
+Affected systems: LivePlay (CUTOFF slot, routing, relay, redirect, ETAs), tuning, MatchView, tests.
