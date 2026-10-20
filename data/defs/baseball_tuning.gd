@@ -86,6 +86,10 @@ extends Resource
 @export var rookie_assist: bool = true
 @export var assist_pitch_speed_scale: float = 0.85
 @export var assist_timing_window_scale: float = 1.3
+## Human fielder under Rookie assist: speed multiplier, extra glove reach,
+## and auto-routing to the ball while the stick is at rest.
+@export var assist_fielder_speed_scale: float = 1.12
+@export var assist_reach_bonus: float = 0.35
 
 @export_group("Ball Flight")
 @export var gravity: float = 9.81

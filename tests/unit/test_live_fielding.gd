@@ -117,3 +117,25 @@ func test_live_fielding_is_deterministic() -> void:
 	check(a.is_secured() and b.is_secured(), "both finished")
 	check_eq(a.result.secure_time, b.result.secure_time, "same time")
 	check_eq(a.result.fielder_id, b.result.fielder_id, "same fielder")
+
+
+func test_rookie_assist_runs_to_the_ball_with_no_input() -> void:
+	var s := _setup(36.0, 32.0, -22.0)  # fly into the left-center gap
+	var plain := LiveFielding.new(s["traj"], s["fielders"], s["projection"], tuning(), _index(&"lf"))
+	var helped := LiveFielding.new(s["traj"], s["fielders"], s["projection"], tuning(), _index(&"lf"))
+	helped.assist = true
+	while not plain.is_secured() and plain.time < 30.0:
+		plain.step(tuning().sim_step)
+	while not helped.is_secured() and helped.time < 30.0:
+		helped.step(tuning().sim_step)
+	check(not plain.result.caught_in_air, "standing still drops it")
+	check(helped.result.caught_in_air, "assist auto-routes to the catch")
+
+
+func test_stick_input_overrides_the_assist() -> void:
+	var s := _setup(36.0, 32.0, -22.0)
+	var live := LiveFielding.new(s["traj"], s["fielders"], s["projection"], tuning(), _index(&"lf"))
+	live.assist = true
+	while not live.is_secured() and live.time < 30.0:
+		live.step(tuning().sim_step, Vector2(0.0, -1.0))  # run the wrong way on purpose
+	check(not live.result.caught_in_air, "the player can still misplay it")

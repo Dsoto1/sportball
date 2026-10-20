@@ -161,7 +161,7 @@ func _handle_global_input() -> void:
 		start_match(int(Time.get_ticks_usec() % 1000000))
 	if Input.is_action_just_pressed(&"toggle_assist"):
 		tuning.rookie_assist = not tuning.rookie_assist
-		_hud.show_callout("ROOKIE ASSIST %s" % ("ON" if tuning.rookie_assist else "OFF"), "slower pitches, wider timing window")
+		_hud.show_callout("ROOKIE ASSIST %s" % ("ON" if tuning.rookie_assist else "OFF"), "batting: slower pitches, wider window · fielding: quicker, longer reach, auto-runs to the ball")
 		_hud.show_prompt(_hud_prompt_suffix())
 	if Input.is_action_just_pressed(&"switch_side"):
 		user_team = MatchState.HOME if user_team == MatchState.AWAY else MatchState.AWAY
@@ -252,7 +252,8 @@ func _process_pitch_flight(_delta: float) -> void:
 	var travel := _pitch.travel_time
 	# Flight runs on the same clock the swing is judged on.
 	var flight := float(_now_usec() - _pitch_release_usec) / 1000000.0
-	_view.show_pitch(_pitch, minf(flight, travel))
+	var family := content.pitch(_pitch.family_id)
+	_view.show_pitch(_pitch, minf(flight, travel), family.tell_color, family.tell_trail)
 	var timing := flight - travel
 	if user_is_batting():
 		_view.show_timing_ring(flight / travel if _contact == null or flight < travel else -1.0)
@@ -340,6 +341,7 @@ func _start_ball_in_play() -> void:
 		if human_fields:
 			# The human steers whoever the projection says gets there first.
 			_live = LiveFielding.new(_bip.trajectory, _bip.fielders, _bip.fielding, tuning, _bip.fielding.fielder_index)
+			_live.assist = tuning.rookie_assist
 		_play = _bip.start_live(not human_fields)
 		_play.human_defense = not user_is_batting()
 	_set_phase(Phase.BALL_IN_PLAY)
@@ -519,7 +521,7 @@ func _hud_prompt_suffix() -> String:
 				base = "Runners: advance E / RB   retreat Q / LB   (hold 1-4 / B Y X A for one runner)"
 			else:
 				base = "Run: WASD / L-stick   Dive: Shift / RT   Switch: F / LT   Throw (again to relay) 1st-2nd-3rd-home: 1-4 / B Y X A"
-	var assist := "   Rookie assist: %s (T)" % ("ON" if tuning.rookie_assist else "OFF") if user_is_batting() else ""
+	var assist := "   Rookie assist: %s (T)" % ("ON" if tuning.rookie_assist else "OFF")
 	return "%s\n[%s]   Tab/Back: switch side   ` or F1: debug   R or F5: restart%s" % [base, role, assist]
 
 

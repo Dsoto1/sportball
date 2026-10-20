@@ -56,13 +56,19 @@ adding, and the arrow on the field shows where it sends an on-time swing
 (blue and long = in the air, brown and short = on the ground). Swinging
 early pulls the ball left of the arrow, late pushes it right.
 
+Read the pitch by its trail: a **long blue** streak is a fastball, a
+**short orange** one a breaking ball (it moves late), a **stub of green** a
+changeup (slower, so wait on it).
+
 After every swing the callout tells you how it went and why, for example
 "SOLID contact · a hair late (9 ms) · on the edge of the zone". Hitting the
 sweet spot (perfect timing on a pitch over the middle) flashes at the
 plate and calls out **BARRELED!**, or **CRUSHED!** with a power swing. For
 home runs: power swing, hold up for lift, perfect timing, middle pitch.
 
-On defense you steer the fielder who can reach the ball first; a white
+On defense, Rookie assist also makes your fielder a little quicker with
+more reach, and if you let go of the stick he runs to the ball himself.
+You steer the fielder who can reach the ball first; a white
 ring marks where a fly ball will land. Press a throw button any time, even
 before the catch. Press another one to have the receiver throw on (for
 example 2 then 1 to turn a 6-4-3 double play). Long throws from the

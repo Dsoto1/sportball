@@ -190,3 +190,14 @@ Decision:
 Reason: Owner asked how to aim and how to find the sweet spot for homers; nothing on screen taught either.
 
 Affected systems: new `ui/hud/contact_feedback.gd`, new `presentation/audio/contact_sound.gd`, MatchView (aim arrow, flash, sound), MatchDirector (feedback at contact), README, tests.
+
+## 2026-10-20 - Phase 0 Feel Pass: Pitch Tells, Fielding Assist, Contact Punch
+
+Decision:
+- **Pitch tells:** each `PitchFamilyDef` has a `tell_color` and `tell_trail` (ghost-ball count): fastball long blue, breaking ball short orange, changeup a short green stub. The trail scales with the ball's readability growth. Colour and length both differ, so the cue is not colour-only.
+- **Rookie assist on defense:** the human fielder gets `assist_fielder_speed_scale` 1.12 and `assist_reach_bonus` 0.35 m. With the stick at rest he auto-routes to the landing spot (or just ahead of a grounder). Any stick input overrides it, so misplays are still possible.
+- **Contact punch:** solid contact and better kicks the camera (brief FOV zoom plus shake, stronger on a barrel). This is presentation only and a candidate for the "reduced camera shake" accessibility option.
+
+Reason: The Phase 0 report's remaining weak spots: no hitter-side read, human fielding held to AI-perfect routes, and flat contact.
+
+Affected systems: PitchFamilyDef and pitch data, MatchView (trail, punch), LiveFielding (assist), MatchDirector, tuning, README, tests.

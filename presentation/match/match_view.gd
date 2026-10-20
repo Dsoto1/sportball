@@ -52,6 +52,10 @@ var _flash: MeshInstance3D
 var _flash_start := -10.0
 var _flash_size := 0.0
 var _contact_sound: ContactSound
+var _trail: Array[MeshInstance3D] = []
+var _punch_start := -10.0
+var _punch_strength := 0.0
+var _shake_rng := RandomNumberGenerator.new()
 var _animator := PlayAnimator.new()
 var _last_actor_pos := {}
 var _rundown_focus := Vector3.ZERO
@@ -170,6 +174,9 @@ func contact_feedback(location: Vector2, tier: int) -> void:
 	_contact_sound.play_tier(tier)
 	if tier < ContactFeedback.Tier.SOLID:
 		return
+	# Camera punch: a quick zoom-in kick and shake, bigger on the barrel.
+	_punch_start = _view_clock
+	_punch_strength = 1.0 if tier == ContactFeedback.Tier.SWEET else 0.5
 	_flash.position = Vector3(location.x, location.y, 0.1)
 	_flash_size = 0.9 if tier == ContactFeedback.Tier.SWEET else 0.45
 	var color := Color(1.0, 0.9, 0.3, 0.9) if tier == ContactFeedback.Tier.SWEET else Color(1, 1, 1, 0.8)
@@ -200,9 +207,20 @@ func show_timing_ring(u: float) -> void:
 	(_timing_ring.material_override as StandardMaterial3D).albedo_color = Color(0.3, 1.0, 0.4) if now else Color(1, 1, 1, 0.8)
 
 
-func show_pitch(pitch: PitchResult, t: float) -> void:
+## tell: the pitch family's colour and trail length (batter's read).
+func show_pitch(pitch: PitchResult, t: float, tell_color: Color = Color.WHITE, tell_trail: int = 0) -> void:
 	_ball.position = pitch.position_at(t)
 	_update_shadow()
+	for i in _trail.size():
+		var ghost := _trail[i]
+		ghost.visible = i < tell_trail and t > 0.0 and t < pitch.travel_time
+		if not ghost.visible:
+			continue
+		ghost.position = pitch.position_at(maxf(t - (i + 1) * 0.022, 0.0))
+		var fade := 1.0 - float(i + 1) / (tell_trail + 1)
+		# Same distance-based growth as the ball, so the tell reads from the box.
+		ghost.scale = _ball.scale * (0.9 * fade + 0.35)
+		(ghost.material_override as StandardMaterial3D).albedo_color = Color(tell_color, 0.35 + 0.6 * fade)
 
 
 func show_pitch_marker(pitch: PitchResult) -> void:
@@ -234,6 +252,8 @@ func show_play(bip: BallInPlay, t: float, play: LivePlay, outcome: PlayOutcome, 
 	_zone.visible = false
 	_bat_pivot.visible = false
 	_aim.visible = false
+	for ghost in _trail:
+		ghost.visible = false
 	_timing_ring.visible = false
 	_windup = -1.0
 	var fielding := bip.fielding
@@ -392,6 +412,11 @@ func _process(delta: float) -> void:
 	if _flash.visible:
 		_flash.scale = Vector3.ONE * _flash_size * (0.4 + flash_age / 0.18)
 	_camera.fov = lerpf(_camera.fov, CAMERA_FOV[_camera_mode], 1.0 - exp(-delta * 6.0))
+	var punch_age := _view_clock - _punch_start
+	var kick := 0.0
+	if punch_age < 0.25:
+		kick = _punch_strength * (1.0 - punch_age / 0.25)
+		_camera.fov = CAMERA_FOV[_camera_mode] - 5.0 * kick
 	_update_bat()
 	_update_windup(delta)
 	var spot: Array = CAMERA_SPOTS[_camera_mode]
@@ -406,6 +431,8 @@ func _process(delta: float) -> void:
 		goal += focus
 		target += focus
 	_camera.position = _camera.position.lerp(goal, weight)
+	if kick > 0.0:
+		_camera.position += Vector3(_shake_rng.randf_range(-1, 1), _shake_rng.randf_range(-1, 1), 0.0) * 0.06 * kick
 	var forward := -_camera.global_transform.basis.z
 	var wanted := (target - _camera.position).normalized()
 	var look := forward.slerp(wanted, weight)
@@ -463,6 +490,10 @@ func _build_aim_and_flash() -> void:
 	_aim_head.material_override = _unshaded(Color(1, 1, 1, 0.5))
 	_aim.add_child(_aim_head)
 	_aim.visible = false
+	for i in 8:
+		var ghost := _sphere(0.11, Color(1, 1, 1, 0.5), false)
+		ghost.visible = false
+		_trail.append(ghost)
 	_flash = _sphere(1.0, Color(1, 1, 1, 0.8), false)
 	_flash.visible = false
 	_contact_sound = ContactSound.new()

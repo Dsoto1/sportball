@@ -97,8 +97,8 @@ bot, screenshots and reading the timings.
 6. **The batting read is untested with people.** *(Update: batting is now
    timing-first; see DECISIONS.)* Pitches take 0.43–0.54 s. The only
    location skill left is take-or-swing: corners and chases cost quality,
-   and pitches beyond reach whiff. There is no pitch-type tell yet, and the
-   AI batter still reads location with noise. Windows and penalties were
+   and pitches beyond reach whiff. Pitch types now have a trail tell (colour and length). The AI batter
+   still reads location with noise. Windows and penalties were
    tuned against the AI only.
 7. **No contact feedback.** There is no bat, no swing animation, no hit
    pause and no camera punch. The batter teleports to home plate on

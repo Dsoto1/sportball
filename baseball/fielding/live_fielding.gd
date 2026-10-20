@@ -20,6 +20,9 @@ var result: FieldingResult = null
 ## Controlled fielder cannot move or catch until this time (missed dive).
 var down_until: float = -1.0
 var dives_missed: int = 0
+## Rookie assist for the human fielder: a little quicker, a little more
+## reach, and with the stick at rest he runs to the ball on his own.
+var assist := false
 
 var _targets: PackedVector3Array = PackedVector3Array()
 var _target_times: PackedFloat32Array = PackedFloat32Array()
@@ -60,10 +63,16 @@ func step(dt: float, move: Vector2 = Vector2.ZERO, dive: bool = false) -> void:
 				if result != null:
 					return
 				continue
+			var speed := f.speed * (tuning.assist_fielder_speed_scale if assist else 1.0)
+			if assist and move.length() < 0.2:
+				# Auto-route: the landing spot for a fly, just ahead of a grounder.
+				var goal := trajectory.landing_point if airborne else trajectory.position_at(time + 0.6)
+				positions[i] = positions[i].move_toward(Vector3(goal.x, 0.0, goal.z), speed * dt)
+				continue
 			var dir := Vector3(move.x, 0.0, -move.y)
 			if dir.length() > 1.0:
 				dir = dir.normalized()
-			positions[i] += dir * f.speed * dt
+			positions[i] += dir * speed * dt
 		elif time > f.reaction:
 			# Run the projected route; once that moment has passed, chase the ball.
 			var goal := _targets[i] if time < _target_times[i] else Vector3(ball.x, 0.0, ball.z)
@@ -78,7 +87,8 @@ func step(dt: float, move: Vector2 = Vector2.ZERO, dive: bool = false) -> void:
 		if airborne and controlled >= 0 and i != controlled:
 			continue
 		var gap := _gap(positions[i], ball)
-		if gap <= fielders[i].reach and gap < best_gap:
+		var reach := fielders[i].reach + (tuning.assist_reach_bonus if assist and i == controlled else 0.0)
+		if gap <= reach and gap < best_gap:
 			best = i
 			best_gap = gap
 	if best >= 0:

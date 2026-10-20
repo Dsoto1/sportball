@@ -13,3 +13,7 @@ extends Resource
 @export var deception: float = 0.0
 ## Multiplier on command scatter; harder pitches miss by more.
 @export var scatter_scale: float = 1.0
+## Readability tell for the batter: trail colour and trail length (number
+## of ghost balls), so the cue does not rely on colour alone.
+@export var tell_color: Color = Color(1, 1, 1)
+@export var tell_trail: int = 4

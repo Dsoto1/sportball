@@ -10,3 +10,5 @@ speed = 41.0
 break_amount = Vector2(0.0, 0.06)
 deception = 0.0
 scatter_scale = 1.0
+tell_color = Color(0.6, 0.85, 1, 1)
+tell_trail = 7
