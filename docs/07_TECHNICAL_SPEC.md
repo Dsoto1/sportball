@@ -100,4 +100,4 @@ Do not build online multiplayer into MVP. Preserve a clean authoritative match m
 
 ## Asset Strategy
 
-The project is free/CC0-first, but free assets are raw material, not the art direction. Follow 12_ASSET_PIPELINE.md and record every third-party asset in 13_ASSET_MANIFEST.md. No third-party asset enters production without a known license and source.
+The project is free/CC0-first, but free assets are raw material, not the art direction. Discover assets via 14_ASSET_SOURCES.md, follow 12_ASSET_PIPELINE.md and record every third-party asset in 13_ASSET_MANIFEST.md. No third-party asset enters production without a known license and source.

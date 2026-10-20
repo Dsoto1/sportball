@@ -15,7 +15,7 @@ Free/CC0-first. Build custom only where custom creates identity. External assets
 
 ## Candidate Sources
 
-Evaluate reputable sources such as Quaternius, Kenney, Poly Haven and official Godot demos/assets. This is not blanket approval; verify each exact asset/pack.
+Search sources in the order given by `14_ASSET_SOURCES.md` (Tier 1: Quaternius, Kenney, KayKit, Poly Haven, ambientCG, Mixamo; Tier 2: itch.io, OpenGameArt, Poly Pizza; Tier 3: Sketchfab). That guide also lists what to reuse versus make our own. It is not blanket approval; verify each exact asset/pack.
 
 ## Mandatory Intake
 

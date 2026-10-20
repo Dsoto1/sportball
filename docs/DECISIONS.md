@@ -140,3 +140,11 @@ Decision: A throw at least `cutoff_min_throw` (45 m) long from the fielder who m
 Reason: Owner request. Removes the long-throw exploit, which had produced too many extra bases, and adds a defensive decision.
 
 Affected systems: LivePlay (CUTOFF slot, routing, relay, redirect, ETAs), tuning, MatchView, tests.
+
+## 2026-10-20 - Asset Discovery Guide
+
+Decision: `14_ASSET_SOURCES.md` is the approved discovery guide. It sets a tiered search order, per-source license expectations, what to reuse versus build ourselves, a baseball-specific search checklist and a selection score. `13_ASSET_MANIFEST.md` remains the record of what was actually obtained and under which terms; the guide approves nothing by itself. Quaternius packs must record whether the exact download was CC0 or the 2026 Quaternius Asset License.
+
+Reason: Owner-provided guide; reduces search time and license risk.
+
+Affected systems: asset pipeline, manifest, agent rules. No assets imported yet.

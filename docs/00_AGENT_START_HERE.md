@@ -21,8 +21,9 @@ Inspirations are creative shorthand only. Do not clone protected teams, characte
 11. `11_GODOT_ARCHITECTURE.md`
 12. `12_ASSET_PIPELINE.md`
 13. `13_ASSET_MANIFEST.md`
-14. `DECISIONS.md`
-15. `PHASE0_REPORT.md` (current state and weak spots)
+14. `14_ASSET_SOURCES.md`
+15. `DECISIONS.md`
+16. `PHASE0_REPORT.md` (current state and weak spots)
 
 Review `visual_reference_concept.jpg` as directional mood reference, not literal final UI.
 

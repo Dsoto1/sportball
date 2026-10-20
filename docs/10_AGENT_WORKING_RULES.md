@@ -20,7 +20,7 @@ Typed GDScript where practical; readable names; composition over deep inheritanc
 
 ## Third-Party Assets
 
-Follow 12_ASSET_PIPELINE.md; update 13_ASSET_MANIFEST.md before production use. Unknown license = do not use.
+Find candidates via 14_ASSET_SOURCES.md, follow 12_ASSET_PIPELINE.md, and update 13_ASSET_MANIFEST.md before production use. Unknown license = do not use.
 
 ## Art Drift
 
