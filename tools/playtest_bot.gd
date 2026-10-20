@@ -20,6 +20,7 @@ var _planned_pitch: PitchResult
 var _last_phase := -1
 var _plays := 0
 var _control_home := false
+var _events_down: Array[StringName] = []
 
 
 func _initialize() -> void:
@@ -38,12 +39,18 @@ func _initialize() -> void:
 func _process(delta: float) -> bool:
 	if _director == null:
 		_director = root.get_node_or_null("Main/MatchDirector")
-		if _director != null and _control_home:
-			_director.user_team = MatchState.HOME
+		if _director != null:
+			# --fixed-fps runs faster than real time: judge swings on frame time.
+			_director.use_wall_clock = false
+			if _control_home:
+				_director.user_team = MatchState.HOME
 		return false
 	for action in _pressed:
 		Input.action_release(action)
 	_pressed.clear()
+	for action in _events_down:
+		_send(action, false)
+	_events_down.clear()
 	_elapsed += delta
 	_drive()
 	if _director.state.game_over or _elapsed >= _sim_seconds:
@@ -76,8 +83,11 @@ func _drive() -> void:
 			if batting and pitch != null:
 				if _rng.randf() < 0.5:
 					_press(&"aim_up" if _rng.randf() < 0.5 else &"aim_down", _rng.randf())
-				if _director.phase_time() >= pitch.travel_time + _swing_offset and PitchResolver.in_zone(pitch.location, _director.tuning):
-					_press(&"swing_power" if _rng.randf() < 0.3 else &"swing_contact")
+				# The event is seen next frame, so press one frame ahead.
+				if _director.phase_time() + FRAME >= pitch.travel_time + _swing_offset and PitchResolver.in_zone(pitch.location, _director.tuning):
+					var swing := &"swing_power" if _rng.randf() < 0.3 else &"swing_contact"
+					_send(swing, true)
+					_events_down.append(swing)
 		MatchDirector.Phase.BALL_IN_PLAY:
 			if entered:
 				_plays += 1
@@ -107,6 +117,14 @@ func _steer(live: LiveFielding) -> void:
 	var gap := Vector2(ball.x - me.x, ball.z - me.z).length()
 	if traj.is_airborne_at(live.time) and ball.y < 2.0 and gap > live.fielders[live.controlled].reach and gap < 2.0 and _rng.randf() < 0.3:
 		_press(&"dive")
+
+
+## Swings go through the event path (_input), like a real key press.
+func _send(action: StringName, pressed: bool) -> void:
+	var event := InputEventAction.new()
+	event.action = action
+	event.pressed = pressed
+	Input.parse_input_event(event)
 
 
 func _press(action: StringName, strength: float = 1.0) -> void:

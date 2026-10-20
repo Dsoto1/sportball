@@ -43,6 +43,16 @@ var _throw_base := UNDECIDED
 var _outcome: PlayOutcome
 var _settle_time := 0.0
 var _event_cursor := 0
+## Swing timing clock. Wall-clock microseconds in play; tools that run
+## faster than real time (--fixed-fps) switch to accumulated frame time.
+var use_wall_clock := true
+var _virtual_usec := 0
+var _last_frame_usec := -1
+var _frame_interval := 1.0 / 60.0
+var _pitch_release_usec := 0
+var _pending_swing := SwingIntent.Type.NONE
+var _pending_swing_usec := 0
+var _pending_stick := Vector2.ZERO
 var _input_log: Array[Dictionary] = []
 
 
@@ -100,9 +110,28 @@ func debug_set_cursor(at: Vector2) -> void:
 	_cursor = at.clamp(tuning.cursor_min, tuning.cursor_max)
 
 
+## Swings are stamped here, as the event arrives, not when _process polls.
+func _input(event: InputEvent) -> void:
+	if state == null or _phase != Phase.PITCH_FLIGHT or not user_is_batting():
+		return
+	if _contact != null or _pending_swing != SwingIntent.Type.NONE:
+		return
+	var type := SwingIntent.Type.NONE
+	if event.is_action_pressed(&"swing_contact"):
+		type = SwingIntent.Type.CONTACT
+	elif event.is_action_pressed(&"swing_power"):
+		type = SwingIntent.Type.POWER
+	if type == SwingIntent.Type.NONE:
+		return
+	_pending_swing = type
+	_pending_swing_usec = _now_usec()
+	_pending_stick = Input.get_vector(&"aim_left", &"aim_right", &"aim_down", &"aim_up")
+
+
 func _process(delta: float) -> void:
 	if state == null:
 		return
+	_tick_clock(delta)
 	_phase_time += delta
 	_handle_global_input()
 	match _phase:
@@ -201,28 +230,32 @@ func _throw_pitch(intent: PitchIntent) -> void:
 		_hud.show_pitching(false)
 		_view.set_cursor(_cursor, 0.0, 0.0, Color.WHITE)
 	_debug.clear_section("contact")
+	_pending_swing = SwingIntent.Type.NONE
+	_pitch_release_usec = _now_usec()
 	_set_phase(Phase.PITCH_FLIGHT)
 
 
 # --- Pitch flight and swing ------------------------------------------------
 
-func _process_pitch_flight(delta: float) -> void:
+func _process_pitch_flight(_delta: float) -> void:
 	var travel := _pitch.travel_time
-	_view.show_pitch(_pitch, minf(_phase_time, travel))
-	var timing := _phase_time - travel
+	# Flight runs on the same clock the swing is judged on.
+	var flight := float(_now_usec() - _pitch_release_usec) / 1000000.0
+	_view.show_pitch(_pitch, minf(flight, travel))
+	var timing := flight - travel
 	if _contact == null:
 		if user_is_batting():
-			var stick := _show_stick_marker()
-			if Input.is_action_just_pressed(&"swing_contact"):
-				_resolve_swing(SwingIntent.swing(SwingIntent.Type.CONTACT, timing, stick))
-			elif Input.is_action_just_pressed(&"swing_power"):
-				_resolve_swing(SwingIntent.swing(SwingIntent.Type.POWER, timing, stick))
+			_show_stick_marker()
+			if _pending_swing != SwingIntent.Type.NONE:
+				var offset := SwingTiming.offset(_pending_swing_usec, _pitch_release_usec, travel,
+					_frame_interval, tuning.swing_latency_calibration)
+				_resolve_swing(SwingIntent.swing(_pending_swing, offset, _pending_stick))
 		elif _ai_swing.type != SwingIntent.Type.NONE and timing >= _ai_swing.timing_offset:
 			_resolve_swing(_ai_swing)
 		if _contact == null and timing >= tuning.swing_late_cutoff:
 			_resolve_swing(SwingIntent.take())
 	# The ball always reaches the plate before the result plays out.
-	if _contact != null and _phase_time >= travel:
+	if _contact != null and flight >= travel:
 		_view.show_pitch_marker(_pitch)
 		if _contact.outcome == ContactResult.Outcome.IN_PLAY:
 			_start_ball_in_play()
@@ -428,6 +461,18 @@ func _move_cursor(delta: float) -> void:
 	var dir := Input.get_vector(&"aim_left", &"aim_right", &"aim_down", &"aim_up")
 	_cursor += dir * CURSOR_SPEED * delta
 	_cursor = _cursor.clamp(tuning.cursor_min, tuning.cursor_max)
+
+
+func _now_usec() -> int:
+	return Time.get_ticks_usec() if use_wall_clock else _virtual_usec
+
+
+func _tick_clock(delta: float) -> void:
+	_virtual_usec += roundi(delta * 1000000.0)
+	var now := _now_usec()
+	if _last_frame_usec >= 0:
+		_frame_interval = float(now - _last_frame_usec) / 1000000.0
+	_last_frame_usec = now
 
 
 func _set_phase(phase: Phase) -> void:

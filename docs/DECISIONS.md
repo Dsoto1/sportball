@@ -93,3 +93,11 @@ Decision: The batter no longer aims a cursor. `SwingIntent` carries swing type, 
 Reason: Owner decision. Simpler to learn ("within 2 minutes, understand how to hit") while timing, take/swing discipline and situational stick input remain skill.
 
 Affected systems: ContactResolver, SwingIntent, ContactResult, AI batter, BaseballTuning (batting group), MatchDirector input/HUD, tests. Batting windows were retuned against the AI sim (contact ±78 ms, power ±52 ms).
+
+## 2026-10-20 - Event-Stamped Swing Timing
+
+Decision: Human swings are captured in `MatchDirector._input` and stamped with `Time.get_ticks_usec()` on delivery instead of being polled in `_process`. `SwingTiming.offset()` subtracts half the last frame interval (capped at 1/30 s), because a press is delivered at the start of the frame after it happens. Pitch flight is drawn from the same microsecond clock, so what is seen and what is judged cannot drift (delta smoothing and hitches no longer matter). Tools that run faster than real time (`--fixed-fps`) set `use_wall_clock = false` and use accumulated frame time instead. `swing_latency_calibration` (tuning) holds a future per-player display-latency offset.
+
+Reason: Per-frame polling read every swing 0–1 frame late (bias ~8 ms, worst ~17 ms at 60 fps), about a third of the ±52 ms power window. The new path is unbiased with ±½ frame jitter. Godot 4.7.2 input events carry no timestamps, so this is the floor without a native input extension.
+
+Affected systems: MatchDirector (input, pitch flight clock), new `app/swing_timing.gd`, BaseballTuning, playtest bot (sends real InputEventAction for swings), tests.

@@ -71,10 +71,15 @@ bot, screenshots and reading the timings.
 4. **Dives may be too common** at ~3 per game. They are free apart from
    0.7 s of recovery, with no failure chance. "DIVING CATCH!" will stop
    feeling special. Failed dives should be possible (and content).
-5. **Swing timing is frame-quantized, and timing is now the whole swing.**
-   The windows are ±78 ms (contact) and ±52 ms (power). At 60 fps one frame
-   is about 32% of the power window. Sub-frame input timing (or a fixed
-   high-rate input poll) should come before tuning windows by feel.
+5. **Swing timing: residual half-frame jitter.** *(Update: fixed as far
+   as Godot allows; see DECISIONS.)* Swings are now stamped on input
+   delivery with a microsecond clock, and the half-frame delivery bias is
+   removed. The pitch flies on the same clock. Godot gives events no OS
+   timestamp, so ±½ frame of jitter remains (±8 ms at 60 fps, ±3.5 ms at
+   144 fps, about 16% of the power window at 60 fps). Display latency is a
+   constant offset, handled by `swing_latency_calibration` (0 until a
+   calibration screen exists). Removing the jitter entirely would need an
+   OS-level input extension.
 6. **The batting read is untested with people.** *(Update: batting is now
    timing-first; see DECISIONS.)* Pitches take 0.43–0.54 s. The only
    location skill left is take-or-swing: corners and chases cost quality,

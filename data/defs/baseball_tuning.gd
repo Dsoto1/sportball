@@ -75,6 +75,9 @@ extends Resource
 ## Extra spray sigma (degrees) for a total mishit.
 @export var mishit_spray_spread: float = 12.0
 @export var contact_height: float = 0.9
+## Seconds of display + input latency subtracted from human swing timing.
+## A per-player calibration value; 0 until a calibration screen exists.
+@export var swing_latency_calibration: float = 0.0
 ## Seconds after the batter is allowed to swing before a no-swing is a take.
 @export var swing_late_cutoff: float = 0.22
 
