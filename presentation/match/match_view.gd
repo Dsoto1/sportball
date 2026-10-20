@@ -26,6 +26,8 @@ var _camera_mode := CameraMode.BAT
 var _ball: MeshInstance3D
 var _ball_shadow: MeshInstance3D
 var _fielders: Array[ActorView] = []
+## Green ring on the base the stick is aiming a throw at.
+var _throw_target: MeshInstance3D
 var _roster: MatchRoster
 ## Current batter hits left-handed: he stands in the other box.
 var _bats_left := false
@@ -147,6 +149,7 @@ func reset_for_pitch(state: MatchState) -> void:
 	_pitch_marker.visible = false
 	_control_ring.visible = false
 	_landing_hint.visible = false
+	_throw_target.visible = false
 	_field_focus = Vector3(0.0, 0.0, -42.0)
 	_zone.visible = true
 
@@ -568,6 +571,14 @@ func _cover_assignments(fielder_index: int, cutoff: int = -1) -> Dictionary:
 	return covers
 
 
+## Highlights the base a directional throw would go to (0 hides it).
+func set_throw_target(base: int) -> void:
+	_throw_target.visible = base > 0
+	if base > 0:
+		_throw_target.position = FieldLayout.base_position(base) + Vector3.UP * 0.06
+		_throw_target.scale = Vector3.ONE * (1.6 + 0.15 * sin(_view_clock * 10.0))
+
+
 func set_roster(roster: MatchRoster) -> void:
 	_roster = roster
 
@@ -643,6 +654,11 @@ func _build_zone() -> void:
 	_landing_hint.scale = Vector3.ONE * tuning.catch_reach * 1.5
 	_landing_hint.visible = false
 	add_child(_landing_hint)
+	_throw_target = _ring(Color(0.3, 1.0, 0.45, 0.9))
+	_throw_target.rotation_degrees.x = 0.0
+	_throw_target.scale = Vector3.ONE * 1.6
+	_throw_target.visible = false
+	add_child(_throw_target)
 	_cursor = _ring(Color(1.0, 0.85, 0.2))
 	_cursor_inner = _ring(Color(1.0, 0.95, 0.6))
 	_zone.add_child(_cursor)

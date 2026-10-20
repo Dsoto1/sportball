@@ -443,6 +443,10 @@ func _process_ball_in_play() -> void:
 		var r := _play.runner_for_base(_held_base())
 		selected = r.id if r != null else &""
 	_view.show_play(_bip, t, _play, _outcome, _live, selected)
+	var aim := 0
+	if not user_is_batting() and _play != null and _outcome == null and _play.ball == LivePlay.Ball.HELD:
+		aim = ThrowAim.base_for(Input.get_vector(&"aim_left", &"aim_right", &"aim_down", &"aim_up"))
+	_view.set_throw_target(aim)
 	_view.set_field_focus(_field_focus(t))
 	if _outcome == null:
 		return
@@ -465,6 +469,9 @@ func _step_play(t: float) -> void:
 		for base in [1, 2, 3, 4]:
 			if Input.is_action_just_pressed(StringName("throw_base_%d" % base)):
 				defense["throw"] = base
+		# Or point at the base and press throw (centered = best play).
+		if Input.is_action_just_pressed(&"throw_ball"):
+			defense["throw"] = ThrowAim.base_for(move)
 		defense["move"] = move if _live == null or _live.is_secured() else Vector2.ZERO
 		if _live != null and not _live.is_secured():
 			if Input.is_action_just_pressed(&"switch_fielder"):
@@ -630,7 +637,7 @@ func _hud_prompt_suffix() -> String:
 			elif user_is_batting():
 				base = "Runners: advance E / RB   retreat Q / LB   (hold 1-4 / B Y X A for one runner)"
 			else:
-				base = "Run: WASD / L-stick   Dive: Shift / RT   Switch: F / LT   Throw (again to relay) 1st-2nd-3rd-home: 1-4 / B Y X A"
+				base = "Run: WASD / L-stick   Dive: Shift / RT   Switch: F / LT\nThrow: hold a direction (→ 1st  ↑ 2nd  ← 3rd  ↓ home) + Space / J / click / RB  (no direction = best play)   or 1-4 / B Y X A"
 	var assist := "   Rookie assist: %s (T)" % ("ON" if tuning.rookie_assist else "OFF")
 	return "%s\n[%s]   Tab/Back: switch side   ` or F1: debug   R or F5: restart%s" % [base, role, assist]
 

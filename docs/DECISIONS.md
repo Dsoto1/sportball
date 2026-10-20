@@ -238,3 +238,16 @@ Decision:
 Reason: Phase 1 vertical slice. The owner chose the teams and arcade rules, and asked for the Who's on First names.
 
 Affected systems: data (teams, rules, defs), MatchState, MatchRoster, Ratings, AiBatter/AiPitcher/AiManager, PitchResolver, ContactResolver, FielderState, RunnerResolver, LivePlay, BallInPlay, AutoMatch, MatchDirector, MatchHud, MatchView, ActorView, input map, bot, sim report, tests.
+
+## 2026-10-20 - Directional Throws
+
+Decision: A fielder throws by holding a direction and pressing throw (Space / J / left click, RB on a gamepad).
+- Directions follow the diamond as seen from behind home: right = first, up = second, left = third, down = home.
+- A centered stick throws to the best play, which is the AI's choice.
+- A green ring shows the aimed base while the fielder holds the ball.
+- The 1–4 keys and the B / Y / X / A face buttons still throw straight to a base.
+- Throws are now buffered before the catch too. The README always promised this, but a press before the catch used to be dropped.
+
+Reason: Owner request: throw with WASD and the normal movement controls. Pointing and pressing is the standard arcade scheme, and it works the same on keyboard and gamepad.
+
+Affected systems: ThrowAim (new), LivePlay (auto throw, buffering), MatchDirector, MatchView, input map, README, bot, tests.

@@ -39,7 +39,9 @@ fast runners beat out grounders, good gloves bobble less.
 | Run with the fielder (yellow ring) | WASD or arrows | Left stick |
 | Dive | Shift or L | RT |
 | Switch to fielder nearest the ball | F | LT |
-| Throw to 1st / 2nd / 3rd / home | 1 / 2 / 3 / 4 | B / Y / X / A |
+| Throw: hold toward the base (→ 1st, ↑ 2nd, ← 3rd, ↓ home) and press throw | WASD + Space, J or left click | Left stick + RB |
+| ...no direction: throw to the best play | Space, J or left click | RB |
+| ...or throw straight to 1st / 2nd / 3rd / home | 1 / 2 / 3 / 4 | B / Y / X / A |
 | With the ball: run at a runner / to a bag | WASD or arrows | Left stick |
 | Batting, ball in play: runners advance / retreat | E / Q | RB / LB |
 | ...only the runner on (or heading to) a base: hold that base | 1 / 2 / 3 / 4 | B / Y / X / A |
@@ -79,8 +81,11 @@ On defense, Rookie assist also makes your fielder a little quicker with
 more reach, and if you let go of the stick he runs to the ball himself.
 If a grounder gets past your fielder, control jumps to the teammate
 closest to it. You steer the fielder who can reach the ball first; a white
-ring marks where a fly ball will land. Press a throw button any time, even
-before the catch. Press another one to have the receiver throw on (for
+ring marks where a fly ball will land. To throw, point WASD (or the stick)
+at the base the way the diamond looks on screen and press Space / J / click
+(RB on a gamepad). A green ring shows which base you are aiming at, and a
+throw with no direction goes to the best play. Throw any time, even before
+the catch. Press another one to have the receiver throw on (for
 example 2 then 1 to turn a 6-4-3 double play). Long throws from the
 outfield go through a cutoff man. He relays to your base unless you press
 a different one while the ball is on its way to him. If you hold the ball for

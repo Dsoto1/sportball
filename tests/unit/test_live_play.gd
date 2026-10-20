@@ -305,3 +305,40 @@ func test_misplayed_ball_rolls_to_fielder() -> void:
 	check(early.y < 0.5, "ball on the ground while it gets away")
 	_step_until(play, 2.0)
 	check(play.ball_position().y > 1.0, "back in the glove after the bobble")
+
+
+# --- Directional throws -----------------------------------------------------
+
+func test_direction_picks_base() -> void:
+	check_eq(ThrowAim.base_for(Vector2(1, 0)), 1, "right = first")
+	check_eq(ThrowAim.base_for(Vector2(0, 1)), 2, "up = second")
+	check_eq(ThrowAim.base_for(Vector2(-1, 0)), 3, "left = third")
+	check_eq(ThrowAim.base_for(Vector2(0, -1)), 4, "down = home")
+	check_eq(ThrowAim.base_for(Vector2(0.7, 0.4)), 1, "mostly right")
+	check_eq(ThrowAim.base_for(Vector2(0.1, 0.2)), ThrowAim.AUTO, "centered = best play")
+
+
+## Steps a human-defense play, pressing `throw` once at `press_time`.
+func _human_throw(f: FieldingResult, throw: int, press_time: float) -> LivePlay:
+	var play := _play(_bases(), 0, f)
+	play.human_defense = true
+	var pressed := false
+	while not play.is_done() and play.time < 15.0:
+		var defense := {}
+		if not pressed and play.time >= press_time:
+			defense["throw"] = throw
+			pressed = true
+		play.step(tuning().sim_play_step, defense)
+	return play
+
+
+func test_best_play_throw_goes_to_first() -> void:
+	var play := _human_throw(_fielded(Vector3(-9, 0, -34), 1.0), ThrowAim.AUTO, 1.05)
+	check(not play.legs.is_empty(), "a throw was made")
+	check_eq(play.legs[0]["base"], 1, "best play is first")
+	check(play.legs[0]["release"] < 1.05 + tuning().throw_release_time + 0.05, "thrown right away (released %.2f), not on the AI timeout" % play.legs[0]["release"])
+
+
+func test_throw_pressed_before_the_catch_is_kept() -> void:
+	var play := _human_throw(_fielded(Vector3(-9, 0, -34), 1.0), 3, 0.5)
+	check(not play.legs.is_empty() and play.legs[0]["base"] == 3, "buffered throw to third")

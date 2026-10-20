@@ -28,6 +28,8 @@ const HOME_PLATE := 4
 const ON_BAG := 0.8
 ## covers[CUTOFF] is the cutoff man's spot; flight base CUTOFF means a throw to him.
 const CUTOFF := 0
+## A human throw with no base picked: throw where the AI would.
+const AUTO_THROW := 0
 
 
 class Runner:
@@ -478,9 +480,9 @@ func _resolve_arrivals() -> void:
 # --- Defense ------------------------------------------------------------------
 
 func _apply_defense(dt: float, defense: Dictionary) -> void:
-	if human_defense and defense.get("throw", -1) > 0 and ball != Ball.LOOSE:
-		# Buffered even mid-throw: pressing a base while the ball is on its way
-		# to the cutoff man redirects his relay.
+	if human_defense and defense.get("throw", -1) >= AUTO_THROW:
+		# Buffered before the catch and mid-throw: pressing a base while the
+		# ball is on its way to the cutoff man redirects his relay.
 		_pending_throw = defense["throw"]
 		_last_human_input = time
 	if ball != Ball.HELD:
@@ -491,8 +493,8 @@ func _apply_defense(dt: float, defense: Dictionary) -> void:
 		if move.length() > 0.2:
 			_last_human_input = time
 			action = {"kind": "move", "dir": move}
-		if _pending_throw > 0 and time >= busy_until:
-			action = {"kind": "throw", "base": _pending_throw}
+		if _pending_throw >= AUTO_THROW and time >= busy_until:
+			action = {"kind": "throw", "base": _pending_throw if _pending_throw > 0 else _best_throw_base()}
 			_pending_throw = -1
 		elif action.is_empty() and time >= maxf(busy_until, _last_human_input) + tuning.human_throw_decision_window:
 			action = ai_defense_action()
@@ -567,6 +569,14 @@ func ai_defense_action() -> Dictionary:
 	if holder_cover == -1:
 		return {"kind": "throw", "base": _hold_base()}
 	return {}
+
+
+## Base for a "best play" throw: the AI's choice, else ahead of the lead runner.
+func _best_throw_base() -> int:
+	var pick := ai_defense_action()
+	if pick.get("kind", "") in ["throw", "run"]:
+		return pick["base"]
+	return _hold_base()
 
 
 func _hold_base() -> int:

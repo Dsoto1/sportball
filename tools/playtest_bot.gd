@@ -128,7 +128,14 @@ func _drive() -> void:
 					_press(StringName("throw_base_%d" % _rng.randi_range(1, 4)))  # single runner
 				_press(&"runner_advance" if _rng.randf() < 0.6 else &"runner_retreat")
 			if not batting and _director.phase_time() > 0.5 and _rng.randf() < 0.02:
-				_press(StringName("throw_base_%d" % _rng.randi_range(1, 4)))
+				if _rng.randf() < 0.5:
+					_press(StringName("throw_base_%d" % _rng.randi_range(1, 4)))
+				else:
+					# Directional throw: hold toward a base (or nothing) and press throw.
+					var dirs: Array[StringName] = [&"aim_right", &"aim_up", &"aim_left", &"aim_down"]
+					if _rng.randf() < 0.8:
+						_press(dirs[_rng.randi_range(0, 3)])
+					_press(&"throw_ball")
 			var shot_chance := 0.08 if (live != null and not live.is_secured()) else 0.01
 			if _director.phase_time() > 0.8 and _shots_taken < 12 and _rng.randf() < shot_chance:
 				_screenshot("field" if live != null else "play")
