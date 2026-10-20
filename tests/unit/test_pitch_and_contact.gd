@@ -130,3 +130,17 @@ func test_wild_miss_is_whiff_near_miss_is_foul() -> void:
 	var near := _swing(p, SwingIntent.Type.CONTACT, tuning().contact_timing_window * 1.3)
 	check_eq(near.outcome, ContactResult.Outcome.FOUL, "just late fouls off")
 	check_eq(ContactResolver.call_for(p, near), MatchState.PitchCall.FOUL)
+
+
+func test_rookie_assist_slows_pitch_and_widens_window() -> void:
+	var intent := PitchIntent.new(&"fastball", Vector2(0.0, 0.8), 0.0)
+	var normal := PitchResolver.resolve(intent, content().pitch(&"fastball"), tuning(), MatchRng.new(3))
+	intent.speed_scale = tuning().assist_pitch_speed_scale
+	var slow := PitchResolver.resolve(intent, content().pitch(&"fastball"), tuning(), MatchRng.new(3))
+	check(slow.travel_time > normal.travel_time * 1.1, "assisted pitch takes longer")
+	var late := tuning().contact_timing_window * 1.05
+	var plain := SwingIntent.swing(SwingIntent.Type.CONTACT, late)
+	var helped := SwingIntent.swing(SwingIntent.Type.CONTACT, late)
+	helped.window_scale = tuning().assist_timing_window_scale
+	check(ContactResolver.resolve(normal, plain, tuning(), MatchRng.new(1)).outcome != ContactResult.Outcome.IN_PLAY, "just late misses without help")
+	check_eq(ContactResolver.resolve(normal, helped, tuning(), MatchRng.new(1)).outcome, ContactResult.Outcome.IN_PLAY, "assist puts it in play")

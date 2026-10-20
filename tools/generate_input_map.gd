@@ -26,8 +26,10 @@ const BINDINGS := {
 	&"runner_advance": [["key", KEY_E], ["button", JOY_BUTTON_RIGHT_SHOULDER]],
 	&"runner_retreat": [["key", KEY_Q], ["button", JOY_BUTTON_LEFT_SHOULDER]],
 	&"switch_side": [["key", KEY_TAB], ["button", JOY_BUTTON_BACK]],
-	&"toggle_debug": [["key", KEY_F1], ["button", JOY_BUTTON_RIGHT_STICK]],
-	&"restart_match": [["key", KEY_F5], ["button", JOY_BUTTON_START]],
+	# MacBooks need fn for F-keys, so each also has a plain key.
+	&"toggle_debug": [["key", KEY_F1], ["key", KEY_QUOTELEFT], ["button", JOY_BUTTON_RIGHT_STICK]],
+	&"restart_match": [["key", KEY_F5], ["key", KEY_R], ["button", JOY_BUTTON_START]],
+	&"toggle_assist": [["key", KEY_T], ["button", JOY_BUTTON_LEFT_STICK]],
 }
 
 

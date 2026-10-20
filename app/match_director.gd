@@ -8,7 +8,9 @@ extends Node
 enum Phase { PRE_PITCH, METER, PITCH_FLIGHT, CALL, BALL_IN_PLAY, GAME_OVER }
 
 # Presentation pacing (seconds). Kept short: no dead air between pitches.
-const AI_PRE_PITCH_DELAY := 0.9
+const AI_PRE_PITCH_DELAY := 1.8
+# The last part of the pre-pitch is the pitcher's visible windup.
+const WINDUP_TIME := 0.7
 const CALL_PAUSE := 0.8
 const PLAY_SETTLE_PAUSE := 0.9
 # How long a human fielder can hold the ball before the AI throw is used.
@@ -70,7 +72,7 @@ func start_match(seed_value: int) -> void:
 	print("[match] seed=%d" % seed_value)
 	_debug.set_section("match", {"seed": seed_value})
 	_view.clear_debug_play()
-	_hud.show_callout("PLAY BALL", "seed %d" % seed_value)
+	_hud.show_callout("PLAY BALL", "Batting: press J (or click) as the white ring closes on the plate", 4.0)
 	_enter_pre_pitch()
 
 
@@ -157,6 +159,10 @@ func _handle_global_input() -> void:
 		_view.set_debug_visible(_debug.visible)
 	if Input.is_action_just_pressed(&"restart_match"):
 		start_match(int(Time.get_ticks_usec() % 1000000))
+	if Input.is_action_just_pressed(&"toggle_assist"):
+		tuning.rookie_assist = not tuning.rookie_assist
+		_hud.show_callout("ROOKIE ASSIST %s" % ("ON" if tuning.rookie_assist else "OFF"), "slower pitches, wider timing window")
+		_hud.show_prompt(_hud_prompt_suffix())
 	if Input.is_action_just_pressed(&"switch_side"):
 		user_team = MatchState.HOME if user_team == MatchState.AWAY else MatchState.AWAY
 		_hud.show_callout("YOU CONTROL %s" % ("AWAY" if user_team == MatchState.AWAY else "HOME"))
@@ -189,8 +195,14 @@ func _enter_pre_pitch() -> void:
 func _process_pre_pitch(delta: float) -> void:
 	if user_is_batting():
 		_show_stick_marker()
+		var windup_start := AI_PRE_PITCH_DELAY - WINDUP_TIME
+		if _phase_time >= windup_start:
+			_view.show_windup((_phase_time - windup_start) / WINDUP_TIME)
 		if _phase_time >= AI_PRE_PITCH_DELAY:
-			_throw_pitch(AiPitcher.choose(state, content.pitches, tuning, rng))
+			var intent := AiPitcher.choose(state, content.pitches, tuning, rng)
+			if tuning.rookie_assist:
+				intent.speed_scale = tuning.assist_pitch_speed_scale
+			_throw_pitch(intent)
 		return
 	_move_cursor(delta)
 	_view.set_cursor(_cursor, 0.07, 0.0, Color(0.3, 0.95, 1.0))
@@ -230,6 +242,7 @@ func _throw_pitch(intent: PitchIntent) -> void:
 	_debug.clear_section("contact")
 	_pending_swing = SwingIntent.Type.NONE
 	_pitch_release_usec = _now_usec()
+	_view.show_windup(-1.0)
 	_set_phase(Phase.PITCH_FLIGHT)
 
 
@@ -241,13 +254,18 @@ func _process_pitch_flight(_delta: float) -> void:
 	var flight := float(_now_usec() - _pitch_release_usec) / 1000000.0
 	_view.show_pitch(_pitch, minf(flight, travel))
 	var timing := flight - travel
+	if user_is_batting():
+		_view.show_timing_ring(flight / travel if _contact == null or flight < travel else -1.0)
 	if _contact == null:
 		if user_is_batting():
 			_show_stick_marker()
 			if _pending_swing != SwingIntent.Type.NONE:
 				var offset := SwingTiming.offset(_pending_swing_usec, _pitch_release_usec, travel,
 					_frame_interval, tuning.swing_latency_calibration)
-				_resolve_swing(SwingIntent.swing(_pending_swing, offset, _pending_stick))
+				var swing := SwingIntent.swing(_pending_swing, offset, _pending_stick)
+				if tuning.rookie_assist:
+					swing.window_scale = tuning.assist_timing_window_scale
+				_resolve_swing(swing)
 		elif _ai_swing.type != SwingIntent.Type.NONE and timing >= _ai_swing.timing_offset:
 			_resolve_swing(_ai_swing)
 		if _contact == null and timing >= tuning.swing_late_cutoff:
@@ -265,6 +283,7 @@ func _resolve_swing(swing: SwingIntent) -> void:
 	_contact = ContactResolver.resolve(_pitch, swing, tuning, rng)
 	_log({"swing": SwingIntent.Type.keys()[swing.type], "timing_ms": roundi(swing.timing_offset * 1000.0), "stick": swing.stick})
 	if swing.type != SwingIntent.Type.NONE:
+		_view.swing_bat()
 		var ms := roundi(swing.timing_offset * 1000.0)
 		var when := "PERFECT" if absi(ms) <= 15 else ("EARLY %d ms" % -ms if ms < 0 else "LATE %d ms" % ms)
 		_hud.show_callout("", when, 1.0)
@@ -473,7 +492,7 @@ func _hud_prompt_suffix() -> String:
 	match _phase:
 		Phase.PRE_PITCH, Phase.PITCH_FLIGHT:
 			if user_is_batting():
-				base = "Contact: J / A    Power: K / X    Hold WASD / L-stick: ←→ left/right field  ↑ lift  ↓ chop"
+				base = "Watch the pitcher. SWING as the ring closes: J or click (contact) / K or right-click (power)\nHold WASD / L-stick while swinging: ←→ aim field  ↑ lift  ↓ chop"
 			else:
 				base = "Aim: WASD / L-stick    Pitch: Q E / LB RB    Start meter: Space / A"
 		Phase.BALL_IN_PLAY:
@@ -483,7 +502,8 @@ func _hud_prompt_suffix() -> String:
 				base = "Runners: advance E / RB   retreat Q / LB   (hold 1-4 / B Y X A for one runner)"
 			else:
 				base = "Run: WASD / L-stick   Dive: Shift / RT   Switch: F / LT   Throw (again to relay) 1st-2nd-3rd-home: 1-4 / B Y X A"
-	return "%s\n[%s]   Tab/Back: switch side   F1: debug   F5: restart" % [base, role]
+	var assist := "   Rookie assist: %s (T)" % ("ON" if tuning.rookie_assist else "OFF") if user_is_batting() else ""
+	return "%s\n[%s]   Tab/Back: switch side   ` or F1: debug   R or F5: restart%s" % [base, role, assist]
 
 
 ## Reads the batting stick and shows it as a small marker on the zone:

@@ -17,7 +17,7 @@ static func resolve(intent: PitchIntent, family: PitchFamilyDef, tuning: Basebal
 	location.y = clampf(location.y, center.y - tuning.wild_limit.y, center.y + tuning.wild_limit.y)
 	location.y = maxf(location.y, 0.05)
 	result.location = location
-	result.speed = family.speed * lerpf(1.0, tuning.pitch_speed_at_max_error, intent.meter_error)
+	result.speed = family.speed * intent.speed_scale * lerpf(1.0, tuning.pitch_speed_at_max_error, intent.meter_error)
 	result.release_point = Vector3(tuning.release_side, tuning.release_height, -tuning.release_distance)
 	result.travel_time = result.release_point.distance_to(Vector3(location.x, location.y, 0.0)) / result.speed
 	result.in_zone = in_zone(location, tuning)

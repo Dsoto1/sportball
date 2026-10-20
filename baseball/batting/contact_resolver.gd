@@ -15,7 +15,7 @@ static func resolve(pitch: PitchResult, swing: SwingIntent, tuning: BaseballTuni
 		return result
 
 	var power := swing.type == SwingIntent.Type.POWER
-	var window := tuning.power_timing_window if power else tuning.contact_timing_window
+	var window := (tuning.power_timing_window if power else tuning.contact_timing_window) * swing.window_scale
 	result.timing_offset = swing.timing_offset
 	result.timing_norm = swing.timing_offset / window
 	result.location_norm = location_norm(pitch.location, tuning)

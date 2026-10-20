@@ -79,7 +79,7 @@ func set_look(color: Color, tag: String) -> void:
 
 ## Lowers the body for crouching roles (catcher) without changing position.
 func set_crouch(crouched: bool) -> void:
-	scale = Vector3(1.0, 0.45, 1.0) if crouched else Vector3.ONE
+	scale = Vector3(1.0, 0.38, 1.0) if crouched else Vector3.ONE
 
 
 func face(target: Vector3) -> void:

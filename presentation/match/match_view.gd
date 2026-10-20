@@ -10,7 +10,9 @@ const AWAY_COLOR := Color(0.85, 0.22, 0.2)
 const HOME_COLOR := Color(0.18, 0.42, 0.9)
 const BATTER_SPOT := Vector3(-0.85, 0.0, 0.15)
 const CAMERA_SPOTS := {
-	CameraMode.BAT: [Vector3(0.3, 3.2, 6.5), Vector3(0.0, 0.8, -18.0)],
+	# Telephoto from behind and right of the plate: batter on the left,
+	# pitcher and zone large and clear.
+	CameraMode.BAT: [Vector3(1.5, 3.4, 9.0), Vector3(0.0, 1.0, -9.0)],
 	CameraMode.PITCH: [Vector3(0.4, 2.7, -24.5), Vector3(0.0, 0.9, 0.0)],
 	CameraMode.FIELD: [Vector3(0.0, 30.0, 40.0), Vector3.ZERO],  # offset from the field focus
 }
@@ -36,6 +38,13 @@ var _pitch_marker: MeshInstance3D
 var _control_ring: MeshInstance3D
 var _landing_hint: MeshInstance3D
 var _field_focus := Vector3(0.0, 0.0, -42.0)
+## Seconds a swing takes to come through the zone and follow through.
+const SWING_TIME := 0.28
+var _bat_pivot: Node3D
+var _bat_swing_start := -1.0
+var _view_clock := 0.0
+var _timing_ring: MeshInstance3D
+var _windup := -1.0
 var _animator := PlayAnimator.new()
 var _last_actor_pos := {}
 var _rundown_focus := Vector3.ZERO
@@ -61,7 +70,11 @@ func setup(p_tuning: BaseballTuning) -> void:
 		actor.setup(HOME_COLOR, String(id).to_upper())
 		_fielders.append(actor)
 	_build_zone()
+	_build_bat()
 	_build_debug()
+
+
+const CAMERA_FOV := {CameraMode.BAT: 34.0, CameraMode.PITCH: 50.0, CameraMode.FIELD: 55.0}
 
 
 func set_camera_mode(mode: CameraMode) -> void:
@@ -92,7 +105,12 @@ func reset_for_pitch(state: MatchState) -> void:
 		_fielders[i].face(Vector3.ZERO)
 		_fielders[i].set_crouch(tuning.fielder_ids[i] == &"c")
 	_clear_runners()
-	_runner_actor(state.current_batter(), batting_color).position = BATTER_SPOT
+	var batter := _runner_actor(state.current_batter(), batting_color)
+	batter.position = BATTER_SPOT
+	batter.face(BATTER_SPOT + Vector3.RIGHT)  # square to the plate
+	set_bat(true)
+	_windup = -1.0
+	_timing_ring.visible = false
 	for base in [1, 2, 3]:
 		var id := state.runner_on(base)
 		if id != &"":
@@ -106,6 +124,35 @@ func reset_for_pitch(state: MatchState) -> void:
 	_landing_hint.visible = false
 	_field_focus = Vector3(0.0, 0.0, -42.0)
 	_zone.visible = true
+
+
+## The batter's bat: shown in his stance until the ball is put in play.
+func set_bat(visible_now: bool) -> void:
+	_bat_pivot.visible = visible_now
+	_bat_swing_start = -1.0
+
+
+## Plays the swing (on contact and on a miss alike).
+func swing_bat() -> void:
+	_bat_swing_start = _view_clock
+
+
+## Pitcher's windup, 0..1, or -1 when not winding up. The ball sits in his
+## glove until the pitch is released.
+func show_windup(progress: float) -> void:
+	_windup = progress
+
+
+## Timing aid: a ring on the plate that closes as the pitch arrives
+## (u = flight / travel time; hidden outside 0..1.2).
+func show_timing_ring(u: float) -> void:
+	_timing_ring.visible = u >= 0.0 and u <= 1.2
+	if not _timing_ring.visible:
+		return
+	var r := lerpf(0.75, tuning.zone_half_width * 0.6, clampf(u, 0.0, 1.0))
+	_timing_ring.scale = Vector3.ONE * r
+	var now := absf(u - 1.0) < 0.08
+	(_timing_ring.material_override as StandardMaterial3D).albedo_color = Color(0.3, 1.0, 0.4) if now else Color(1, 1, 1, 0.8)
 
 
 func show_pitch(pitch: PitchResult, t: float) -> void:
@@ -140,6 +187,9 @@ const COVER_PREFERENCE := {1: [&"1b", &"p", &"2b"], 2: [&"2b", &"ss"], 3: [&"3b"
 
 func show_play(bip: BallInPlay, t: float, play: LivePlay, outcome: PlayOutcome, live: LiveFielding = null, selected_runner: StringName = &"") -> void:
 	_zone.visible = false
+	_bat_pivot.visible = false
+	_timing_ring.visible = false
+	_windup = -1.0
 	var fielding := bip.fielding
 	var secured := play != null and play.ball != LivePlay.Ball.LOOSE
 	_ball.position = play.ball_position() if play != null else bip.trajectory.position_at(t)
@@ -290,6 +340,10 @@ func clear_debug_play() -> void:
 func _process(delta: float) -> void:
 	if _camera == null:
 		return
+	_view_clock += delta
+	_camera.fov = lerpf(_camera.fov, CAMERA_FOV[_camera_mode], 1.0 - exp(-delta * 6.0))
+	_update_bat()
+	_update_windup(delta)
 	var spot: Array = CAMERA_SPOTS[_camera_mode]
 	var weight := 1.0 - exp(-delta * 6.0)
 	var goal: Vector3 = spot[0]
@@ -306,6 +360,56 @@ func _process(delta: float) -> void:
 	var wanted := (target - _camera.position).normalized()
 	var look := forward.slerp(wanted, weight)
 	_camera.look_at(_camera.position + look, Vector3.UP)
+
+
+func _update_bat() -> void:
+	if not _bat_pivot.visible:
+		return
+	_bat_pivot.position = BATTER_SPOT + Vector3(0.3, 1.0, 0.05)
+	# Yaw 90 = barrel back toward the catcher, 0 = across the plate, -90 =
+	# toward the pitcher. Elevation in degrees above level.
+	var yaw := 100.0 + sin(_view_clock * 3.0) * 6.0  # stance with a waggle
+	var lift := 50.0
+	if _bat_swing_start >= 0.0:
+		var p := clampf((_view_clock - _bat_swing_start) / SWING_TIME, 0.0, 1.0)
+		var eased := p * p * (3.0 - 2.0 * p)
+		yaw = lerpf(100.0, -170.0, eased)
+		lift = lerpf(50.0, 5.0, minf(p * 2.0, 1.0)) if p < 0.5 else lerpf(5.0, 40.0, (p - 0.5) * 2.0)
+	var y := deg_to_rad(yaw)
+	var e := deg_to_rad(lift)
+	var dir := Vector3(cos(e) * cos(y), sin(e), cos(e) * sin(y))
+	_bat_pivot.look_at(_bat_pivot.global_position + dir, Vector3.UP)
+
+
+func _update_windup(delta: float) -> void:
+	var pitcher := tuning.fielder_ids.find(&"p")
+	if pitcher < 0 or _windup < 0.0:
+		return
+	var actor := _fielders[pitcher]
+	actor.face(Vector3.ZERO)
+	actor.animate(ActorView.Pose.THROW, delta, 0.0, false, _windup)
+	_ball.position = actor.hand_position()
+	_update_shadow()
+
+
+func _build_bat() -> void:
+	_bat_pivot = Node3D.new()
+	_bat_pivot.name = "Bat"
+	add_child(_bat_pivot)
+	var bat := MeshInstance3D.new()
+	var cyl := CylinderMesh.new()
+	cyl.top_radius = 0.06  # barrel
+	cyl.bottom_radius = 0.025  # handle
+	cyl.height = 0.95
+	bat.mesh = cyl
+	bat.rotation_degrees.x = -90.0  # lie along -Z, the pivot's facing
+	bat.position = Vector3(0.0, 0.0, -0.475)  # handle at the pivot (the hands)
+	bat.material_override = GrayboxField._mat(Color(0.82, 0.62, 0.36))
+	_bat_pivot.add_child(bat)
+	_timing_ring = _ring(Color(1, 1, 1, 0.8))
+	_timing_ring.position = Vector3(0.0, (tuning.zone_top + tuning.zone_bottom) * 0.5, 0.04)
+	_timing_ring.visible = false
+	_zone.add_child(_timing_ring)
 
 
 func _snap_camera() -> void:

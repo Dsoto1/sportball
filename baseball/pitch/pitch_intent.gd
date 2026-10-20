@@ -7,6 +7,8 @@ var family_id: StringName
 var aim: Vector2
 ## 0 = perfect meter, 1 = fully missed.
 var meter_error: float
+## Assist: multiplies the family's speed (1 = normal).
+var speed_scale: float = 1.0
 
 
 func _init(p_family_id: StringName, p_aim: Vector2, p_meter_error: float) -> void:

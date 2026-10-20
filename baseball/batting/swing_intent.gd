@@ -12,6 +12,8 @@ var timing_offset: float = 0.0
 ## the pitch's height on its own; this only shapes direction and loft.
 var stick: Vector2 = Vector2.ZERO
 var bats_left: bool = false
+## Assist: multiplies the timing window (1 = normal).
+var window_scale: float = 1.0
 
 
 static func take() -> SwingIntent:

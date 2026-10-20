@@ -81,6 +81,12 @@ extends Resource
 ## Seconds after the batter is allowed to swing before a no-swing is a take.
 @export var swing_late_cutoff: float = 0.22
 
+@export_group("Assists")
+## Rookie assist for a human batter (toggle in game with T).
+@export var rookie_assist: bool = true
+@export var assist_pitch_speed_scale: float = 0.85
+@export var assist_timing_window_scale: float = 1.3
+
 @export_group("Ball Flight")
 @export var gravity: float = 9.81
 ## Quadratic drag coefficient k in a = -k|v|v.

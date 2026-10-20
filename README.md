@@ -38,10 +38,18 @@ choose throws in the bottom half. Tab / Back switches teams.
 | ...only the runner on (or heading to) a base: hold that base | 1 / 2 / 3 / 4 | B / Y / X / A |
 | Skip to next pitch after a play | J | A |
 | Switch team | Tab | Back |
-| Debug overlay | F1 | R-stick click |
-| New match | F5 | Start |
+| Debug overlay | ` (backtick) or F1 | R-stick click |
+| New match | R or F5 | Start |
+| Rookie assist on/off | T | L-stick click |
 
-Batting is about timing: the bat finds the ball's height on its own. Lay off
+**On a MacBook:** click the trackpad to swing (contact); a two-finger click
+is a power swing. Use ` and R instead of F1 and F5, which need fn. Click
+the game window once if keys don't respond (it needs focus).
+
+Batting is about timing: watch the pitcher wind up, then swing as the
+white ring on the plate closes (it turns green when the ball arrives).
+Rookie assist (on by default) slows pitches a little and widens the timing
+window while you bat. The bat finds the ball's height on its own. Lay off
 pitches far off the plate, since they cost contact quality or can't be
 reached. The small yellow marker on the zone shows what your stick is
 adding.

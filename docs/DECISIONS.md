@@ -164,3 +164,17 @@ Decision: Until the canonical rig exists (Phase 2), bodies are animated procedur
 Reason: Owner request for rundown animation; keeps "AnimationTree/state machines must not contain baseball rules" by making the animator a read-only consumer.
 
 Affected systems: ActorView, new `presentation/match/play_animator.gd`, MatchView (pose pass, rundown camera), tests.
+
+## 2026-10-20 - Batting Readability Pass (First Playtest)
+
+Decision: After the owner's first playtest (MacBook: "it just slings balls one after another; no easy way to swing or see the bat"):
+- **Pacing:** the AI pre-pitch is now 1.8 s, ending in a visible 0.7 s pitcher windup with the ball in his glove.
+- **Bat:** the batter holds a visible bat in a stance and swings it on every swing.
+- **Timing ring:** a ring on the plate closes as the pitch arrives and turns green at the plate. It sits at the zone centre, so it never reveals pitch location.
+- **Camera:** the batting camera is now a raised telephoto from behind and right of the plate.
+- **Rookie assist (default on, T):** pitches at 0.85 speed and a 1.3x timing window for a human batter only. It is applied through `PitchIntent.speed_scale` and `SwingIntent.window_scale`, so the rules stay authoritative.
+- **Mac keys:** plain-key alternatives for the F-keys (` debug, R restart).
+
+Reason: The first human test showed the hitting loop was unreadable. The brief's 2-minute goal ("understand how to pitch and hit") was failing.
+
+Affected systems: MatchDirector (pacing, assist, prompts), MatchView (bat, windup, ring, camera), ActorView (catcher crouch), PitchIntent, SwingIntent, ContactResolver, PitchResolver, tuning, input map, README.
