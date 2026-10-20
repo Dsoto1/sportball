@@ -35,12 +35,11 @@ var _ai_swing: SwingIntent
 var _contact: ContactResult
 var _bip: BallInPlay
 var _live: LiveFielding
-var _live_accumulator := 0.0
 var _dive_requested := false
-var _throw_choice := -1
-var _play: ThrowPlay
+var _play: LivePlay
+var _play_event_cursor := 0
+var _play_done_at := -1.0
 var _outcome: PlayOutcome
-var _settle_time := 0.0
 var _event_cursor := 0
 ## Swing timing clock. Wall-clock microseconds in play; tools that run
 ## faster than real time (--fixed-fps) switch to accumulated frame time.
@@ -288,117 +287,104 @@ func _apply_call() -> void:
 
 func _start_ball_in_play() -> void:
 	_bip = BallInPlay.create(_contact, state, tuning)
-	_throw_choice = -1
 	_play = null
 	_outcome = null
+	_play_event_cursor = 0
+	_play_done_at = -1.0
 	_view.show_debug_play(_bip)
 	_view.set_camera_mode(MatchView.CameraMode.FIELD)
 	_view.set_cursor(Vector2.ZERO, 0.0, 0.0, Color.WHITE)
 	_live = null
-	_live_accumulator = 0.0
 	_dive_requested = false
 	if _bip.is_home_run():
+		_play_done_at = _bip.home_run_settle_time()
 		_finish_play(RunnerResolver.home_run(_bip.bases_before, _bip.batter_id))
-	elif not user_is_batting() and _bip.fielding.has_fielder():
-		# The human steers whoever the projection says gets there first.
-		_live = LiveFielding.new(_bip.trajectory, _bip.fielders, _bip.fielding, tuning, _bip.fielding.fielder_index)
+	else:
+		var human_fields := not user_is_batting() and _bip.fielding.has_fielder()
+		if human_fields:
+			# The human steers whoever the projection says gets there first.
+			_live = LiveFielding.new(_bip.trajectory, _bip.fielders, _bip.fielding, tuning, _bip.fielding.fielder_index)
+		_play = _bip.start_live(not human_fields)
+		_play.human_defense = not user_is_batting()
 	_set_phase(Phase.BALL_IN_PLAY)
 	_hud.show_prompt(_hud_prompt_suffix())
 
 
 func _process_ball_in_play() -> void:
 	var t := _phase_time
-	if not user_is_batting():
-		for base in [1, 2, 3, 4]:
-			if Input.is_action_just_pressed(StringName("throw_base_%d" % base)):
-				_throw_choice = base  # buffered: used for the next throw
-	if _live != null and not _live.is_secured():
-		_step_live_fielding(t)
-	if _outcome == null:
-		var secured := _live.is_secured() if _live != null else t >= _bip.fielding.ready_time
-		if secured:
-			if _play == null:
-				_play = _bip.start_throws()
-			_advance_throws(t)
+	if _play != null and _outcome == null:
+		_step_play(t)
 	_view.show_play(_bip, t, _play, _outcome, _live)
 	_view.set_field_focus(_field_focus(t))
 	if _outcome == null:
 		return
 	var skip := Input.is_action_just_pressed(&"swing_contact") or Input.is_action_just_pressed(&"pitch_primary")
-	if t >= _settle_time + PLAY_SETTLE_PAUSE or (skip and t > _play_end_time() + 0.3):
+	if t >= _play_done_at + PLAY_SETTLE_PAUSE or (skip and t > _play_done_at):
 		state.apply_play(_outcome)
 		_enter_pre_pitch()
 
 
-## Throws one leg at a time. A human picks each base (buttons are buffered,
-## so a double play can be called before the first catch); with no input
-## for THROW_DECISION_WINDOW the AI throw is used. Holding costs time.
-func _advance_throws(t: float) -> void:
-	if not _play.can_throw():
-		_finish_play(_play.outcome())
-		return
-	var earliest := _play.next_release_time()
-	if t < earliest:
-		return
-	var suggestion := AiDefense.next_throw(_play)
-	if user_is_batting():
-		if suggestion == AiDefense.NO_THROW:
-			_finish_play(_play.outcome())
-		else:
-			_throw_leg(suggestion, earliest)
-		return
-	if _throw_choice != -1:
-		var base := _throw_choice
-		_throw_choice = -1
-		if base != _play.holder_base():
-			_throw_leg(base, t)
-		return
-	if suggestion == AiDefense.NO_THROW:
-		_finish_play(_play.outcome())
-	elif t >= earliest + THROW_DECISION_WINDOW:
-		_throw_leg(suggestion, t)
-
-
-func _throw_leg(base: int, not_before: float) -> void:
-	var leg := _play.throw_to(base, not_before)
-	_log({"throw": base, "release": snappedf(leg["release"], 0.01), "arrival": snappedf(leg["arrival"], 0.01), "out": leg["out_runner"], "kind": leg["out_kind"]})
-	if leg["out_runner"] != &"":
-		_hud.show_callout("OUT!", "at %s" % FieldLayout.base_name(base), 1.2)
-
-
-func _play_end_time() -> float:
-	return _play.last_arrival() if _play != null else _bip.fielding.secure_time
-
-
-func _step_live_fielding(t: float) -> void:
-	if Input.is_action_just_pressed(&"switch_fielder"):
-		_live.switch_to_nearest()
-	if Input.is_action_just_pressed(&"dive"):
-		_dive_requested = true
+## Steps fielding and the live play together at the fixed sim step, feeding
+## the human's intents to whichever side they control.
+func _step_play(t: float) -> void:
+	var defense := {}
+	var offense := {}
 	var move := Input.get_vector(&"aim_left", &"aim_right", &"aim_down", &"aim_up")
-	# Fixed steps keep the authoritative result independent of frame rate.
-	_live_accumulator = t - _live.time
-	while _live_accumulator >= tuning.sim_step and not _live.is_secured():
-		_live.step(tuning.sim_step, move, _dive_requested)
-		_dive_requested = false
-		_live_accumulator -= tuning.sim_step
-	if _live.is_secured():
-		_bip.set_fielding(_live.result)
-		_log({"fielded": _live.result.fielder_id, "time": snappedf(_live.result.secure_time, 0.01), "in_air": _live.result.caught_in_air, "dive": _live.result.is_dive, "missed_dives": _live.dives_missed})
+	if user_is_batting():
+		offense = {"advance": Input.is_action_just_pressed(&"runner_advance"), "retreat": Input.is_action_just_pressed(&"runner_retreat")}
+	else:
+		for base in [1, 2, 3, 4]:
+			if Input.is_action_just_pressed(StringName("throw_base_%d" % base)):
+				defense["throw"] = base
+		defense["move"] = move if _live == null or _live.is_secured() else Vector2.ZERO
+		if _live != null and not _live.is_secured():
+			if Input.is_action_just_pressed(&"switch_fielder"):
+				_live.switch_to_nearest()
+			if Input.is_action_just_pressed(&"dive"):
+				_dive_requested = true
+	var dt := tuning.sim_step
+	while _play.time + dt <= t and not _play.is_done():
+		if _live != null and not _live.is_secured():
+			_live.step(dt, move, _dive_requested)
+			_dive_requested = false
+			if _live.is_secured():
+				_play.secure(_live.result)
+				_bip.fielding = _live.result
+				_log({"fielded": _live.result.fielder_id, "time": snappedf(_live.result.secure_time, 0.01), "in_air": _live.result.caught_in_air, "dive": _live.result.is_dive, "missed_dives": _live.dives_missed})
+		_play.step(dt, defense, offense)
+		defense.erase("throw")  # one-shot inputs apply to one step only
+		offense = {}
+	_drain_play_events()
+	if _play.is_done():
+		_play_done_at = _play.time
+		_finish_play(_play.outcome())
+
+
+func _drain_play_events() -> void:
+	while _play_event_cursor < _play.events.size():
+		var e: Dictionary = _play.events[_play_event_cursor]
+		_play_event_cursor += 1
+		match e["type"]:
+			"out":
+				var labels := {PlayOutcome.OUT_FORCE: "FORCE OUT", PlayOutcome.OUT_TAG: "TAGGED OUT", PlayOutcome.OUT_DOUBLED_OFF: "DOUBLED OFF", PlayOutcome.OUT_CATCH: "CAUGHT"}
+				_hud.show_callout(labels.get(e["kind"], "OUT"), "at %s" % FieldLayout.base_name(e["base"]), 1.2)
+				_log({"out": e["runner"], "kind": e["kind"], "base": e["base"], "time": snappedf(_play.time, 0.01)})
+			"rundown":
+				_hud.show_callout("RUNDOWN!", "", 1.0)
+			"throw":
+				_log({"throw": e["base"], "time": snappedf(_play.time, 0.01)})
 
 
 func _field_focus(t: float) -> Vector3:
-	var ball := _bip.trajectory.position_at(minf(t, _bip.fielding.secure_time if _live == null else t))
+	var ball := _play.ball_position() if _play != null else _bip.trajectory.position_at(t)
 	var focus := Vector3(ball.x, 0.0, ball.z)
-	if _live != null:
-		var controlled := _live.positions[_live.controlled] if _live.controlled >= 0 else focus
-		focus = focus.lerp(controlled, 0.5)
+	if _live != null and not _live.is_secured() and _live.controlled >= 0:
+		focus = focus.lerp(_live.positions[_live.controlled], 0.5)
 	return focus.lerp(Vector3(0.0, 0.0, -30.0), 0.35)
 
 
 func _finish_play(outcome: PlayOutcome) -> void:
 	_outcome = outcome
-	_settle_time = _bip.settle_time(_outcome)
 	_log({"outcome": _outcome.kind, "throws": _outcome.throws.map(func(leg: Dictionary) -> int: return leg["base"]), "runs": _outcome.runs.size(), "outs": _outcome.outs.size()})
 	var detail := "%.1f m/s  %d°  %.0f m" % [_contact.exit_velocity, roundi(_contact.launch_angle), _bip.trajectory.distance()]
 	var text := String(_outcome.kind).replace("_", " ").to_upper()
@@ -456,9 +442,10 @@ func _update_debug() -> void:
 		candidates.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a["time"] < b["time"])
 		f["next_best"] = candidates.slice(1, 3).map(func(c: Dictionary) -> String: return "%s %.2fs" % [c["id"], c["time"]])
 		_debug.set_section("fielding", f)
-		_debug.set_section("runners", _bip.plans.map(func(p: RunnerPlan) -> Dictionary: return p.to_dict()))
+		if _play != null:
+			_debug.set_section("runners", _play.runners.map(func(r: LivePlay.Runner) -> String: return "%s %s->%d s=%.1f%s%s" % [r.id, LivePlay.State.keys()[r.state], r.target, r.s, " forced" if r.forced else "", " retouch" if r.must_retouch else ""]))
 		if _outcome != null:
-			_debug.set_section("outcome", {"kind": _outcome.kind, "throws": _outcome.throws.map(func(leg: Dictionary) -> String: return "%s@%.2f%s" % [FieldLayout.base_name(leg["base"]), leg["arrival"], (" OUT " + String(leg["out_runner"])) if leg["out_runner"] != &"" else ""]), "runs": _outcome.runs, "outs": _outcome.outs.size()})
+			_debug.set_section("outcome", {"kind": _outcome.kind, "throws": _outcome.throws.map(func(leg: Dictionary) -> String: return "%s@%.2f" % [FieldLayout.base_name(leg["base"]), leg["arrival"]]), "runs": _outcome.runs, "outs": _outcome.outs.map(func(o: Dictionary) -> String: return "%s %s@%s" % [o["runner_id"], o["kind"], FieldLayout.base_name(o["base"])])})
 
 
 func _timing_detail() -> String:
@@ -479,7 +466,9 @@ func _hud_prompt_suffix() -> String:
 		Phase.BALL_IN_PLAY:
 			if _outcome != null:
 				base = "Skip: J / A"
-			elif not user_is_batting():
+			elif user_is_batting():
+				base = "Runners: advance E / RB   retreat Q / LB"
+			else:
 				base = "Run: WASD / L-stick   Dive: Shift / RT   Switch: F / LT   Throw (again to relay) 1st-2nd-3rd-home: 1-4 / B Y X A"
 	return "%s\n[%s]   Tab/Back: switch side   F1: debug   F5: restart" % [base, role]
 

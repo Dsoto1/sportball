@@ -18,6 +18,8 @@ const KIND_TRIPLE_PLAY := &"triple_play"
 const OUT_CATCH := &"catch"
 const OUT_FORCE := &"force"
 const OUT_TAG := &"tag"
+## Runner who had not retouched after a catch, beaten back by the ball.
+const OUT_DOUBLED_OFF := &"doubled_off"
 
 var kind: StringName
 var batter_id: StringName
@@ -32,7 +34,7 @@ var batter_base: int = 0
 ## First throw of the play (kept for quick checks); every leg is in throws.
 var throw_base: int = -1
 var throw_arrival: float = INF
-## ThrowPlay legs: {from, base, release, arrival, unassisted, out_runner, out_kind, out_time}
+## Throws made in the play: {from, to, base, release, arrival}
 var throws: Array[Dictionary] = []
 ## Runner movements for presentation/logging: {runner_id, from, to, safe}
 var advances: Array[Dictionary] = []

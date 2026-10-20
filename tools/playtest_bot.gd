@@ -94,6 +94,8 @@ func _drive() -> void:
 			var live := _director.live_fielding()
 			if live != null and not live.is_secured():
 				_steer(live)
+			if batting and _director.phase_time() > 0.3 and _rng.randf() < 0.01:
+				_press(&"runner_advance" if _rng.randf() < 0.6 else &"runner_retreat")
 			if not batting and _director.phase_time() > 0.5 and _rng.randf() < 0.02:
 				_press(StringName("throw_base_%d" % _rng.randi_range(1, 4)))
 			var shot_chance := 0.08 if (live != null and not live.is_secured()) else 0.01

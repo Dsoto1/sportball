@@ -110,4 +110,25 @@ The AI picks each leg by trying every base on a copy of the play with one throw 
 
 Reason: Double plays and relays are core baseball. The leg-by-leg model keeps the human in the decision while the outcome stays authoritative and testable.
 
-Affected systems: new `baseball/running/throw_play.gd`; RunnerResolver (now wraps ThrowPlay), AiDefense, BallInPlay (`start_throws`, `resolve_ai`), PlayOutcome, AutoMatch, MatchDirector, MatchView (animated legs, base covers), tuning, tests.
+Affected systems: superseded the same day by "Live Runners and Rundowns" (ThrowPlay and AiDefense were removed).
+
+## 2026-10-20 - Live Runners and Rundowns
+
+Decision: Everything after contact except the batted ball runs in `LivePlay`, a fixed-step simulation of runners (position along the base path), the ball once fielded, throws between base covers, the ball holder's movement, and covers closing in. Outs come from positions and the rules:
+- **Force:** the holder is on the bag before a forced runner gets there. A force holds only while every runner behind is alive, and a forced runner who stays put is still liable.
+- **Tag:** the holder is within `tag_reach` of a runner who is off a bag.
+- **Doubled off:** the ball beats a runner back to a base he had not retouched after a catch.
+
+Ties go to the runner. Third-out run rules are applied by time.
+
+Runner behaviour:
+- Runners start from the read (`RunnerResolver.plan`), freeze on a ball in the air (unless there are two outs), and retouch after a catch.
+- Standing runners take a base on a throw elsewhere, or tag up, only with `runner_take_base_margin`.
+- A runner who would lose the race reverses after `runner_reverse_time` if that is better. This is how rundowns emerge.
+- With the ball held and no force or tag available, the defense AI chases a nearby runner off a bag; otherwise the fielder who made the play throws ahead of the lead runner who is not already scoring.
+
+Humans: on defense, the stick moves the ball holder and the base buttons throw (the AI takes over after `human_throw_decision_window` idle). On offense, `runner_advance` / `runner_retreat` (E/Q, RB/LB) move all runners; a runner given an order is no longer steered by the AI. ThrowPlay and AiDefense were removed: there is one model of a play, and AI-vs-AI sims run the same LivePlay at `sim_play_step`.
+
+Reason: Owner request. Live decisions and rundowns need position and time, not a fixed list of commitments.
+
+Affected systems: new `baseball/running/live_play.gd`; BallInPlay (`start_live`, `resolve_ai`), RunnerResolver (read only), PlayOutcome (`doubled_off`), MatchDirector (one fixed-step loop for LiveFielding and LivePlay, intents, event callouts), MatchView (draws from LivePlay), input (`runner_advance`, `runner_retreat`), tuning, tests.

@@ -37,14 +37,14 @@ runner/base resolution → reset.
 
 | Metric | Value | Rough target |
 |---|---|---|
-| Runs / team / 6 innings | 3.33 | 2.5–3.5 |
-| Hits / PA | .273 | .23–.27 |
+| Runs / team / 6 innings | 2.65 | 2.5–3.5 |
+| Hits / PA | .259 | .23–.27 |
 | K% / BB% | 16.1% / 8.3% | 18–23% / 7–9% |
 | HR / PA | 3.1% | 2.5–3.5% (arcade: higher is fine) |
 | Pitches / game (both teams) | 210 | — |
 | Diving catches | 7% of balls in play | "rare enough to stay exciting" |
-| Double plays / team / 6 inn | 0.84 | ~0.6 |
-| Triples / inside-the-park HR | **~0 / 0** | should exist |
+| Double plays / team / 6 inn | 0.46 | ~0.6 |
+| Triples / doubles (% of balls in play) | 0.3% / 9.8% | ~0.5% / ~6.5% |
 
 Hit rate by launch angle (`tools/launch_angle_report.gd`): grounders
 (−10–10°) 25–32%, liners (10–20°) 79%, 20–30° 42%, high flies (40°+) 0%.
@@ -63,13 +63,15 @@ bot, screenshots and reading the timings.
    gave up 17 runs. Expect to tune fielder speed, reach, the landing hint
    and the first-step feel with real players. There are no jumping catches
    at the wall yet, and auto-switching only happens on request.
-2. **Throws don't change runner decisions.** *(Update: multi-throw plays
-   and double/triple plays exist now; see DECISIONS.)* Runners still
-   commit when the ball is read and never react to where it is thrown, so
-   there are no rundowns, and no doubling off a runner who strayed on a
-   liner. Throws only go base to base, with no cutoff man in the outfield.
-   Double plays run at about 0.84 per team per 6 innings, slightly high;
-   `relay_release_time` is the knob.
+2. **Live running is new and AI-tuned only.** *(Update: runners decide
+   live and rundowns exist; see DECISIONS.)* Runners freeze on balls in the
+   air (except with two outs), retouch after catches, take bases on throws,
+   retreat, and get hung up in rundowns. The defense throws, runs the ball
+   to a bag, chases runners, and covers close in. Still missing: cutoff men
+   (outfield throws go straight to a base), per-runner human control
+   (advance/retreat moves all runners), and visible rundown animation
+   (fielders slide; there is no chase pose). A rundown that runs past
+   `max_play_time` ends with a tag.
 3. **No triples or inside-the-park home runs.** Runners only take a base
    when they beat a *perfect* throw by 0.35 s. Wall balls get cut off fast,
    and there is no throw inaccuracy or bobble to punish defenders.
@@ -115,8 +117,7 @@ bot, screenshots and reading the timings.
 ## Suggested next increments (still Phase 0/1, no new systems)
 
 1. Tune steered fielding with people; add throw accuracy/bobble.
-2. Live runner decisions (`runner_advance` / `runner_retreat`), rundowns,
-   and cutoff men.
+2. Cutoff men, per-runner human control, and rundown presentation.
 3. Timestamped swing input, a hit pause and a bat swing placeholder.
 4. Retune dive frequency, extra-base aggression and infield depth with the
    sim and launch-angle reports.

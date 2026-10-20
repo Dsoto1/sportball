@@ -1,11 +1,11 @@
 class_name RunnerResolver
 extends RefCounted
-## Base running and base/tag resolution.
+## The runners' read when the ball is put in play.
 ##
-## plan(): every runner commits to a target base the moment the ball is
-## read. They take an extra base only if they beat the projected throw to
-## it by a safety margin; forced runners must advance.
-## Throws, outs and third-out run rules are resolved by ThrowPlay.
+## plan(): every runner picks a target base. They take an extra base only if
+## they beat the projected throw to it by a safety margin; forced runners
+## must advance. LivePlay seeds its runners from this and then lets them
+## change their minds as the play develops.
 
 
 static func plan(bases: Array[StringName], batter_id: StringName, fielding: FieldingResult, outs_before: int, tuning: BaseballTuning) -> Array[RunnerPlan]:
@@ -50,21 +50,6 @@ static func plan(bases: Array[StringName], batter_id: StringName, fielding: Fiel
 		b.arrival_time = arrival_between(b.start_base, b.target_base, b.start_time, tuning)
 		plans.append(b)
 	return plans
-
-
-## Resolves a play with a fixed list of throw targets (each from the base
-## the previous throw went to). Interactive play drives ThrowPlay leg by leg.
-static func resolve_throws(plans: Array[RunnerPlan], batter_id: StringName, fielding: FieldingResult, throws: Array[int], outs_before: int, launch_angle: float, tuning: BaseballTuning) -> PlayOutcome:
-	var play := ThrowPlay.new(plans, batter_id, fielding, outs_before, launch_angle, tuning)
-	for base in throws:
-		if base > 0 and base != play.holder_base() and play.can_throw():
-			play.throw_to(base)
-	return play.outcome()
-
-
-static func resolve(plans: Array[RunnerPlan], batter_id: StringName, fielding: FieldingResult, throw_base: int, outs_before: int, launch_angle: float, tuning: BaseballTuning) -> PlayOutcome:
-	var throws: Array[int] = [throw_base]
-	return resolve_throws(plans, batter_id, fielding, throws, outs_before, launch_angle, tuning)
 
 
 ## Outcome for a ball that left the park: everyone scores.

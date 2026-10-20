@@ -19,7 +19,7 @@ func _initialize() -> void:
 				sim.state.apply_pitch_call(ContactResolver.call_for(pitch, c))
 				continue
 			var bip := BallInPlay.create(c, sim.state, t)
-			var o := bip.resolve(bip.ai_throw_target())
+			var o := bip.resolve_ai()
 			var key := "LA %+03d" % (floori(c.launch_angle / 10.0) * 10)
 			var b: Array = buckets.get(key, [0, 0, 0.0])
 			b[0] += 1

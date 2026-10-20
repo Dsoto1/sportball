@@ -142,8 +142,29 @@ extends Resource
 ## Runners only take a base when they beat the projected throw by this much.
 @export var runner_safety_margin: float = 0.35
 @export var two_out_safety_margin: float = 0.15
-## Time a fielder needs to apply a tag after the ball arrives.
+## A runner standing on a base takes the next one on a throw (or tags up)
+## only when beating the ball there by this much.
+@export var runner_take_base_margin: float = 0.7
+## Time a fielder needs to apply a tag after the ball arrives (planning).
 @export var tag_time: float = 0.18
+## Ball holder tags a runner off the bag within this distance.
+@export var tag_reach: float = 1.1
+## Stop-and-turn time when a runner reverses direction.
+@export var runner_reverse_time: float = 0.3
+## After a decision, AI runners wait this long before changing their minds.
+@export var runner_decision_lock: float = 0.25
+## How far a cover steps off the bag toward a runner hung up nearby.
+@export var cover_close_in: float = 7.0
+## The ball holder chases runners off a bag within this distance.
+@export var rundown_chase_range: float = 20.0
+## A human holder idle for this long gets the AI throw.
+@export var human_throw_decision_window: float = 0.6
+## Play ends once every runner has been standing still this long.
+@export var play_settle_time: float = 0.2
+## Safety net: a rundown still going after this long ends with a tag.
+@export var max_play_time: float = 25.0
+## Fixed step for the live play when no human is driving it (AI sims).
+@export var sim_play_step: float = 0.0166667
 
 @export_group("AI")
 @export var ai_pitcher_meter_sigma: float = 0.22

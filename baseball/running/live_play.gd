@@ -1,0 +1,681 @@
+class_name LivePlay
+extends RefCounted
+## Everything on a ball in play except the batted ball itself, stepped at a
+## fixed rate: runners, the ball once a fielder has it, throws, base covers,
+## forces and tags. Runners decide live (hold on a fly, retouch after a
+## catch, take the extra base on a throw, retreat, break out of a rundown).
+## The defense throws, runs the ball to a bag or chases a runner. Either
+## side can be driven by a human through intents; otherwise the built-in AI
+## decides. Deterministic for a given sequence of step() calls.
+##
+## Rules modelled: force outs (a force holds only while every runner behind
+## in the chain is alive), tag outs (ball holder within tag reach of a
+## runner who is off a base), doubled off (a runner who has not retouched
+## after a catch is out if the ball beats them back), ties go to the runner,
+## third-out run rules by time.
+
+enum State { WAITING, RUNNING, ON_BASE, OUT, SCORED }
+enum Ball { LOOSE, HELD, FLIGHT }
+
+const BASE := FieldLayout.BASE_DISTANCE
+const HOME_PLATE := 4
+## Holder counts as on the bag within this distance of it.
+const ON_BAG := 0.8
+
+
+class Runner:
+	extends RefCounted
+	var id: StringName
+	var start_base: int
+	var is_batter := false
+	## Meters along the base path from home plate (0) to scoring (4 * BASE).
+	var s := 0.0
+	## Base the runner is heading to, or standing on when ON_BASE.
+	var target := 0
+	var state := 0
+	var go_time := 0.0
+	var lock_until := 0.0
+	var forced := false
+	var must_retouch := false
+	## Set once a human has given this runner an order; the AI leaves it alone.
+	var human := false
+	var out_time := INF
+	var score_time := INF
+	## Furthest base reached safely (for scoring a batter's hit).
+	var reached := 0
+
+
+var tuning: BaseballTuning
+var trajectory: BallTrajectory
+var projection: FieldingResult
+var fielding: FieldingResult
+var batter_id: StringName
+var outs_before: int
+var launch_angle: float
+var runners: Array[Runner] = []
+var time := 0.0
+var ball := Ball.LOOSE
+var holder_pos := Vector3.ZERO
+## Base whose cover holds the ball; -1 while the fielder who got it has it.
+var holder_cover := -1
+var busy_until := 0.0
+var windup := 0.0
+var flight := {}
+## Cover positions by base 1..4 (index 0 unused; 4 = home plate).
+var covers: Array[Vector3] = []
+var outs: Array[Dictionary] = []
+## Throws made: {from, base, release, arrival}
+var legs: Array[Dictionary] = []
+## Things presentation may want to call out: {type, ...}
+var events: Array[Dictionary] = []
+var auto_secure := true
+var human_defense := false
+
+var _went := false
+var _ground_targets := {}
+var _ground_forced := {}
+var _pending_throw := -1
+var _last_human_input := -INF
+var _settled_since := INF
+var _done := false
+
+
+func _init(bases: Array[StringName], p_batter_id: StringName, p_outs_before: int, p_launch_angle: float,
+		p_trajectory: BallTrajectory, p_projection: FieldingResult, p_tuning: BaseballTuning, p_auto_secure: bool = true) -> void:
+	tuning = p_tuning
+	trajectory = p_trajectory
+	projection = p_projection
+	batter_id = p_batter_id
+	outs_before = p_outs_before
+	launch_angle = p_launch_angle
+	auto_secure = p_auto_secure
+	covers.resize(5)
+	for b in range(1, 5):
+		covers[b] = FieldLayout.base_position(b)
+	# The runners' read if the ball lands: targets and forces from the
+	# projected fielding treated as a ball on the ground.
+	var ground := _as_ground_ball(projection)
+	for plan in RunnerResolver.plan(bases, batter_id, ground, outs_before, tuning):
+		_ground_targets[plan.runner_id] = plan.target_base
+		_ground_forced[plan.runner_id] = plan.forced
+	for base in [3, 2, 1]:
+		var id: StringName = bases[base - 1]
+		if id == &"":
+			continue
+		var r := Runner.new()
+		r.id = id
+		r.start_base = base
+		r.s = base * BASE + tuning.runner_lead_distance
+		r.target = base
+		r.state = State.WAITING
+		runners.append(r)
+	var batter := Runner.new()
+	batter.id = batter_id
+	batter.start_base = FieldLayout.HOME
+	batter.is_batter = true
+	batter.target = FieldLayout.FIRST
+	batter.state = State.RUNNING
+	batter.forced = true
+	batter.go_time = tuning.batter_start_delay
+	runners.append(batter)
+
+
+# --- Queries ----------------------------------------------------------------
+
+func is_done() -> bool:
+	return _done
+
+
+func inning_over() -> bool:
+	return outs_before + outs.size() >= MatchState.OUTS_PER_HALF
+
+
+func runner(id: StringName) -> Runner:
+	for r in runners:
+		if r.id == id:
+			return r
+	return null
+
+
+func runner_position(r: Runner) -> Vector3:
+	var s := clampf(r.s, 0.0, 4.0 * BASE)
+	var leg := mini(int(s / BASE), 3)
+	return FieldLayout.base_position(leg).lerp(FieldLayout.base_position(leg + 1), (s - leg * BASE) / BASE)
+
+
+func ball_position() -> Vector3:
+	match ball:
+		Ball.LOOSE:
+			return trajectory.position_at(time)
+		Ball.FLIGHT:
+			if time < flight["release"]:
+				return holder_pos + Vector3.UP * 1.3
+			var u := clampf((time - flight["release"]) / maxf(flight["arrival"] - flight["release"], 0.01), 0.0, 1.0)
+			return ThrowModel.position_at(flight["from"], flight["to"], u, tuning)
+	return holder_pos + Vector3.UP * 1.3
+
+
+## Seconds until a runner can reach a base from where they are now.
+func runner_eta(r: Runner, base: int) -> float:
+	var goal := base * BASE
+	var wait := maxf(r.go_time - time, 0.0)
+	var penalty := 0.0
+	if r.state == State.RUNNING:
+		var now_dir := signf(r.target * BASE - r.s)
+		var new_dir := signf(goal - r.s)
+		if now_dir != 0.0 and new_dir != 0.0 and now_dir != new_dir:
+			penalty = tuning.runner_reverse_time
+	return wait + penalty + absf(goal - r.s) / tuning.runner_speed
+
+
+## Seconds until the defense can have the ball on a base (run or throw).
+func ball_eta(base: int) -> float:
+	match ball:
+		Ball.LOOSE:
+			return maxf(ThrowModel.arrival_at_base(projection, base, tuning) - time, 0.0)
+		Ball.FLIGHT:
+			var to_base: int = flight["base"]
+			var land: float = flight["arrival"] - time
+			if to_base == base:
+				return maxf(land, 0.0)
+			return maxf(land, 0.0) + tuning.relay_release_time + ThrowModel.flight_time(flight["to"], covers[base], tuning)
+	var wait := maxf(busy_until - time, 0.0)
+	return wait + minf(_run_time(base), _throw_time(base))
+
+
+## A force holds only toward the next base and only while every runner
+## behind in the force chain is still alive.
+func forced_now(r: Runner, base: int) -> bool:
+	if not r.forced or base != r.start_base + 1 or r.s >= base * BASE:
+		return false
+	for q in runners:
+		if q.forced and q.start_base < r.start_base and q.state == State.OUT:
+			return false
+	return true
+
+
+# --- Driving the play ---------------------------------------------------------
+
+## The ball is in a fielder's hands (from the projection or LiveFielding).
+func secure(f: FieldingResult) -> void:
+	if ball != Ball.LOOSE:
+		return
+	fielding = f
+	ball = Ball.HELD
+	holder_pos = f.secure_point
+	holder_cover = -1
+	busy_until = f.ready_time
+	windup = tuning.throw_release_time
+	if f.caught_in_air:
+		var batter := runner(batter_id)
+		_record_out(batter, FieldLayout.HOME, PlayOutcome.OUT_CATCH)
+		events.append({"type": "catch"})
+		for r in runners:
+			if r.is_batter or r.state == State.OUT:
+				continue
+			# Every runner has to get back to the bag before tagging up.
+			r.forced = false
+			var was_going := r.state == State.RUNNING and r.target > r.start_base
+			r.must_retouch = r.s > r.start_base * BASE + 0.01
+			r.target = r.start_base
+			r.state = State.RUNNING if r.must_retouch else State.ON_BASE
+			r.go_time = maxf(r.go_time, time + (tuning.runner_reverse_time if was_going else 0.0))
+			r.human = false
+	elif not _went:
+		_go_ground()
+
+
+## defense: {throw: base, move: Vector2} from a human (or {} for AI).
+## offense: {advance: bool, retreat: bool} from a human (or {} for AI).
+func step(dt: float, defense: Dictionary = {}, offense: Dictionary = {}) -> void:
+	if _done:
+		return
+	time += dt
+	if ball == Ball.LOOSE:
+		if auto_secure and projection.has_fielder() and time >= projection.secure_time:
+			secure(projection)
+		elif not _went and (time >= trajectory.first_bounce_time or outs_before == MatchState.OUTS_PER_HALF - 1):
+			_go_ground()  # with two outs everyone runs on contact
+	_apply_offense(offense)
+	if ball != Ball.LOOSE:
+		for r in runners:
+			_ai_runner(r)
+	_apply_defense(dt, defense)
+	if ball == Ball.FLIGHT and time >= flight["arrival"]:
+		_catch_throw()
+	_move_runners(dt)
+	_update_covers(dt)
+	_resolve_arrivals()
+	_resolve_outs()
+	_check_done()
+
+
+## Runs the whole play with the AI on both sides.
+func run_ai(step_size: float) -> PlayOutcome:
+	var guard := 0
+	while not _done and guard < 100000:
+		step(step_size)
+		guard += 1
+	return outcome()
+
+
+# --- Offense ------------------------------------------------------------------
+
+func _go_ground() -> void:
+	_went = true
+	for r in runners:
+		if r.state == State.OUT or r.state == State.SCORED:
+			continue
+		r.forced = _ground_forced.get(r.id, r.forced)
+		if r.human:
+			continue  # keeps whatever the player told them
+		r.target = _ground_targets.get(r.id, r.target)
+		r.state = State.RUNNING
+		if not r.is_batter:
+			r.go_time = maxf(r.go_time, time + tuning.runner_read_delay)
+
+
+func _apply_offense(offense: Dictionary) -> void:
+	if offense.get("advance", false):
+		# Lead runner first so trailing runners never pass them.
+		for r in _ordered(true):
+			var next := r.target + 1
+			if r.state == State.WAITING:
+				next = r.start_base + 1
+			elif r.state == State.RUNNING and r.target * BASE < r.s:
+				next = ceili((r.s + 0.01) / BASE)  # turn around and go forward
+			next = mini(next, HOME_PLATE)
+			if next != r.target and not _blocked(r, next):
+				_set_target(r, next, 0.0)
+			r.human = true
+	if offense.get("retreat", false):
+		for r in _ordered(false):
+			if r.state != State.RUNNING or forced_now(r, r.target):
+				r.human = true
+				continue
+			var back := floori((r.s - 0.01) / BASE)
+			if back >= 1 and back != r.target and not _blocked(r, back):
+				_set_target(r, back, tuning.runner_reverse_time)
+			r.human = true
+
+
+func _ai_runner(r: Runner) -> void:
+	if r.human or time < r.lock_until or r.state == State.WAITING:
+		return
+	if r.state == State.ON_BASE:
+		# Standing runners only go on a throw to another base (taking the base
+		# on the throw) or to tag up; stretching a hit was decided at the read.
+		var next := r.target + 1
+		if next > HOME_PLATE or r.must_retouch or _blocked(r, next) or inning_over():
+			return
+		var tagging := fielding != null and fielding.caught_in_air and ball == Ball.HELD and holder_cover == -1
+		if not tagging and not (ball == Ball.FLIGHT and flight["base"] != next):
+			return
+		var slack := ball_eta(next) - runner_eta(r, next) - _tag_margin()
+		if slack > tuning.runner_take_base_margin:
+			_set_target(r, next, tuning.runner_read_delay)
+			events.append({"type": "advance", "runner": r.id, "base": next})
+	elif r.state == State.RUNNING:
+		var cur := r.target
+		var dir := signf(cur * BASE - r.s)
+		if dir == 0.0 or (r.must_retouch and cur == r.start_base) or forced_now(r, cur):
+			return
+		var slack_cur := ball_eta(cur) - runner_eta(r, cur) - _tag_margin()
+		if slack_cur >= 0.0:
+			return
+		var alt := floori((r.s - 0.01) / BASE) if dir > 0.0 else ceili((r.s + 0.01) / BASE)
+		if alt < 1 or alt > HOME_PLATE or alt == cur or _blocked(r, alt):
+			return
+		var slack_alt := ball_eta(alt) - runner_eta(r, alt) - _tag_margin()
+		if slack_alt > slack_cur + 0.05:
+			_set_target(r, alt, tuning.runner_reverse_time)
+			if ball == Ball.HELD and holder_pos.distance_to(runner_position(r)) < tuning.rundown_chase_range:
+				events.append({"type": "rundown", "runner": r.id})
+
+
+func _set_target(r: Runner, base: int, pause: float) -> void:
+	r.target = base
+	r.state = State.RUNNING
+	r.go_time = maxf(r.go_time, time + pause)
+	r.lock_until = time + pause + tuning.runner_decision_lock
+
+
+func _blocked(r: Runner, base: int) -> bool:
+	if base >= HOME_PLATE or base == r.start_base and not r.is_batter:
+		return false
+	for q in runners:
+		if q != r and (q.state == State.ON_BASE or q.state == State.RUNNING or q.state == State.WAITING) and q.target == base:
+			return true
+	return false
+
+
+func _ordered(lead_first: bool) -> Array[Runner]:
+	var list: Array[Runner] = []
+	for r in runners:
+		if r.state != State.OUT and r.state != State.SCORED:
+			list.append(r)
+	list.sort_custom(func(a: Runner, b: Runner) -> bool: return a.s > b.s if lead_first else a.s < b.s)
+	return list
+
+
+func _move_runners(dt: float) -> void:
+	for r in runners:
+		if r.state != State.RUNNING or time < r.go_time:
+			continue
+		r.s = move_toward(r.s, r.target * BASE, tuning.runner_speed * dt)
+		if r.must_retouch and r.s <= r.start_base * BASE + 0.01:
+			r.must_retouch = false
+
+
+func _resolve_arrivals() -> void:
+	for r in runners:
+		if r.state != State.RUNNING or absf(r.s - r.target * BASE) > 0.001:
+			continue
+		r.reached = maxi(r.reached, r.target)
+		if r.target == HOME_PLATE:
+			r.state = State.SCORED
+			r.score_time = time
+			events.append({"type": "run", "runner": r.id})
+		else:
+			r.state = State.ON_BASE
+
+
+# --- Defense ------------------------------------------------------------------
+
+func _apply_defense(dt: float, defense: Dictionary) -> void:
+	if ball != Ball.HELD:
+		return
+	var action := {}
+	if human_defense:
+		var throw_base: int = defense.get("throw", -1)
+		var move: Vector2 = defense.get("move", Vector2.ZERO)
+		if throw_base > 0:
+			_pending_throw = throw_base
+			_last_human_input = time
+		if move.length() > 0.2:
+			_last_human_input = time
+			action = {"kind": "move", "dir": move}
+		if _pending_throw > 0 and time >= busy_until:
+			action = {"kind": "throw", "base": _pending_throw}
+			_pending_throw = -1
+		elif action.is_empty() and time >= maxf(busy_until, _last_human_input) + tuning.human_throw_decision_window:
+			action = ai_defense_action()
+	elif time >= busy_until:
+		action = ai_defense_action()
+	match action.get("kind", ""):
+		"throw":
+			_throw(action["base"])
+		"run":
+			_move_holder(FieldLayout.base_position(action["base"]), dt)
+		"chase":
+			_move_holder(action["point"], dt)
+		"move":
+			var dir: Vector2 = action["dir"]
+			var world := Vector3(dir.x, 0.0, -dir.y).limit_length(1.0)
+			_move_holder(holder_pos + world * 10.0, dt)
+
+
+## The defense AI: best force/tag available by throwing or running the ball
+## there; otherwise chase a runner caught off base; otherwise hold.
+func ai_defense_action() -> Dictionary:
+	if ball != Ball.HELD or inning_over():
+		return {}
+	var outs_now := outs_before + outs.size()
+	var best := {}
+	var best_score := -INF
+	for r in runners:
+		var stuck := r.state == State.ON_BASE and forced_now(r, r.start_base + 1)
+		if r.state != State.RUNNING and not stuck:
+			continue
+		var bases: Array[int] = [r.start_base + 1 if stuck else r.target]
+		if r.must_retouch and r.target != r.start_base:
+			bases.append(r.start_base)
+		for b in bases:
+			if b < 1:
+				continue
+			var appeal := r.must_retouch and b == r.start_base
+			if not appeal and signf(b * BASE - r.s) == 0.0:
+				continue
+			var forced := forced_now(r, b) or appeal
+			var wait := maxf(busy_until - time, 0.0)
+			var run := wait + _run_time(b)
+			var throw := wait + _throw_time(b)
+			var eta := minf(run, throw)
+			var margin := runner_eta(r, b) - eta - (0.0 if forced else _tag_margin())
+			if margin <= tuning.ai_throw_min_margin:
+				continue
+			var score := margin + b * tuning.ai_throw_lead_runner_bias
+			if b == HOME_PLATE:
+				score += tuning.ai_throw_run_prevention_bias
+			if outs_now == MatchState.OUTS_PER_HALF - 1 and forced:
+				score += 10.0  # a sure force ends the inning and cancels runs
+			if score > best_score:
+				best_score = score
+				best = {"kind": "run" if run <= throw else "throw", "base": b}
+	if not best.is_empty():
+		return best
+	# Nothing to throw at: run at the nearest runner hung up off a base.
+	var chase: Runner = null
+	var chase_d := tuning.rundown_chase_range
+	for r in runners:
+		if r.state != State.RUNNING or r.must_retouch:
+			continue
+		var d := holder_pos.distance_to(runner_position(r))
+		if d < chase_d:
+			chase = r
+			chase_d = d
+	if chase != null:
+		return {"kind": "chase", "point": runner_position(chase)}
+	# Otherwise get the ball back in: throw ahead of the lead runner so
+	# nobody keeps running on a fielder who is just holding it.
+	if holder_cover == -1:
+		return {"kind": "throw", "base": _hold_base()}
+	return {}
+
+
+func _hold_base() -> int:
+	var lead: Runner = null
+	for r in runners:
+		# Runners already scoring are not worth a throw; hold the others.
+		if (r.state == State.RUNNING or r.state == State.ON_BASE) and r.target < HOME_PLATE and (lead == null or r.s > lead.s):
+			lead = r
+	if lead == null:
+		return FieldLayout.SECOND
+	# Throw ahead of the lead runner so he cannot take another base on it.
+	return clampi(lead.target + 1, FieldLayout.FIRST, HOME_PLATE)
+
+
+func _throw(base: int) -> void:
+	if _holder_on_bag() == base or base < 1 or base > HOME_PLATE:
+		return
+	var to := covers[base]
+	var release := maxf(time, busy_until) + windup
+	var arrival := release + ThrowModel.flight_time(holder_pos, to, tuning)
+	flight = {"from": holder_pos, "to": to, "base": base, "release": release, "arrival": arrival}
+	legs.append(flight.duplicate())
+	ball = Ball.FLIGHT
+	events.append({"type": "throw", "base": base})
+
+
+func _catch_throw() -> void:
+	var base: int = flight["base"]
+	ball = Ball.HELD
+	holder_cover = base
+	holder_pos = flight["to"]
+	covers[base] = holder_pos
+	busy_until = time
+	windup = tuning.relay_release_time
+
+
+func _move_holder(goal: Vector3, dt: float) -> void:
+	holder_pos = holder_pos.move_toward(Vector3(goal.x, 0.0, goal.z), tuning.fielder_speed * dt)
+	if holder_cover > 0:
+		covers[holder_cover] = holder_pos
+	windup = tuning.relay_release_time
+
+
+func _holder_on_bag() -> int:
+	for b in range(1, 5):
+		if holder_pos.distance_to(FieldLayout.base_position(b)) <= ON_BAG:
+			return b
+	return -1
+
+
+func _run_time(base: int) -> float:
+	var d := holder_pos.distance_to(FieldLayout.base_position(base))
+	return 0.0 if d <= ON_BAG else d / tuning.fielder_speed
+
+
+func _throw_time(base: int) -> float:
+	if _holder_on_bag() == base:
+		return 0.0
+	return windup + ThrowModel.flight_time(holder_pos, covers[base], tuning)
+
+
+func _tag_margin() -> float:
+	return tuning.tag_reach / tuning.runner_speed
+
+
+## Covers next to a runner hung up between bases close in on him.
+func _update_covers(dt: float) -> void:
+	if ball == Ball.LOOSE:
+		return
+	for b in range(1, 5):
+		if b == holder_cover and ball == Ball.HELD:
+			continue
+		if ball == Ball.FLIGHT and flight["base"] == b:
+			continue
+		var bag := FieldLayout.base_position(b)
+		var goal := bag
+		for r in runners:
+			if r.state != State.RUNNING or r.must_retouch:
+				continue
+			var away := signf(b * BASE - r.s) != signf(r.target * BASE - r.s)
+			if absf(b * BASE - r.s) < BASE and away and ball == Ball.HELD:
+				goal = bag.move_toward(runner_position(r), tuning.cover_close_in)
+		covers[b] = covers[b].move_toward(goal, tuning.fielder_speed * dt)
+
+
+# --- Outs and the end of the play -------------------------------------------
+
+func _resolve_outs() -> void:
+	if ball != Ball.HELD or inning_over():
+		return
+	var bag := _holder_on_bag()
+	for r in runners:
+		if inning_over():
+			break
+		if r.state == State.ON_BASE and bag > 0 and forced_now(r, bag):
+			_record_out(r, bag, PlayOutcome.OUT_FORCE)  # stayed put while forced
+			continue
+		if r.state != State.RUNNING:
+			continue
+		if bag > 0 and forced_now(r, bag):
+			_record_out(r, bag, PlayOutcome.OUT_FORCE)
+		elif bag > 0 and r.must_retouch and bag == r.start_base:
+			_record_out(r, bag, PlayOutcome.OUT_DOUBLED_OFF)
+		elif holder_pos.distance_to(runner_position(r)) <= tuning.tag_reach:
+			_record_out(r, r.target, PlayOutcome.OUT_TAG)
+
+
+func _record_out(r: Runner, base: int, kind: StringName) -> void:
+	r.state = State.OUT
+	r.out_time = time
+	outs.append({"runner_id": r.id, "base": base, "kind": kind, "time": time})
+	events.append({"type": "out", "runner": r.id, "base": base, "kind": kind})
+
+
+func _check_done() -> void:
+	if inning_over():
+		_done = true
+		return
+	if ball == Ball.LOOSE:
+		return
+	var moving := runners.any(func(r: Runner) -> bool: return r.state == State.RUNNING)
+	if not moving and ball == Ball.HELD and time >= busy_until:
+		if _settled_since == INF:
+			_settled_since = time
+		if time - _settled_since >= tuning.play_settle_time:
+			_done = true
+	else:
+		_settled_since = INF
+	if not _done and time > tuning.max_play_time:
+		# A rundown that never ends: the runner is ruled tagged.
+		for r in runners:
+			if r.state == State.RUNNING and not inning_over():
+				_record_out(r, r.target, PlayOutcome.OUT_TAG)
+		_done = true
+
+
+func outcome() -> PlayOutcome:
+	var result := PlayOutcome.new()
+	result.batter_id = batter_id
+	result.outs = outs.duplicate(true)
+	result.throws = legs.duplicate(true)
+	if not legs.is_empty():
+		result.throw_base = legs[0]["base"]
+		result.throw_arrival = legs[0]["arrival"]
+	var over := inning_over()
+	var third_out: Dictionary = outs[MatchState.OUTS_PER_HALF - outs_before - 1] if over else {}
+	var scored := runners.filter(func(r: Runner) -> bool: return r.state == State.SCORED)
+	scored.sort_custom(func(a: Runner, b: Runner) -> bool: return a.score_time < b.score_time)
+	for r: Runner in scored:
+		if over:
+			# No run on a third out that is a force or a catch; on a time play
+			# (tag, doubled off) only runners who crossed before it count.
+			var kind: StringName = third_out["kind"]
+			if kind == PlayOutcome.OUT_FORCE or kind == PlayOutcome.OUT_CATCH or r.score_time >= third_out["time"]:
+				continue
+		result.runs.append(r.id)
+	for r in runners:
+		var safe := r.state != State.OUT
+		var final := r.target
+		if r.state == State.WAITING:
+			final = r.start_base
+		elif r.state == State.SCORED:
+			final = HOME_PLATE
+		result.advances.append({"runner_id": r.id, "from": r.start_base, "to": final, "safe": safe})
+		if safe and not over and final >= FieldLayout.FIRST and final <= FieldLayout.THIRD:
+			result.final_bases[final - 1] = r.id
+		if r.is_batter:
+			result.batter_base = final if safe and r.state != State.RUNNING else 0
+	result.kind = _classify(result)
+	return result
+
+
+func _classify(result: PlayOutcome) -> StringName:
+	if result.outs.size() >= 3:
+		return PlayOutcome.KIND_TRIPLE_PLAY
+	if result.outs.size() == 2:
+		return PlayOutcome.KIND_DOUBLE_PLAY
+	if fielding != null and fielding.caught_in_air:
+		if launch_angle >= 50.0:
+			return PlayOutcome.KIND_POP_OUT
+		if launch_angle < 15.0:
+			return PlayOutcome.KIND_LINE_OUT
+		return PlayOutcome.KIND_FLY_OUT
+	var batter := runner(batter_id)
+	var hit_base := result.batter_base if result.batter_base > 0 else batter.reached
+	if hit_base == 0:
+		return PlayOutcome.KIND_GROUND_OUT
+	if not result.outs.is_empty() and result.batter_base == FieldLayout.FIRST:
+		return PlayOutcome.KIND_FIELDERS_CHOICE
+	match hit_base:
+		1:
+			return PlayOutcome.KIND_SINGLE
+		2:
+			return PlayOutcome.KIND_DOUBLE
+		3:
+			return PlayOutcome.KIND_TRIPLE
+	return PlayOutcome.KIND_INSIDE_PARK_HR
+
+
+static func _as_ground_ball(f: FieldingResult) -> FieldingResult:
+	var g := FieldingResult.new()
+	g.fielder_index = f.fielder_index
+	g.fielder_id = f.fielder_id
+	g.secure_time = f.secure_time
+	g.ready_time = f.ready_time
+	g.secure_point = f.secure_point
+	g.caught_in_air = false
+	return g

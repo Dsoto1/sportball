@@ -56,7 +56,6 @@ func test_standing_still_lets_the_ball_drop() -> void:
 
 
 func test_misplayed_fly_lets_runners_advance() -> void:
-	var s := _setup(36.0, 32.0, 0.0)
 	var state := new_match()
 	state.bases = [&"r1", &"", &""]
 	var contact := ContactResult.new()
@@ -65,10 +64,14 @@ func test_misplayed_fly_lets_runners_advance() -> void:
 	var bip := BallInPlay.create(contact, state, tuning())
 	check(bip.fielding.caught_in_air, "projection says routine fly")
 	var live := LiveFielding.new(bip.trajectory, bip.fielders, bip.fielding, tuning(), _index(&"cf"))
-	while not live.is_secured() and live.time < 30.0:
-		live.step(tuning().sim_step, Vector2(0.0, -1.0))  # run the wrong way
-	bip.set_fielding(live.result)
-	var outcome := bip.resolve(bip.ai_throw_target())
+	var play := bip.start_live(false)
+	while not play.is_done() and play.time < 30.0:
+		if not live.is_secured():
+			live.step(tuning().sim_play_step, Vector2(0.0, -1.0))  # run the wrong way
+			if live.is_secured():
+				play.secure(live.result)
+		play.step(tuning().sim_play_step)
+	var outcome := play.outcome()
 	check(outcome.batter_base >= 1, "batter reaches (%s)" % outcome.kind)
 
 

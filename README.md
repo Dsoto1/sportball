@@ -33,6 +33,8 @@ choose throws in the bottom half. Tab / Back switches teams.
 | Dive | Shift or L | RT |
 | Switch to fielder nearest the ball | F | LT |
 | Throw to 1st / 2nd / 3rd / home | 1 / 2 / 3 / 4 | B / Y / X / A |
+| With the ball: run at a runner / to a bag | WASD or arrows | Left stick |
+| Batting, ball in play: all runners advance / retreat | E / Q | RB / LB |
 | Skip to next pitch after a play | J | A |
 | Switch team | Tab | Back |
 | Debug overlay | F1 | R-stick click |
@@ -47,7 +49,12 @@ On defense you steer the fielder who can reach the ball first; a white
 ring marks where a fly ball will land. Press a throw button any time, even
 before the catch. Press another one to have the receiver throw on (for
 example 2 then 1 to turn a 6-4-3 double play). If you hold the ball for
-more than 0.6 s, the AI throw is used.
+more than 0.6 s, the AI takes over. Once you have the ball, the stick
+moves the fielder holding it: run a runner down in a rundown, or step on
+a bag yourself.
+
+When you are batting, runners decide for themselves until you press
+advance or retreat. After that, they do what you said.
 
 Bindings live in `project.godot` as semantic actions. To change them, edit
 the table in `tools/generate_input_map.gd` and run
@@ -86,8 +93,8 @@ app/           bootstrap (main.tscn) and MatchDirector: input -> intents -> reso
 baseball/      authoritative rules and math; no scene dependencies
   match_state.gd           inning/half, outs, count, score, bases, lineup, domain events
   pitch/ batting/ ball/    PitchResolver, ContactResolver, BallTrajectory
-  fielding/ running/       FieldingResolver, ThrowModel, RunnerResolver, PlayOutcome
-  ai/                      AI pitcher, batter and throw choice (produce the same intents as a human)
+  fielding/ running/       FieldingResolver, LiveFielding, ThrowModel, RunnerResolver (read), LivePlay, PlayOutcome
+  ai/                      AI pitcher and batter (produce the same intents as a human); play AI lives in LivePlay
   sim/auto_match.gd        full AI-vs-AI match with no scene
 data/          tuning and pitch definitions (Resources)
 presentation/  graybox field, match view, placeholder actors
