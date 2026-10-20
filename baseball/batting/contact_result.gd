@@ -9,8 +9,7 @@ var swing_type: SwingIntent.Type = SwingIntent.Type.NONE
 var timing_offset: float = 0.0
 ## Timing error divided by the swing's window (|x| <= 1 is a hit window).
 var timing_norm: float = 0.0
-## Pitch location minus bat cursor, meters.
-var location_error: Vector2 = Vector2.ZERO
+## Pitch distance from the zone center, in zone half-sizes (1 = edge).
 var location_norm: float = 0.0
 ## 0..1 contact quality.
 var quality: float = 0.0

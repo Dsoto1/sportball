@@ -6,8 +6,8 @@ func _pitch(aim: Vector2, error: float, seed_value: int = 1, family: StringName 
 	return PitchResolver.resolve(PitchIntent.new(family, aim, error), content().pitch(family), tuning(), rng)
 
 
-func _swing(pitch: PitchResult, type: SwingIntent.Type, timing: float, cursor_offset: Vector2 = Vector2.ZERO, lefty: bool = false) -> ContactResult:
-	var swing := SwingIntent.swing(type, timing, pitch.location + cursor_offset, lefty)
+func _swing(pitch: PitchResult, type: SwingIntent.Type, timing: float, stick: Vector2 = Vector2.ZERO, lefty: bool = false) -> ContactResult:
+	var swing := SwingIntent.swing(type, timing, stick, lefty)
 	return ContactResolver.resolve(pitch, swing, tuning(), MatchRng.new(7))
 
 
@@ -93,11 +93,35 @@ func test_early_pulls_late_goes_opposite() -> void:
 	check(lefty_early.spray_angle > 10.0, "left-handed early swing pulls to right (%.1f)" % lefty_early.spray_angle)
 
 
-func test_bat_under_ball_lifts_it() -> void:
+func test_stick_lifts_or_chops() -> void:
 	var p := _pitch(Vector2(0.0, 0.8), 0.0)
-	var under := _swing(p, SwingIntent.Type.CONTACT, 0.0, Vector2(0.0, -0.1))
-	var over := _swing(p, SwingIntent.Type.CONTACT, 0.0, Vector2(0.0, 0.1))
-	check(under.launch_angle > over.launch_angle + 30.0, "under = fly, over = grounder (%.1f vs %.1f)" % [under.launch_angle, over.launch_angle])
+	var lift := _swing(p, SwingIntent.Type.CONTACT, 0.0, Vector2(0.0, 1.0))
+	var chop := _swing(p, SwingIntent.Type.CONTACT, 0.0, Vector2(0.0, -1.0))
+	check(lift.launch_angle > chop.launch_angle + 30.0, "stick up = fly, down = grounder (%.1f vs %.1f)" % [lift.launch_angle, chop.launch_angle])
+
+
+func test_stick_steers_spray() -> void:
+	var p := _pitch(Vector2(0.0, 0.8), 0.0)
+	var left := _swing(p, SwingIntent.Type.CONTACT, 0.0, Vector2(-1.0, 0.0))
+	var right := _swing(p, SwingIntent.Type.CONTACT, 0.0, Vector2(1.0, 0.0))
+	check_near(right.spray_angle - left.spray_angle, 2.0 * tuning().stick_spray, 0.5, "stick shifts spray")
+
+
+func test_location_costs_quality_and_chases_whiff() -> void:
+	var middle := _swing(_pitch(Vector2(0.0, 0.8), 0.0), SwingIntent.Type.CONTACT, 0.0)
+	var corner := ContactResolver.resolve(_fixed_pitch(Vector2(0.26, 1.1)), SwingIntent.swing(SwingIntent.Type.CONTACT, 0.0), tuning(), MatchRng.new(7))
+	var chase := ContactResolver.resolve(_fixed_pitch(Vector2(0.7, 0.8)), SwingIntent.swing(SwingIntent.Type.CONTACT, 0.0), tuning(), MatchRng.new(7))
+	check(middle.quality > corner.quality + 0.1, "corner is harder (%.2f vs %.2f)" % [middle.quality, corner.quality])
+	check_eq(chase.outcome, ContactResult.Outcome.WHIFF, "way outside is out of reach")
+	var power_corner := ContactResolver.resolve(_fixed_pitch(Vector2(0.26, 1.1)), SwingIntent.swing(SwingIntent.Type.POWER, 0.0), tuning(), MatchRng.new(7))
+	check(power_corner.quality < corner.quality, "power covers the corners worse")
+
+
+func _fixed_pitch(location: Vector2) -> PitchResult:
+	var p := _pitch(Vector2(0.0, 0.8), 0.0)
+	p.location = location
+	p.in_zone = PitchResolver.in_zone(location, tuning())
+	return p
 
 
 func test_wild_miss_is_whiff_near_miss_is_foul() -> void:

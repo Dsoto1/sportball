@@ -160,12 +160,12 @@ func _enter_pre_pitch() -> void:
 
 
 func _process_pre_pitch(delta: float) -> void:
-	_move_cursor(delta)
 	if user_is_batting():
-		_view.set_cursor(_cursor, tuning.contact_radius, tuning.power_radius, Color(1.0, 0.85, 0.2))
+		_show_stick_marker()
 		if _phase_time >= AI_PRE_PITCH_DELAY:
 			_throw_pitch(AiPitcher.choose(state, content.pitches, tuning, rng))
 		return
+	_move_cursor(delta)
 	_view.set_cursor(_cursor, 0.07, 0.0, Color(0.3, 0.95, 1.0))
 	var count := content.pitches.size()
 	if Input.is_action_just_pressed(&"pitch_next"):
@@ -212,12 +212,11 @@ func _process_pitch_flight(delta: float) -> void:
 	var timing := _phase_time - travel
 	if _contact == null:
 		if user_is_batting():
-			_move_cursor(delta)
-			_view.set_cursor(_cursor, tuning.contact_radius, tuning.power_radius, Color(1.0, 0.85, 0.2))
+			var stick := _show_stick_marker()
 			if Input.is_action_just_pressed(&"swing_contact"):
-				_resolve_swing(SwingIntent.swing(SwingIntent.Type.CONTACT, timing, _cursor))
+				_resolve_swing(SwingIntent.swing(SwingIntent.Type.CONTACT, timing, stick))
 			elif Input.is_action_just_pressed(&"swing_power"):
-				_resolve_swing(SwingIntent.swing(SwingIntent.Type.POWER, timing, _cursor))
+				_resolve_swing(SwingIntent.swing(SwingIntent.Type.POWER, timing, stick))
 		elif _ai_swing.type != SwingIntent.Type.NONE and timing >= _ai_swing.timing_offset:
 			_resolve_swing(_ai_swing)
 		if _contact == null and timing >= tuning.swing_late_cutoff:
@@ -233,7 +232,7 @@ func _process_pitch_flight(delta: float) -> void:
 
 func _resolve_swing(swing: SwingIntent) -> void:
 	_contact = ContactResolver.resolve(_pitch, swing, tuning, rng)
-	_log({"swing": SwingIntent.Type.keys()[swing.type], "timing_ms": roundi(swing.timing_offset * 1000.0), "cursor": swing.cursor})
+	_log({"swing": SwingIntent.Type.keys()[swing.type], "timing_ms": roundi(swing.timing_offset * 1000.0), "stick": swing.stick})
 	if swing.type != SwingIntent.Type.NONE:
 		var ms := roundi(swing.timing_offset * 1000.0)
 		var when := "PERFECT" if absi(ms) <= 15 else ("EARLY %d ms" % -ms if ms < 0 else "LATE %d ms" % ms)
@@ -405,7 +404,7 @@ func _hud_prompt_suffix() -> String:
 	match _phase:
 		Phase.PRE_PITCH, Phase.PITCH_FLIGHT:
 			if user_is_batting():
-				base = "Aim: WASD / L-stick    Contact: J / A    Power: K / X"
+				base = "Contact: J / A    Power: K / X    Hold WASD / L-stick: ←→ left/right field  ↑ lift  ↓ chop"
 			else:
 				base = "Aim: WASD / L-stick    Pitch: Q E / LB RB    Start meter: Space / A"
 		Phase.BALL_IN_PLAY:
@@ -414,6 +413,15 @@ func _hud_prompt_suffix() -> String:
 			elif not user_is_batting():
 				base = "Run: WASD / L-stick   Dive: Shift / RT   Switch: F / LT   Throw 1st-2nd-3rd-home: 1-4 / B Y X A"
 	return "%s\n[%s]   Tab/Back: switch side   F1: debug   F5: restart" % [base, role]
+
+
+## Reads the batting stick and shows it as a small marker on the zone:
+## where in the zone it points is the direction/loft it will add.
+func _show_stick_marker() -> Vector2:
+	var stick := Input.get_vector(&"aim_left", &"aim_right", &"aim_down", &"aim_up")
+	var half := Vector2(tuning.zone_half_width, (tuning.zone_top - tuning.zone_bottom) * 0.5)
+	_view.set_cursor(PitchResolver.zone_center(tuning) + stick * half, 0.05, 0.0, Color(1.0, 0.85, 0.2))
+	return stick
 
 
 func _move_cursor(delta: float) -> void:

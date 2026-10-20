@@ -23,9 +23,10 @@ choose throws in the bottom half. Tab / Back switches teams.
 
 | Action | Keyboard / mouse | Gamepad |
 |---|---|---|
-| Aim bat cursor / pitch target | WASD or arrows | Left stick / D-pad |
 | Contact swing | J or left click | A |
 | Power swing (harder, smaller window) | K or right click | X |
+| While swinging: steer left/right field, lift (up) or chop (down) | WASD or arrows | Left stick |
+| Aim pitch target | WASD or arrows | Left stick / D-pad |
 | Pick pitch | Q / E | LB / RB |
 | Start meter, then release | Space, J or left click | A |
 | Run with the fielder (yellow ring) | WASD or arrows | Left stick |
@@ -36,6 +37,11 @@ choose throws in the bottom half. Tab / Back switches teams.
 | Switch team | Tab | Back |
 | Debug overlay | F1 | R-stick click |
 | New match | F5 | Start |
+
+Batting is about timing: the bat finds the ball's height on its own. Lay off
+pitches far off the plate, since they cost contact quality or can't be
+reached. The small yellow marker on the zone shows what your stick is
+adding.
 
 On defense you steer the fielder who can reach the ball first; a white
 ring marks where a fly ball will land. Press a throw button any time

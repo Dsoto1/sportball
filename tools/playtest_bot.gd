@@ -74,7 +74,8 @@ func _drive() -> void:
 				if _shots_taken < 3:
 					_screenshot("pitch")
 			if batting and pitch != null:
-				_director.debug_set_cursor(pitch.location + Vector2(_rng.randfn(0, 0.05), _rng.randfn(0, 0.05)))
+				if _rng.randf() < 0.5:
+					_press(&"aim_up" if _rng.randf() < 0.5 else &"aim_down", _rng.randf())
 				if _director.phase_time() >= pitch.travel_time + _swing_offset and PitchResolver.in_zone(pitch.location, _director.tuning):
 					_press(&"swing_power" if _rng.randf() < 0.3 else &"swing_contact")
 		MatchDirector.Phase.BALL_IN_PLAY:

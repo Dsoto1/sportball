@@ -19,7 +19,7 @@ runner/base resolution → reset.
   pitch families are `PitchFamilyDef` resources.
 - **AI** for pitcher, batter and throw choice. It produces the same intent
   objects a human produces.
-- **Interactive graybox match**: batting (cursor + timing, contact/power),
+- **Interactive graybox match**: timing-first batting (contact/power, stick shapes direction and loft),
   pitching (aim, pitch select, meter), throw choice on defense, a
   broadcast-style HUD, and an F1 debug overlay. The overlay shows the seed,
   match state, pitch target/location, contact quality, exit velocity,
@@ -33,17 +33,17 @@ runner/base resolution → reset.
   reproducibility and outcome rates). `tools/playtest_bot.gd` drives the
   real scene with simulated input through a full 6-inning match.
 
-## Numbers (100 AI-vs-AI matches, `tools/sim_report.gd -- 100 1`)
+## Numbers (100 AI-vs-AI matches, `tools/sim_report.gd -- 100 1`, timing-first batting)
 
 | Metric | Value | Rough target |
 |---|---|---|
-| Runs / team / 6 innings | 3.08 | 2.5–3.5 |
-| Hits / PA | .257 | .23–.27 |
-| K% / BB% | 15.7% / 9.1% | 18–23% / 7–9% |
-| HR / PA | 2.0% | 2.5–3.5% (arcade: higher is fine) |
-| Pitches / game (both teams) | 215 | — |
+| Runs / team / 6 innings | 3.60 | 2.5–3.5 |
+| Hits / PA | .273 | .23–.27 |
+| K% / BB% | 16.1% / 8.3% | 18–23% / 7–9% |
+| HR / PA | 3.1% | 2.5–3.5% (arcade: higher is fine) |
+| Pitches / game (both teams) | 210 | — |
 | Diving catches | 7% of balls in play | "rare enough to stay exciting" |
-| Double plays / triples / inside-the-park HR | **0 / 0 / 0** | should exist |
+| Double plays / triples / inside-the-park HR | **0 / ~0 / 0** | should exist |
 
 Hit rate by launch angle (`tools/launch_angle_report.gd`): grounders
 (−10–10°) 25–32%, liners (10–20°) 79%, 20–30° 42%, high flies (40°+) 0%.
@@ -71,13 +71,16 @@ bot, screenshots and reading the timings.
 4. **Dives may be too common** at ~3 per game. They are free apart from
    0.7 s of recovery, with no failure chance. "DIVING CATCH!" will stop
    feeling special. Failed dives should be possible (and content).
-5. **Swing timing is frame-quantized.** At 60 fps one frame is ~24% of the
-   power window. Use input event timestamps before tuning windows by feel.
-6. **The batting read may be too hard for humans.** Pitches take 0.43–0.54 s.
-   The cursor moves at 1.5 m/s, so a pitch on the far corner can be
-   unreachable after release. There is also no hitter-side telegraph
-   (pitch-type tell or location hint). This needs human testing; the AI
-   batter cheats by reading location with noise.
+5. **Swing timing is frame-quantized, and timing is now the whole swing.**
+   The windows are ±78 ms (contact) and ±52 ms (power). At 60 fps one frame
+   is about 32% of the power window. Sub-frame input timing (or a fixed
+   high-rate input poll) should come before tuning windows by feel.
+6. **The batting read is untested with people.** *(Update: batting is now
+   timing-first; see DECISIONS.)* Pitches take 0.43–0.54 s. The only
+   location skill left is take-or-swing: corners and chases cost quality,
+   and pitches beyond reach whiff. There is no pitch-type tell yet, and the
+   AI batter still reads location with noise. Windows and penalties were
+   tuned against the AI only.
 7. **No contact feedback.** There is no bat, no swing animation, no hit
    pause and no camera punch. The batter teleports to home plate on
    contact. Contact can be correct while still feeling flat.
@@ -90,13 +93,9 @@ bot, screenshots and reading the timings.
 1. ~~**Fielding control model.**~~ Decided: the human steers the fielder,
    and it is implemented (`baseball/fielding/live_fielding.gd`). A
    catch-timing press could still be layered on top.
-2. **Batting input model.** Choose one:
-   - The current approach: aim a cursor at the pitch plus swing timing. It
-     is deep, but the read may be too hard (weak point 6).
-   - Timing-first: the bat finds the ball's height automatically, and
-     stick direction at contact sets pull or push and lift.
-
-   This changes ContactResolver inputs and the whole skill curve.
+2. ~~**Batting input model.**~~ Decided: timing-first, and it is
+   implemented. The bat finds the pitch's height; the stick at the swing
+   sets left/right field (±15°) and lift/chop (±20°).
 3. **Original rules package.** The prototype uses 6 innings, standard counts,
    standard walk-off and extra innings. Decide which pace and spectacle rules
    the league adds (shot clock, tie-break format, etc.) before Phase 1

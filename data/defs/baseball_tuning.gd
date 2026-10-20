@@ -17,7 +17,7 @@ extends Resource
 @export var zone_top: float = 1.10
 ## Furthest a pitch can end up from the zone center (wild pitch clamp).
 @export var wild_limit: Vector2 = Vector2(0.9, 0.9)
-## Bounds of the pitcher aim / batter cursor, relative to the plate plane.
+## Bounds of the pitcher's aim cursor in the plate plane.
 @export var cursor_min: Vector2 = Vector2(-0.55, 0.15)
 @export var cursor_max: Vector2 = Vector2(0.55, 1.55)
 
@@ -36,30 +36,44 @@ extends Resource
 @export var pitch_meter_sweet_spot: float = 0.88
 
 @export_group("Batting")
-@export var contact_timing_window: float = 0.105
-@export var power_timing_window: float = 0.07
-@export var contact_radius: float = 0.17
-@export var power_radius: float = 0.12
-## Normalized error band beyond the hit window that still produces a foul.
-@export var foul_timing_band: float = 1.6
-@export var foul_location_band: float = 1.35
+@export var contact_timing_window: float = 0.078
+@export var power_timing_window: float = 0.052
+## Normalized timing error beyond the hit window that still produces a foul.
+@export var foul_timing_band: float = 1.5
+## Pitches within this many zone half-sizes of center cost no quality.
+@export var sweet_zone: float = 0.5
+## Quality lost per zone half-size beyond the sweet zone.
+@export var location_penalty: float = 0.5
+@export var power_location_penalty_scale: float = 1.35
+## Pitches farther than this (zone half-sizes) cannot be reached: whiff.
+@export var reach_limit: float = 2.1
+## Weight of squared timing error in the quality calculation.
+@export var timing_weight: float = 0.8
 ## Quality below this is a foul tip / dribbler foul instead of a fair ball.
 @export var min_fair_quality: float = 0.22
 @export var exit_velocity_min: float = 27.0
-@export var contact_exit_velocity_max: float = 43.0
+@export var contact_exit_velocity_max: float = 42.0
 @export var power_exit_velocity_max: float = 51.0
 ## Exponent on quality when mapping to exit velocity (<1 = forgiving).
 @export var exit_velocity_curve: float = 0.7
 @export var contact_base_launch: float = 9.0
 @export var power_base_launch: float = 19.0
-## Degrees of launch change per normalized vertical miss (under = up).
-@export var launch_spread: float = 42.0
+## Degrees of loft from a full stick up (or chop from full down).
+@export var stick_lift: float = 20.0
+## Degrees of launch per zone half-height above center (high pitches lift).
+@export var launch_per_height: float = 8.0
 @export var launch_noise: float = 4.0
+## Extra launch sigma (degrees) for a total mishit (quality 0).
+@export var mishit_launch_spread: float = 34.0
 ## Degrees of spray per normalized timing error (early = pull).
 @export var spray_per_timing: float = 40.0
 ## Degrees of spray from pitch horizontal location (outside = opposite field).
 @export var spray_per_location: float = 9.0
 @export var spray_noise: float = 4.0
+## Degrees of spray from a full stick left/right.
+@export var stick_spray: float = 15.0
+## Extra spray sigma (degrees) for a total mishit.
+@export var mishit_spray_spread: float = 12.0
 @export var contact_height: float = 0.9
 ## Seconds after the batter is allowed to swing before a no-swing is a take.
 @export var swing_late_cutoff: float = 0.22
@@ -128,7 +142,8 @@ extends Resource
 @export var ai_pitcher_edge_bias: float = 1.7
 @export var ai_batter_read_sigma: float = 0.07
 @export var ai_batter_timing_sigma: float = 0.055
-@export var ai_batter_cursor_sigma: float = 0.06
+## Sigma of the AI's stick input on each axis.
+@export var ai_batter_stick_sigma: float = 0.35
 @export var ai_swing_in_zone: float = 0.7
 @export var ai_swing_chase: float = 0.2
 @export var ai_two_strike_protect: float = 0.15

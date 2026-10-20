@@ -21,7 +21,8 @@ static func decide(pitch: PitchResult, family: PitchFamilyDef, state: MatchState
 	var power := state.strikes < 2 and rng.chance(tuning.ai_power_swing_rate)
 	var type := SwingIntent.Type.POWER if power else SwingIntent.Type.CONTACT
 	var timing := rng.randfn(0.0, tuning.ai_batter_timing_sigma * fooled)
-	var cursor := read + Vector2(
-		rng.randfn(0.0, tuning.ai_batter_cursor_sigma),
-		rng.randfn(0.0, tuning.ai_batter_cursor_sigma))
-	return SwingIntent.swing(type, timing, cursor)
+	var stick := Vector2(rng.randfn(0.0, tuning.ai_batter_stick_sigma), rng.randfn(0.0, tuning.ai_batter_stick_sigma))
+	# Runner on third, fewer than two outs: try to lift it for a sacrifice fly.
+	if state.runner_on(3) != &"" and state.outs < 2:
+		stick.y += 0.5
+	return SwingIntent.swing(type, timing, stick)

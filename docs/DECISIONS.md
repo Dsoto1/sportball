@@ -85,3 +85,11 @@ Decision: Do not optimize for mobile hardware or touch input. Target desktop (Wi
 Reason: Owner direction. Mobile constraints would limit rendering, crowd density and control design without serving the target platform.
 
 Affected systems: rendering, performance budgets, input, UI layout.
+
+## 2026-10-20 - Timing-First Batting
+
+Decision: The batter no longer aims a cursor. `SwingIntent` carries swing type, timing offset and the stick held at the swing. Timing sets contact quality and pull/push; pitch distance from the heart of the zone costs quality (worse for power swings), and pitches beyond `reach_limit` whiff. The stick adds up to ±15° of spray (absolute field direction) and ±20° of lift/chop. Mishits widen the launch and spray scatter. The pitcher keeps the aim cursor.
+
+Reason: Owner decision. Simpler to learn ("within 2 minutes, understand how to hit") while timing, take/swing discipline and situational stick input remain skill.
+
+Affected systems: ContactResolver, SwingIntent, ContactResult, AI batter, BaseballTuning (batting group), MatchDirector input/HUD, tests. Batting windows were retuned against the AI sim (contact ±78 ms, power ±52 ms).
