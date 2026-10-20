@@ -8,9 +8,16 @@ var speed: float
 var reaction: float
 var reach: float
 var dive_reach: float
+var player_id: StringName = &""
+## Throw speed multiplier (arm rating).
+var arm: float = 1.0
+## Multipliers on this fielder's bobble and wild-throw chances.
+var error_scale: float = 1.0
+var throw_error_scale: float = 1.0
 
 
-static func default_defense(tuning: BaseballTuning) -> Array[FielderState]:
+## players: field position id -> PlayerDef (missing = league average).
+static func default_defense(tuning: BaseballTuning, players: Dictionary = {}) -> Array[FielderState]:
 	var fielders: Array[FielderState] = []
 	for i in tuning.fielder_ids.size():
 		var f := FielderState.new()
@@ -20,6 +27,7 @@ static func default_defense(tuning: BaseballTuning) -> Array[FielderState]:
 		f.reaction = tuning.fielder_reaction
 		f.reach = tuning.catch_reach
 		f.dive_reach = tuning.dive_reach
+		Ratings.apply_fielder(f, players.get(f.id), tuning)
 		fielders.append(f)
 	return fielders
 

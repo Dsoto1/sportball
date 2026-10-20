@@ -14,9 +14,14 @@ var batter_id: StringName
 var outs_before: int
 var bases_before: Array[StringName]
 var tuning: BaseballTuning
+## Runner id -> m/s from ratings; the batting team's run aggression.
+var runner_speeds: Dictionary = {}
+var runner_aggression: float = 0.0
 
 
-static func create(p_contact: ContactResult, state: MatchState, p_tuning: BaseballTuning) -> BallInPlay:
+## roster: who the MatchState ids are (ratings, personalities); null plays
+## everyone at league average.
+static func create(p_contact: ContactResult, state: MatchState, p_tuning: BaseballTuning, roster: MatchRoster = null) -> BallInPlay:
 	var bip := BallInPlay.new()
 	bip.contact = p_contact
 	bip.tuning = p_tuning
@@ -24,7 +29,16 @@ static func create(p_contact: ContactResult, state: MatchState, p_tuning: Baseba
 	bip.outs_before = state.outs
 	bip.bases_before = state.bases.duplicate()
 	bip.trajectory = BallTrajectory.simulate(p_contact.exit_velocity, p_contact.launch_angle, p_contact.spray_angle, p_tuning)
-	bip.fielders = FielderState.default_defense(p_tuning)
+	var players := {}
+	if roster != null:
+		for pos: StringName in state.defense[state.fielding_team()]:
+			players[pos] = roster.player(state.defense[state.fielding_team()][pos])
+		for id in [bip.batter_id] + Array(bip.bases_before):
+			if id != &"":
+				bip.runner_speeds[id] = Ratings.runner_speed(roster.player(id), p_tuning)
+		var club := roster.teams[state.batting_team()]
+		bip.runner_aggression = club.runner_aggression
+	bip.fielders = FielderState.default_defense(p_tuning, players)
 	bip.fielding = FieldingResolver.resolve(bip.trajectory, bip.fielders, p_tuning)
 	return bip
 
@@ -35,7 +49,8 @@ func is_home_run() -> bool:
 
 ## rng enables fielding errors; without one the play is error-free.
 func start_live(auto_secure: bool = true, rng: MatchRng = null) -> LivePlay:
-	var play := LivePlay.new(bases_before, batter_id, outs_before, contact.launch_angle, trajectory, fielding, tuning, auto_secure)
+	var play := LivePlay.new(bases_before, batter_id, outs_before, contact.launch_angle, trajectory, fielding, tuning, auto_secure,
+		fielders, runner_speeds, runner_aggression)
 	play.rng = rng
 	return play
 

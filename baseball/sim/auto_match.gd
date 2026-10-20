@@ -6,25 +6,33 @@ extends RefCounted
 var state: MatchState
 var rng: MatchRng
 var content: ContentLibrary
+## Null for a placeholder match (league-average players, classic rules).
+var roster: MatchRoster
 var stats := {
 	"pitches": 0, "in_zone": 0, "swings": 0, "whiffs": 0, "fouls": 0, "balls_in_play": 0,
 	"hits": 0, "home_runs": 0, "strikeouts": 0, "walks": 0, "dives": 0, "air_outs": 0,
-	"ground_outs": 0, "double_plays": 0, "errors": 0, "dive_misses": 0, "plate_appearances": 0, "exit_velocity_sum": 0.0,
+	"ground_outs": 0, "double_plays": 0, "errors": 0, "dive_misses": 0, "pitching_changes": 0, "plate_appearances": 0, "exit_velocity_sum": 0.0,
 }
 var outcome_counts := {}
 
 
-func _init(p_seed: int, p_content: ContentLibrary) -> void:
+## away/home: team ids from the content library, or &"" for a placeholder
+## match with classic rules.
+func _init(p_seed: int, p_content: ContentLibrary, away: StringName = &"gearheads", home: StringName = &"glitterati") -> void:
 	content = p_content
 	rng = MatchRng.new(p_seed)
-	state = MatchState.new(
-		MatchState.placeholder_lineup("away"),
-		MatchState.placeholder_lineup("home"),
-		content.tuning.innings)
+	if away == &"" or home == &"":
+		state = MatchState.new(
+			MatchState.placeholder_lineup("away"),
+			MatchState.placeholder_lineup("home"),
+			content.tuning.innings)
+	else:
+		roster = MatchRoster.new(content.team(away), content.team(home))
+		state = MatchState.from_teams(roster.teams[0], roster.teams[1], content.rules)
 
 
-static func play(p_seed: int, p_content: ContentLibrary) -> AutoMatch:
-	var sim := AutoMatch.new(p_seed, p_content)
+static func play(p_seed: int, p_content: ContentLibrary, away: StringName = &"gearheads", home: StringName = &"glitterati") -> AutoMatch:
+	var sim := AutoMatch.new(p_seed, p_content, away, home)
 	sim.run()
 	return sim
 
@@ -38,14 +46,22 @@ func run() -> void:
 
 func play_pitch() -> void:
 	var tuning := content.tuning
-	var intent := AiPitcher.choose(state, content.pitches, tuning, rng)
+	var reliever := AiManager.pitching_change(state, roster, tuning)
+	if reliever != &"" and state.substitute(state.fielding_team(), state.pitcher(state.fielding_team()), reliever):
+		stats["pitching_changes"] += 1
+	var defense_club := roster.teams[state.fielding_team()] if roster != null else null
+	var offense_club := roster.teams[state.batting_team()] if roster != null else null
+	var pitcher := roster.player(state.pitcher(state.fielding_team())) if roster != null else null
+	var batter := roster.player(state.current_batter()) if roster != null else null
+	var intent := AiPitcher.choose(state, content.pitches, tuning, rng, defense_club, pitcher)
 	var family := content.pitch(intent.family_id)
-	var pitch := PitchResolver.resolve(intent, family, tuning, rng)
+	var mods := Ratings.pitcher_mods(pitcher, state.pitches_thrown(state.pitcher(state.fielding_team())), tuning)
+	var pitch := PitchResolver.resolve(intent, family, tuning, rng, mods)
 	state.record_pitch(pitch.to_dict())
 	stats["pitches"] += 1
 	if pitch.in_zone:
 		stats["in_zone"] += 1
-	var swing := AiBatter.decide(pitch, family, state, tuning, rng)
+	var swing := AiBatter.decide(pitch, family, state, tuning, rng, offense_club, batter)
 	var contact := ContactResolver.resolve(pitch, swing, tuning, rng)
 	if swing.type != SwingIntent.Type.NONE:
 		stats["swings"] += 1
@@ -57,7 +73,7 @@ func play_pitch() -> void:
 	if contact.outcome != ContactResult.Outcome.IN_PLAY:
 		state.apply_pitch_call(ContactResolver.call_for(pitch, contact))
 		return
-	var bip := BallInPlay.create(contact, state, tuning)
+	var bip := BallInPlay.create(contact, state, tuning, roster)
 	var outcome := bip.resolve_ai(rng)
 	_count_outcome(bip, outcome)
 	state.apply_play(outcome)

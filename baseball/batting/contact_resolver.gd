@@ -31,7 +31,7 @@ static func resolve(pitch: PitchResult, swing: SwingIntent, tuning: BaseballTuni
 		coverage *= tuning.power_location_penalty_scale
 	var error := sqrt(t_abs * t_abs * tuning.timing_weight + coverage * coverage)
 	result.quality = clampf(1.0 - error, 0.0, 1.0)
-	var ev_max := tuning.power_exit_velocity_max if power else tuning.contact_exit_velocity_max
+	var ev_max := (tuning.power_exit_velocity_max if power else tuning.contact_exit_velocity_max) * swing.power_scale
 	result.exit_velocity = lerpf(tuning.exit_velocity_min, ev_max, pow(result.quality, tuning.exit_velocity_curve))
 
 	var miss := 1.0 - result.quality

@@ -3,11 +3,11 @@
 Stylized retro-futurist arcade baseball. **Godot 4.7.2 stable + GDScript.**
 The design brief lives in [`docs/`](docs/00_AGENT_START_HERE.md); start there.
 
-Current state: **Phase 0 — Foundation + Feel.** Graybox field, primitive
-placeholders, and the full loop: pitch → contact → authoritative ball
-flight → fielder intercept → throw → runner/base resolution → reset.
-See [`docs/PHASE0_REPORT.md`](docs/PHASE0_REPORT.md) for the feel review
-and known weak spots.
+Current state: **Phase 1 — Baseball Vertical Slice.** A 6-inning
+exhibition between the **Rustwater Gearheads** and the **Neon Heights
+Glitterati** (yes, Who's on first) under arcade rules, on a graybox field
+with primitive placeholders. See [`docs/PHASE1_REPORT.md`](docs/PHASE1_REPORT.md)
+and the earlier [`docs/PHASE0_REPORT.md`](docs/PHASE0_REPORT.md).
 
 ## Run
 
@@ -18,8 +18,15 @@ godot --path .                      # random seed (printed to the console)
 godot --path . -- --seed=1234       # reproduce a logged match
 ```
 
-You control the **AWAY** team: you bat in the top half, and pitch and
-choose throws in the bottom half. Tab / Back switches teams.
+On the matchup card, pick your club: J / click / A for the Gearheads (you
+bat first), K / right-click / X for the Glitterati (you field first). Tab /
+Back switches sides mid-game.
+
+**Arcade rules:** 6 innings, a designated hitter for everyone, the game
+ends if a team leads by 10 or more after 4 innings, extra innings start
+with a runner on second, and you have 15 s to start each pitch (or it is a
+ball). Ratings matter: hard throwers are faster, sluggers hit it farther,
+fast runners beat out grounders, good gloves bobble less.
 
 | Action | Keyboard / mouse | Gamepad |
 |---|---|---|
@@ -41,6 +48,8 @@ choose throws in the bottom half. Tab / Back switches teams.
 | Debug overlay | ` (backtick) or F1 | R-stick click |
 | New match | R or F5 | Start |
 | Rookie assist on/off | T | L-stick click |
+| Pitching change (fielding) / pinch hitter (batting), between pitches | P | Y |
+| ...in the menu: choose / confirm / cancel | W S, J / P | Stick, A / Y |
 
 **On a MacBook:** click the trackpad to swing (contact); a two-finger click
 is a power swing. Use ` and R instead of F1 and F5, which need fn. Click

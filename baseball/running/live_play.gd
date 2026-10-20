@@ -50,6 +50,7 @@ class Runner:
 	var score_time := INF
 	## Furthest base reached safely (for scoring a batter's hit).
 	var reached := 0
+	var speed := 8.0
 
 
 var tuning: BaseballTuning
@@ -87,6 +88,10 @@ var rng: MatchRng = null
 var error_scale := 1.0
 ## Misplays so far: {type: "bobble"|"wild_throw"|"dive_miss", on_batter, base}
 var errors: Array[Dictionary] = []
+## The defense's fielders (arms, error scales); empty = league average.
+var fielders: Array[FielderState] = []
+## Seconds the batting team's runners shave off their safety margins.
+var runner_aggression := 0.0
 
 var _went := false
 var _ground_targets := {}
@@ -104,8 +109,11 @@ var _scramble_until := -INF
 
 
 func _init(bases: Array[StringName], p_batter_id: StringName, p_outs_before: int, p_launch_angle: float,
-		p_trajectory: BallTrajectory, p_projection: FieldingResult, p_tuning: BaseballTuning, p_auto_secure: bool = true) -> void:
+		p_trajectory: BallTrajectory, p_projection: FieldingResult, p_tuning: BaseballTuning, p_auto_secure: bool = true,
+		p_fielders: Array[FielderState] = [], speeds: Dictionary = {}, p_aggression: float = 0.0) -> void:
 	tuning = p_tuning
+	fielders = p_fielders
+	runner_aggression = p_aggression
 	trajectory = p_trajectory
 	projection = p_projection
 	batter_id = p_batter_id
@@ -118,7 +126,8 @@ func _init(bases: Array[StringName], p_batter_id: StringName, p_outs_before: int
 	# The runners' read if the ball lands: targets and forces from the
 	# projected fielding treated as a ball on the ground.
 	var ground := _as_ground_ball(projection)
-	for plan in RunnerResolver.plan(bases, batter_id, ground, outs_before, tuning):
+	var arm := fielders[projection.fielder_index].arm if projection.fielder_index >= 0 and projection.fielder_index < fielders.size() else 1.0
+	for plan in RunnerResolver.plan(bases, batter_id, ground, outs_before, tuning, speeds, runner_aggression, arm):
 		_ground_targets[plan.runner_id] = plan.target_base
 		_ground_forced[plan.runner_id] = plan.forced
 	for base in [3, 2, 1]:
@@ -131,6 +140,7 @@ func _init(bases: Array[StringName], p_batter_id: StringName, p_outs_before: int
 		r.s = base * BASE + tuning.runner_lead_distance
 		r.target = base
 		r.state = State.WAITING
+		r.speed = speeds.get(id, tuning.runner_speed)
 		runners.append(r)
 	var batter := Runner.new()
 	batter.id = batter_id
@@ -140,6 +150,7 @@ func _init(bases: Array[StringName], p_batter_id: StringName, p_outs_before: int
 	batter.state = State.RUNNING
 	batter.forced = true
 	batter.go_time = tuning.batter_start_delay
+	batter.speed = speeds.get(batter_id, tuning.runner_speed)
 	runners.append(batter)
 
 
@@ -192,21 +203,22 @@ func runner_eta(r: Runner, base: int) -> float:
 		var new_dir := signf(goal - r.s)
 		if now_dir != 0.0 and new_dir != 0.0 and now_dir != new_dir:
 			penalty = tuning.runner_reverse_time
-	return wait + penalty + absf(goal - r.s) / tuning.runner_speed
+	return wait + penalty + absf(goal - r.s) / r.speed
 
 
 ## Seconds until the defense can have the ball on a base (run or throw).
 func ball_eta(base: int) -> float:
 	match ball:
 		Ball.LOOSE:
-			return maxf(ThrowModel.arrival_at_base(projection, base, tuning) - time, 0.0)
+			var f := fielders[projection.fielder_index] if projection.fielder_index >= 0 and projection.fielder_index < fielders.size() else null
+			return maxf(ThrowModel.arrival_at_base(projection, base, tuning, f.arm if f != null else 1.0) - time, 0.0)
 		Ball.FLIGHT:
 			var to_base: int = flight["base"]
 			var land: float = flight["arrival"] - time
 			if to_base == base:
 				return maxf(land, 0.0)
 			var pivot := tuning.cutoff_release_time if to_base == CUTOFF else tuning.relay_release_time
-			return maxf(land, 0.0) + pivot + ThrowModel.flight_time(flight["to"], covers[base], tuning)
+			return maxf(land, 0.0) + pivot + ThrowModel.flight_time(flight["to"], covers[base], tuning, _team_arm())
 	var wait := maxf(busy_until - time, 0.0)
 	return wait + minf(_run_time(base), _throw_time(base))
 
@@ -239,7 +251,7 @@ func secure(f: FieldingResult) -> void:
 		fielding = _copy(f)
 		fielding.caught_in_air = false
 		_misplay("dive_miss", tuning.dive_miss_roll, tuning.dive_miss_delay)
-	elif not f.caught_in_air and _roll(tuning.bobble_chance + tuning.bobble_chance_per_speed * _ball_speed(f.secure_time)):
+	elif not f.caught_in_air and _roll((tuning.bobble_chance + tuning.bobble_chance_per_speed * _ball_speed(f.secure_time)) * _holder_fielder_scale(false)):
 		_misplay("bobble", tuning.bobble_roll, tuning.bobble_time)
 	if fielding.caught_in_air:
 		var batter := runner(batter_id)
@@ -388,7 +400,7 @@ func _ai_runner(r: Runner) -> void:
 		if not tagging and not scramble and not (ball == Ball.FLIGHT and flight["base"] != next):
 			return
 		var slack := ball_eta(next) - runner_eta(r, next) - _tag_margin()
-		if slack > (tuning.runner_safety_margin if scramble else tuning.runner_take_base_margin):
+		if slack > (tuning.runner_safety_margin if scramble else tuning.runner_take_base_margin) - runner_aggression:
 			_set_target(r, next, tuning.runner_read_delay)
 			events.append({"type": "advance", "runner": r.id, "base": next})
 	elif r.state == State.RUNNING:
@@ -397,7 +409,7 @@ func _ai_runner(r: Runner) -> void:
 		if time < _scramble_until and dir > 0.0 and cur < HOME_PLATE and not _blocked(r, cur + 1) and not inning_over():
 			# The ball got away: keep going past the base if it is there to take.
 			var slack_on := ball_eta(cur + 1) - runner_eta(r, cur + 1) - tuning.base_turn_penalty - _tag_margin()
-			if slack_on > tuning.runner_safety_margin:
+			if slack_on > tuning.runner_safety_margin - runner_aggression:
 				_set_target(r, cur + 1, 0.0)
 				events.append({"type": "advance", "runner": r.id, "base": cur + 1})
 				return
@@ -445,7 +457,7 @@ func _move_runners(dt: float) -> void:
 	for r in runners:
 		if r.state != State.RUNNING or time < r.go_time:
 			continue
-		r.s = move_toward(r.s, r.target * BASE, tuning.runner_speed * dt)
+		r.s = move_toward(r.s, r.target * BASE, r.speed * dt)
 		if r.must_retouch and r.s <= r.start_base * BASE + 0.01:
 			r.must_retouch = false
 
@@ -575,14 +587,14 @@ func _throw(base: int) -> void:
 	var route := _route(base)
 	var to: Vector3 = route["to"]
 	var release := maxf(time, busy_until) + windup
-	var arrival := release + ThrowModel.flight_time(holder_pos, to, tuning)
+	var arrival := release + ThrowModel.flight_time(holder_pos, to, tuning, _holder_arm())
 	var aim := CUTOFF if route["cutoff"] else base
 	if route["cutoff"]:
 		covers[CUTOFF] = to
 		cutoff_active = true
 		relay_target = base
 	var flat := Vector2(to.x - holder_pos.x, to.z - holder_pos.z).length()
-	var wild := _roll(tuning.throw_error_chance + tuning.throw_error_per_meter * flat)
+	var wild := _roll((tuning.throw_error_chance + tuning.throw_error_per_meter * flat) * _holder_fielder_scale(true))
 	if wild:
 		# It sails: off to one side and past the target.
 		var along := Vector3(to.x - holder_pos.x, 0.0, to.z - holder_pos.z).normalized()
@@ -659,9 +671,38 @@ func _throw_time(base: int) -> float:
 		return 0.0
 	var route := _route(base)
 	if not route["cutoff"]:
-		return windup + ThrowModel.flight_time(holder_pos, covers[base], tuning)
+		return windup + ThrowModel.flight_time(holder_pos, covers[base], tuning, _holder_arm())
 	var cut: Vector3 = route["to"]
-	return windup + ThrowModel.flight_time(holder_pos, cut, tuning) + tuning.cutoff_release_time + ThrowModel.flight_time(cut, covers[base], tuning)
+	return windup + ThrowModel.flight_time(holder_pos, cut, tuning, _holder_arm()) + tuning.cutoff_release_time + ThrowModel.flight_time(cut, covers[base], tuning, _team_arm())
+
+
+## Arm of whoever holds the ball: the fielder who made the play, else a
+## cover or the cutoff man (the defense's average arm).
+func _holder_arm() -> float:
+	var f := _first_fielder()
+	return f.arm if holder_cover == -1 and f != null else _team_arm()
+
+
+func _team_arm() -> float:
+	if fielders.is_empty():
+		return 1.0
+	var total := 0.0
+	for f in fielders:
+		total += f.arm
+	return total / fielders.size()
+
+
+func _holder_fielder_scale(throwing: bool) -> float:
+	var f := _first_fielder()
+	if holder_cover != -1 or f == null:
+		return 1.0
+	return f.throw_error_scale if throwing else f.error_scale
+
+
+func _first_fielder() -> FielderState:
+	if fielding == null or fielding.fielder_index < 0 or fielding.fielder_index >= fielders.size():
+		return null
+	return fielders[fielding.fielder_index]
 
 
 func _roll(probability: float) -> bool:
@@ -829,7 +870,10 @@ func _classify(result: PlayOutcome) -> StringName:
 		return PlayOutcome.KIND_GROUND_OUT
 	if result.batter_base > 0 and errors.any(func(e: Dictionary) -> bool: return e["on_batter"]):
 		return PlayOutcome.KIND_REACHED_ON_ERROR
-	if not result.outs.is_empty() and result.batter_base == FieldLayout.FIRST:
+	# A runner forced out means the batter reached on the fielder's choice,
+	# however far he got afterwards.
+	var forced_runner := result.outs.any(func(o: Dictionary) -> bool: return o["kind"] == PlayOutcome.OUT_FORCE and o["runner_id"] != batter_id)
+	if forced_runner or not result.outs.is_empty() and result.batter_base == FieldLayout.FIRST:
 		return PlayOutcome.KIND_FIELDERS_CHOICE
 	match hit_base:
 		1:

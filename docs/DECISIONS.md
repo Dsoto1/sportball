@@ -221,3 +221,20 @@ Decision:
 Reason: The remaining Phase 0 weak spots (no triples, no defensive failure, free dives, a human stranded by a grounder through the hole, flat contact). This closes Phase 0.
 
 Affected systems: LivePlay, PlayOutcome, BallInPlay, AutoMatch, BallTrajectory, FieldingResolver, LiveFielding, MatchDirector, MatchView, tuning, sim report, tests.
+
+## 2026-10-20 - Phase 1: Gearheads vs Glitterati, Arcade Rules, Ratings, Subs
+
+Decision:
+- **Clubs (owner's pick):** the Rustwater Gearheads (away) and the Neon Heights Glitterati (home). They are data (`TeamDef`/`PlayerDef` resources) generated from `tools/generate_teams.gd`, with stable ids separate from display names.
+- **Who's on First (owner request):** the Glitterati lineup is named after the routine's positions; the right fielder stays unnamed. The names are short phrases, and no dialogue from the routine is reproduced.
+- **Arcade rules package (owner's pick, `MatchRules`):** 6 innings, universal DH, a 10-run mercy rule after 4 innings, a runner on second in extra innings, a 15 s pitch clock for human pitchers (an automatic ball), and no re-entry. `MatchState` reads its counts and endings from the rules. Passing an innings count gives classic rules, which old tests use.
+- **Ratings** (0–100, 50 = average) scale existing mechanics through `Ratings`. They never add new dice, and average players change nothing. The spreads are tuning values.
+- **AI personality** lives on `TeamDef`. The bullpen AI (`AiManager`) uses fatigue and a hook, plus a closer in save spots.
+- **Substitutions:** the human can make a pitching change or use a pinch hitter between pitches. The AI manages the other club's pitching.
+- **Balance:** the Glitterati win about 62% of AI-vs-AI games, which is accepted for now as the underdog story. The real fix is steals and bunts for the small-ball Gearheads.
+- **Scoring:** a play with a runner forced out is a fielder's choice even if the batter takes an extra base on it.
+- **Debug overlay:** it now starts hidden (` or F1 shows it).
+
+Reason: Phase 1 vertical slice. The owner chose the teams and arcade rules, and asked for the Who's on First names.
+
+Affected systems: data (teams, rules, defs), MatchState, MatchRoster, Ratings, AiBatter/AiPitcher/AiManager, PitchResolver, ContactResolver, FielderState, RunnerResolver, LivePlay, BallInPlay, AutoMatch, MatchDirector, MatchHud, MatchView, ActorView, input map, bot, sim report, tests.

@@ -14,6 +14,9 @@ const OUT_RECORDED := &"out_recorded"
 const PLATE_APPEARANCE_ENDED := &"plate_appearance_ended"
 const HALF_INNING_ENDED := &"half_inning_ended"
 const GAME_ENDED := &"game_ended"
+const SUBSTITUTION := &"substitution"
+## A runner put on base by rule (the extra-innings runner).
+const RUNNER_PLACED := &"runner_placed"
 
 var sequence: int
 var type: StringName

@@ -134,3 +134,110 @@ func test_events_are_sequenced() -> void:
 	for i in s.events.size():
 		check_eq(s.events[i].sequence, i, "event sequence")
 	check(s.events.any(func(e: DomainEvent) -> bool: return e.type == DomainEvent.OUT_RECORDED), "out event emitted")
+
+
+# --- Arcade rules, rosters, substitutions -------------------------------------
+
+func _arcade_match() -> MatchState:
+	return MatchState.from_teams(content().team(&"gearheads"), content().team(&"glitterati"), content().rules)
+
+
+## Walks in `runs` runs for the batting team (bases loaded first).
+func _walk_in(state: MatchState, runs: int) -> void:
+	_calls(state, MatchState.PitchCall.BALL, 4 * (3 + runs))
+
+
+func test_from_teams_sets_lineups_and_defense() -> void:
+	var s := _arcade_match()
+	check_eq(s.current_batter(), &"rwg_calloway", "Gearheads lead off")
+	check_eq(s.pitcher(MatchState.HOME), &"nhg_tomorrow", "Glitterati starter")
+	check_eq(s.defense[MatchState.HOME][&"1b"], &"nhg_who", "first baseman")
+	check(not s.defense[MatchState.HOME].values().has(&"nhg_lux"), "the DH does not field")
+	check_eq(s.rules.innings, 6, "six innings")
+
+
+func test_pitch_counts_follow_the_pitcher() -> void:
+	var s := _arcade_match()
+	s.record_pitch({})
+	s.record_pitch({})
+	check_eq(s.pitches_thrown(&"nhg_tomorrow"), 2, "starter's count")
+	check(s.substitute(MatchState.HOME, &"nhg_tomorrow", &"nhg_crisp"), "pitching change")
+	s.record_pitch({})
+	check_eq(s.pitches_thrown(&"nhg_crisp"), 1, "reliever's count")
+	check_eq(s.pitcher(MatchState.HOME), &"nhg_crisp", "new pitcher")
+
+
+func test_pinch_hitter_takes_slot_and_position() -> void:
+	var s := _arcade_match()
+	check(s.substitute(MatchState.AWAY, &"rwg_calloway", &"rwg_strand"), "pinch hit")
+	check_eq(s.current_batter(), &"rwg_strand", "pinch hitter is up")
+	check_eq(s.defense[MatchState.AWAY][&"cf"], &"rwg_strand", "and stays in center")
+	check(not s.can_substitute(MatchState.AWAY, &"rwg_strand", &"rwg_calloway"), "no re-entry")
+	check(not s.can_substitute(MatchState.AWAY, &"rwg_paskett", &"rwg_mahoney"), "cannot bring in someone already playing")
+	check(s.events.any(func(e: DomainEvent) -> bool: return e.type == DomainEvent.SUBSTITUTION), "substitution event")
+
+
+func test_mercy_rule_ends_game_after_fourth() -> void:
+	var s := _arcade_match()
+	for i in 3:
+		_half_inning(s)
+		_half_inning(s)
+	_walk_in(s, 10)  # top of the 4th: away leads 10-0
+	check(not s.game_over, "mercy waits for the end of the inning")
+	_half_inning(s)
+	check(not s.game_over, "home still bats in the 4th")
+	_half_inning(s)
+	check(s.game_over, "mercy after four")
+	check_eq(s.events[s.events.size() - 1].data["reason"], &"mercy", "reason")
+
+
+func test_mercy_needs_four_innings() -> void:
+	var s := _arcade_match()
+	_walk_in(s, 10)
+	_half_inning(s)
+	_half_inning(s)
+	check(not s.game_over, "no mercy in the first")
+
+
+func test_home_mercy_ends_mid_inning() -> void:
+	var s := _arcade_match()
+	for i in 3:
+		_half_inning(s)
+		_half_inning(s)
+	_half_inning(s)
+	_walk_in(s, 10)
+	check(s.game_over, "home goes up ten in the bottom of the 4th")
+	check_eq(s.score[MatchState.HOME], 10, "stops at the deciding run")
+
+
+func test_extra_innings_start_with_runner_on_second() -> void:
+	var s := _arcade_match()
+	for i in 12:
+		_half_inning(s)
+	check_eq(s.inning, 7, "extra innings")
+	check(s.bases[1] != &"", "runner on second")
+	check_eq(s.bases[1], s.lineups[MatchState.AWAY][(s.lineup_index[MatchState.AWAY] + 8) % 9], "the previous batter")
+	check_eq(s.bases[0], &"", "first empty")
+
+
+func test_classic_rules_have_no_extras_runner() -> void:
+	var s := new_match()
+	for i in 12:
+		_half_inning(s)
+	check_eq(s.bases[1], &"", "classic extras start empty")
+
+
+func test_hits_and_errors_are_counted() -> void:
+	var s := _arcade_match()
+	var single := PlayOutcome.new()
+	single.kind = PlayOutcome.KIND_SINGLE
+	single.batter_id = s.current_batter()
+	single.final_bases = [single.batter_id, &"", &""]
+	s.apply_play(single)
+	var roe := PlayOutcome.new()
+	roe.kind = PlayOutcome.KIND_REACHED_ON_ERROR
+	roe.batter_id = s.current_batter()
+	roe.errors = [{"type": "bobble", "base": -1, "on_batter": true}]
+	s.apply_play(roe)
+	check_eq(s.hits[MatchState.AWAY], 1, "one hit")
+	check_eq(s.errors[MatchState.HOME], 1, "error charged to the defense")

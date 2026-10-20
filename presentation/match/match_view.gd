@@ -26,6 +26,9 @@ var _camera_mode := CameraMode.BAT
 var _ball: MeshInstance3D
 var _ball_shadow: MeshInstance3D
 var _fielders: Array[ActorView] = []
+var _roster: MatchRoster
+## Current batter hits left-handed: he stands in the other box.
+var _bats_left := false
 var _runners := {}
 var _zone: Node3D
 var _cursor: MeshInstance3D
@@ -107,19 +110,28 @@ func set_debug_visible(value: bool) -> void:
 func reset_for_pitch(state: MatchState) -> void:
 	var fielding_color := HOME_COLOR if state.fielding_team() == MatchState.HOME else AWAY_COLOR
 	var batting_color := AWAY_COLOR if state.batting_team() == MatchState.AWAY else HOME_COLOR
+	var fielding_trim := Color(0, 0, 0, 0)
+	var batting_trim := Color(0, 0, 0, 0)
+	if _roster != null:
+		fielding_color = _roster.teams[state.fielding_team()].primary_color
+		fielding_trim = _roster.teams[state.fielding_team()].secondary_color
+		batting_color = _roster.teams[state.batting_team()].primary_color
+		batting_trim = _roster.teams[state.batting_team()].secondary_color
 	_animator = PlayAnimator.new()
 	_last_actor_pos.clear()
 	_rundown_zoom = false
 	for i in _fielders.size():
 		_fielders[i].reset_pose()
-		_fielders[i].set_look(fielding_color, String(tuning.fielder_ids[i]).to_upper())
+		_fielders[i].set_look(fielding_color, _fielder_tag(state, tuning.fielder_ids[i]), fielding_trim)
 		_fielders[i].position = tuning.fielder_spots[i]
 		_fielders[i].face(Vector3.ZERO)
 		_fielders[i].set_crouch(tuning.fielder_ids[i] == &"c")
 	_clear_runners()
-	var batter := _runner_actor(state.current_batter(), batting_color)
-	batter.position = BATTER_SPOT
-	batter.face(BATTER_SPOT + Vector3.RIGHT)  # square to the plate
+	var batter := _runner_actor(state.current_batter(), batting_color, batting_trim)
+	var hitter := _roster.player(state.current_batter()) if _roster != null else null
+	_bats_left = hitter != null and hitter.bats_left()
+	batter.position = _batter_spot()
+	batter.face(batter.position + (Vector3.LEFT if _bats_left else Vector3.RIGHT))  # square to the plate
 	set_bat(true)
 	set_aim_preview(false)
 	_windup = -1.0
@@ -127,7 +139,7 @@ func reset_for_pitch(state: MatchState) -> void:
 	for base in [1, 2, 3]:
 		var id := state.runner_on(base)
 		if id != &"":
-			var actor := _runner_actor(id, batting_color)
+			var actor := _runner_actor(id, batting_color, batting_trim)
 			actor.position = FieldLayout.base_position(base)
 			actor.face(FieldLayout.base_position(base + 1))
 	_ball.position = Vector3(tuning.release_side, tuning.release_height, -tuning.release_distance)
@@ -446,7 +458,8 @@ func _process(delta: float) -> void:
 func _update_bat() -> void:
 	if not _bat_pivot.visible:
 		return
-	_bat_pivot.position = BATTER_SPOT + Vector3(0.3, 1.0, 0.05)
+	var side := -1.0 if _bats_left else 1.0
+	_bat_pivot.position = _batter_spot() + Vector3(0.3 * side, 1.0, 0.05)
 	# Yaw 90 = barrel back toward the catcher, 0 = across the plate, -90 =
 	# toward the pitcher. Elevation in degrees above level.
 	var yaw := 100.0 + sin(_view_clock * 3.0) * 6.0  # stance with a waggle
@@ -458,7 +471,7 @@ func _update_bat() -> void:
 		lift = lerpf(50.0, 5.0, minf(p * 2.0, 1.0)) if p < 0.5 else lerpf(5.0, 40.0, (p - 0.5) * 2.0)
 	var y := deg_to_rad(yaw)
 	var e := deg_to_rad(lift)
-	var dir := Vector3(cos(e) * cos(y), sin(e), cos(e) * sin(y))
+	var dir := Vector3(cos(e) * cos(y) * side, sin(e), cos(e) * sin(y))
 	_bat_pivot.look_at(_bat_pivot.global_position + dir, Vector3.UP)
 
 
@@ -555,10 +568,31 @@ func _cover_assignments(fielder_index: int, cutoff: int = -1) -> Dictionary:
 	return covers
 
 
-func _runner_actor(id: StringName, color: Color) -> ActorView:
+func set_roster(roster: MatchRoster) -> void:
+	_roster = roster
+
+
+func _batter_spot() -> Vector3:
+	return Vector3(-BATTER_SPOT.x, BATTER_SPOT.y, BATTER_SPOT.z) if _bats_left else BATTER_SPOT
+
+
+## Jersey number over a fielder (position code without a roster).
+func _fielder_tag(state: MatchState, position: StringName) -> String:
+	if _roster == null:
+		return String(position).to_upper()
+	var p := _roster.player(state.defense[state.fielding_team()].get(position, &""))
+	return "#%d" % p.number if p != null else String(position).to_upper()
+
+
+func _runner_actor(id: StringName, color: Color, trim: Color = Color(0, 0, 0, 0)) -> ActorView:
 	var actor := ActorView.new()
 	add_child(actor)
+	var p := _roster.player(id) if _roster != null else null
 	actor.setup(color, String(id).get_slice("_", 1))
+	if p != null:
+		actor.set_look(color, "#%d %s" % [p.number, p.display_name.to_upper()], trim)
+	elif trim.a > 0.0:
+		actor.set_look(color, String(id).get_slice("_", 1), trim)
 	_runners[id] = actor
 	return actor
 

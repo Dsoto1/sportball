@@ -5,6 +5,13 @@ extends Control
 ## state handed to it.
 
 var _score: Label
+var _away_score: Label
+var _home_score: Label
+var _menu: Label
+var _clock: Label
+var _menu_title := ""
+var _card: VBoxContainer
+var _roster: MatchRoster
 var _diamond: BaseDiamond
 var _count: Label
 var _matchup: Label
@@ -27,7 +34,12 @@ func _ready() -> void:
 	panel.add_child(row)
 	var left := VBoxContainer.new()
 	row.add_child(left)
-	_score = _label(left, 30)
+	var scores := HBoxContainer.new()
+	scores.add_theme_constant_override("separation", 22)
+	left.add_child(scores)
+	_away_score = _label(scores, 30)
+	_home_score = _label(scores, 30)
+	_score = _label(left, 14)
 	_count = _label(left, 22)
 	_matchup = _label(left, 16)
 	_diamond = BaseDiamond.new()
@@ -48,18 +60,103 @@ func _ready() -> void:
 	_meter.position = Vector2(24, -60)
 	_meter.size = Vector2(320, 24)
 	add_child(_meter)
+	_menu = _label(self, 22)
+	_menu.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	_menu.position += Vector2(-330, -60)
+	_menu.visible = false
+	_clock = _label(self, 34)
+	_clock.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	_clock.position += Vector2(-150, 24)
+	_clock.visible = false
+	_card = VBoxContainer.new()
+	_card.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	_card.position.y = 130.0
+	_card.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_card)
 	show_pitching(false)
+
+
+func set_roster(roster: MatchRoster) -> void:
+	_roster = roster
+	for i in 2:
+		var label := _away_score if i == 0 else _home_score
+		label.add_theme_color_override("font_color", text_color(roster.teams[i]))
+
+
+## The brighter of a team's two main colors, so it reads on a dark panel.
+static func text_color(team: TeamDef) -> Color:
+	var a := team.primary_color
+	var b := team.secondary_color
+	return a if a.get_luminance() >= b.get_luminance() else b
 
 
 func show_state(state: MatchState, user_team: int) -> void:
 	var half := "▲" if state.is_top else "▼"
-	var away := "AWAY%s" % (" (YOU)" if user_team == MatchState.AWAY else "")
-	var home := "HOME%s" % (" (YOU)" if user_team == MatchState.HOME else "")
-	_score.text = "%s %d   %s %d" % [away, state.score[MatchState.AWAY], home, state.score[MatchState.HOME]]
+	var names := ["AWAY", "HOME"]
+	if _roster != null:
+		names = [_roster.teams[0].abbreviation, _roster.teams[1].abbreviation]
+	_away_score.text = "%s %d%s" % [names[0], state.score[MatchState.AWAY], " (YOU)" if user_team == MatchState.AWAY else ""]
+	_home_score.text = "%s %d%s" % [names[1], state.score[MatchState.HOME], " (YOU)" if user_team == MatchState.HOME else ""]
+	_score.text = "H %d-%d   E %d-%d" % [state.hits[0], state.hits[1], state.errors[0], state.errors[1]]
 	var outs := "●".repeat(state.outs) + "○".repeat(MatchState.OUTS_PER_HALF - state.outs)
 	_count.text = "%s%d   %d-%d   OUTS %s (%d)" % [half, state.inning, state.balls, state.strikes, outs, state.outs]
-	_matchup.text = "AT BAT: %s" % String(state.current_batter()).to_upper()
+	_matchup.text = _matchup_text(state)
 	_diamond.set_bases(state.bases)
+
+
+func _matchup_text(state: MatchState) -> String:
+	var batter := state.current_batter()
+	if _roster == null:
+		return "AT BAT: %s" % String(batter).to_upper()
+	var b := _roster.player(batter)
+	var p := _roster.player(state.pitcher(state.fielding_team()))
+	var line := "AT BAT  #%d %s (%s)  \"%s\"" % [b.number, b.display_name, b.bats, b.nickname]
+	if p != null:
+		line += "\nPITCHING  #%d %s  %d pitches" % [p.number, p.display_name, state.pitches_thrown(p.id)]
+	return line
+
+
+## A title card (pregame matchup, final score): lines of [text, color,
+## font size], centered. An empty list hides it.
+func show_card(lines: Array) -> void:
+	for child in _card.get_children():
+		child.queue_free()
+	_card.visible = not lines.is_empty()
+	for line in lines:
+		var label := _label(_card, line[2])
+		label.text = line[0]
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.add_theme_color_override("font_color", line[1])
+	if _card.visible:
+		_callout_timer = 0.0
+		_callout.modulate.a = 0.0
+		_detail.modulate.a = 0.0
+
+
+## Seconds left on the pitch clock; shown in the last few seconds (<0 hides).
+func set_clock(seconds: float) -> void:
+	_clock.visible = seconds >= 0.0 and seconds <= 5.0
+	_clock.text = "⏱ %d" % ceili(seconds)
+	_clock.add_theme_color_override("font_color", Color(1.0, 0.35, 0.3) if seconds <= 3.0 else Color.WHITE)
+
+
+## A simple list menu (substitutions). An empty title hides it.
+func show_menu(title: String, lines: Array, selected: int) -> void:
+	_menu_title = title
+	_menu.visible = title != ""
+	update_menu(lines, selected)
+
+
+func update_menu(lines: Array, selected: int) -> void:
+	if not _menu.visible:
+		return
+	var text := PackedStringArray([_menu_title, ""])
+	for i in lines.size():
+		text.append(("▶ %s" if i == selected else "   %s") % lines[i])
+	text.append("")
+	text.append("Up/Down: choose    J / A: confirm    P / Y: cancel")
+	_menu.text = "\n".join(text)
 
 
 func show_callout(text: String, detail: String = "", seconds: float = 1.4) -> void:

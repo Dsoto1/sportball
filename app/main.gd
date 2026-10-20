@@ -25,6 +25,8 @@ func _ready() -> void:
 	director.name = "MatchDirector"
 	add_child(director)
 	director.setup(content, view, hud, debug)
+	debug.visible = false  # ` or F1 shows it
+	view.set_debug_visible(false)
 	director.start_match(_seed_from_args())
 
 

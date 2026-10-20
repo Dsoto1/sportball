@@ -1,0 +1,288 @@
+[gd_resource type="Resource" script_class="TeamDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/player_def.gd" id="1_0c1l0"]
+[ext_resource type="Script" path="res://data/defs/team_def.gd" id="2_dvcwr"]
+
+[sub_resource type="Resource" id="Resource_rxisn"]
+script = ExtResource("1_0c1l0")
+id = &"rwg_calloway"
+display_name = "Wren Calloway"
+nickname = "Spark"
+number = 2
+bats = &"L"
+positions = Array[StringName]([&"cf", &"lf"])
+contact = 74
+power = 35
+eye = 68
+speed = 88
+arm = 60
+glove = 80
+
+[sub_resource type="Resource" id="Resource_oiky8"]
+script = ExtResource("1_0c1l0")
+id = &"rwg_brightwater"
+display_name = "Tomas Brightwater"
+nickname = "Socket"
+number = 6
+positions = Array[StringName]([&"ss", &"2b"])
+contact = 70
+power = 40
+eye = 60
+speed = 78
+arm = 72
+glove = 84
+
+[sub_resource type="Resource" id="Resource_d0q5f"]
+script = ExtResource("1_0c1l0")
+id = &"rwg_paskett"
+display_name = "Junie Paskett"
+nickname = "Lugnut"
+number = 4
+bats = &"L"
+positions = Array[StringName]([&"2b", &"ss"])
+contact = 76
+power = 38
+eye = 70
+speed = 72
+arm = 58
+glove = 76
+
+[sub_resource type="Resource" id="Resource_26ueu"]
+script = ExtResource("1_0c1l0")
+id = &"rwg_mahoney"
+display_name = "Oz Mahoney"
+nickname = "Anvil"
+number = 33
+positions = Array[StringName]([&"1b"])
+contact = 64
+power = 72
+eye = 55
+speed = 38
+arm = 55
+glove = 62
+
+[sub_resource type="Resource" id="Resource_w71ru"]
+script = ExtResource("1_0c1l0")
+id = &"rwg_inkwell"
+display_name = "Rosa Inkwell"
+nickname = "Rivet"
+number = 15
+positions = Array[StringName]([&"3b", &"1b"])
+contact = 68
+power = 55
+eye = 58
+speed = 55
+arm = 74
+glove = 70
+
+[sub_resource type="Resource" id="Resource_w4k70"]
+script = ExtResource("1_0c1l0")
+id = &"rwg_corrigan"
+display_name = "Hank Corrigan"
+nickname = "Smokestack"
+number = 21
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"1b", &"lf"])
+contact = 62
+power = 62
+eye = 52
+speed = 40
+glove = 48
+
+[sub_resource type="Resource" id="Resource_jeb01"]
+script = ExtResource("1_0c1l0")
+id = &"rwg_varga"
+display_name = "Pip Varga"
+nickname = "Pistons"
+number = 9
+positions = Array[StringName]([&"lf", &"rf"])
+contact = 67
+power = 45
+eye = 55
+speed = 80
+arm = 62
+glove = 70
+
+[sub_resource type="Resource" id="Resource_vksa5"]
+script = ExtResource("1_0c1l0")
+id = &"rwg_mott"
+display_name = "Della Mott"
+nickname = "Ratchet"
+number = 12
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"rf", &"cf"])
+contact = 66
+power = 48
+eye = 60
+speed = 74
+arm = 78
+glove = 72
+
+[sub_resource type="Resource" id="Resource_k3b4f"]
+script = ExtResource("1_0c1l0")
+id = &"rwg_ferrow"
+display_name = "Gus Ferrow"
+nickname = "Boiler"
+number = 8
+positions = Array[StringName]([&"c"])
+contact = 59
+power = 44
+speed = 35
+arm = 70
+glove = 66
+
+[sub_resource type="Resource" id="Resource_vfu5h"]
+script = ExtResource("1_0c1l0")
+id = &"rwg_strand"
+display_name = "Milo Strand"
+nickname = "Shift Whistle"
+number = 18
+bats = &"L"
+positions = Array[StringName]([&"lf", &"cf", &"rf"])
+contact = 64
+power = 35
+eye = 58
+speed = 84
+arm = 55
+glove = 66
+
+[sub_resource type="Resource" id="Resource_4evyl"]
+script = ExtResource("1_0c1l0")
+id = &"rwg_kettle"
+display_name = "Ivy Kettle"
+nickname = "Teakettle"
+number = 3
+positions = Array[StringName]([&"2b", &"3b", &"ss"])
+contact = 69
+power = 32
+eye = 64
+speed = 70
+arm = 60
+glove = 74
+
+[sub_resource type="Resource" id="Resource_rmlcf"]
+script = ExtResource("1_0c1l0")
+id = &"rwg_holloway"
+display_name = "Bram Holloway"
+nickname = "Bellows"
+number = 27
+positions = Array[StringName]([&"c", &"1b"])
+contact = 54
+power = 52
+eye = 46
+speed = 30
+arm = 64
+glove = 58
+
+[sub_resource type="Resource" id="Resource_vb03f"]
+script = ExtResource("1_0c1l0")
+id = &"rwg_hollerith"
+display_name = "Otis Hollerith"
+nickname = "The Foreman"
+number = 41
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 54
+control = 80
+stuff = 62
+stamina = 80
+
+[sub_resource type="Resource" id="Resource_rkm2g"]
+script = ExtResource("1_0c1l0")
+id = &"rwg_bracket"
+display_name = "Nell Bracket"
+nickname = "Shim"
+number = 50
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+control = 66
+stuff = 64
+stamina = 40
+
+[sub_resource type="Resource" id="Resource_ptbt5"]
+script = ExtResource("1_0c1l0")
+id = &"rwg_wexley"
+display_name = "Cobb Wexley"
+nickname = "Grease Fire"
+number = 36
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 58
+control = 58
+stuff = 52
+stamina = 38
+
+[sub_resource type="Resource" id="Resource_v6b6o"]
+script = ExtResource("1_0c1l0")
+id = &"rwg_sprock"
+display_name = "Juno Sprock"
+nickname = "Torque"
+number = 47
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 52
+control = 70
+stuff = 58
+stamina = 42
+
+[sub_resource type="Resource" id="Resource_aghee"]
+script = ExtResource("1_0c1l0")
+id = &"rwg_fenwick"
+display_name = "Mack Fenwick"
+nickname = "Overtime"
+number = 99
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 62
+control = 68
+stuff = 66
+stamina = 30
+
+[resource]
+script = ExtResource("2_dvcwr")
+id = &"gearheads"
+city = "Rustwater"
+team_name = "Gearheads"
+abbreviation = "RWG"
+primary_color = Color(0.76862746, 0.3372549, 0.12156863, 1)
+secondary_color = Color(0.11372549, 0.16470589, 0.2901961, 1)
+accent_color = Color(0.9372549, 0.8901961, 0.78431374, 1)
+mascot = "Sprocket, a patched-up wind-up robot"
+stadium = "Foundry Field"
+identity = "Scrappy river-port underdogs. Small ball: steals, bunts, hustle doubles, strong gloves and not much power. Blue-collar grit: fans bang wrenches on the metal bleachers."
+rival = &"glitterati"
+roster = Array[ExtResource("1_0c1l0")]([SubResource("Resource_rxisn"), SubResource("Resource_oiky8"), SubResource("Resource_d0q5f"), SubResource("Resource_26ueu"), SubResource("Resource_w71ru"), SubResource("Resource_w4k70"), SubResource("Resource_jeb01"), SubResource("Resource_vksa5"), SubResource("Resource_k3b4f"), SubResource("Resource_vfu5h"), SubResource("Resource_4evyl"), SubResource("Resource_rmlcf"), SubResource("Resource_vb03f"), SubResource("Resource_rkm2g"), SubResource("Resource_ptbt5"), SubResource("Resource_v6b6o"), SubResource("Resource_aghee")])
+batting_order = Array[StringName]([&"rwg_calloway", &"rwg_brightwater", &"rwg_paskett", &"rwg_mahoney", &"rwg_inkwell", &"rwg_corrigan", &"rwg_varga", &"rwg_mott", &"rwg_ferrow"])
+lineup_positions = Array[StringName]([&"cf", &"ss", &"2b", &"1b", &"3b", &"dh", &"lf", &"rf", &"c"])
+starting_pitcher = &"rwg_hollerith"
+bullpen = Array[StringName]([&"rwg_bracket", &"rwg_wexley", &"rwg_sprock", &"rwg_fenwick"])
+swing_aggression = 0.95
+chase_scale = 0.75
+power_swing_rate = 0.36
+runner_aggression = 0.2
+edge_bias_scale = 1.1
+bullpen_hook = 0.55

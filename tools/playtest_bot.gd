@@ -21,6 +21,11 @@ var _last_phase := -1
 var _plays := 0
 var _control_home := false
 var _events_down: Array[StringName] = []
+## One of each: a pitching change, a pinch hitter, a pitch-clock violation.
+var _did_pitching_change := false
+var _did_pinch_hit := false
+var _did_clock := false
+var _waiting_clock := false
 
 
 func _initialize() -> void:
@@ -65,8 +70,32 @@ func _drive() -> void:
 	var entered := phase != _last_phase
 	_last_phase = phase
 	var batting := _director.user_is_batting()
+	if _waiting_clock and phase != MatchDirector.Phase.PRE_PITCH:
+		_waiting_clock = false
+		_did_clock = true
 	match phase:
+		MatchDirector.Phase.PREGAME:
+			if _director.phase_time() > 0.3 and _shots_taken == 0:
+				_screenshot("pregame")
+			if _director.phase_time() > 0.5:
+				_press(&"swing_power" if _control_home else &"swing_contact")
 		MatchDirector.Phase.PRE_PITCH:
+			var inning := _director.state.inning
+			if _director.sub_menu_open():
+				_press(&"swing_contact" if batting else &"pitch_primary")
+				return
+			if not batting and not _did_clock and inning >= 2:
+				_waiting_clock = true
+				return  # let the pitch clock run out once
+			if _director.phase_time() > 0.15 and _director.phase_time() < 0.25 and inning >= 3:
+				if not batting and not _did_pitching_change:
+					_did_pitching_change = true
+					_press(&"open_subs")
+					return
+				if batting and not _did_pinch_hit:
+					_did_pinch_hit = true
+					_press(&"open_subs")
+					return
 			if not batting and _director.phase_time() > 0.3:
 				_director.debug_set_cursor(Vector2(_rng.randf_range(-0.3, 0.3), _rng.randf_range(0.5, 1.1)))
 				_press(&"pitch_primary")

@@ -4,12 +4,13 @@ extends RefCounted
 ## widens scatter; it does not roll dice on whether the pitch "works".
 
 
-static func resolve(intent: PitchIntent, family: PitchFamilyDef, tuning: BaseballTuning, rng: MatchRng) -> PitchResult:
+## mods: the pitcher's ratings and fatigue (Ratings.pitcher_mods); {} = average.
+static func resolve(intent: PitchIntent, family: PitchFamilyDef, tuning: BaseballTuning, rng: MatchRng, mods: Dictionary = {}) -> PitchResult:
 	var result := PitchResult.new()
 	result.family_id = family.id
 	result.aim = intent.aim
 	result.meter_error = intent.meter_error
-	var sigma := lerpf(tuning.pitch_scatter_min, tuning.pitch_scatter_max, intent.meter_error) * family.scatter_scale
+	var sigma: float = lerpf(tuning.pitch_scatter_min, tuning.pitch_scatter_max, intent.meter_error) * family.scatter_scale * mods.get("scatter", 1.0)
 	var offset := Vector2(rng.randfn(0.0, sigma), rng.randfn(0.0, sigma))
 	var center := zone_center(tuning)
 	var location := intent.aim + offset
@@ -17,11 +18,12 @@ static func resolve(intent: PitchIntent, family: PitchFamilyDef, tuning: Basebal
 	location.y = clampf(location.y, center.y - tuning.wild_limit.y, center.y + tuning.wild_limit.y)
 	location.y = maxf(location.y, 0.05)
 	result.location = location
-	result.speed = family.speed * intent.speed_scale * lerpf(1.0, tuning.pitch_speed_at_max_error, intent.meter_error)
+	result.speed = family.speed * intent.speed_scale * mods.get("speed", 1.0) * lerpf(1.0, tuning.pitch_speed_at_max_error, intent.meter_error)
 	result.release_point = Vector3(tuning.release_side, tuning.release_height, -tuning.release_distance)
 	result.travel_time = result.release_point.distance_to(Vector3(location.x, location.y, 0.0)) / result.speed
 	result.in_zone = in_zone(location, tuning)
-	result.break_amount = family.break_amount
+	result.break_amount = family.break_amount * mods.get("break", 1.0)
+	result.deception = maxf(family.deception + mods.get("deception", 0.0), 0.0)
 	return result
 
 

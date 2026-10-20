@@ -1,18 +1,18 @@
 class_name MatchState
 extends RefCounted
 ## Authoritative record of a match: inning/half, outs, count, score, bases
-## and batting order. Scenes present this state; they never own it.
-## Counts per out/walk/strikeout are rules of baseball and live here as
-## constants. Format choices (innings) are passed in.
+## and batting order, plus who is in the game: each team's defense,
+## pitcher, substitutions and pitch counts. Scenes present this state; they
+## never own it. The rules package (MatchRules) sets counts, innings, the
+## mercy rule and the extra-innings runner.
 
 enum PitchCall { BALL, CALLED_STRIKE, SWINGING_STRIKE, FOUL }
 
 const AWAY := 0
 const HOME := 1
-const BALLS_FOR_WALK := 4
-const STRIKES_FOR_OUT := 3
 const OUTS_PER_HALF := 3
 
+var rules: MatchRules
 var innings_scheduled: int
 var inning: int = 1
 var is_top: bool = true
@@ -29,15 +29,41 @@ var line_score: Array = [[], []]
 var game_over: bool = false
 var pitch_count: int = 0
 var events: Array[DomainEvent] = []
+## Per team: field position -> player id (&"p" is the pitcher). Empty for
+## placeholder lineups (tests and old sims), which have no named defense.
+var defense: Array = [{}, {}]
+## Pitches thrown by each pitcher id.
+var pitches_by: Dictionary = {}
+## Player ids that have left the game (no re-entry under the rules).
+var removed: Dictionary = {}
+var hits: Array[int] = [0, 0]
+## Errors charged to each team's defense.
+var errors: Array[int] = [0, 0]
 
 var _next_sequence: int = 0
 var _half_runs: int = 0
 
 
-func _init(away_lineup: Array[StringName], home_lineup: Array[StringName], p_innings: int) -> void:
+## p_rules: a MatchRules, or an innings count for classic rules.
+func _init(away_lineup: Array[StringName], home_lineup: Array[StringName], p_rules: Variant) -> void:
 	assert(not away_lineup.is_empty() and not home_lineup.is_empty())
 	lineups = [away_lineup.duplicate(), home_lineup.duplicate()]
-	innings_scheduled = p_innings
+	rules = p_rules if p_rules is MatchRules else MatchRules.classic(int(p_rules))
+	innings_scheduled = rules.innings
+
+
+## A match between two clubs with their default lineups and defenses.
+static func from_teams(away: TeamDef, home: TeamDef, p_rules: MatchRules) -> MatchState:
+	var state := MatchState.new(away.batting_order, home.batting_order, p_rules)
+	for team in [AWAY, HOME]:
+		var def: TeamDef = away if team == AWAY else home
+		var spots := {}
+		for i in def.batting_order.size():
+			if def.lineup_positions[i] != &"dh":
+				spots[def.lineup_positions[i]] = def.batting_order[i]
+		spots[&"p"] = def.starting_pitcher
+		state.defense[team] = spots
+	return state
 
 
 static func placeholder_lineup(prefix: String, size: int = 9) -> Array[StringName]:
@@ -60,6 +86,57 @@ func current_batter() -> StringName:
 	return lineups[team][lineup_index[team]]
 
 
+## Current pitcher of a team (&"" for placeholder lineups).
+func pitcher(team: int) -> StringName:
+	return defense[team].get(&"p", &"")
+
+
+func pitches_thrown(pitcher_id: StringName) -> int:
+	return pitches_by.get(pitcher_id, 0)
+
+
+## Players of `team` currently in the game (lineup and pitcher).
+func in_game(team: int) -> Array[StringName]:
+	var list: Array[StringName] = []
+	list.assign(lineups[team])
+	for id: StringName in defense[team].values():
+		if not list.has(id):
+			list.append(id)
+	return list
+
+
+## Can `in_id` replace `out_id` for `team` right now?
+func can_substitute(team: int, out_id: StringName, in_id: StringName) -> bool:
+	if game_over or out_id == in_id or in_id == &"":
+		return false
+	if rules.no_reentry and removed.has(in_id):
+		return false
+	var current := in_game(team)
+	return current.has(out_id) and not current.has(in_id)
+
+
+## Replaces a player: the newcomer takes his lineup slot and his position.
+## A pitching change is substitute(team, pitcher(team), reliever).
+func substitute(team: int, out_id: StringName, in_id: StringName) -> bool:
+	if not can_substitute(team, out_id, in_id):
+		return false
+	var slot: int = lineups[team].find(out_id)
+	if slot >= 0:
+		lineups[team][slot] = in_id
+	var position: StringName = &""
+	for pos: StringName in defense[team]:
+		if defense[team][pos] == out_id:
+			position = pos
+	if position != &"":
+		defense[team][position] = in_id
+	for i in bases.size():
+		if bases[i] == out_id:
+			bases[i] = in_id  # pinch runner
+	removed[out_id] = true
+	emit(DomainEvent.SUBSTITUTION, {"team": team, "out": out_id, "in": in_id, "position": position, "slot": slot})
+	return true
+
+
 func runner_on(base: int) -> StringName:
 	return bases[base - 1]
 
@@ -79,6 +156,9 @@ func emit(type: StringName, data: Dictionary = {}) -> DomainEvent:
 
 func record_pitch(data: Dictionary) -> void:
 	pitch_count += 1
+	var p := pitcher(fielding_team())
+	if p != &"":
+		pitches_by[p] = pitches_by.get(p, 0) + 1
 	emit(DomainEvent.PITCH_THROWN, data)
 
 
@@ -90,16 +170,16 @@ func apply_pitch_call(call: PitchCall) -> void:
 	match call:
 		PitchCall.BALL:
 			balls += 1
-			if balls >= BALLS_FOR_WALK:
+			if balls >= rules.balls_for_walk:
 				_walk()
 		PitchCall.CALLED_STRIKE, PitchCall.SWINGING_STRIKE:
 			strikes += 1
-			if strikes >= STRIKES_FOR_OUT:
+			if strikes >= rules.strikes_for_out:
 				var batter := current_batter()
 				_end_plate_appearance(&"strikeout")
 				_record_out(batter, FieldLayout.HOME, &"strikeout")
 		PitchCall.FOUL:
-			if strikes < STRIKES_FOR_OUT - 1:
+			if strikes < rules.strikes_for_out - 1:
 				strikes += 1
 
 
@@ -108,13 +188,18 @@ func apply_play(outcome: PlayOutcome) -> void:
 	if game_over:
 		return
 	emit(DomainEvent.BALL_CONTACTED, {"batter": outcome.batter_id, "kind": outcome.kind})
+	if outcome.is_hit():
+		hits[batting_team()] += 1
+	for e in outcome.errors:
+		if e["type"] != "dive_miss":
+			errors[fielding_team()] += 1
 	for advance in outcome.advances:
 		if advance["safe"] and advance["to"] != advance["from"]:
 			emit(DomainEvent.RUNNER_ADVANCED, advance)
 	for runner in outcome.runs:
 		_score_run(runner)
 		if game_over and outcome.kind != PlayOutcome.KIND_HOME_RUN:
-			# Walk-off: only the winning run counts unless it left the park.
+			# Walk-off (or mercy): only the deciding run counts unless it left the park.
 			_end_plate_appearance(outcome.kind)
 			return
 	_end_plate_appearance(outcome.kind)
@@ -160,6 +245,8 @@ func _score_run(runner: StringName) -> void:
 	emit(DomainEvent.RUN_SCORED, {"runner": runner, "team": team, "score": score.duplicate()})
 	if not is_top and inning >= innings_scheduled and score[HOME] > score[AWAY]:
 		_finish_game(&"walk_off")
+	elif not is_top and _mercy_inning() and score[HOME] - score[AWAY] >= rules.mercy_runs:
+		_finish_game(&"mercy")
 
 
 func _record_out(runner: StringName, base: int, kind: StringName) -> void:
@@ -188,21 +275,40 @@ func _end_half() -> void:
 	strikes = 0
 	bases = [&"", &"", &""]
 	var last_scheduled := inning >= innings_scheduled
+	var lead := score[HOME] - score[AWAY]
 	if is_top:
-		if last_scheduled and score[HOME] > score[AWAY]:
+		if last_scheduled and lead > 0:
 			_finish_game(&"home_leads")
+			return
+		if _mercy_inning() and lead >= rules.mercy_runs:
+			_finish_game(&"mercy")
 			return
 		is_top = false
 	else:
-		if last_scheduled and score[HOME] != score[AWAY]:
+		if last_scheduled and lead != 0:
 			_finish_game(&"regulation")
+			return
+		if _mercy_inning() and absi(lead) >= rules.mercy_runs:
+			_finish_game(&"mercy")
 			return
 		inning += 1
 		is_top = true
+	if inning > innings_scheduled and rules.extras_runner_on_second:
+		# Extra innings start with the previous batter on second.
+		var team := batting_team()
+		var size: int = lineups[team].size()
+		var runner: StringName = lineups[team][(lineup_index[team] + size - 1) % size]
+		bases[1] = runner
+		emit(DomainEvent.RUNNER_PLACED, {"runner": runner, "base": 2})
+
+
+func _mercy_inning() -> bool:
+	return rules.mercy_runs > 0 and inning >= rules.mercy_after_inning
 
 
 func _finish_game(reason: StringName) -> void:
-	if reason == &"walk_off":
+	# Mid-half endings have not closed their line-score entry yet.
+	if reason == &"walk_off" or (reason == &"mercy" and _half_runs > 0):
 		line_score[batting_team()].append(_half_runs)
 	game_over = true
 	emit(DomainEvent.GAME_ENDED, {"reason": reason, "score": score.duplicate(), "inning": inning})

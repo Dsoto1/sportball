@@ -17,6 +17,8 @@ var _clock := 0.0
 var _lean := 0.0
 var _arm := 0.0
 var _drop := 0.0
+var _cap: MeshInstance3D
+var _belt: MeshInstance3D
 var _sway := 0.0
 
 
@@ -39,6 +41,23 @@ func setup(color: Color, tag: String) -> void:
 	head.position.y = 1.95
 	head.material_override = GrayboxField._mat(Color(0.93, 0.78, 0.62))
 	_rig.add_child(head)
+	# Cap and belt carry the team's second color.
+	_cap = MeshInstance3D.new()
+	var crown := CylinderMesh.new()
+	crown.top_radius = 0.24
+	crown.bottom_radius = 0.28
+	crown.height = 0.16
+	_cap.mesh = crown
+	_cap.position.y = 2.14
+	_rig.add_child(_cap)
+	_belt = MeshInstance3D.new()
+	var band := CylinderMesh.new()
+	band.top_radius = 0.4
+	band.bottom_radius = 0.4
+	band.height = 0.12
+	_belt.mesh = band
+	_belt.position.y = 0.95
+	_rig.add_child(_belt)
 	_shoulder = Node3D.new()
 	_shoulder.position = Vector3(0.42, 1.45, 0.0)
 	_rig.add_child(_shoulder)
@@ -72,8 +91,11 @@ func setup(color: Color, tag: String) -> void:
 	arm.material_override = _body.material_override
 
 
-func set_look(color: Color, tag: String) -> void:
+func set_look(color: Color, tag: String, trim: Color = Color(0, 0, 0, 0)) -> void:
 	_body.material_override = GrayboxField._mat(color)
+	var second := GrayboxField._mat(trim if trim.a > 0.0 else color)
+	_cap.material_override = second
+	_belt.material_override = second
 	_tag.text = tag
 
 

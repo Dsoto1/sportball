@@ -8,10 +8,14 @@ extends RefCounted
 ## change their minds as the play develops.
 
 
-static func plan(bases: Array[StringName], batter_id: StringName, fielding: FieldingResult, outs_before: int, tuning: BaseballTuning) -> Array[RunnerPlan]:
+## speeds: runner id -> m/s (missing = tuning.runner_speed). aggression:
+## seconds off the safety margin (the batting team's personality). arm:
+## the fielder's throw-speed multiplier.
+static func plan(bases: Array[StringName], batter_id: StringName, fielding: FieldingResult, outs_before: int, tuning: BaseballTuning,
+		speeds: Dictionary = {}, aggression: float = 0.0, arm: float = 1.0) -> Array[RunnerPlan]:
 	var plans: Array[RunnerPlan] = []
 	var occupied := [false, bases[0] != &"", bases[1] != &"", bases[2] != &""]
-	var margin := tuning.two_out_safety_margin if outs_before == 2 else tuning.runner_safety_margin
+	var margin := (tuning.two_out_safety_margin if outs_before == 2 else tuning.runner_safety_margin) - aggression
 	var limit := FieldLayout.SCORED
 	var caught := fielding.caught_in_air
 	var inning_over := caught and outs_before + 1 >= MatchState.OUTS_PER_HALF
@@ -23,6 +27,8 @@ static func plan(bases: Array[StringName], batter_id: StringName, fielding: Fiel
 		p.runner_id = bases[base - 1]
 		p.start_base = base
 		p.is_batter = false
+		p.speed = speeds.get(p.runner_id, tuning.runner_speed)
+		p.arm = arm
 		if caught:
 			# Fly ball caught: retouch, then tag up for at most one base.
 			p.forced = false
@@ -35,7 +41,7 @@ static func plan(bases: Array[StringName], batter_id: StringName, fielding: Fiel
 			p.lead = tuning.runner_lead_distance
 			var min_target := base + 1 if p.forced else base
 			p.target_base = _choose_target(p, min_target, limit, fielding, margin, tuning)
-		p.arrival_time = arrival_between(p.start_base, p.target_base, p.start_time, tuning, p.lead)
+		p.arrival_time = arrival_between(p.start_base, p.target_base, p.start_time, tuning, p.lead, p.speed)
 		plans.append(p)
 		limit = FieldLayout.SCORED if p.target_base == FieldLayout.SCORED else p.target_base - 1
 
@@ -44,10 +50,12 @@ static func plan(bases: Array[StringName], batter_id: StringName, fielding: Fiel
 		b.runner_id = batter_id
 		b.start_base = FieldLayout.HOME
 		b.is_batter = true
+		b.speed = speeds.get(batter_id, tuning.runner_speed)
+		b.arm = arm
 		b.forced = true
 		b.start_time = tuning.batter_start_delay
 		b.target_base = _choose_target(b, FieldLayout.FIRST, limit, fielding, margin, tuning)
-		b.arrival_time = arrival_between(b.start_base, b.target_base, b.start_time, tuning)
+		b.arrival_time = arrival_between(b.start_base, b.target_base, b.start_time, tuning, 0.0, b.speed)
 		plans.append(b)
 	return plans
 
@@ -69,8 +77,8 @@ static func home_run(bases: Array[StringName], batter_id: StringName) -> PlayOut
 
 
 ## Contact-relative time a throw would reach each base, indexed 1..4.
-static func ball_arrival(fielding: FieldingResult, base: int, tuning: BaseballTuning) -> float:
-	return ThrowModel.arrival_at_base(fielding, base, tuning)
+static func ball_arrival(fielding: FieldingResult, base: int, tuning: BaseballTuning, arm: float = 1.0) -> float:
+	return ThrowModel.arrival_at_base(fielding, base, tuning, arm)
 
 
 static func _is_forced(base: int, occupied: Array) -> bool:
@@ -84,19 +92,19 @@ static func _is_forced(base: int, occupied: Array) -> bool:
 	return false
 
 
-static func arrival_between(from_base: int, to_base: int, start_time: float, tuning: BaseballTuning, lead: float = 0.0) -> float:
+static func arrival_between(from_base: int, to_base: int, start_time: float, tuning: BaseballTuning, lead: float = 0.0, speed: float = -1.0) -> float:
 	var legs := to_base - from_base
 	if legs <= 0:
 		return start_time
 	var run := legs * FieldLayout.BASE_DISTANCE - lead
-	return start_time + run / tuning.runner_speed + (legs - 1) * tuning.base_turn_penalty
+	return start_time + run / (speed if speed > 0.0 else tuning.runner_speed) + (legs - 1) * tuning.base_turn_penalty
 
 
 static func _choose_target(p: RunnerPlan, min_target: int, limit: int, fielding: FieldingResult, margin: float, tuning: BaseballTuning) -> int:
 	var target := min_target
 	for t in range(min_target + 1, limit + 1):
-		var arrive := arrival_between(p.start_base, t, p.start_time, tuning, p.lead)
-		if arrive + margin < ball_arrival(fielding, t, tuning):
+		var arrive := arrival_between(p.start_base, t, p.start_time, tuning, p.lead, p.speed)
+		if arrive + margin < ball_arrival(fielding, t, tuning, p.arm):
 			target = t
 		else:
 			break

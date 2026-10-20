@@ -25,6 +25,7 @@ const BINDINGS := {
 	&"switch_fielder": [["key", KEY_F], ["axis", JOY_AXIS_TRIGGER_LEFT, 1.0]],
 	&"runner_advance": [["key", KEY_E], ["button", JOY_BUTTON_RIGHT_SHOULDER]],
 	&"runner_retreat": [["key", KEY_Q], ["button", JOY_BUTTON_LEFT_SHOULDER]],
+	&"open_subs": [["key", KEY_P], ["button", JOY_BUTTON_Y]],
 	&"switch_side": [["key", KEY_TAB], ["button", JOY_BUTTON_BACK]],
 	# MacBooks need fn for F-keys, so each also has a plain key.
 	&"toggle_debug": [["key", KEY_F1], ["key", KEY_QUOTELEFT], ["button", JOY_BUTTON_RIGHT_STICK]],

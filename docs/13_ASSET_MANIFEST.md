@@ -16,7 +16,7 @@ CC0 / permissive-commercial / attribution-required / restricted-do-not-use / unk
 |----|--------------|---------|--------------|---------|--------------|----------------------|--------------|-----------|---------------|--------|-------|
 | EXAMPLE-001 | Example | Example | exact source URL | CC0 | No | verify package terms | prototype prop | Yes | YYYY-MM-DD | candidate | Example only — delete when real assets are logged |
 
-Phase 0 uses **no third-party assets**. All geometry is Godot primitive meshes generated in code; no textures, audio or fonts beyond the engine default are shipped.
+Phases 0 and 1 use **no third-party assets**. Team names, logos-in-words, uniforms and colors are original. All geometry is Godot primitive meshes generated in code; no textures, audio or fonts beyond the engine default are shipped.
 
 ## Candidate Source Register
 

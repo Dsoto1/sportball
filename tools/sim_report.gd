@@ -12,8 +12,25 @@ func _initialize() -> void:
 	var runs := 0
 	var innings := 0
 	var start := Time.get_ticks_msec()
+	var team := [{"runs": 0, "hits": 0, "errors": 0, "hr": 0, "wins": 0}, {"runs": 0, "hits": 0, "errors": 0, "hr": 0, "wins": 0}]
+	var mercy := 0
+	var names := ["away", "home"]
 	for i in matches:
 		var sim := AutoMatch.play(first_seed + i, content)
+		if sim.roster != null:
+			names = [sim.roster.teams[0].team_name, sim.roster.teams[1].team_name]
+		for t in 2:
+			team[t]["runs"] += sim.state.score[t]
+			team[t]["hits"] += sim.state.hits[t]
+			team[t]["errors"] += sim.state.errors[t]
+			if sim.state.winner() == t:
+				team[t]["wins"] += 1
+		for e in sim.state.events:
+			if e.type == DomainEvent.BALL_CONTACTED and e.data["kind"] == PlayOutcome.KIND_HOME_RUN:
+				var t: int = 0 if sim.roster == null or sim.roster.teams[0].player(e.data["batter"]) != null else 1
+				team[t]["hr"] += 1
+			if e.type == DomainEvent.GAME_ENDED and e.data["reason"] == &"mercy":
+				mercy += 1
 		runs += sim.state.score[0] + sim.state.score[1]
 		innings += sim.state.inning
 		for key in sim.stats:
@@ -33,6 +50,10 @@ func _initialize() -> void:
 	print("BIP: %d   avg EV: %.1f m/s   air outs: %d   ground outs: %d   dives: %d   multi-out plays: %d" % [
 		totals["balls_in_play"], totals["exit_velocity_sum"] / bip, totals["air_outs"], totals["ground_outs"],
 		totals["dives"], totals["double_plays"]])
+	for t in 2:
+		print("%-12s W %3d   R/G %.2f   H/G %.2f   HR/G %.2f   E/G %.2f" % [names[t], team[t]["wins"], team[t]["runs"] / float(matches),
+			team[t]["hits"] / float(matches), team[t]["hr"] / float(matches), team[t]["errors"] / float(matches)])
+	print("mercy-rule games: %d   pitching changes/game: %.2f" % [mercy, totals["pitching_changes"] / float(matches)])
 	print("errors: %d (%.2f/team/game)   missed dives: %d" % [totals["errors"], totals["errors"] / (2.0 * matches), totals["dive_misses"]])
 	var keys := outcomes.keys()
 	keys.sort()

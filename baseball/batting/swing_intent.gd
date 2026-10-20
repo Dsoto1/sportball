@@ -12,8 +12,10 @@ var timing_offset: float = 0.0
 ## the pitch's height on its own; this only shapes direction and loft.
 var stick: Vector2 = Vector2.ZERO
 var bats_left: bool = false
-## Assist: multiplies the timing window (1 = normal).
+## Multiplies the timing window (batter's contact rating, Rookie assist).
 var window_scale: float = 1.0
+## Multiplies the swing's top exit velocity (batter's power rating).
+var power_scale: float = 1.0
 
 
 static func take() -> SwingIntent:

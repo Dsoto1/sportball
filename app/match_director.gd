@@ -5,7 +5,7 @@ extends Node
 ## MatchState and tells the view/HUD what to show. Real-time windows (pitch
 ## meter, swing, throw choice) live here; baseball outcomes never do.
 
-enum Phase { PRE_PITCH, METER, PITCH_FLIGHT, CALL, BALL_IN_PLAY, GAME_OVER }
+enum Phase { PREGAME, PRE_PITCH, METER, PITCH_FLIGHT, CALL, BALL_IN_PLAY, GAME_OVER }
 
 # Presentation pacing (seconds). Kept short: no dead air between pitches.
 const AI_PRE_PITCH_DELAY := 1.8
@@ -25,6 +25,7 @@ var tuning: BaseballTuning
 var state: MatchState
 var rng: MatchRng
 var user_team := MatchState.AWAY
+var roster: MatchRoster
 
 var _view: MatchView
 var _hud: MatchHud
@@ -58,6 +59,11 @@ var _pending_swing := SwingIntent.Type.NONE
 var _pending_swing_usec := 0
 var _pending_stick := Vector2.ZERO
 var _input_log: Array[Dictionary] = []
+## Substitution menu: open while not empty. Each option {label, out, in}.
+var _sub_options: Array[Dictionary] = []
+var _sub_selected := 0
+## Who's on first: announced once each time he gets there.
+var _who_on_first := false
 
 
 func setup(p_content: ContentLibrary, view: MatchView, hud: MatchHud, debug: DebugOverlay) -> void:
@@ -68,15 +74,50 @@ func setup(p_content: ContentLibrary, view: MatchView, hud: MatchHud, debug: Deb
 	_debug = debug
 
 
+## A 6-inning exhibition: the first two clubs in the library, away at home.
 func start_match(seed_value: int) -> void:
 	rng = MatchRng.new(seed_value)
-	state = MatchState.new(MatchState.placeholder_lineup("away"), MatchState.placeholder_lineup("home"), tuning.innings)
+	roster = MatchRoster.new(content.teams[0], content.teams[1])
+	state = MatchState.from_teams(roster.teams[0], roster.teams[1], content.rules)
 	_event_cursor = 0
 	_input_log.clear()
-	print("[match] seed=%d" % seed_value)
+	_sub_options.clear()
+	_who_on_first = false
+	print("[match] seed=%d  %s at %s" % [seed_value, roster.teams[0].full_name(), roster.teams[1].full_name()])
 	_debug.set_section("match", {"seed": seed_value})
 	_view.clear_debug_play()
-	_hud.show_callout("PLAY BALL", "Batting: press J (or click) as the white ring closes on the plate", 4.0)
+	_view.set_roster(roster)
+	_hud.set_roster(roster)
+	_view.reset_for_pitch(state)
+	_view.set_camera_mode(MatchView.CameraMode.FIELD)
+	_set_phase(Phase.PREGAME)
+	var away := roster.teams[0]
+	var home := roster.teams[1]
+	_hud.show_card([
+		[away.full_name().to_upper(), MatchHud.text_color(away), 54],
+		[away.identity.get_slice(".", 0), Color(0.9, 0.9, 0.9), 18],
+		["at", Color.WHITE, 26],
+		[home.full_name().to_upper(), MatchHud.text_color(home), 54],
+		[home.identity.get_slice(".", 0), Color(0.9, 0.9, 0.9), 18],
+		["", Color.WHITE, 12],
+		["%s · Exhibition · %d innings · %s rules" % [home.stadium, content.rules.innings, content.rules.display_name], Color.WHITE, 22],
+		["Mercy rule at %d runs after %d · runner on second in extras · %ds pitch clock" % [content.rules.mercy_runs, content.rules.mercy_after_inning, roundi(content.rules.pitch_clock)], Color(0.85, 0.85, 0.85), 16],
+	])
+	_hud.show_prompt("Play as the %s (bat first): J / click / A      Play as the %s (field first): K / right-click / X" % [away.team_name.to_upper(), home.team_name.to_upper()])
+
+
+func _process_pregame() -> void:
+	var pick := -1
+	if Input.is_action_just_pressed(&"swing_contact"):
+		pick = MatchState.AWAY
+	elif Input.is_action_just_pressed(&"swing_power"):
+		pick = MatchState.HOME
+	if pick < 0:
+		return
+	user_team = pick
+	_hud.show_card([])
+	var hint := "You bat first: swing as the white ring closes on the plate" if pick == MatchState.AWAY else "You pitch first: aim, then stop the meter in the white band"
+	_hud.show_callout("PLAY BALL", "You are the %s. %s" % [roster.teams[pick].full_name(), hint], 3.0)
 	_enter_pre_pitch()
 
 
@@ -107,6 +148,10 @@ func ball_in_play() -> BallInPlay:
 
 func live_fielding() -> LiveFielding:
 	return _live
+
+
+func sub_menu_open() -> bool:
+	return not _sub_options.is_empty()
 
 
 ## Tool hook: place the aim/bat cursor directly (bots, tests).
@@ -142,8 +187,13 @@ func _process(delta: float) -> void:
 		_phase_time += delta
 	_handle_global_input()
 	match _phase:
+		Phase.PREGAME:
+			_process_pregame()
 		Phase.PRE_PITCH:
-			_process_pre_pitch(delta)
+			if not _sub_options.is_empty():
+				_process_sub_menu()
+			else:
+				_process_pre_pitch(delta)
 		Phase.METER:
 			_process_meter(delta)
 		Phase.PITCH_FLIGHT:
@@ -170,9 +220,9 @@ func _handle_global_input() -> void:
 		tuning.rookie_assist = not tuning.rookie_assist
 		_hud.show_callout("ROOKIE ASSIST %s" % ("ON" if tuning.rookie_assist else "OFF"), "batting: slower pitches, wider window · fielding: quicker, longer reach, auto-runs to the ball")
 		_hud.show_prompt(_hud_prompt_suffix())
-	if Input.is_action_just_pressed(&"switch_side"):
+	if Input.is_action_just_pressed(&"switch_side") and _phase != Phase.PREGAME:
 		user_team = MatchState.HOME if user_team == MatchState.AWAY else MatchState.AWAY
-		_hud.show_callout("YOU CONTROL %s" % ("AWAY" if user_team == MatchState.AWAY else "HOME"))
+		_hud.show_callout("YOU CONTROL THE %s" % roster.teams[user_team].team_name.to_upper())
 		if _phase == Phase.PRE_PITCH:
 			_enter_pre_pitch()
 
@@ -180,10 +230,13 @@ func _handle_global_input() -> void:
 # --- Pitch setup ---------------------------------------------------------
 
 func _enter_pre_pitch() -> void:
+	_hud.set_clock(-1.0)
 	if state.game_over:
 		_enter_game_over()
 		return
 	_set_phase(Phase.PRE_PITCH)
+	_ai_pitching_change()
+	_announce_whos_on_first()
 	_view.reset_for_pitch(state)
 	_bip = null
 	_outcome = null
@@ -194,7 +247,8 @@ func _enter_pre_pitch() -> void:
 		_hud.show_pitching(false)
 	else:
 		_view.set_camera_mode(MatchView.CameraMode.PITCH)
-		_hud.show_pitching(true, content.pitches, _selected_pitch)
+		_selected_pitch = mini(_selected_pitch, _repertoire().size() - 1)
+		_hud.show_pitching(true, _repertoire(), _selected_pitch)
 		_hud.set_meter(0.0, tuning.pitch_meter_sweet_spot)
 	_hud.show_prompt(_hud_prompt_suffix())
 
@@ -205,21 +259,40 @@ func _process_pre_pitch(delta: float) -> void:
 		var windup_start := AI_PRE_PITCH_DELAY - WINDUP_TIME
 		if _phase_time >= windup_start:
 			_view.show_windup((_phase_time - windup_start) / WINDUP_TIME)
+		if Input.is_action_just_pressed(&"open_subs") and _phase_time < AI_PRE_PITCH_DELAY - WINDUP_TIME:
+			_open_sub_menu()
+			return
 		if _phase_time >= AI_PRE_PITCH_DELAY:
-			var intent := AiPitcher.choose(state, content.pitches, tuning, rng)
+			var intent := AiPitcher.choose(state, content.pitches, tuning, rng, _club(state.fielding_team()), _player(state.pitcher(state.fielding_team())))
 			if tuning.rookie_assist:
 				intent.speed_scale = tuning.assist_pitch_speed_scale
 			_throw_pitch(intent)
 		return
+	if Input.is_action_just_pressed(&"open_subs"):
+		_open_sub_menu()
+		return
+	# Pitch clock: a human pitcher who never starts the pitch is charged a ball.
+	var clock := content.rules.pitch_clock
+	if clock > 0.0:
+		_hud.set_clock(clock - _phase_time)
+		if _phase_time >= clock:
+			_hud.set_clock(-1.0)
+			_hud.show_callout("PITCH CLOCK", "automatic ball", 1.2)
+			_log({"pitch_clock": "ball"})
+			state.apply_pitch_call(MatchState.PitchCall.BALL)
+			_set_phase(Phase.CALL)
+			return
 	_move_cursor(delta)
 	_view.set_cursor(_cursor, 0.07, 0.0, Color(0.3, 0.95, 1.0))
-	var count := content.pitches.size()
+	var repertoire := _repertoire()
+	var count := repertoire.size()
 	if Input.is_action_just_pressed(&"pitch_next"):
 		_selected_pitch = (_selected_pitch + 1) % count
 	if Input.is_action_just_pressed(&"pitch_prev"):
 		_selected_pitch = (_selected_pitch + count - 1) % count
-	_hud.show_pitching(true, content.pitches, _selected_pitch)
+	_hud.show_pitching(true, repertoire, _selected_pitch)
 	if Input.is_action_just_pressed(&"pitch_primary"):
+		_hud.set_clock(-1.0)
 		_set_phase(Phase.METER)
 		_hud.show_prompt("Release in the white band: Space / A")
 
@@ -230,20 +303,21 @@ func _process_meter(delta: float) -> void:
 	_meter = minf(_meter + delta / tuning.pitch_meter_sweep_time, 1.0)
 	_hud.set_meter(_meter, tuning.pitch_meter_sweet_spot)
 	if Input.is_action_just_pressed(&"pitch_primary") or _meter >= 1.0:
-		var family := content.pitches[_selected_pitch]
+		var family := _repertoire()[_selected_pitch]
 		var error := PitchResolver.meter_error(_meter, tuning)
 		_throw_pitch(PitchIntent.new(family.id, _cursor, error))
 
 
 func _throw_pitch(intent: PitchIntent) -> void:
 	var family := content.pitch(intent.family_id)
-	_pitch = PitchResolver.resolve(intent, family, tuning, rng)
+	var pitcher := state.pitcher(state.fielding_team())
+	_pitch = PitchResolver.resolve(intent, family, tuning, rng, Ratings.pitcher_mods(_player(pitcher), state.pitches_thrown(pitcher), tuning))
 	state.record_pitch(_pitch.to_dict())
 	_log({"pitch": state.pitch_count, "family": intent.family_id, "aim": intent.aim, "meter_error": snappedf(intent.meter_error, 0.001)})
 	_ai_swing = null
 	_contact = null
 	if not user_is_batting():
-		_ai_swing = AiBatter.decide(_pitch, family, state, tuning, rng)
+		_ai_swing = AiBatter.decide(_pitch, family, state, tuning, rng, _club(state.batting_team()), _player(state.current_batter()))
 		_hud.show_pitching(false)
 		_view.set_cursor(_cursor, 0.0, 0.0, Color.WHITE)
 	_debug.clear_section("contact")
@@ -271,8 +345,9 @@ func _process_pitch_flight(_delta: float) -> void:
 				var offset := SwingTiming.offset(_pending_swing_usec, _pitch_release_usec, travel,
 					_frame_interval, tuning.swing_latency_calibration)
 				var swing := SwingIntent.swing(_pending_swing, offset, _pending_stick)
+				Ratings.apply_batter(swing, _player(state.current_batter()), tuning)
 				if tuning.rookie_assist:
-					swing.window_scale = tuning.assist_timing_window_scale
+					swing.window_scale *= tuning.assist_timing_window_scale
 				_resolve_swing(swing)
 		elif _ai_swing.type != SwingIntent.Type.NONE and timing >= _ai_swing.timing_offset:
 			_resolve_swing(_ai_swing)
@@ -332,7 +407,7 @@ func _apply_call() -> String:
 # --- Ball in play ---------------------------------------------------------
 
 func _start_ball_in_play() -> void:
-	_bip = BallInPlay.create(_contact, state, tuning)
+	_bip = BallInPlay.create(_contact, state, tuning, roster)
 	_play = null
 	_outcome = null
 	_play_event_cursor = 0
@@ -471,8 +546,16 @@ func _enter_game_over() -> void:
 	_set_phase(Phase.GAME_OVER)
 	_view.set_camera_mode(MatchView.CameraMode.FIELD)
 	_hud.show_pitching(false)
-	var winner := "AWAY" if state.winner() == MatchState.AWAY else "HOME"
-	_hud.show_callout("FINAL", "%s WINS %d-%d" % [winner, state.score[MatchState.AWAY], state.score[MatchState.HOME]], 3600.0)
+	var reason: StringName = state.events[state.events.size() - 1].data.get("reason", &"")
+	var lines := [["FINAL%s" % (" · MERCY RULE" if reason == &"mercy" else ""), Color.WHITE, 60]]
+	if state.winner() >= 0:
+		var club := roster.teams[state.winner()]
+		lines.append(["%s WIN" % club.full_name().to_upper(), MatchHud.text_color(club), 40])
+	lines.append(["", Color.WHITE, 10])
+	lines.append(["        R    H    E", Color(0.85, 0.85, 0.85), 26])
+	for team in [MatchState.AWAY, MatchState.HOME]:
+		lines.append(["%s   %2d   %2d   %2d" % [roster.teams[team].abbreviation, state.score[team], state.hits[team], state.errors[team]], MatchHud.text_color(roster.teams[team]), 30])
+	_hud.show_card(lines)
 	_hud.show_prompt("New match: F5 / Start")
 	print("[match] final %s  line %s" % [state.score, state.line_score])
 
@@ -490,6 +573,15 @@ func _drain_events() -> void:
 					_hud.show_callout("WALK")
 			DomainEvent.HALF_INNING_ENDED:
 				_hud.show_callout("SIDE RETIRED", "%d run%s" % [event.data["runs"], "" if event.data["runs"] == 1 else "s"])
+			DomainEvent.SUBSTITUTION:
+				var who := _name(event.data["in"])
+				if event.data["position"] == &"p":
+					_hud.show_callout("PITCHING CHANGE", "%s replaces %s" % [who, _name(event.data["out"])], 2.0)
+				else:
+					_hud.show_callout("SUBSTITUTION", "%s for %s" % [who, _name(event.data["out"])], 2.0)
+				_log({"sub": event.data["in"], "for": event.data["out"]})
+			DomainEvent.RUNNER_PLACED:
+				_hud.show_callout("EXTRA INNINGS", "%s starts on second" % _name(event.data["runner"]), 2.0)
 
 
 func _update_debug() -> void:
@@ -529,9 +621,9 @@ func _hud_prompt_suffix() -> String:
 	match _phase:
 		Phase.PRE_PITCH, Phase.PITCH_FLIGHT:
 			if user_is_batting():
-				base = "Watch the pitcher. SWING as the ring closes: J or click (contact) / K or right-click (power)\nHold WASD / L-stick while swinging: ←→ aim field  ↑ lift  ↓ chop"
+				base = "Watch the pitcher. SWING as the ring closes: J or click (contact) / K or right-click (power)\nHold WASD / L-stick while swinging: ←→ aim field  ↑ lift  ↓ chop    Pinch hit: P / Y"
 			else:
-				base = "Aim: WASD / L-stick    Pitch: Q E / LB RB    Start meter: Space / A"
+				base = "Aim: WASD / L-stick    Pitch: Q E / LB RB    Start meter: Space / A    Pitching change: P / Y"
 		Phase.BALL_IN_PLAY:
 			if _outcome != null:
 				base = "Skip: J / A"
@@ -557,6 +649,102 @@ func _move_cursor(delta: float) -> void:
 	var dir := Input.get_vector(&"aim_left", &"aim_right", &"aim_down", &"aim_up")
 	_cursor += dir * CURSOR_SPEED * delta
 	_cursor = _cursor.clamp(tuning.cursor_min, tuning.cursor_max)
+
+
+# --- Roster helpers ------------------------------------------------------
+
+func _player(id: StringName) -> PlayerDef:
+	return roster.player(id) if roster != null else null
+
+
+func _club(team: int) -> TeamDef:
+	return roster.teams[team] if roster != null else null
+
+
+func _name(id: StringName) -> String:
+	var p := _player(id)
+	return p.display_name if p != null else String(id)
+
+
+## Pitches the current pitcher throws.
+func _repertoire() -> Array[PitchFamilyDef]:
+	var p := _player(state.pitcher(state.fielding_team()))
+	var list: Array[PitchFamilyDef] = []
+	for f in content.pitches:
+		if p == null or p.pitches.has(f.id):
+			list.append(f)
+	return list if not list.is_empty() else content.pitches
+
+
+## The AI manages whichever side the human is not.
+func _ai_pitching_change() -> void:
+	if state.fielding_team() == user_team:
+		return
+	var reliever := AiManager.pitching_change(state, roster, tuning)
+	if reliever != &"":
+		state.substitute(state.fielding_team(), state.pitcher(state.fielding_team()), reliever)
+
+
+func _announce_whos_on_first() -> void:
+	var first := state.runner_on(1)
+	var p := _player(first)
+	var there := p != null and p.display_name == "Who"
+	if there and not _who_on_first:
+		var up := _name(state.current_batter())
+		_hud.show_callout("WHO'S ON FIRST", "and %s is at the plate" % up if up in ["What", "I Don't Know"] else "naturally", 2.5)
+	_who_on_first = there
+
+
+# --- Substitutions ----------------------------------------------------------
+
+## Pitching change when fielding, pinch hitter when batting.
+func _open_sub_menu() -> void:
+	_sub_options.clear()
+	var team := user_team
+	var club := _club(team)
+	if club == null:
+		return
+	if state.fielding_team() == team:
+		var current := state.pitcher(team)
+		for id in club.bullpen:
+			if state.can_substitute(team, current, id):
+				var p := _player(id)
+				_sub_options.append({"label": "P  #%d %s  (%s)  vel %d  ctl %d" % [p.number, p.display_name, p.throws, p.velocity, p.control], "out": current, "in": id})
+		var tired := Ratings.fatigue(_player(current), state.pitches_thrown(current), tuning)
+		_hud.show_menu("PITCHING CHANGE — %s: %d pitches, %d%% tired" % [_name(current), state.pitches_thrown(current), roundi(tired * 100.0)], _sub_options.map(func(o: Dictionary) -> String: return o["label"]), 0)
+	else:
+		var batter := state.current_batter()
+		for p in club.bench():
+			if state.can_substitute(team, batter, p.id):
+				_sub_options.append({"label": "PH  #%d %s  (%s)  con %d  pow %d  spd %d" % [p.number, p.display_name, p.bats, p.contact, p.power, p.speed], "out": batter, "in": p.id})
+		_hud.show_menu("PINCH HITTER for %s" % _name(batter), _sub_options.map(func(o: Dictionary) -> String: return o["label"]), 0)
+	if _sub_options.is_empty():
+		_hud.show_menu("", [], 0)
+		_hud.show_callout("NO SUBSTITUTES LEFT", "", 1.2)
+	_sub_selected = 0
+
+
+func _process_sub_menu() -> void:
+	var count := _sub_options.size()
+	if Input.is_action_just_pressed(&"aim_down"):
+		_sub_selected = (_sub_selected + 1) % count
+	if Input.is_action_just_pressed(&"aim_up"):
+		_sub_selected = (_sub_selected + count - 1) % count
+	var labels: Array = _sub_options.map(func(o: Dictionary) -> String: return o["label"])
+	_hud.update_menu(labels, _sub_selected)
+	if Input.is_action_just_pressed(&"open_subs"):
+		_close_sub_menu()
+	elif Input.is_action_just_pressed(&"pitch_primary") or Input.is_action_just_pressed(&"swing_contact"):
+		var pick := _sub_options[_sub_selected]
+		state.substitute(user_team, pick["out"], pick["in"])
+		_close_sub_menu()
+
+
+func _close_sub_menu() -> void:
+	_sub_options.clear()
+	_hud.show_menu("", [], 0)
+	_drain_events()
+	_enter_pre_pitch()
 
 
 func _now_usec() -> int:

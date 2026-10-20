@@ -12,6 +12,8 @@ var travel_time: float
 var in_zone: bool
 var release_point: Vector3
 var break_amount: Vector2
+## 0..1+: how hard this pitch is to read (family plus the pitcher's stuff).
+var deception: float = 0.0
 
 
 ## Position along the pitch path, t seconds after release. The pitch starts

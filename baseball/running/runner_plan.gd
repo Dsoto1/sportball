@@ -14,6 +14,9 @@ var start_time: float
 var arrival_time: float
 ## Meters already off the bag toward the next base when the ball is hit.
 var lead: float = 0.0
+## Runner's speed (m/s) and the fielder's arm, for the read.
+var speed: float = 8.0
+var arm: float = 1.0
 
 
 func is_moving() -> bool:

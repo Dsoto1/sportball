@@ -8,7 +8,8 @@ func test_matches_complete_without_intervention() -> void:
 	for seed_value in SEEDS:
 		var sim := AutoMatch.play(seed_value, content())
 		check(sim.state.game_over, "seed %d finished" % seed_value)
-		check(sim.state.inning >= tuning().innings, "seed %d played regulation" % seed_value)
+		var mercy: bool = sim.state.events[sim.state.events.size() - 1].data.get("reason") == &"mercy"
+		check(sim.state.inning >= tuning().innings or mercy, "seed %d played regulation" % seed_value)
 		check(sim.state.winner() != -1, "seed %d has a winner" % seed_value)
 
 
@@ -49,3 +50,34 @@ func test_outcome_rates_are_baseball_shaped() -> void:
 	check(totals["ground_outs"] > 0 and totals["air_outs"] > 0, "both ground and air outs")
 	var dp_per_team: float = totals["double_plays"] / (2.0 * SEEDS)
 	check(dp_per_team > 0.2 and dp_per_team < 2.0, "double plays per team per game %.2f" % dp_per_team)
+
+
+func test_placeholder_match_still_plays() -> void:
+	var sim := AutoMatch.play(5, content(), &"", &"")
+	check(sim.state.game_over, "placeholder teams finish")
+	check(sim.roster == null, "no roster")
+
+
+func test_bullpen_gets_used() -> void:
+	var changes := 0
+	for seed_value in 10:
+		var sim := AutoMatch.play(200 + seed_value, content())
+		changes += sim.stats["pitching_changes"]
+		for team in 2:
+			check(sim.state.pitches_thrown(sim.roster.teams[team].starting_pitcher) > 0, "starters pitch")
+	check(changes >= 10, "pitching changes happen (%d in 10 games)" % changes)
+
+
+func test_team_styles_show_up_in_the_numbers() -> void:
+	# Glitterati hit for power; the Gearheads put the ball in play.
+	var hr := [0, 0]
+	var events := [0, 0]
+	for seed_value in 20:
+		var sim := AutoMatch.play(300 + seed_value, content())
+		for e in sim.state.events:
+			if e.type == DomainEvent.BALL_CONTACTED:
+				var team: int = 0 if sim.roster.teams[0].player(e.data["batter"]) != null else 1
+				events[team] += 1
+				if e.data["kind"] == PlayOutcome.KIND_HOME_RUN:
+					hr[team] += 1
+	check(hr[1] > hr[0], "Glitterati out-homer the Gearheads (%d vs %d)" % [hr[1], hr[0]])

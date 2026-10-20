@@ -213,6 +213,31 @@ extends Resource
 ## Fixed step for the live play when no human is driving it (AI sims).
 @export var sim_play_step: float = 0.0166667
 
+@export_group("Ratings")
+## Each value is the effect of a 100 rating (a 0 rating is the mirror
+## image); 50 is league average and changes nothing.
+@export var rating_velocity_spread: float = 0.06
+@export var rating_control_spread: float = 0.35
+@export var rating_stuff_break_spread: float = 0.35
+@export var rating_stuff_deception_spread: float = 0.15
+@export var rating_contact_window_spread: float = 0.18
+@export var rating_power_ev_spread: float = 0.07
+@export var rating_eye_spread: float = 0.35
+@export var rating_speed_spread: float = 0.1
+@export var rating_fielder_speed_spread: float = 0.08
+@export var rating_glove_reach_spread: float = 0.15
+@export var rating_glove_reaction_spread: float = 0.06
+@export var rating_arm_spread: float = 0.1
+@export var rating_error_spread: float = 0.6
+## Pitches thrown before fatigue sets in, for stamina 0 and 100.
+@export var stamina_pitches_min: float = 20.0
+@export var stamina_pitches_max: float = 90.0
+## Pitches from first fatigue to empty.
+@export var fatigue_ramp_pitches: float = 30.0
+@export var fatigue_speed_loss: float = 0.06
+@export var fatigue_scatter_gain: float = 0.9
+@export var fatigue_break_loss: float = 0.3
+
 @export_group("AI")
 @export var ai_pitcher_meter_sigma: float = 0.22
 @export var ai_pitcher_edge_bias: float = 1.7

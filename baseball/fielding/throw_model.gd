@@ -3,15 +3,16 @@ extends RefCounted
 ## Throw timing. Phase 0 assumes the target base is covered in time.
 
 
-static func flight_time(from: Vector3, to: Vector3, tuning: BaseballTuning) -> float:
+## arm: the thrower's throw-speed multiplier (1 = average).
+static func flight_time(from: Vector3, to: Vector3, tuning: BaseballTuning, arm: float = 1.0) -> float:
 	var flat := Vector2(to.x - from.x, to.z - from.z).length()
-	return flat / tuning.throw_speed + flat * flat * tuning.throw_long_penalty
+	return flat / (tuning.throw_speed * arm) + flat * flat * tuning.throw_long_penalty / arm
 
 
 ## Contact-relative time a throw from the fielding play reaches a base.
-static func arrival_at_base(fielding: FieldingResult, base: int, tuning: BaseballTuning) -> float:
+static func arrival_at_base(fielding: FieldingResult, base: int, tuning: BaseballTuning, arm: float = 1.0) -> float:
 	var target := FieldLayout.base_position(base)
-	return fielding.ready_time + tuning.throw_release_time + flight_time(fielding.secure_point, target, tuning)
+	return fielding.ready_time + tuning.throw_release_time + flight_time(fielding.secure_point, target, tuning, arm)
 
 
 ## Visible throw position: straight line with a shallow arc.
