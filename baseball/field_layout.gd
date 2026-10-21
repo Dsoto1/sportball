@@ -64,6 +64,20 @@ static func fence_height(spray_deg: float, tuning: BaseballTuning) -> float:
 
 
 ## Air drag in this park (thin air carries the ball).
+## Ground-ball roll slowdown (m/s²) on this park's surface.
+static func roll_deceleration(tuning: BaseballTuning) -> float:
+	return tuning.roll_deceleration / _surface(tuning)
+
+
+## Share of ground speed a bounce keeps on this park's surface.
+static func bounce_friction(tuning: BaseballTuning) -> float:
+	return minf(tuning.bounce_friction * (1.0 + (_surface(tuning) - 1.0) * 0.5), 0.98)
+
+
+static func _surface(tuning: BaseballTuning) -> float:
+	return tuning.field_shape.surface_speed if tuning.field_shape != null else 1.0
+
+
 static func drag(tuning: BaseballTuning) -> float:
 	return tuning.drag * (tuning.field_shape.air_drag_scale if tuning.field_shape != null else 1.0)
 

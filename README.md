@@ -4,8 +4,9 @@ Stylized retro-futurist arcade baseball. **Godot 4.7.2 stable + GDScript.**
 The design brief lives in [`docs/`](docs/00_AGENT_START_HERE.md); start there.
 
 Current state: **Phase 1 — Baseball Vertical Slice**, with a first art pass
-(rigged players, the Halo Dome stadium with a reactive crowd and live
-scoreboard, field surfaces, fonts, button icons and sound;
+(rigged players with the game's own baseball animations, eleven ballparks
+with their own walls, air and turf, a reactive crowd and live scoreboard,
+field surfaces, fonts, button icons and sound;
 every third-party asset is in `docs/13_ASSET_MANIFEST.md`). A 6-inning
 exhibition between the **Rustwater Gearheads** and the **Neon Heights
 Glitterati** (yes, Who's on first) under arcade rules. See [`docs/PHASE1_REPORT.md`](docs/PHASE1_REPORT.md)
@@ -20,7 +21,8 @@ godot --path .                      # random seed (printed to the console)
 godot --path . -- --seed=1234       # reproduce a logged match
 ```
 
-On the matchup card, pick your club: J / click / A for the Gearheads (you
+On the matchup card, ← / → picks the ballpark (eleven of them, see below),
+then pick your club: J / click / A for the Gearheads (you
 bat first), K / right-click / X for the Glitterati (you field first). Tab /
 Back switches sides mid-game.
 
@@ -155,6 +157,26 @@ Bindings live in `project.godot` as semantic actions. To change them, edit
 the table in `tools/generate_input_map.gd` and run
 `godot --headless --path . -s res://tools/generate_input_map.gd`.
 
+## Ballparks
+
+Each park's walls, wall heights, air and surface are rules: fly balls,
+caroms off the walls and grounders play differently. Fielders play deeper
+in deeper parks. 80 AI-vs-AI games each (`tools/park_report.gd`):
+
+| Park | Signature | R/G | HR/G | 2B/G | 3B/G |
+|---|---|---|---|---|---|
+| The Halo Dome | Glitterati home: symmetric, neon halo overhead | 5.16 | 1.35 | 2.19 | 0.47 |
+| Foundry Field | Gearheads home: the Boilerplate, a 34 ft iron wall in short right | 4.69 | 0.91 | 2.02 | 0.68 |
+| Ledger Street Park | the Leviathan, a 37 ft green wall in short left; deep triangle | 5.29 | 1.07 | 1.66 | 1.20 |
+| Pier 9 Ballyard | short porch in right with the bay beyond it | 4.99 | 0.96 | 1.93 | 0.57 |
+| The Kiln | thin desert air, canyon-deep outfield, brick | 5.79 | 1.00 | 1.39 | 1.38 |
+| The Icebox | cold heavy air, ivy walls | 4.70 | 0.84 | 2.09 | 0.53 |
+| Reactor Park | night game; odd angles, a 427 ft center-field notch | 5.74 | 1.06 | 1.65 | 1.10 |
+| The Horseshoe | night game; 279 / 266 ft lines, a 482 ft center field | 5.62 | 0.28 | 1.11 | 1.68 |
+| Warehouse Row | 25 ft brick wall in right, the Roundhouse warehouse beyond it | 5.53 | 0.97 | 1.98 | 1.02 |
+| Fountain Gardens | night game; big and fair, fountains beyond the wall | 5.22 | 0.89 | 1.25 | 1.20 |
+| The Vault | sealed dome on fast turf | 6.09 | 1.16 | 2.25 | 0.54 |
+
 ## Test
 
 ```sh
@@ -176,7 +198,9 @@ resources in `data/pitches/`.
 godot --headless --path . -s res://tools/sim_report.gd -- 100 1           # AI-vs-AI rates over 100 matches
 godot --headless --path . -s res://tools/launch_angle_report.gd           # hit rate by launch angle
 godot --headless --path . -s res://tools/pitch_report.gd -- 300 1         # usage and results per pitch type
-godot --path . --resolution 1280x720 -s res://tools/stadium_tour.gd -- /tmp/shots   # screenshots of the stadium
+godot --headless --path . -s res://tools/park_report.gd -- 80             # how each ballpark plays
+godot --path . --resolution 1280x720 -s res://tools/stadium_tour.gd -- /tmp/shots [park_id]   # screenshots of a park
+godot --path . --resolution 360x420 -s res://tools/pose_gallery.gd -- /tmp/poses [lefty]      # every baked baseball move
 godot --headless --path . --fixed-fps 60 -s res://tools/playtest_bot.gd -- 900   # drive the real scene with fake input (append `"" home` to field first)
 ```
 
@@ -194,7 +218,7 @@ baseball/      authoritative rules and math; no scene dependencies
   ai/                      AI pitcher and batter (produce the same intents as a human); play AI lives in LivePlay
   sim/auto_match.gd        full AI-vs-AI match with no scene
 data/          tuning and pitch definitions (Resources)
-presentation/  graybox field, match view, placeholder actors
+presentation/  field, stadiums, match view, players and their baked baseball moves (animation/)
 ui/            HUD and debug overlay
 tests/         unit and scenario tests
 tools/         test runner, input map generator, sim/feel reports, playtest bot

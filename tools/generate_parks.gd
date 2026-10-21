@@ -69,9 +69,49 @@ const PARKS := [
 		"blurb": "Neutral · odd angles and a deep center-field notch behind a tall reactor wall",
 		"shape": [[-45, 98, 3.0], [-28, 108, 3.0], [-12, 121, 3.0], [-9, 130, 6.5], [-3, 130, 6.5], [0, 120, 3.0], [9, 121, 3.0], [18, 111, 3.0], [31, 102, 3.0], [45, 97, 3.0]], "air": 1.0,
 		"seat_color": Color("2b2b2b"), "seat_color_alt": Color("1f1f1f"), "structure_color": Color("c9b458"), "accent_color": Color("7dffb0"),
-		"outfield_wall_color": Color("3a3a2a"), "wall_style": &"iron", "home_fan_share": 0.45, "away_fan_share": 0.3, "attendance": 0.82,
+		"outfield_wall_color": Color("3a3a2a"), "wall_style": &"iron", "home_fan_share": 0.45, "away_fan_share": 0.3, "attendance": 0.82, "night": true,
 		"sponsors": ["ATOMIC FALLS POWER & LIGHT", "MUSHROOM CLOUD MALTS", "FISSION FIZZ", "RAY-GUN RADIO"],
 		"skyline_color": Color("3d3f2e"), "window_color": Color("c8ffd8"), "skyline_height": 0.9,
+	},
+	{
+		"id": &"the_horseshoe", "display_name": "The Horseshoe",
+		"blurb": "Neutral · night ball in a horseshoe: 279-foot lines, a 483-foot center field",
+		"shape": [[-45, 85, 4.9], [-36, 97, 4.9], [-26, 120, 3.0], [-12, 139, 3.0], [0, 147, 3.0], [12, 139, 3.0], [26, 119, 3.0], [36, 94, 3.4], [45, 81, 3.4]], "air": 1.0,
+		"seat_color": Color("1b2a4a"), "seat_color_alt": Color("142038"), "structure_color": Color("d8d0bc"), "accent_color": Color("ff4f7b"),
+		"outfield_wall_color": Color("1a3d2a"), "wall_style": &"padded", "home_fan_share": 0.45, "away_fan_share": 0.3, "attendance": 0.9,
+		"foul_rows": 28, "outfield_rows": 20, "night": true,
+		"sponsors": ["OLD TOWNE TROLLEY", "HORSESHOE HAMS", "MIDNIGHT MATINEE", "NICKEL ARCADE", "LAMPLIGHTER LAGER"],
+		"skyline_color": Color("1a1f33"), "window_color": Color("ffe0a0"), "skyline_height": 1.2,
+	},
+	{
+		"id": &"warehouse_row", "display_name": "Warehouse Row",
+		"blurb": "Neutral · a 25-foot brick wall in right and the old Roundhouse warehouse looming over it",
+		"shape": [[-45, 101, 2.4], [-25, 111, 2.4], [-8, 123, 2.4], [0, 122, 2.4], [14, 115, 2.4], [20, 112, 2.4], [21.5, 110, 7.6], [45, 97, 7.6]], "air": 1.0,
+		"seat_color": Color("1f5a3a"), "seat_color_alt": Color("184a2f"), "structure_color": Color("4a3f3a"), "accent_color": Color("ff9b3d"),
+		"outfield_wall_color": Color("7a3324"), "wall_style": &"brick", "home_fan_share": 0.5, "away_fan_share": 0.3, "attendance": 0.92,
+		"foul_rows": 24, "outfield_rows": 12, "landmark": &"warehouse",
+		"sponsors": ["ROUNDHOUSE STORAGE CO.", "HARBORLIGHT CRAB SHACK", "BRASS RAIL BITTERS", "OLD LINE LOCKSMITHS", "CANAL STREET CANDY"],
+		"skyline_color": Color("514848"), "window_color": Color("ffe1a8"), "skyline_height": 0.9,
+	},
+	{
+		"id": &"fountain_gardens", "display_name": "Fountain Gardens",
+		"blurb": "Neutral · big, symmetric and fair, fountains dancing beyond the wall",
+		"shape": [[-45, 101, 3.7], [-22, 118, 3.7], [0, 125, 3.7], [22, 118, 3.7], [45, 101, 3.7]], "air": 1.0,
+		"seat_color": Color("1e3f7a"), "seat_color_alt": Color("173263"), "structure_color": Color("e5e8ee"), "accent_color": Color("6fd6ff"),
+		"outfield_wall_color": Color("16336a"), "wall_style": &"padded", "home_fan_share": 0.5, "away_fan_share": 0.25, "attendance": 0.8,
+		"foul_rows": 24, "outfield_rows": 5, "night": true, "landmark": &"fountains",
+		"sponsors": ["CASCADE COLA", "SPRINKLE & SONS PLUMBING", "BLUE PLAINS BBQ", "MISTY MEADOW DAIRY", "JUBILEE JEWELERS"],
+		"skyline_color": Color("26304a"), "window_color": Color("d8ecff"), "skyline_height": 0.6,
+	},
+	{
+		"id": &"the_vault", "display_name": "The Vault",
+		"blurb": "Neutral · a sealed dome on fast turf: grounders scoot through the gaps",
+		"shape": [[-45, 100, 3.0], [-22, 114, 3.0], [0, 122, 3.0], [22, 114, 3.0], [45, 100, 3.0]], "air": 0.97, "surface": 1.3,
+		"seat_color": Color("2a2f3a"), "seat_color_alt": Color("20242d"), "structure_color": Color("9aa3b5"), "accent_color": Color("ff5ad0"),
+		"outfield_wall_color": Color("1c2236"), "wall_style": &"padded", "home_fan_share": 0.5, "away_fan_share": 0.25, "attendance": 0.7,
+		"foul_rows": 26, "outfield_rows": 14, "roof": true, "turf": true, "skyline": false,
+		"sponsors": ["STRONGBOX SECURITY", "TITAN TURF", "DOMELIGHT DINER", "PRESSURE SEAL WINDOWS", "BIG TOP BURGERS"],
+		"skyline_color": Color("26304a"), "window_color": Color("d8ecff"), "skyline_height": 0.0,
 	},
 ]
 
@@ -88,9 +128,10 @@ func _init() -> void:
 			points.append(Vector3(p[0], p[1], p[2]))
 		shape.points = points
 		shape.air_drag_scale = spec["air"]
+		shape.surface_speed = spec.get("surface", 1.0)
 		park.field_shape = shape
 		for key in spec:
-			if key in ["shape", "air"]:
+			if key in ["shape", "air", "surface"]:
 				continue
 			var value: Variant = spec[key]
 			park.set(key, PackedStringArray(value) if key == "sponsors" else value)

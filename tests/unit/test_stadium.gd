@@ -83,3 +83,28 @@ func test_signature_walls() -> void:
 	var foundry := content().park(&"foundry_field").field_shape
 	check(foundry.height_at(30) > 10.0 and foundry.distance_at(45) < 92.0, "the Boilerplate in right")
 	check(content().park(&"the_kiln").field_shape.air_drag_scale < 0.9, "thin air at the Kiln")
+
+
+func _build_park(id: StringName) -> Stadium:
+	var park := content().park(id)
+	var st := Stadium.new()
+	st.build(content().tuning_for(park), park, content().team(&"glitterati"), content().team(&"gearheads"))
+	return st
+
+
+func test_landmark_parks_build_their_landmarks() -> void:
+	var st := _build_park(&"warehouse_row")
+	check(st.has_node("Warehouse"), "Warehouse Row has its warehouse")
+	st.free()
+	st = _build_park(&"the_vault")
+	check(st.has_node("Roof"), "the Vault is roofed")
+	st.free()
+	check(content().park(&"the_vault").turf, "the Vault plays on turf")
+	check(content().park(&"the_horseshoe").night, "the Horseshoe is a night game")
+
+
+func test_turf_runs_grounders_faster() -> void:
+	var grass := tuning()
+	var turf := content().tuning_for(content().park(&"the_vault"))
+	check(FieldLayout.roll_deceleration(turf) < FieldLayout.roll_deceleration(grass), "less roll friction on turf")
+	check(FieldLayout.bounce_friction(turf) > FieldLayout.bounce_friction(grass), "grounders skip off turf")

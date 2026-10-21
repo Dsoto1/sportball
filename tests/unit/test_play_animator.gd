@@ -93,3 +93,23 @@ func test_runner_slides_into_a_close_play() -> void:
 		if r.state == LivePlay.State.RUNNING and anim.runner_cue(play, r)["pose"] == ActorView.Pose.SLIDE:
 			slid = true
 	check(slid, "runner from first slides into second on a close play")
+
+
+func test_catch_pose_matches_how_the_ball_is_taken() -> void:
+	var f := FieldingResult.new()
+	f.fielder_index = 5
+	f.secure_time = 2.0
+	f.ready_time = 2.8
+	f.secure_point = Vector3(0, 0.2, -30)
+	var t := 1.0
+	check_eq(PlayAnimator.catch_pose(t, f), -1, "still running to it")
+	t = 1.9
+	check_eq(PlayAnimator.catch_pose(t, f), ActorView.Pose.SCOOP, "scoops a grounder")
+	f.secure_point.y = 2.2
+	f.caught_in_air = true
+	check_eq(PlayAnimator.catch_pose(t, f), ActorView.Pose.CATCH_HIGH, "reaches up for a high one")
+	f.is_dive = true
+	t = 2.6
+	check_eq(PlayAnimator.catch_pose(t, f), ActorView.Pose.DIVE, "stays down until he is up")
+	t = 3.0
+	check_eq(PlayAnimator.catch_pose(t, f), -1, "back up after the dive")

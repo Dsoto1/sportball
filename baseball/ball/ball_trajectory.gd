@@ -51,8 +51,9 @@ static func simulate(exit_velocity: float, launch_angle: float, spray_angle: flo
 					traj.landing_point = p
 				if -v.y > tuning.bounce_min_speed:
 					v.y = -v.y * tuning.bounce_restitution
-					v.x *= tuning.bounce_friction
-					v.z *= tuning.bounce_friction
+					var friction := FieldLayout.bounce_friction(tuning)
+					v.x *= friction
+					v.z *= friction
 				else:
 					v.y = 0.0
 					airborne = false
@@ -62,7 +63,7 @@ static func simulate(exit_velocity: float, launch_angle: float, spray_angle: flo
 			if speed <= tuning.stop_speed:
 				traj._append(t, p)
 				break
-			flat = flat * (maxf(speed - tuning.roll_deceleration * traj.step, 0.0) / speed)
+			flat = flat * (maxf(speed - FieldLayout.roll_deceleration(tuning) * traj.step, 0.0) / speed)
 			v = Vector3(flat.x, 0.0, flat.y)
 			p += v * traj.step
 		traj.apex_height = maxf(traj.apex_height, p.y)

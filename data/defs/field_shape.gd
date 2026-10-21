@@ -12,6 +12,9 @@ extends Resource
 @export var points: PackedVector3Array = PackedVector3Array([Vector3(-45, 92, 3.2), Vector3(0, 112, 3.2), Vector3(45, 92, 3.2)])
 ## Multiplier on air drag: < 1 is thin air (the ball carries), > 1 heavy.
 @export var air_drag_scale: float = 1.0
+## How fast grounders run on this surface: 1 = grass, > 1 = artificial turf
+## (less roll friction, skips off the bounce).
+@export var surface_speed: float = 1.0
 
 
 func distance_at(spray_deg: float) -> float:

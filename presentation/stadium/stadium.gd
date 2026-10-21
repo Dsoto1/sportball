@@ -9,6 +9,7 @@ extends Node3D
 
 const CROWD_SHADER := preload("res://presentation/stadium/crowd.gdshader")
 const SKYLINE_SHADER := preload("res://presentation/stadium/skyline.gdshader")
+const FOUNTAIN_SHADER := preload("res://presentation/stadium/fountain.gdshader")
 const DISPLAY_FONT := preload("res://assets/third_party/fonts/bungee/Bungee-Regular.ttf")
 
 const ROW_DEPTH := 0.9
@@ -47,7 +48,8 @@ func build(tuning: BaseballTuning, def: StadiumDef, home: TeamDef, away: TeamDef
 	_build_dugouts(home, away)
 	_build_backstop()
 	_build_markers()
-	_build_towers()
+	if not def.roof:
+		_build_towers()
 	_build_scoreboard(home, away)
 	if def.wall_scoreboard:
 		_build_wall_scoreboard(home, away, def.wall_scoreboard_angle)
@@ -55,8 +57,15 @@ func build(tuning: BaseballTuning, def: StadiumDef, home: TeamDef, away: TeamDef
 		_build_water(def.water_side)
 	if def.halo:
 		_build_halo()
-	if def.skyline:
+	if def.skyline and not def.roof:
 		_build_skyline()
+	match def.landmark:
+		&"warehouse":
+			_build_warehouse()
+		&"fountains":
+			_build_fountains()
+	if def.roof:
+		_build_roof()
 
 
 ## The crowd reacts (0..1); it settles back over a couple of seconds.
@@ -307,7 +316,7 @@ func _build_towers() -> void:
 			for col in 6:
 				var lamp := _box(Vector3(1.2, 1.2, 0.3), Color.WHITE, bank)
 				lamp.position = Vector3(-3.75 + col * 1.5, -1.5 + row * 1.5, -0.5)
-				lamp.material_override = _glow(Color(1.0, 0.97, 0.85), 2.5)
+				lamp.material_override = _glow(Color(1.0, 0.97, 0.85), 6.0 if _def.night else 2.5)
 
 
 # --- Scoreboard -----------------------------------------------------------
@@ -497,8 +506,9 @@ func _build_skyline() -> void:
 	mat.shader = SKYLINE_SHADER
 	mat.set_shader_parameter("wall_color", _def.skyline_color)
 	mat.set_shader_parameter("window_color", _def.window_color)
-	mat.set_shader_parameter("lit_share", 0.22)
-	mat.set_shader_parameter("glow", 0.35)
+	# At night more of the city is awake and its windows glow brighter.
+	mat.set_shader_parameter("lit_share", 0.5 if _def.night else 0.22)
+	mat.set_shader_parameter("glow", 1.6 if _def.night else 0.35)
 	var count := 40
 	for i in count:
 		var a := TAU * (i + _rng.randf_range(-0.3, 0.3)) / count
@@ -511,6 +521,150 @@ func _build_skyline() -> void:
 		tower.position = FIELD_CENTER + Vector3(cos(a) * radius, size.y * 0.5, sin(a) * radius)
 		tower.rotation.y = _rng.randf_range(0.0, PI)
 		tower.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+
+# --- Landmarks --------------------------------------------------------------
+
+## A long brick warehouse beyond the right-field stands, parallel to the
+## line, its windows lit and its name painted along the top.
+func _build_warehouse() -> void:
+	var line := FieldLayout.direction_for_spray(_tuning.foul_line_angle)
+	var outward := Vector3(-line.z, 0.0, line.x)  # away from the field, right of the line
+	var p := _profile(_tuning.foul_line_angle + 20.0)
+	var setback := p.x * 0.45 + p.z * ROW_DEPTH + 14.0
+	var size := Vector3(22.0, 30.0, 250.0)
+	var center := line * 175.0 + outward * setback + Vector3.UP * size.y * 0.5
+	var mat := ShaderMaterial.new()
+	mat.shader = SKYLINE_SHADER
+	mat.set_shader_parameter("wall_color", _def.outfield_wall_color.darkened(0.1))
+	mat.set_shader_parameter("window_color", _def.window_color)
+	mat.set_shader_parameter("lit_share", 0.45 if _def.night else 0.12)
+	mat.set_shader_parameter("glow", 1.4 if _def.night else 0.25)
+	var building := Node3D.new()
+	building.name = "Warehouse"
+	add_child(building)
+	building.look_at_from_position(center, center + line, Vector3.UP)
+	var body := _box(size, _def.outfield_wall_color, building)
+	body.material_override = mat
+	var cornice := _box(Vector3(size.x + 1.2, 1.4, size.z + 1.2), _def.structure_color, building)
+	cornice.position.y = size.y * 0.5
+	for i in 6:
+		var stack := _box(Vector3(2.4, 7.0, 2.4), _def.structure_color.darkened(0.2), building)
+		stack.position = Vector3(0.0, size.y * 0.5 + 3.5, -size.z * 0.4 + i * size.z * 0.16)
+	var sign := _label(_def.sponsors[0] if not _def.sponsors.is_empty() else "WAREHOUSE", 900, _def.accent_color, building)
+	sign.rotation.y = -PI * 0.5  # read from the field side
+	sign.position = Vector3(-size.x * 0.5 - 0.15, size.y * 0.5 - 4.0, 0.0)
+
+
+## Pools beyond the outfield wall in both power alleys: a cascade spills
+## over the back and a row of jets rises and falls, lit at night.
+func _build_fountains() -> void:
+	var jet_mat := ShaderMaterial.new()
+	jet_mat.shader = FOUNTAIN_SHADER
+	jet_mat.set_shader_parameter("color", _def.accent_color.lerp(Color(0.85, 0.95, 1.0), 0.3))
+	jet_mat.set_shader_parameter("glow", 0.7 if _def.night else 0.15)
+	var water := _glow(WATER.lightened(0.15), 0.6 if _def.night else 0.0)
+	for side: float in [-1.0, 1.0]:
+		var a0 := 14.0 * side
+		var a1 := 40.0 * side
+		var steps := 10
+		for i in steps:
+			var a := lerpf(a0, a1, (i + 0.5) / steps)
+			var p := _profile(a)
+			var radius := p.x + p.z * ROW_DEPTH + 7.0
+			var spot := FieldLayout.direction_for_spray(a) * radius
+			var basin := _box(Vector3(14.0, 0.6, 9.0), _def.structure_color)
+			basin.position = spot + Vector3.UP * 0.3
+			basin.look_at_from_position(basin.position, basin.position + FieldLayout.direction_for_spray(a), Vector3.UP)
+			var surface := _box(Vector3(13.4, 0.1, 8.4), WATER, basin)
+			surface.position.y = 0.32
+			surface.material_override = water
+			var cascade := _box(Vector3(14.0, 8.0, 1.2), _def.structure_color.darkened(0.15), basin)
+			cascade.position = Vector3(0.0, 4.0, -4.5)
+			var sheet := _box(Vector3(13.0, 7.6, 0.2), WATER, basin)
+			sheet.position = Vector3(0.0, 4.0, -3.8)
+			sheet.material_override = jet_mat
+			for j in 3:
+				var jet := MeshInstance3D.new()
+				var cyl := CylinderMesh.new()
+				cyl.top_radius = 0.25
+				cyl.bottom_radius = 0.6
+				cyl.height = 1.0
+				jet.mesh = cyl
+				jet.material_override = jet_mat
+				jet.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+				jet.position = Vector3(-4.0 + j * 4.0, 0.3, 0.0)
+				jet.set_instance_shader_parameter("phase", float(i * 3 + j) * 0.7)
+				jet.set_instance_shader_parameter("peak", 9.0 + 4.0 * float((i + j) % 3))
+				basin.add_child(jet)
+
+
+## A sealed dome: a ribbed shell over the bowl, catwalk rings hung with
+## light banks, a glowing crown at the top.
+func _build_roof() -> void:
+	var radius := 215.0
+	var rim := 22.0
+	var rise := 70.0
+	var center := FIELD_CENTER + Vector3(0.0, 0.0, 10.0)
+	var shell := MeshInstance3D.new()
+	shell.name = "Roof"
+	var dome := SphereMesh.new()
+	dome.radius = radius
+	dome.height = rise * 2.0
+	dome.is_hemisphere = true
+	dome.radial_segments = 64
+	dome.rings = 16
+	dome.flip_faces = true
+	shell.mesh = dome
+	shell.position = center + Vector3.UP * rim
+	var roof_mat := GrayboxField._mat(_def.structure_color.darkened(0.45))
+	roof_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	shell.material_override = roof_mat
+	shell.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(shell)
+	var wall := MeshInstance3D.new()
+	var cyl := CylinderMesh.new()
+	cyl.top_radius = radius
+	cyl.bottom_radius = radius
+	cyl.height = rim
+	cyl.radial_segments = 64
+	cyl.cap_top = false
+	cyl.cap_bottom = false
+	cyl.flip_faces = true
+	wall.mesh = cyl
+	wall.position = center + Vector3.UP * rim * 0.5
+	wall.material_override = roof_mat
+	wall.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(wall)
+	# Ribs and catwalks: thin glowing rings at a few heights up the shell.
+	for k in 4:
+		var u := (k + 1) / 5.0
+		var ring := MeshInstance3D.new()
+		var torus := TorusMesh.new()
+		var r := radius * sqrt(1.0 - u * u)
+		torus.inner_radius = r - 1.2
+		torus.outer_radius = r
+		torus.rings = 96
+		ring.mesh = torus
+		ring.position = center + Vector3.UP * (rim + rise * u - 1.0)
+		ring.material_override = _glow(_def.accent_color if k % 2 == 0 else _def.structure_color, 1.2 if k % 2 == 0 else 0.0)
+		ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		add_child(ring)
+	for i in 12:
+		var a := TAU * i / 12.0
+		var bank := _box(Vector3(10.0, 1.0, 4.0), Color.WHITE)
+		bank.position = center + Vector3(cos(a), 0.0, sin(a)) * radius * 0.55 + Vector3.UP * (rim + rise * 0.8)
+		bank.material_override = _glow(Color(1.0, 0.97, 0.88), 5.0)
+		bank.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var crown := MeshInstance3D.new()
+	var disc := CylinderMesh.new()
+	disc.top_radius = 24.0
+	disc.bottom_radius = 24.0
+	disc.height = 1.0
+	crown.mesh = disc
+	crown.position = center + Vector3.UP * (rim + rise - 0.8)
+	crown.material_override = _glow(_def.accent_color, 2.5)
+	add_child(crown)
 
 
 # --- Helpers ----------------------------------------------------------------

@@ -48,12 +48,18 @@ var _landing_hint: MeshInstance3D
 var _field_focus := Vector3(0.0, 0.0, -42.0)
 ## Seconds a swing takes to come through the zone and follow through.
 const SWING_TIME := 0.28
+## Pitcher's follow-through after release (s), and the windup progress
+## where his hands break and the ball leaves the glove.
+const FOLLOW_TIME := 0.45
+const HANDS_BREAK := 0.55
 var _bat_pivot: Node3D
 var _bat_swing_start := -1.0
 var _bat_bunt := false
 var _view_clock := 0.0
 var _timing_ring: MeshInstance3D
 var _windup := -1.0
+## View clock when the pitcher let go (his follow-through), or -1.
+var _follow_start := -1.0
 var _aim: Node3D
 var _aim_shaft: MeshInstance3D
 var _aim_head: MeshInstance3D
@@ -147,11 +153,17 @@ func reset_for_pitch(state: MatchState) -> void:
 	batter.set_tag_visible(_camera_mode != CameraMode.BAT)
 	var hitter := _roster.player(state.current_batter()) if _roster != null else null
 	_bats_left = hitter != null and hitter.bats_left()
+	batter.set_lefty(_bats_left)
+	var pitcher_index := tuning.fielder_ids.find(&"p")
+	var pitcher_def := _roster.player(state.pitcher(state.fielding_team())) if _roster != null else null
+	if pitcher_index >= 0:
+		_fielders[pitcher_index].set_lefty(pitcher_def != null and pitcher_def.throws == &"L")
 	batter.position = _batter_spot()
 	batter.face(batter.position + (Vector3.LEFT if _bats_left else Vector3.RIGHT))  # square to the plate
 	set_bat(true)
 	set_aim_preview(false)
 	_windup = -1.0
+	_follow_start = -1.0
 	_timing_ring.visible = false
 	for base in [1, 2, 3]:
 		var id := state.runner_on(base)
@@ -195,7 +207,7 @@ func set_runner_off_base(id: StringName, base: int, meters: float, running: bool
 	if running:
 		actor.animate(ActorView.Pose.RUN, get_process_delta_time(), tuning.runner_speed)
 	else:
-		actor.animate(ActorView.Pose.IDLE, get_process_delta_time())
+		actor.animate(ActorView.Pose.LEAD, get_process_delta_time())
 
 
 ## Aim preview while batting: an arrow from home plate in the direction the
@@ -248,6 +260,8 @@ func swing_bat() -> void:
 ## Pitcher's windup, 0..1, or -1 when not winding up. The ball sits in his
 ## glove until the pitch is released.
 func show_windup(progress: float) -> void:
+	if progress < 0.0 and _windup >= 0.0:
+		_follow_start = _view_clock
 	_windup = progress
 
 
@@ -312,6 +326,7 @@ func show_play(bip: BallInPlay, t: float, play: LivePlay, outcome: PlayOutcome, 
 		ghost.visible = false
 	_timing_ring.visible = false
 	_windup = -1.0
+	_follow_start = -1.0
 	var fielding := bip.fielding
 	var secured := play != null and play.ball != LivePlay.Ball.LOOSE
 	_ball.position = play.ball_position() if play != null else bip.trajectory.position_at(t)
@@ -403,8 +418,11 @@ func _animate_play(play: LivePlay, fielding: FieldingResult, holder: int, covers
 		var actor := _fielders[i]
 		var moved: float = actor.position.distance_to(_last_actor_pos.get(actor, actor.position)) / delta
 		_last_actor_pos[actor] = actor.position
+		var catch_pose := PlayAnimator.catch_pose(play.time, fielding) if i == fielding.fielder_index else -1
 		if i == thrower:
 			actor.animate(ActorView.Pose.THROW, delta, 0.0, false, _animator.thrower_progress)
+		elif catch_pose >= 0:
+			actor.animate(catch_pose, delta)
 		elif i == holder:
 			actor.animate(_animator.holder_pose, delta, _animator.holder_speed)
 		else:
@@ -506,8 +524,13 @@ func _update_bat() -> void:
 		return
 	var batter: ActorView = _runners.get(_batter_id)
 	if batter != null:
-		var swinging := _bat_swing_start >= 0.0 or _bat_bunt
-		batter.animate(ActorView.Pose.SWING if swinging else ActorView.Pose.BAT_STANCE, get_process_delta_time())
+		var delta := get_process_delta_time()
+		if _bat_bunt:
+			batter.animate(ActorView.Pose.BUNT, delta)
+		elif _bat_swing_start >= 0.0:
+			batter.animate(ActorView.Pose.SWING, delta, 0.0, false, (_view_clock - _bat_swing_start) / SWING_TIME)
+		else:
+			batter.animate(ActorView.Pose.BAT_STANCE, delta)
 	var side := -1.0 if _bats_left else 1.0
 	_bat_pivot.position = _batter_spot() + Vector3(0.3 * side, 1.0, 0.05)
 	if batter != null:
@@ -528,20 +551,28 @@ func _update_bat() -> void:
 	var y := deg_to_rad(yaw)
 	var e := deg_to_rad(lift)
 	var dir := Vector3(cos(e) * cos(y) * side, sin(e), cos(e) * sin(y))
-	if batter != null:
-		# The torso turns with the bat, about half as far.
-		batter.set_twist((100.0 - yaw) * 0.5 * side)
 	_bat_pivot.look_at(_bat_pivot.global_position + dir, Vector3.UP)
 
 
 func _update_windup(delta: float) -> void:
 	var pitcher := tuning.fielder_ids.find(&"p")
-	if pitcher < 0 or _windup < 0.0:
+	if pitcher < 0:
 		return
 	var actor := _fielders[pitcher]
+	if _windup < 0.0:
+		# After the release: the arm sweeps through and he lands ready.
+		if _follow_start < 0.0:
+			return
+		var u := (_view_clock - _follow_start) / FOLLOW_TIME
+		if u >= 1.0:
+			_follow_start = -1.0
+			return
+		actor.animate(ActorView.Pose.PITCH, delta, 0.0, false, lerpf(BaseballMoves.PITCH_RELEASE, BaseballMoves.PITCH_LENGTH, u))
+		return
 	actor.face(Vector3.ZERO)
-	actor.animate(ActorView.Pose.THROW, delta, 0.0, false, _windup)
-	_ball.position = actor.hand_position()
+	actor.animate(ActorView.Pose.PITCH, delta, 0.0, false, _windup)
+	# The ball sits in the glove until his hands break.
+	_ball.position = actor.grip_position() if _windup > HANDS_BREAK else actor.hand_position()
 	_update_shadow()
 
 

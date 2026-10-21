@@ -35,6 +35,16 @@ extends Resource
 @export var attendance: float = 0.85
 ## The Halo Dome's signature ring over the park.
 @export var halo: bool = false
+## Played under the lights: night sky, floodlights, glowing landmarks.
+@export var night: bool = false
+## A sealed dome over the whole park (indoor lighting, no sky or skyline).
+@export var roof: bool = false
+## Artificial turf instead of grass (look only; its speed is in field_shape).
+@export var turf: bool = false
+## A signature structure beyond the stands: &"warehouse" (a long brick
+## warehouse over right field), &"fountains" (beyond the outfield wall), or
+## &"" for none.
+@export var landmark: StringName = &""
 ## Fictional sponsors on the boards (original names only).
 @export var sponsors: PackedStringArray = []
 @export var skyline: bool = true

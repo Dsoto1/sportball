@@ -12,6 +12,12 @@ const SLIDE_DISTANCE := 4.5
 const SLIDE_BALL_RANGE := 6.0
 const RUNDOWN_RANGE := 12.0
 const JUKE_RANGE := 6.0
+## The fielder making the play shows how he gets the ball this long before
+## it arrives, and holds it this long after (a diver stays down until up).
+const CATCH_LEAD := 0.3
+const CATCH_HOLD := 0.25
+const HIGH_CATCH := 1.8
+const LOW_CATCH := 0.6
 
 ## How the actor holding (or who just threw) the ball is identified:
 ## -1 = the fielder who made the play, LivePlay.CUTOFF, or a base 1..4.
@@ -108,6 +114,23 @@ func update(play: LivePlay) -> void:
 	thrower_progress = clampf((play.time - _throw_start) / THROW_TIME, 0.0, 1.0)
 	if play.time - _throw_start > THROW_TIME:
 		thrower_cover = -2
+
+
+## How the fielder making the play takes the ball: dive, high catch or
+## scoop around the moment he secures it (time is contact-relative), else -1 (run or stand as usual).
+static func catch_pose(time: float, fielding: FieldingResult) -> int:
+	if fielding == null or fielding.fielder_index < 0 or not is_finite(fielding.secure_time):
+		return -1
+	var until := fielding.ready_time if fielding.is_dive else fielding.secure_time + CATCH_HOLD
+	if time < fielding.secure_time - CATCH_LEAD or time > until:
+		return -1
+	if fielding.is_dive:
+		return ActorView.Pose.DIVE
+	if fielding.secure_point.y > HIGH_CATCH:
+		return ActorView.Pose.CATCH_HIGH
+	if fielding.secure_point.y < LOW_CATCH and not fielding.caught_in_air:
+		return ActorView.Pose.SCOOP
+	return -1
 
 
 func rundown_active() -> bool:

@@ -1,11 +1,13 @@
 class_name ActorView
 extends Node3D
 ## A player's body: the Quaternius mannequin (CC0, Universal Animation
-## Library) in team colors, animated from its clip library. Gameplay
-## decides where everyone is; this only picks a clip per pose, matches run
-## cycles to speed and keeps the glove on the hand. Purely visual.
+## Library) in team colors. Baseball moves (stance, swing, bunt, pitch,
+## throw, ready, scoop, high catch, dive, tag, lead, slide) are the game's
+## own, baked by BaseballMoves; runs and celebrations come from the library.
+## Gameplay decides where everyone is; this only picks a clip per pose,
+## matches run cycles to speed and keeps the glove on the hand. Visual only.
 
-enum Pose { IDLE, RUN, TURN, CHASE, TAG, THROW, DOWN, SLIDE, BAT_STANCE, SWING, CELEBRATE }
+enum Pose { IDLE, RUN, TURN, CHASE, TAG, THROW, DOWN, SLIDE, BAT_STANCE, SWING, CELEBRATE, BUNT, PITCH, SCOOP, CATCH_HIGH, DIVE, LEAD }
 
 const BODY := preload("res://assets/third_party/quaternius/universal-animation-library/UAL1_Standard.glb")
 const BLEND := 0.12
@@ -13,19 +15,20 @@ const BLEND := 0.12
 ## players read from the high field camera.
 const BUILD := Vector3(1.35, 1.12, 1.35)
 ## Ground speed (m/s) the jog and sprint cycles are animated at.
+## Moves that play once and hold their last frame, by pose.
+const ONE_SHOTS := {Pose.TAG: "Tag", Pose.SLIDE: "Slide", Pose.SCOOP: "Scoop", Pose.CATCH_HIGH: "Catch_High", Pose.DIVE: "Dive"}
 const JOG_SPEED := 3.6
 const SPRINT_SPEED := 7.2
-## Clip time where a punch/throw/swing reaches full extension.
-const THROW_RELEASE := 0.45
-## Poses that play once and hold their last frame.
 
 var _model: Node3D
 var _player: AnimationPlayer
 var _mesh: MeshInstance3D
-var _hand: Node3D
+## Glove hand (left for a righty).
+var _hand: BoneAttachment3D
 var _glove: MeshInstance3D
-## Right hand: where a batter's bat is gripped.
-var _grip: Node3D
+## Throwing hand (right for a righty): holds the bat's handle and the ball.
+var _grip: BoneAttachment3D
+var _lefty := false
 var _twist := 0.0
 var _tag: Label3D
 var _clock := 0.0
@@ -45,6 +48,7 @@ func setup(color: Color, tag: String) -> void:
 	_player = _model.find_child("AnimationPlayer") as AnimationPlayer
 	_mesh = _model.find_child("Mannequin") as MeshInstance3D
 	var skeleton := _model.find_child("Skeleton3D") as Skeleton3D
+	_player.add_animation_library(BaseballMoves.LIBRARY, BaseballMoves.library(skeleton, _player))
 	var attach := BoneAttachment3D.new()
 	attach.bone_name = "hand_l"
 	skeleton.add_child(attach)
@@ -80,9 +84,22 @@ func set_tag_visible(value: bool) -> void:
 ## Fielders wear a glove; batters and runners do not.
 func set_glove_visible(value: bool) -> void:
 	_glove.visible = value
+	if _pose <= Pose.IDLE:
+		_play(_idle_clip(), 1.0, 0.0)
 
 
-## Where the batter's hands hold the bat.
+## Lefties play the mirrored moves and wear the glove on the right hand.
+func set_lefty(value: bool) -> void:
+	if value == _lefty:
+		return
+	_lefty = value
+	_hand.bone_name = "hand_r" if value else "hand_l"
+	_grip.bone_name = "hand_l" if value else "hand_r"
+	_clip = &""
+	_play(_idle_clip(), 1.0, 0.0)
+
+
+## Where the batter's hands hold the bat (and a thrower holds the ball).
 func grip_position() -> Vector3:
 	return _grip.global_position
 
@@ -107,7 +124,7 @@ func set_look(color: Color, tag: String, trim: Color = Color(0, 0, 0, 0)) -> voi
 func set_crouch(crouched: bool) -> void:
 	_crouched = crouched
 	if _pose == -1 or _pose == Pose.IDLE:
-		_play(&"Crouch_Idle" if crouched else &"Idle", 1.0, 0.0)
+		_play(_idle_clip(), 1.0, 0.0)
 
 
 func face(target: Vector3) -> void:
@@ -122,7 +139,7 @@ func reset_pose() -> void:
 	_model.position = Vector3.ZERO
 	set_twist(0.0)
 	_pose = -1
-	_play(&"Crouch_Idle" if _crouched else &"Idle", 1.0, 0.0)
+	_play(_idle_clip(), 1.0, 0.0)
 
 
 ## World position of the glove (where a held ball is drawn).
@@ -131,41 +148,59 @@ func hand_position() -> Vector3:
 
 
 ## Drives the body toward a pose. speed (m/s) matches run cycles; juke adds
-## a side-to-side feint; progress (0..1) scrubs one-shot poses (throw).
+## a side-to-side feint; progress scrubs the timed moves: THROW and SWING
+## 0..1, PITCH 0..BaseballMoves.PITCH_LENGTH (release at 1).
 func animate(pose: Pose, delta: float, speed: float = 0.0, juke: bool = false, progress: float = 0.0) -> void:
 	_clock += delta
 	var fresh := pose != _pose
 	_pose = pose
 	match pose:
 		Pose.IDLE, Pose.TURN:
-			_play(&"Crouch_Idle" if _crouched else &"Idle", 1.0)
+			_play(_idle_clip(), 1.0)
 		Pose.RUN, Pose.CHASE:
 			if speed > (JOG_SPEED + SPRINT_SPEED) * 0.5:
 				_play(&"Sprint", speed / SPRINT_SPEED)
 			else:
 				_play(&"Jog_Fwd", maxf(speed / JOG_SPEED, 0.6))
 		Pose.THROW:
-			# Scrubbed by the throw's progress: cocked, then released.
-			_play(&"Punch_Cross", 0.0)
-			_player.seek(lerpf(0.1, THROW_RELEASE + 0.2, clampf(progress, 0.0, 1.0)), true)
-		Pose.TAG:
+			_scrub("Throw", progress, 1.0)
+		Pose.SWING:
+			_scrub("Swing", progress, 1.0)
+		Pose.PITCH:
+			_scrub("Pitch", progress, BaseballMoves.PITCH_LENGTH)
+		Pose.BAT_STANCE:
+			_play(BaseballMoves.clip("Stance", _lefty), 1.0)
+		Pose.BUNT:
+			_play(BaseballMoves.clip("Bunt", _lefty), 1.6)
+		Pose.LEAD:
+			_play(BaseballMoves.clip("Lead", _lefty), 1.0)
+		Pose.TAG, Pose.SLIDE, Pose.SCOOP, Pose.CATCH_HIGH, Pose.DIVE:
 			if fresh:
-				_play(&"Punch_Jab", 1.4, BLEND, true)
+				_play(BaseballMoves.clip(ONE_SHOTS[pose], _lefty), 1.0, BLEND, true)
 		Pose.DOWN:
 			if fresh:
 				_play(&"Death01", 1.2, BLEND, true)
-		Pose.SLIDE:
-			if fresh:
-				_play(&"Roll", 1.3, BLEND, true)
-		Pose.BAT_STANCE, Pose.SWING:
-			# Both hands together out front: the grip. The swing itself is
-			# the bat's sweep plus a torso twist (set_twist), timed by play.
-			_play(&"Pistol_Idle", 1.0)
 		Pose.CELEBRATE:
 			_play(&"Dance", 1.0)
 	var target := sin(_clock * 9.0) * 0.22 if juke else 0.0
 	_sway = lerpf(_sway, target, 1.0 - exp(-delta * 14.0))
 	_model.position.x = _sway
+
+
+## Holds a timed move at a point on its 0..length progress clock.
+func _scrub(move: String, progress: float, length: float) -> void:
+	_play(BaseballMoves.clip(move, _lefty), 0.0)
+	_player.seek(clampf(progress, 0.0, length), true)
+
+
+## Standing still: catchers squat, gloved fielders sit in their ready
+## stance, everyone else stands.
+func _idle_clip() -> StringName:
+	if _crouched:
+		return BaseballMoves.clip("Catcher", _lefty)
+	if _glove != null and _glove.visible:
+		return BaseballMoves.clip("Ready", _lefty)
+	return &"Idle"
 
 
 func _play(clip: StringName, speed: float, blend: float = BLEND, restart: bool = false) -> void:

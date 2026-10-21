@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="StadiumDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/field_shape.gd" id="1_3da82"]
+[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="2_4f6d0"]
+
+[sub_resource type="Resource" id="Resource_wib25"]
+script = ExtResource("1_3da82")
+id = &"fountain_gardens"
+display_name = "Fountain Gardens"
+points = PackedVector3Array(-45, 101, 3.7, -22, 118, 3.7, 0, 125, 3.7, 22, 118, 3.7, 45, 101, 3.7)
+
+[resource]
+script = ExtResource("2_4f6d0")
+id = &"fountain_gardens"
+display_name = "Fountain Gardens"
+blurb = "Neutral · big, symmetric and fair, fountains dancing beyond the wall"
+field_shape = SubResource("Resource_wib25")
+seat_color = Color(0.11764706, 0.24705882, 0.47843137, 1)
+seat_color_alt = Color(0.09019608, 0.19607843, 0.3882353, 1)
+structure_color = Color(0.8980392, 0.9098039, 0.93333334, 1)
+accent_color = Color(0.43529412, 0.8392157, 1, 1)
+outfield_wall_color = Color(0.08627451, 0.2, 0.41568628, 1)
+foul_rows = 24
+outfield_rows = 5
+skyline_height = 0.6
+home_fan_share = 0.5
+away_fan_share = 0.25
+attendance = 0.8
+night = true
+landmark = &"fountains"
+sponsors = PackedStringArray("CASCADE COLA", "SPRINKLE & SONS PLUMBING", "BLUE PLAINS BBQ", "MISTY MEADOW DAIRY", "JUBILEE JEWELERS")
+skyline_color = Color(0.14901961, 0.1882353, 0.2901961, 1)
+window_color = Color(0.84705883, 0.9254902, 1, 1)
