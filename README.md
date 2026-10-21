@@ -96,9 +96,25 @@ the pitch is wilder and a little slower. The AI pitcher slide-steps against
 fast runners and when he reads a lean. You can spot it because his windup
 is visibly quicker, so be ready to swing a beat earlier.
 
-Read the pitch by its trail: a **long blue** streak is a fastball, a
-**short orange** one a breaking ball (it moves late), a **stub of green** a
-changeup (slower, so wait on it).
+Read the pitch by its trail. Each pitch has its own color and length,
+longest to shortest:
+
+| Pitch | Trail | What it does |
+|---|---|---|
+| Fastball | long blue | fastest and straightest |
+| Sinker | teal | runs in and down: ground balls |
+| Cutter | lilac | late, short break away from a righty |
+| Splitter | yellow | looks like a fastball, then falls off the table |
+| Slider | orange | hard sideways break |
+| Curveball | red, short | slow and drops a lot |
+| Changeup | green stub | slow, fades and drops |
+| **Junkball** (Gearheads' Otis Hollerith) | a single white dot | slow knuckler that dances on the way in |
+| **Showstopper** (Glitterati's Tomorrow) | long gold | hangs in mid-air, then rushes the plate |
+
+Each pitcher throws 2–4 of these, and the pitch menu shows only his. A
+left-hander's pitches break the other way. Breaking balls are nastier
+against same-handed hitters, and changeups and splitters against
+opposite-handed ones.
 
 After every swing the callout tells you how it went and why, for example
 "SOLID contact · a hair late (9 ms) · on the edge of the zone". Hitting the
@@ -157,6 +173,7 @@ resources in `data/pitches/`.
 ```sh
 godot --headless --path . -s res://tools/sim_report.gd -- 100 1           # AI-vs-AI rates over 100 matches
 godot --headless --path . -s res://tools/launch_angle_report.gd           # hit rate by launch angle
+godot --headless --path . -s res://tools/pitch_report.gd -- 300 1         # usage and results per pitch type
 godot --headless --path . --fixed-fps 60 -s res://tools/playtest_bot.gd -- 900   # drive the real scene with fake input (append `"" home` to field first)
 ```
 

@@ -316,3 +316,39 @@ Decision:
 Reason: Owner request. The slide step completes the pitcher's answers to the running game: holding the runner (pickoffs) and being quick to the plate.
 
 Affected systems: PitchIntent, PitchResult, PitchResolver, LivePlay.steal_head_start, BallInPlay.create_steal, AiManager (slide_step, steal estimate), Ratings.steal_jump, AutoMatch, MatchDirector (AI windup, human toggle), MatchHud, input map, team data, bot, sim report, tests.
+
+## 2026-10-21 - Pitch Arsenal, Repertoires, Pitch Selection
+
+Decision:
+- **Nine pitch families** in `data/pitches/`.
+  - Standard: fastball, sinker, cutter, splitter, slider, curveball and changeup. The old generic breaking ball is split into the slider and the curveball.
+  - Two arcade signatures, each thrown by one pitcher: the Junkball (Gearheads' Otis Hollerith) and the Showstopper (Glitterati's Tomorrow).
+- **New `PitchFamilyDef` fields:**
+  - `category` (fastball / breaking / offspeed / signature)
+  - `aim_height` (where the AI locates it)
+  - `launch_bias` (sinkers -7°, splitters -5°: ground balls)
+  - `usage`
+  - `motion`:
+    - `knuckle` wobbles on a phase seeded per pitch and still ends at its location.
+    - `hesitation` time-warps the flight, so the ball hangs and then rushes, but arrives on time. Only the batter's eyes are fooled.
+- **Tells:** every standard pitch has a unique trail length (8 down to 2) and color. The signatures get a unique color too: the Junkball a 1-ball white trail, the Showstopper 8-ball gold.
+- **Left-handed pitchers** mirror the break and the release point.
+- **Repertoires:** every pitcher has 2–4 pitches, and the human pitch menu shows only his.
+- **AI pitch selection (`AiPitcher`)** weights each pitch by:
+  - usage
+  - the count: fastballs ×2 when behind; deception boosted when ahead
+  - repeats: ×0.55 for the same pitch twice
+  - the platoon matchup: breaking balls to same-handed hitters, offspeed to opposite-handed, ×1.4
+
+  It aims each pitch at that pitch's best height. The AI batter is fooled 12% more by the right platoon pitch.
+- **Batting camera:** it now sits over a left-handed batter's shoulder (it used to look through him), and the batter's name tag is hidden while batting (the HUD names him).
+- **Balance (800 matches):**
+  - Runs per team per game: 2.65.
+  - The Junkball was too good at first (17.6% whiff); its usage dropped to 0.32 and its scatter rose to 1.8×.
+  - The Glitterati chased too much against the new off-speed pitches, so their chase scale went to 1.3 and their power-swing rate to 0.43.
+  - The Glitterati win 56% and out-homer the Gearheads 0.88 to 0.77 per game.
+- **`tools/pitch_report.gd`** reports usage and results per pitch type.
+
+Reason: Owner request to add all proposed pitch types, repertoires and smarter selection.
+
+Affected systems: PitchFamilyDef and pitch data, ContentLibrary, PitchResult (motion, lefty), PitchResolver, ContactResolver (launch bias), Ratings, AiPitcher, AiBatter, AutoMatch, MatchDirector, MatchView (lefty camera, batter tag), ActorView, team data, README, tests.

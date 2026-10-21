@@ -22,6 +22,7 @@ static func pitcher_mods(p: PlayerDef, pitches: int, tuning: BaseballTuning) -> 
 		"break": 1.0 + tuning.rating_stuff_break_spread * norm(p.stuff) - tuning.fatigue_break_loss * tired,
 		"deception": tuning.rating_stuff_deception_spread * norm(p.stuff),
 		"fatigue": tired,
+		"lefty": p.throws == &"L",
 	}
 
 

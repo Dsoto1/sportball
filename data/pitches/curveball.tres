@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PitchFamilyDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/pitch_family_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"curveball"
+display_name = "Curveball"
+speed = 32.0
+break_amount = Vector2(-0.14, -0.44)
+deception = 0.55
+scatter_scale = 1.3
+tell_color = Color(1, 0.3, 0.4, 1)
+tell_trail = 3
+category = &"breaking"
+aim_height = -0.5
+launch_bias = -2.0
+motion = &""
+motion_strength = 0.0
+usage = 0.7

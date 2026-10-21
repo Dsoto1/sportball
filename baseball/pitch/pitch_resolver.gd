@@ -25,7 +25,17 @@ static func resolve(intent: PitchIntent, family: PitchFamilyDef, tuning: Basebal
 	result.release_point = Vector3(tuning.release_side, tuning.release_height, -tuning.release_distance)
 	result.travel_time = result.release_point.distance_to(Vector3(location.x, location.y, 0.0)) / result.speed
 	result.in_zone = in_zone(location, tuning)
+	result.lefty = mods.get("lefty", false)
 	result.break_amount = family.break_amount * mods.get("break", 1.0)
+	if result.lefty:
+		result.break_amount.x = -result.break_amount.x
+		result.release_point.x = -result.release_point.x
+		result.travel_time = result.release_point.distance_to(Vector3(location.x, location.y, 0.0)) / result.speed
+	result.launch_bias = family.launch_bias
+	result.motion = family.motion
+	result.motion_strength = family.motion_strength
+	if family.motion == &"knuckle":
+		result.wobble_phase = Vector2(rng.randf_range(0.0, TAU), rng.randf_range(0.0, TAU))
 	result.deception = maxf(family.deception + mods.get("deception", 0.0), 0.0)
 	return result
 

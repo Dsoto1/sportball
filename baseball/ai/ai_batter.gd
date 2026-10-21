@@ -8,6 +8,12 @@ extends RefCounted
 static func decide(pitch: PitchResult, family: PitchFamilyDef, state: MatchState, tuning: BaseballTuning, rng: MatchRng,
 		profile: TeamDef = null, batter: PlayerDef = null) -> SwingIntent:
 	var fooled := 1.0 + pitch.deception
+	if batter != null:
+		# Breaking balls run away from same-handed hitters; changeups and
+		# splitters fade away from opposite-handed ones.
+		var same := (batter.bats == &"L") == pitch.lefty
+		if family.category == &"breaking" and same or family.category == &"offspeed" and not same:
+			fooled += 0.12
 	var eye := Ratings.eye_scale(batter, tuning)
 	var read := pitch.location + Vector2(
 		rng.randfn(0.0, tuning.ai_batter_read_sigma * fooled * eye),

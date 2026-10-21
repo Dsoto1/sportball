@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PitchFamilyDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/pitch_family_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"showstopper"
+display_name = "Showstopper"
+speed = 37.0
+break_amount = Vector2(0.0, -0.08)
+deception = 0.6
+scatter_scale = 1.15
+tell_color = Color(1, 0.78, 0.25, 1)
+tell_trail = 8
+category = &"signature"
+aim_height = 0.1
+launch_bias = 1.0
+motion = &"hesitation"
+motion_strength = 0.8
+usage = 0.45

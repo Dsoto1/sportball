@@ -192,6 +192,7 @@ velocity = 54
 control = 80
 stuff = 62
 stamina = 80
+pitches = Array[StringName]([&"sinker", &"changeup", &"curveball", &"junkball"])
 
 [sub_resource type="Resource" id="Resource_rkm2g"]
 script = ExtResource("1_0c1l0")
@@ -227,6 +228,7 @@ velocity = 58
 control = 58
 stuff = 52
 stamina = 38
+pitches = Array[StringName]([&"sinker", &"slider", &"splitter"])
 
 [sub_resource type="Resource" id="Resource_v6b6o"]
 script = ExtResource("1_0c1l0")
@@ -244,6 +246,7 @@ velocity = 52
 control = 70
 stuff = 58
 stamina = 42
+pitches = Array[StringName]([&"cutter", &"curveball", &"changeup"])
 
 [sub_resource type="Resource" id="Resource_aghee"]
 script = ExtResource("1_0c1l0")
@@ -261,6 +264,7 @@ velocity = 62
 control = 68
 stuff = 66
 stamina = 30
+pitches = Array[StringName]([&"fastball", &"cutter", &"splitter"])
 
 [resource]
 script = ExtResource("2_dvcwr")

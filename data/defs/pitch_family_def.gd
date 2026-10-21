@@ -17,3 +17,16 @@ extends Resource
 ## of ghost balls), so the cue does not rely on colour alone.
 @export var tell_color: Color = Color(1, 1, 1)
 @export var tell_trail: int = 4
+## fastball / breaking / offspeed / signature: how the AI uses it.
+@export var category: StringName = &"fastball"
+## Where the AI likes to locate it, in zone half-heights (- = down).
+@export var aim_height: float = 0.0
+## Degrees added to launch angle off this pitch (sinkers make grounders).
+@export var launch_bias: float = 0.0
+## Special flight: &"" straight math, &"knuckle" wobbles on the way in,
+## &"hesitation" hangs mid-flight then rushes the plate.
+@export var motion: StringName = &""
+## Knuckle wobble (meters) or hesitation strength (0..0.9).
+@export var motion_strength: float = 0.0
+## Relative weight in the AI's pitch choice (before count and matchup).
+@export var usage: float = 1.0

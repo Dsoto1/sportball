@@ -91,6 +91,10 @@ func setup(color: Color, tag: String) -> void:
 	arm.material_override = _body.material_override
 
 
+func set_tag_visible(value: bool) -> void:
+	_tag.visible = value
+
+
 func set_look(color: Color, tag: String, trim: Color = Color(0, 0, 0, 0)) -> void:
 	_body.material_override = GrayboxField._mat(color)
 	var second := GrayboxField._mat(trim if trim.a > 0.0 else color)

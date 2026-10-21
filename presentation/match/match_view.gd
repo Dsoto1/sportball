@@ -31,6 +31,7 @@ var _throw_target: MeshInstance3D
 var _roster: MatchRoster
 ## Current batter hits left-handed: he stands in the other box.
 var _bats_left := false
+var _batter_id: StringName = &""
 var _runners := {}
 var _zone: Node3D
 var _cursor: MeshInstance3D
@@ -97,6 +98,10 @@ const CAMERA_FOV := {CameraMode.BAT: 34.0, CameraMode.PITCH: 50.0, CameraMode.FI
 
 func set_camera_mode(mode: CameraMode) -> void:
 	_camera_mode = mode
+	# The HUD names the batter; over his head the tag would cover the pitcher.
+	var batter: ActorView = _runners.get(_batter_id)
+	if batter != null:
+		batter.set_tag_visible(mode != CameraMode.BAT)
 
 
 ## Point the ball-in-play camera tracks.
@@ -131,6 +136,8 @@ func reset_for_pitch(state: MatchState) -> void:
 		_fielders[i].set_crouch(tuning.fielder_ids[i] == &"c")
 	_clear_runners()
 	var batter := _runner_actor(state.current_batter(), batting_color, batting_trim)
+	_batter_id = state.current_batter()
+	batter.set_tag_visible(_camera_mode != CameraMode.BAT)
 	var hitter := _roster.player(state.current_batter()) if _roster != null else null
 	_bats_left = hitter != null and hitter.bats_left()
 	batter.position = _batter_spot()
@@ -461,6 +468,8 @@ func _process(delta: float) -> void:
 	var spot: Array = CAMERA_SPOTS[_camera_mode]
 	var weight := 1.0 - exp(-delta * 6.0)
 	var goal: Vector3 = spot[0]
+	if _camera_mode == CameraMode.BAT and _bats_left:
+		goal.x = -goal.x  # look over the lefty's shoulder, not through him
 	var target: Vector3 = spot[1]
 	if _camera_mode == CameraMode.FIELD:
 		# A rundown pulls the camera in tight on the runner and the ball.

@@ -30,7 +30,8 @@ extends Resource
 ## Movement and deception on breaking pitches.
 @export_range(0, 100) var stuff: int = 50
 @export_range(0, 100) var stamina: int = 50
-@export var pitches: Array[StringName] = [&"fastball", &"breaking_ball", &"changeup"]
+## Repertoire: pitch family ids this pitcher throws.
+@export var pitches: Array[StringName] = [&"fastball", &"slider", &"changeup"]
 
 
 func is_pitcher() -> bool:

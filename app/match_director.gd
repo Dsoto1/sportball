@@ -306,7 +306,7 @@ func _process_pre_pitch(delta: float) -> void:
 			_open_sub_menu()
 			return
 		if _phase_time >= windup_start + windup:
-			var intent := AiPitcher.choose(state, content.pitches, tuning, rng, _club(state.fielding_team()), _player(state.pitcher(state.fielding_team())))
+			var intent := AiPitcher.choose(state, content.pitches, tuning, rng, _club(state.fielding_team()), _player(state.pitcher(state.fielding_team())), _player(state.current_batter()))
 			intent.slide_step = _ai_slide_step
 			if tuning.rookie_assist:
 				intent.speed_scale = tuning.assist_pitch_speed_scale

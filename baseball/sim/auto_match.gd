@@ -53,7 +53,7 @@ func play_pitch() -> void:
 	var offense_club := roster.teams[state.batting_team()] if roster != null else null
 	var pitcher := roster.player(state.pitcher(state.fielding_team())) if roster != null else null
 	var batter := roster.player(state.current_batter()) if roster != null else null
-	var intent := AiPitcher.choose(state, content.pitches, tuning, rng, defense_club, pitcher)
+	var intent := AiPitcher.choose(state, content.pitches, tuning, rng, defense_club, pitcher, batter)
 	var family := content.pitch(intent.family_id)
 	var mods := Ratings.pitcher_mods(pitcher, state.pitches_thrown(state.pitcher(state.fielding_team())), tuning)
 	var steals := AiManager.steal_attempts(state, roster, tuning, rng)

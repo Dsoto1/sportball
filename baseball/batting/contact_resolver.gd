@@ -40,7 +40,7 @@ static func resolve(pitch: PitchResult, swing: SwingIntent, tuning: BaseballTuni
 	var center := PitchResolver.zone_center(tuning)
 	var height := (pitch.location.y - center.y) / ((tuning.zone_top - tuning.zone_bottom) * 0.5)
 	var base_launch := tuning.power_base_launch if power else tuning.contact_base_launch
-	var launch := base_launch + swing.stick.y * tuning.stick_lift + height * tuning.launch_per_height
+	var launch := base_launch + swing.stick.y * tuning.stick_lift + height * tuning.launch_per_height + pitch.launch_bias
 	launch += rng.randfn(0.0, tuning.launch_noise + miss * tuning.mishit_launch_spread)
 	result.launch_angle = clampf(launch, -25.0, 80.0)
 

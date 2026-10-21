@@ -6,8 +6,14 @@ extends RefCounted
 const TUNING_PATH := "res://data/tuning/baseball_tuning.tres"
 const PITCH_PATHS: Array[String] = [
 	"res://data/pitches/fastball.tres",
-	"res://data/pitches/breaking_ball.tres",
+	"res://data/pitches/sinker.tres",
+	"res://data/pitches/cutter.tres",
+	"res://data/pitches/splitter.tres",
+	"res://data/pitches/slider.tres",
+	"res://data/pitches/curveball.tres",
 	"res://data/pitches/changeup.tres",
+	"res://data/pitches/junkball.tres",
+	"res://data/pitches/showstopper.tres",
 ]
 const RULES_PATH := "res://data/rules/arcade.tres"
 const TEAM_PATHS: Array[String] = [

@@ -46,7 +46,7 @@ func test_zone_membership() -> void:
 
 
 func test_pitch_path_ends_at_plate_location() -> void:
-	var p := _pitch(Vector2(0.15, 0.7), 0.0, 3, &"breaking_ball")
+	var p := _pitch(Vector2(0.15, 0.7), 0.0, 3, &"slider")
 	var end := p.position_at(p.travel_time)
 	check_near(end.distance_to(Vector3(p.location.x, p.location.y, 0.0)), 0.0, 0.001, "path ends on location")
 	check_near(p.position_at(0.0).distance_to(p.release_point), 0.0, 0.001, "path starts at release")
@@ -216,3 +216,72 @@ func test_sacrifice_bunt_moves_the_runner_up() -> void:
 			sacs += 1
 	check(tries >= 30, "bunts get down (%d/40)" % tries)
 	check(sacs >= tries * 0.5, "runner moves up on most bunts (%d of %d)" % [sacs, tries])
+
+
+# --- Arsenal -----------------------------------------------------------------
+
+func test_every_pitch_has_a_distinct_tell() -> void:
+	var seen := {}
+	for f in content().pitches:
+		if f.category == &"signature":
+			continue
+		check(not seen.has(f.tell_trail), "%s trail length %d is unique" % [f.id, f.tell_trail])
+		seen[f.tell_trail] = true
+
+
+func test_lefty_mirrors_break_and_release() -> void:
+	var family := content().pitch(&"slider")
+	var intent := PitchIntent.new(&"slider", Vector2(0.0, 0.8), 0.0)
+	var righty := PitchResolver.resolve(intent, family, tuning(), MatchRng.new(2))
+	var lefty := PitchResolver.resolve(intent, family, tuning(), MatchRng.new(2), {"lefty": true})
+	check_near(lefty.break_amount.x, -righty.break_amount.x, 0.0001, "break mirrored")
+	check_near(lefty.release_point.x, -righty.release_point.x, 0.0001, "release side mirrored")
+
+
+func test_special_pitches_still_arrive_on_target() -> void:
+	for id in [&"junkball", &"showstopper"]:
+		var family := content().pitch(id)
+		var p := PitchResolver.resolve(PitchIntent.new(id, Vector2(0.1, 0.8), 0.0), family, tuning(), MatchRng.new(5))
+		var end := p.position_at(p.travel_time)
+		check(end.distance_to(Vector3(p.location.x, p.location.y, 0.0)) < 0.001, "%s ends at its location" % id)
+		var mid := p.position_at(p.travel_time * 0.3)
+		var straight := p.release_point.lerp(Vector3(p.location.x, p.location.y, 0.0), 0.3)
+		check(mid.distance_to(straight) > 0.03, "%s does something on the way" % id)
+
+
+func test_sinker_makes_ground_balls() -> void:
+	var lows := [0, 0]
+	for i in 200:
+		for k in 2:
+			var id: StringName = [&"fastball", &"sinker"][k]
+			var p := PitchResolver.resolve(PitchIntent.new(id, Vector2(0.0, 0.8), 0.0), content().pitch(id), tuning(), MatchRng.new(i))
+			var c := ContactResolver.resolve(p, SwingIntent.swing(SwingIntent.Type.CONTACT, 0.0), tuning(), MatchRng.new(i))
+			if c.launch_angle < 10.0:
+				lows[k] += 1
+	check(lows[1] > lows[0] + 20, "more grounders off the sinker (%d vs %d of 200)" % [lows[1], lows[0]])
+
+
+func test_ai_pitch_choice_follows_the_count() -> void:
+	var s := new_match()
+	var fb := content().pitch(&"fastball")
+	var curve := content().pitch(&"curveball")
+	s.balls = 3
+	check(AiPitcher.weight(fb, s, &"", null, null) > AiPitcher.weight(curve, s, &"", null, null) * 2.0, "behind: fastball")
+	s.balls = 0
+	s.strikes = 2
+	check(AiPitcher.weight(curve, s, &"", null, null) > AiPitcher.weight(curve, new_match(), &"", null, null), "ahead: more curves")
+	check(AiPitcher.weight(fb, s, &"fastball", null, null) < AiPitcher.weight(fb, s, &"", null, null), "less likely to repeat")
+
+
+func test_platoon_matchups() -> void:
+	var s := new_match()
+	var righty := PlayerDef.new()
+	righty.throws = &"R"
+	var rhb := PlayerDef.new()
+	rhb.bats = &"R"
+	var lhb := PlayerDef.new()
+	lhb.bats = &"L"
+	var slider := content().pitch(&"slider")
+	var change := content().pitch(&"changeup")
+	check(AiPitcher.weight(slider, s, &"", righty, rhb) > AiPitcher.weight(slider, s, &"", righty, lhb), "slider to same-handed")
+	check(AiPitcher.weight(change, s, &"", righty, lhb) > AiPitcher.weight(change, s, &"", righty, rhb), "changeup to opposite-handed")

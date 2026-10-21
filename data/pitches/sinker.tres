@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PitchFamilyDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/pitch_family_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sinker"
+display_name = "Sinker"
+speed = 39.5
+break_amount = Vector2(0.2, -0.2)
+deception = 0.15
+scatter_scale = 1.0
+tell_color = Color(0.3, 0.95, 0.8, 1)
+tell_trail = 7
+category = &"fastball"
+aim_height = -0.45
+launch_bias = -7.0
+motion = &""
+motion_strength = 0.0
+usage = 1.2

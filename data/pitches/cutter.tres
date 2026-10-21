@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PitchFamilyDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/pitch_family_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"cutter"
+display_name = "Cutter"
+speed = 39.0
+break_amount = Vector2(-0.14, -0.03)
+deception = 0.2
+scatter_scale = 1.05
+tell_color = Color(0.85, 0.75, 1, 1)
+tell_trail = 6
+category = &"fastball"
+aim_height = 0.0
+launch_bias = -1.5
+motion = &""
+motion_strength = 0.0
+usage = 1.0

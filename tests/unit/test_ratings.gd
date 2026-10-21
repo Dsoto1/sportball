@@ -88,4 +88,4 @@ func test_ai_pitcher_sticks_to_repertoire() -> void:
 	var rng := MatchRng.new(11)
 	for i in 60:
 		var intent := AiPitcher.choose(s, content().pitches, tuning(), rng, null, p)
-		check(intent.family_id != &"breaking_ball", "no breaking ball")
+		check(intent.family_id in [&"fastball", &"changeup"], "only his pitches")

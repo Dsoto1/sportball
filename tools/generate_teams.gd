@@ -5,7 +5,7 @@ extends SceneTree
 
 # Hitters: id, name, nickname, number, bats, throws, positions,
 #          contact, power, eye, speed, arm, glove
-# Pitchers: id, name, nickname, number, throws, velocity, control, stuff, stamina
+# Pitchers: id, name, nickname, number, throws, velocity, control, stuff, stamina, pitches
 const TEAMS := [
 	{
 		"id": &"gearheads", "city": "Rustwater", "name": "Gearheads", "abbr": "RWG",
@@ -29,11 +29,11 @@ const TEAMS := [
 			[&"rwg_holloway", "Bram Holloway", "Bellows", 27, &"R", &"R", [&"c", &"1b"], 54, 52, 46, 30, 64, 58],
 		],
 		"pitchers": [
-			[&"rwg_hollerith", "Otis Hollerith", "The Foreman", 41, &"R", 54, 80, 62, 80],
-			[&"rwg_bracket", "Nell Bracket", "Shim", 50, &"L", 50, 66, 64, 40],
-			[&"rwg_wexley", "Cobb Wexley", "Grease Fire", 36, &"R", 58, 58, 52, 38],
-			[&"rwg_sprock", "Juno Sprock", "Torque", 47, &"R", 52, 70, 58, 42],
-			[&"rwg_fenwick", "Mack Fenwick", "Overtime", 99, &"R", 62, 68, 66, 30],
+			[&"rwg_hollerith", "Otis Hollerith", "The Foreman", 41, &"R", 54, 80, 62, 80, [&"sinker", &"changeup", &"curveball", &"junkball"]],
+			[&"rwg_bracket", "Nell Bracket", "Shim", 50, &"L", 50, 66, 64, 40, [&"fastball", &"slider", &"changeup"]],
+			[&"rwg_wexley", "Cobb Wexley", "Grease Fire", 36, &"R", 58, 58, 52, 38, [&"sinker", &"slider", &"splitter"]],
+			[&"rwg_sprock", "Juno Sprock", "Torque", 47, &"R", 52, 70, 58, 42, [&"cutter", &"curveball", &"changeup"]],
+			[&"rwg_fenwick", "Mack Fenwick", "Overtime", 99, &"R", 62, 68, 66, 30, [&"fastball", &"cutter", &"splitter"]],
 		],
 		"order": [&"rwg_calloway", &"rwg_brightwater", &"rwg_paskett", &"rwg_mahoney", &"rwg_inkwell", &"rwg_corrigan", &"rwg_varga", &"rwg_mott", &"rwg_ferrow"],
 		"lineup_positions": [&"cf", &"ss", &"2b", &"1b", &"3b", &"dh", &"lf", &"rf", &"c"],
@@ -61,15 +61,15 @@ const TEAMS := [
 			[&"nhg_halloran", "Fritz Halloran", "Velvet Rope", 29, &"R", &"R", [&"c", &"1b"], 46, 66, 42, 28, 62, 52],
 		],
 		"pitchers": [
-			[&"nhg_tomorrow", "Tomorrow", "Headliner", 19, &"R", 72, 50, 66, 70],
-			[&"nhg_crisp", "Monty Crisp", "Cue Card", 38, &"L", 64, 54, 66, 40],
-			[&"nhg_kahn", "Desiree Kahn", "Standing Ovation", 45, &"R", 70, 48, 60, 38],
-			[&"nhg_platinum", "Ziggy Platinum", "Glam Slam", 64, &"L", 68, 50, 72, 36],
-			[&"nhg_gloss", "Maximilian Gloss", "The Finale", 0, &"R", 82, 56, 64, 28],
+			[&"nhg_tomorrow", "Tomorrow", "Headliner", 19, &"R", 72, 50, 66, 70, [&"fastball", &"slider", &"splitter", &"showstopper"]],
+			[&"nhg_crisp", "Monty Crisp", "Cue Card", 38, &"L", 64, 54, 66, 40, [&"fastball", &"curveball", &"changeup"]],
+			[&"nhg_kahn", "Desiree Kahn", "Standing Ovation", 45, &"R", 70, 48, 60, 38, [&"fastball", &"slider", &"changeup"]],
+			[&"nhg_platinum", "Ziggy Platinum", "Glam Slam", 64, &"L", 68, 50, 72, 36, [&"sinker", &"slider", &"curveball"]],
+			[&"nhg_gloss", "Maximilian Gloss", "The Finale", 0, &"R", 82, 56, 64, 28, [&"fastball", &"splitter"]],
 		],
 		"order": [&"nhg_i_dont_care", &"nhg_because", &"nhg_who", &"nhg_vandermeer", &"nhg_lux", &"nhg_i_dont_know", &"nhg_why", &"nhg_what", &"nhg_today"],
 		"lineup_positions": [&"ss", &"cf", &"1b", &"rf", &"dh", &"3b", &"lf", &"2b", &"c"],
-		"ai": {"swing_aggression": 1.1, "chase_scale": 1.5, "power_swing_rate": 0.39, "runner_aggression": -0.1, "edge_bias_scale": 0.9, "bullpen_hook": 0.8, "steal_rate": 0.5, "bunt_rate": 0.25},
+		"ai": {"swing_aggression": 1.1, "chase_scale": 1.3, "power_swing_rate": 0.43, "runner_aggression": -0.1, "edge_bias_scale": 0.9, "bullpen_hook": 0.8, "steal_rate": 0.5, "bunt_rate": 0.25},
 	},
 ]
 
@@ -101,6 +101,7 @@ func _init() -> void:
 			p.throws = q[4]; p.bats = q[4]
 			p.positions.assign([&"p"])
 			p.velocity = q[5]; p.control = q[6]; p.stuff = q[7]; p.stamina = q[8]
+			p.pitches.assign(q[9])
 			p.contact = 20; p.power = 15; p.eye = 20; p.speed = 40; p.arm = 70; p.glove = 50
 			team.roster.append(p)
 		team.batting_order.assign(t["order"])

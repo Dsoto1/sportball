@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PitchFamilyDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/pitch_family_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"slider"
+display_name = "Slider"
+speed = 36.0
+break_amount = Vector2(-0.34, -0.12)
+deception = 0.5
+scatter_scale = 1.2
+tell_color = Color(1, 0.55, 0.2, 1)
+tell_trail = 4
+category = &"breaking"
+aim_height = -0.2
+launch_bias = -1.0
+motion = &""
+motion_strength = 0.0
+usage = 0.9

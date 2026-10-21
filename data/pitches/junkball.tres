@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PitchFamilyDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/pitch_family_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"junkball"
+display_name = "Junkball"
+speed = 29.0
+break_amount = Vector2(0.0, -0.12)
+deception = 0.7
+scatter_scale = 1.8
+tell_color = Color(0.95, 0.95, 0.95, 1)
+tell_trail = 1
+category = &"signature"
+aim_height = 0.0
+launch_bias = 0.0
+motion = &"knuckle"
+motion_strength = 0.14
+usage = 0.32
