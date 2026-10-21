@@ -60,6 +60,42 @@ points. The Foundry sheet also has a six-color team set.
   - Highlight: Steam White #F1EEE7
 - The sheet's wall is uniform. The Boilerplate (the 34 ft iron wall in right) stays as tuned.
 
+## 03 Ledger Street Park
+
+- Financial-district brick: arches, a domed bank, clock towers, bronze bull statues on the outfield stands, bunting on the deck fronts, flags.
+- An arch centerpiece in brick with the laurel "B" emblem and a green board.
+- A green wall with a gold "B" in the alleys; slogan sign "LEDGER STREET PARK" in right.
+- The sheet's wall is uniform. The Leviathan (37 ft in left) and the knee-high right-field wall stay as tuned.
+- Team colors:
+  - Primary: Bankers Green #0B4D2E
+  - Secondary: Ledger Gold #D4A017
+  - Accent: Brick Red #8B2E2E
+  - Support: Marble White #F4F1E6
+  - Dark: Charcoal Slate #2B2B2B
+
+## 04 Pier 9 Ballyard
+
+- Nautical: pier pilings and boardwalk decks, a crane, a lighthouse, tall ships and sailboats in the harbor, gulls, pennant flags.
+- A wooden centerpiece with anchor banners and the gull emblem; waves painted along the wall.
+- Team colors:
+  - Primary: Harbor Blue #0B4F8A
+  - Secondary: Seafoam Teal #30C6C1
+  - Accent: Dock Red #D64545
+  - Support: Sail White #F4F6F9
+  - Dark: Navy Slate #1B2B44
+  - Highlight: Weathered Wood #C1A878 (partly cut off on the sheet)
+
+## Built so far
+
+- Club identity: six colors per club (exact for the clubs with sheets), a slogan and an emblem.
+- Tiered decks with wordmark fascia bands.
+- The centerpiece with the batter's card.
+- Slogan boards.
+- Light towers flanking the centerpiece.
+- Yellow foul poles.
+- Wall emblems and big distance numbers.
+- Home dugout on first, VISITORS on third.
+
 ## What to build
 
 - **Core:**

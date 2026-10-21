@@ -7,10 +7,25 @@ class_name StadiumModules
 const CATALOG := {
 	&"scoreboard": {
 		"name": "Scoreboard", "category": &"boards", "unique": false, "placed": true,
-		"about": "The big video board over the outfield stands: line score, count, batter.",
-		"angle": 27.0, "angle_range": [-60.0, 60.0],
+		"about": "The line-score board over the outfield stands: innings, R H E, the count, the batter.",
+		"angle": -34.0, "angle_range": [-60.0, 60.0],
 		"params": {"height": [9.5, 4.0, 20.0]},
 		"script": preload("res://presentation/stadium/modules/scoreboard_module.gd"),
+	},
+	&"centerpiece": {
+		"name": "Centerpiece", "category": &"boards", "unique": true, "placed": false,
+		"about": "The board in straightaway center: club name under its emblem and the batter's card. Framed as a board, gate or arch.",
+		"angle": 0.0, "angle_range": [0.0, 0.0],
+		"params": {"height": [17.0, 12.0, 28.0], "frame": [&"board"]},
+		"choices": {"frame": [&"board", &"gate", &"arch"]},
+		"script": preload("res://presentation/stadium/modules/centerpiece_module.gd"),
+	},
+	&"slogan_board": {
+		"name": "Slogan Board", "category": &"boards", "unique": false, "placed": true,
+		"about": "A big lit sign over the stands: the park's name (or text) and the home club's slogan under its emblem.",
+		"angle": 34.0, "angle_range": [-60.0, 60.0],
+		"params": {"height": [8.0, 3.0, 20.0], "text": [""]},
+		"script": preload("res://presentation/stadium/modules/slogan_board_module.gd"),
 	},
 	&"wall_scoreboard": {
 		"name": "Wall Scoreboard", "category": &"boards", "unique": false, "placed": true,
@@ -21,9 +36,9 @@ const CATALOG := {
 	},
 	&"light_towers": {
 		"name": "Light Towers", "category": &"structure", "unique": true, "placed": false,
-		"about": "Six floodlight towers around the bowl; brighter under the lights.",
+		"about": "Floodlight towers around the bowl and a pair flanking the centerpiece; brighter under the lights.",
 		"angle": 0.0, "angle_range": [0.0, 0.0],
-		"params": {"height": [46.0, 25.0, 70.0]},
+		"params": {"height": [46.0, 25.0, 70.0], "flank": [16.0, 0.0, 40.0]},
 		"excludes": [&"dome"],
 		"script": preload("res://presentation/stadium/modules/light_towers_module.gd"),
 	},
@@ -75,7 +90,7 @@ const CATALOG := {
 }
 
 ## Every park gets these unless its designer takes them out.
-const STANDARD := [&"scoreboard", &"light_towers", &"skyline"]
+const STANDARD := [&"centerpiece", &"scoreboard", &"slogan_board", &"light_towers", &"skyline"]
 
 
 static func kinds() -> Array:
@@ -135,8 +150,11 @@ static func validate(def: StadiumDef) -> PackedStringArray:
 			problems.append("%s has no size" % spec["name"])
 		for key in piece.params:
 			var range_spec: Array = spec["params"].get(key, [])
+			var choices: Array = spec.get("choices", {}).get(key, [])
 			if range_spec.is_empty():
 				problems.append("%s has no setting '%s'" % [spec["name"], key])
+			elif not choices.is_empty() and not StringName(str(piece.params[key])) in choices:
+				problems.append("%s %s must be one of %s" % [spec["name"], key, choices])
 			elif range_spec.size() == 3 and (float(piece.params[key]) < float(range_spec[1]) or float(piece.params[key]) > float(range_spec[2])):
 				problems.append("%s %s %s is outside %s..%s" % [spec["name"], key, piece.params[key], range_spec[1], range_spec[2]])
 		if piece.kind == &"wall_scoreboard" and def.field_shape != null and def.field_shape.height_at(piece.angle) < 6.0:
@@ -147,6 +165,6 @@ static func validate(def: StadiumDef) -> PackedStringArray:
 		for other: StringName in info(kind).get("excludes", []):
 			if count.has(other):
 				problems.append("%s and %s can't share a park" % [info(kind)["name"], info(other)["name"]])
-	if not count.has(&"scoreboard") and not count.has(&"wall_scoreboard"):
+	if not count.has(&"scoreboard") and not count.has(&"wall_scoreboard") and not count.has(&"centerpiece"):
 		problems.append("no scoreboard")
 	return problems

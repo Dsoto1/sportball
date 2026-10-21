@@ -51,8 +51,11 @@ func test_scoreboard_follows_the_game() -> void:
 	var roster := MatchRoster.new(content().team(&"gearheads"), content().team(&"glitterati"))
 	s.apply_pitch_call(MatchState.PitchCall.BALL)
 	st.update_scoreboard(s, roster)
-	var board: Dictionary = st._boards[0]
-	check(board["batter"].text.contains("CALLOWAY"), "shows the batter")
+	var card: Dictionary = st._boards[0]["card"]
+	check(card["name"].text.contains("CALLOWAY"), "the centerpiece shows the batter")
+	check(card["avg"].text.begins_with("."), "and his average (%s)" % card["avg"].text)
+	var board: Dictionary = st._boards.filter(func(b: Dictionary) -> bool: return b.has("cells"))[0]
+	check(board["batter"].text.contains("CALLOWAY"), "the line-score board shows the batter")
 	check_eq(board["cells"][Vector2i(9, 0)].text, "0", "away runs")
 	var lamps: Array = board["lamps"]["B"][0]
 	check((lamps[0] as MeshInstance3D).material_override.emission_enabled, "first ball lamp lit")
@@ -215,3 +218,79 @@ func test_recolor_for_a_club() -> void:
 	check(park != content().park(&"halo_dome"), "a copy, the original untouched")
 	check(park.seat_color.is_equal_approx(team.primary_color.darkened(0.35)), "seats in the club's color")
 	check_eq(park.pieces.size(), content().park(&"halo_dome").pieces.size(), "same pieces")
+
+
+# --- Club identity and the shared pieces ---------------------------------------
+
+func test_every_club_has_an_identity() -> void:
+	for team in content().teams:
+		var colors: Array = team.palette().values()
+		check_eq(colors.size(), 6, "%s has six colors" % team.id)
+		var distinct := {}
+		for c: Color in colors:
+			distinct[c.to_html()] = true
+		check(distinct.size() >= 5, "%s's colors are distinct" % team.id)
+		check(not team.slogan.is_empty(), "%s has a slogan" % team.id)
+		check(team.emblem_shape in Emblem.SHAPES, "%s has a known emblem shape" % team.id)
+		var mark := Emblem.build(team, 2.0)
+		check(mark.get_child_count() >= 2, "%s's emblem builds" % team.id)
+		mark.free()
+	var gearheads := content().team(&"gearheads")
+	check(gearheads.primary_color.is_equal_approx(Color("c6531a")), "Gearheads use the reference sheet's Rust Orange")
+
+
+func test_decks_step_up_with_fascia() -> void:
+	var st := _build_park(&"halo_dome")
+	check_eq(st.def.decks, 3, "the Halo Dome has three decks")
+	var p := st.profile(120.0)
+	var k := st.rows_per_deck()
+	var jump := st.row_height(120.0, p, k) - st.row_height(120.0, p, k - 1)
+	check(jump > Stadium.ROW_RISE + 2.0, "the upper deck starts above the one below (%.1f m)" % jump)
+	var out := st.profile(0.0)
+	check_near(st.row_height(0.0, out, k) - st.row_height(0.0, out, k - 1), Stadium.ROW_RISE, 0.01, "the bleachers are one deck")
+	check(st.get_node("Fascia").get_child_count() > 40, "wordmarks along the deck fronts")
+	st.free()
+
+
+func test_shared_pieces_dress_every_park() -> void:
+	for park in content().parks:
+		var home: TeamDef = null
+		for team in content().teams:
+			if team.stadium_def == park:
+				home = team
+		var st := Stadium.new()
+		st.build(content().tuning_for(park), park, home, content().team(&"glitterati") if home.id != &"glitterati" else content().team(&"gearheads"))
+		check(st.has_node("Centerpiece"), "%s has its centerpiece" % park.id)
+		check(st.has_node("SloganBoard"), "%s has its slogan board" % park.id)
+		check(st.has_node("Dugout_%s" % home.abbreviation), "%s has the home dugout" % park.id)
+		check((st.get_node("Dugout_%s" % home.abbreviation) as Node3D).position.x > 0.0, "%s: home dugout on the first-base side" % park.id)
+		var dugout_signs := st.find_children("*", "Label3D", true, false).filter(func(l: Label3D) -> bool: return l.text == "VISITORS")
+		check_eq(dugout_signs.size(), 1, "%s: the visitors' dugout says VISITORS" % park.id)
+		st.free()
+
+
+func test_centerpiece_shows_the_batters_card() -> void:
+	var st := _build()
+	var s := MatchState.from_teams(content().team(&"gearheads"), content().team(&"glitterati"), content().rules)
+	var roster := MatchRoster.new(content().team(&"gearheads"), content().team(&"glitterati"))
+	st.update_scoreboard(s, roster)
+	var card: Dictionary = st._boards[0]["card"]
+	var p := roster.player(s.current_batter())
+	var line := SeasonLine.for_player(p)
+	check_eq(card["number"].text, "#%d" % p.number, "his number")
+	check_eq(card["hr"].text, str(line["hr"]), "his home runs")
+	check(card["position"].text.length() in [1, 2], "his position (%s)" % card["position"].text)
+	check(line["avg"] > 0.15 and line["avg"] < 0.37, "a believable average")
+	st.free()
+
+
+func test_foul_poles_are_yellow_and_tall() -> void:
+	var field := GrayboxField.new()
+	field.build(tuning())
+	var poles := field.find_children("FoulPole*", "MeshInstance3D", true, false).filter(func(m: MeshInstance3D) -> bool: return m.name.begins_with("FoulPole") and not m.name.contains("Screen"))
+	check_eq(poles.size(), 2, "two foul poles")
+	for pole: MeshInstance3D in poles:
+		var c: Color = (pole.material_override as StandardMaterial3D).albedo_color
+		check(c.r > 0.9 and c.g > 0.7 and c.b < 0.3, "yellow")
+		check((pole.mesh as BoxMesh).size.y > FieldLayout.fence_height(45.0, tuning()) + 10.0, "well above the wall")
+	field.free()

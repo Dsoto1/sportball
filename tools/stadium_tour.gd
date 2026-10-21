@@ -1,6 +1,8 @@
 extends SceneTree
 ## Flies the camera to stadium landmarks (left-field corner, scoreboard,
-## aerial, center field) and saves a screenshot of each. Needs a display:
+## aerial, center field, behind home, the third-base stands), dressing the
+## park for its own club when a park_id is given, and saves a screenshot of
+## each. Needs a display:
 ##   godot --path . --resolution 1280x720 -s res://tools/stadium_tour.gd -- /tmp/shots [park_id]
 var _frames := 0
 var _out := ""
@@ -12,6 +14,8 @@ const SHOTS := [
 	[Vector3(10, 10, -40), Vector3(50, 20, -125)],
 	[Vector3(0, 40, 120), Vector3(0, 30, -60)],
 	[Vector3(0, 1.6, -40), Vector3(0, 3, -112)],
+	[Vector3(0, 9, 8), Vector3(0, 5, -60)],
+	[Vector3(30, 6, -30), Vector3(-80, 10, 40)],
 ]
 func _initialize() -> void:
 	_out = OS.get_cmdline_user_args()[0]
@@ -28,7 +32,14 @@ func _process(_d: float) -> bool:
 		if _view != null and _park_id != &"":
 			var content := ContentLibrary.load_default()
 			var park := content.park(_park_id)
+			# Dress the park for its own club (emblem, wordmarks, slogan), then
+			# hand the match's roster back so the boards keep following it.
+			var playing: MatchRoster = _view._roster
+			for team in content.teams:
+				if team.stadium_def == park:
+					_view.set_roster(MatchRoster.new(playing.teams[MatchState.AWAY] if playing != null else team, team))
 			_view.set_park(content.tuning_for(park), park)
+			_view.set_roster(playing)
 		return false
 	if _frames < 30:
 		return false

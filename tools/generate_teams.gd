@@ -10,7 +10,6 @@ extends SceneTree
 const TEAMS := [
 	{
 		"id": &"gearheads", "city": "Rustwater", "name": "Gearheads", "abbr": "RWG",
-		"colors": [Color("c4561f"), Color("1d2a4a"), Color("efe3c8")],
 		"mascot": "Sprocket, a patched-up wind-up robot",
 		"stadium": "Foundry Field",
 		"identity": "Scrappy river-port underdogs. Small ball: steals, bunts, hustle doubles, strong gloves and not much power. Blue-collar grit: fans bang wrenches on the metal bleachers.",
@@ -43,7 +42,6 @@ const TEAMS := [
 	},
 	{
 		"id": &"glitterati", "city": "Neon Heights", "name": "Glitterati", "abbr": "NHG",
-		"colors": [Color("4b2a7b"), Color("d9a93a"), Color("f4f1fa")],
 		"mascot": "Monsieur Marquee, a top-hatted spotlight",
 		"stadium": "The Halo Dome",
 		"identity": "Glamorous sky-city darlings everyone loves to hate. Power, home runs and bat flips, bought with big contracts. Celebrity showboating: fireworks on every homer and a red-carpet entrance. Their lineup is a running vaudeville act: Who plays first, What is on second, I Don't Know is on third, Why in left, Because in center, Tomorrow pitches and Today catches. Nobody has ever named the right fielder.",
@@ -108,57 +106,86 @@ const REPERTOIRES := {
 	"heat": [[&"fastball", &"slider", &"splitter", &"curveball"], [&"fastball", &"slider"], [&"fastball", &"cutter", &"splitter"], [&"fastball", &"curveball", &"slider"], [&"fastball", &"splitter"]],
 	"crafty": [[&"changeup", &"curveball", &"sinker", &"junkball"], [&"cutter", &"changeup", &"curveball"], [&"sinker", &"curveball", &"changeup"], [&"slider", &"changeup", &"junkball"], [&"cutter", &"curveball", &"splitter"]],
 }
+## Each club's identity: the six-color set (primary, secondary, accent,
+## support, dark, highlight), slogan and emblem [shape, glyph]. Clubs with an
+## owner reference sheet (docs/stadium_refs) use its colors exactly; the
+## rest are drafts until theirs arrive.
+const IDENTITY := {
+	&"glitterati": {"colors": ["4b2a7b", "d9a93a", "9b5cff", "a7a9b4", "141019", "f4f1fa"],
+		"slogan": "Bigger Brighter Together", "emblem": [&"halo", "*"]},
+	&"gearheads": {"colors": ["c6531a", "3e4347", "d4a017", "5b7ca8", "1b1b1b", "f1eee7"],
+		"slogan": "Built Harder Together", "emblem": [&"gear", "G"]},
+	&"bankers": {"colors": ["0b4d2e", "d4a017", "8b2e2e", "f4f1e6", "2b2b2b", "e9d58a"],
+		"slogan": "Interest Compounds", "emblem": [&"laurel", "B"]},
+	&"gulls": {"colors": ["0b4f8a", "30c6c1", "d64545", "f4f6f9", "1b2b44", "c1a878"],
+		"slogan": "Ride the Tide", "emblem": [&"disc", "TG"]},
+	&"comets": {"colors": ["1fa596", "b8662f", "f1e2c4", "e0a23a", "1c1410", "fff4dc"],
+		"slogan": "Burn Bright", "emblem": [&"star", ""]},
+	&"yetis": {"colors": ["3a6e9e", "f4f8fb", "9fe8ff", "8a9aa8", "152230", "ffffff"],
+		"slogan": "Cold Blooded", "emblem": [&"shield", "Y"]},
+	&"neutrons": {"colors": ["262626", "7dffb0", "e3c94f", "5e6b5a", "0f0f0f", "eafff2"],
+		"slogan": "Critical Mass", "emblem": [&"halo", "N"]},
+	&"lamplighters": {"colors": ["7a1f3d", "ff4f7b", "f2ead8", "d9b45a", "1a0d14", "fff3e0"],
+		"slogan": "Light Up the Night", "emblem": [&"diamond", "ML"]},
+	&"conductors": {"colors": ["d79a1e", "1f4f34", "1c1c1c", "8a3a2a", "121212", "f6ead0"],
+		"slogan": "All Aboard", "emblem": [&"gear", "IC"]},
+	&"swans": {"colors": ["1e4fb0", "f7f7fa", "6fd6ff", "c9a548", "0f1d3d", "ffffff"],
+		"slogan": "Grace Under Pressure", "emblem": [&"shield", "S"]},
+	&"safecrackers": {"colors": ["5a6272", "ff5ad0", "151518", "9aa3b5", "0c0c10", "f3f0f7"],
+		"slogan": "Crack the Code", "emblem": [&"gear", "V"]},
+}
+
 const LEAGUE := [
 	{"id": &"bankers", "city": "Brickhaven", "name": "Bankers", "abbr": "BHB", "park": &"ledger_street", "stadium": "Ledger Street Park",
-	"colors": [Color("1f6b45"), Color("f2e6c8"), Color("8a4b3c")], "mascot": "Ledger, a monocled piggy bank", "rival": &"conductors",
+	"mascot": "Ledger, a monocled piggy bank", "rival": &"conductors",
 	"identity": "Old-money patience in the oldest park in the league. They work counts, take walks and line doubles off the Leviathan in left. Fans keep score in pencil and boo the wave.",
 	"mods": {"eye": 12, "contact": 4, "power": 4, "speed": -8}, "staff": {"control": 6}, "lefty": 0.2, "pitches": "balanced",
 	"nicknames": ["Interest", "Ledger", "Penny", "Vault", "Dividend", "Escrow", "Teller", "Mortgage", "Collateral", "Audit", "Coupon", "Pinstripe", "Gold Standard", "Compound", "Tax Man", "Fine Print", "Bottom Line"],
 	"ai": {"swing_aggression": 0.85, "chase_scale": 0.7, "power_swing_rate": 0.38, "runner_aggression": -0.1, "edge_bias_scale": 1.1, "bullpen_hook": 0.6, "steal_rate": 0.6, "bunt_rate": 0.4}},
 	{"id": &"gulls", "city": "Tidewater", "name": "Gulls", "abbr": "TWG", "park": &"pier_nine", "stadium": "Pier 9 Ballyard",
-	"colors": [Color("1d3b6c"), Color("ff6b4a"), Color("f4f4f0")], "mascot": "Squawk, a gull in a sailor cap", "rival": &"swans",
+	"mascot": "Squawk, a gull in a sailor cap", "rival": &"swans",
 	"identity": "Harbor sluggers built for the short porch. Left-handed pull power aimed at the bay, where kayakers fight over every splash home run. Loud, salty and streaky.",
 	"mods": {"power": 10, "contact": -4, "eye": -2}, "staff": {"velocity": 2}, "lefty": 0.7, "pitches": "balanced",
 	"nicknames": ["Splash", "Barnacle", "Riptide", "Anchor", "Squall", "Undertow", "Bilge", "Scuttlebutt", "Low Tide", "Harpoon", "Driftwood", "Foghorn", "Breakwater", "Galley", "Starboard", "Mainsail", "Lighthouse"],
 	"ai": {"swing_aggression": 1.05, "chase_scale": 1.1, "power_swing_rate": 0.44, "runner_aggression": 0.0, "edge_bias_scale": 1.0, "bullpen_hook": 0.6, "steal_rate": 0.6, "bunt_rate": 0.3}},
 	{"id": &"comets", "city": "Copper Mesa", "name": "Comets", "abbr": "CMC", "park": &"the_kiln", "stadium": "The Kiln",
-	"colors": [Color("1fa596"), Color("b8662f"), Color("f1e2c4")], "mascot": "Blaze, a comet in mirrored sunglasses", "rival": &"yetis",
+	"mascot": "Blaze, a comet in mirrored sunglasses", "rival": &"yetis",
 	"identity": "Desert speedsters in a canyon of an outfield. They turn gappers into triples, run on everything and track down fly balls nobody else could reach. The thin air does the rest.",
 	"mods": {"speed": 14, "power": -6, "glove": 6, "contact": 2}, "staff": {"stuff": 2}, "lefty": 0.4, "pitches": "balanced",
 	"nicknames": ["Tumbleweed", "Mirage", "Sidewinder", "Cactus", "Heatwave", "Dust Storm", "Meteor", "Roadrunner", "Sundial", "Canyon", "Scorcher", "Coyote", "Stardust", "Prospector", "Buckshot", "Tailwind", "Afterburn"],
 	"ai": {"swing_aggression": 1.0, "chase_scale": 0.95, "power_swing_rate": 0.32, "runner_aggression": 0.35, "edge_bias_scale": 1.0, "bullpen_hook": 0.6, "steal_rate": 2.2, "bunt_rate": 0.6}},
 	{"id": &"yetis", "city": "Frostgate", "name": "Yetis", "abbr": "FGY", "park": &"the_icebox", "stadium": "The Icebox",
-	"colors": [Color("3a6e9e"), Color("f4f8fb"), Color("9fe8ff")], "mascot": "Mitts, a shaggy yeti in earmuffs", "rival": &"comets",
+	"mascot": "Mitts, a shaggy yeti in earmuffs", "rival": &"comets",
 	"identity": "Cold-weather grinders. Contact hitters who foul off everything, sinkerballers who live on ground balls, and gloves that never drop a thing. In the heavy air of the Icebox, nothing comes easy.",
 	"mods": {"contact": 10, "power": -5, "glove": 8, "eye": 4}, "staff": {"control": 10, "velocity": -2, "stuff": 2}, "lefty": 0.35, "pitches": "sinkers",
 	"nicknames": ["Snowplow", "Frostbite", "Icicle", "Avalanche", "Tundra", "Blizzard", "Mitten", "Sleet", "Permafrost", "Hailstorm", "Igloo", "Whiteout", "Polar", "Snowdrift", "Glacier", "Cold Snap", "Deep Freeze"],
 	"ai": {"swing_aggression": 0.9, "chase_scale": 0.8, "power_swing_rate": 0.28, "runner_aggression": 0.0, "edge_bias_scale": 1.15, "bullpen_hook": 0.55, "steal_rate": 1.0, "bunt_rate": 1.0}},
 	{"id": &"neutrons", "city": "Atomic Falls", "name": "Neutrons", "abbr": "AFN", "park": &"reactor_park", "stadium": "Reactor Park",
-	"colors": [Color("262626"), Color("7dffb0"), Color("e3c94f")], "mascot": "Glowy, a friendly glowing atom", "rival": &"lamplighters",
+	"mascot": "Glowy, a friendly glowing atom", "rival": &"lamplighters",
 	"identity": "All-or-nothing power plant. Every swing is a meltdown, every pitcher throws gas, and nobody bothers to bunt. They strike out a ton and hit the scoreboard more than anyone.",
 	"mods": {"power": 14, "contact": -10, "eye": -6, "speed": -4}, "staff": {"velocity": 12, "control": -8}, "lefty": 0.4, "pitches": "heat",
 	"nicknames": ["Meltdown", "Fission", "Gamma", "Half-Life", "Isotope", "Reactor", "Fallout", "Uranium", "Critical Mass", "Particle", "Chain Reaction", "Megaton", "Geiger", "Plutonium", "Supernova", "Cyclotron", "Mushroom Cloud"],
 	"ai": {"swing_aggression": 1.15, "chase_scale": 1.3, "power_swing_rate": 0.52, "runner_aggression": -0.2, "edge_bias_scale": 0.85, "bullpen_hook": 0.7, "steal_rate": 0.4, "bunt_rate": 0.15}},
 	{"id": &"lamplighters", "city": "Midtown", "name": "Lamplighters", "abbr": "MTL", "park": &"the_horseshoe", "stadium": "The Horseshoe",
-	"colors": [Color("7a1f3d"), Color("ff4f7b"), Color("f2ead8")], "mascot": "Wick, a gas lamp in a top hat", "rival": &"neutrons",
+	"mascot": "Wick, a gas lamp in a top hat", "rival": &"neutrons",
 	"identity": "Night owls of the Horseshoe. They pull everything down the 279-foot lines, run down the endless center field and win late. Old-time ball under the lights, with a brass band.",
 	"mods": {"power": 2, "contact": 0, "speed": 2}, "staff": {"stuff": 3, "velocity": -5}, "lefty": 0.5, "pitches": "crafty",
 	"nicknames": ["Gaslight", "Wick", "Nightcap", "Lantern", "Moonbeam", "Streetlight", "Midnight", "Sparkler", "Neon", "Owl", "Curtain Call", "Matinee", "Flicker", "Torch", "Ember", "Last Call", "Encore Bell"],
 	"ai": {"swing_aggression": 1.0, "chase_scale": 1.0, "power_swing_rate": 0.4, "runner_aggression": 0.1, "edge_bias_scale": 1.0, "bullpen_hook": 0.65, "steal_rate": 1.0, "bunt_rate": 0.5}},
 	{"id": &"conductors", "city": "Ironbridge", "name": "Conductors", "abbr": "IBC", "park": &"warehouse_row", "stadium": "Warehouse Row",
-	"colors": [Color("d79a1e"), Color("1f4f34"), Color("1c1c1c")], "mascot": "Chug, a little steam engine", "rival": &"bankers",
+	"mascot": "Chug, a little steam engine", "rival": &"bankers",
 	"identity": "Railyard line-drive machine, always on schedule. Left-handed hitters spray liners off the brick wall in right; nobody chases and nobody panics. Train whistles after every double.",
 	"mods": {"contact": 8, "eye": 2, "power": 0}, "staff": {"control": 6, "velocity": 4, "stuff": 2}, "lefty": 0.65, "pitches": "balanced",
 	"nicknames": ["Caboose", "Whistle", "Boxcar", "Switchman", "Express", "Freight", "Signal", "Coal Car", "Turntable", "Brakeman", "Timetable", "Locomotive", "Sleeper", "Junction", "Semaphore", "Steam", "Full Throttle"],
 	"ai": {"swing_aggression": 0.95, "chase_scale": 0.8, "power_swing_rate": 0.34, "runner_aggression": 0.05, "edge_bias_scale": 1.05, "bullpen_hook": 0.6, "steal_rate": 1.0, "bunt_rate": 0.6}},
 	{"id": &"swans", "city": "Cascade City", "name": "Swans", "abbr": "CCS", "park": &"fountain_gardens", "stadium": "Fountain Gardens",
-	"colors": [Color("1e4fb0"), Color("f7f7fa"), Color("6fd6ff")], "mascot": "Duchess, an elegant swan in a tiara", "rival": &"gulls",
+	"mascot": "Duchess, an elegant swan in a tiara", "rival": &"gulls",
 	"identity": "Graceful pitching and defense in the most beautiful park in the league. Deep staff, slick gloves, strong arms, and just enough offense. Every win feels like a ballet.",
 	"mods": {"glove": 10, "arm": 6, "contact": 0, "power": -2}, "staff": {"velocity": 6, "control": 8, "stuff": 8}, "lefty": 0.45, "pitches": "balanced",
 	"nicknames": ["Ballet", "Cascade", "Feather", "Grace", "Lily Pad", "Pirouette", "Silk", "Swan Song", "Duchess", "Reflection", "Waltz", "Ripple", "Plume", "Serenade", "Fountain", "Elegance", "Curtsy"],
 	"ai": {"swing_aggression": 0.95, "chase_scale": 0.9, "power_swing_rate": 0.33, "runner_aggression": 0.05, "edge_bias_scale": 1.1, "bullpen_hook": 0.5, "steal_rate": 1.1, "bunt_rate": 0.8}},
 	{"id": &"safecrackers", "city": "Vaultborough", "name": "Safecrackers", "abbr": "VBS", "park": &"the_vault", "stadium": "The Vault",
-	"colors": [Color("5a6272"), Color("ff5ad0"), Color("151518")], "mascot": "Tumbler, a masked safecracker with a stethoscope", "rival": &"bankers",
+	"mascot": "Tumbler, a masked safecracker with a stethoscope", "rival": &"bankers",
 	"identity": "Turf burglars. Slap the ball into the carpet, run before anyone blinks, steal every base that isn't bolted down. In the Vault, grounders scoot through and so do they.",
 	"mods": {"speed": 14, "contact": 4, "power": -14}, "staff": {"stuff": 2}, "lefty": 0.55, "pitches": "crafty",
 	"nicknames": ["Lockpick", "Getaway", "Tumbler", "Combination", "Heist", "Alibi", "Ski Mask", "Stethoscope", "Crowbar", "Loot", "Fast Hands", "Jackpot", "Inside Job", "Smoke Bomb", "Safehouse", "Midnight Run", "Clean Getaway"],
@@ -236,9 +263,17 @@ func _init() -> void:
 		team.city = t["city"]
 		team.team_name = t["name"]
 		team.abbreviation = t["abbr"]
-		team.primary_color = t["colors"][0]
-		team.secondary_color = t["colors"][1]
-		team.accent_color = t["colors"][2]
+		var look: Dictionary = IDENTITY[t["id"]]
+		var palette: Array = look["colors"]
+		team.primary_color = Color(palette[0])
+		team.secondary_color = Color(palette[1])
+		team.accent_color = Color(palette[2])
+		team.support_color = Color(palette[3])
+		team.dark_color = Color(palette[4])
+		team.highlight_color = Color(palette[5])
+		team.slogan = look["slogan"]
+		team.emblem_shape = look["emblem"][0]
+		team.emblem_glyph = look["emblem"][1]
 		team.mascot = t["mascot"]
 		team.stadium = t["stadium"]
 		team.identity = t["identity"]

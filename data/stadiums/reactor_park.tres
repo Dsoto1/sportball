@@ -12,14 +12,26 @@ points = PackedVector3Array(-45, 98, 3, -28, 108, 3, -12, 121, 3, -9, 130, 6.5, 
 
 [sub_resource type="Resource" id="Resource_f7572"]
 script = ExtResource("2_smn81")
-kind = &"scoreboard"
-angle = 27.0
+kind = &"centerpiece"
+params = {
+"frame": &"gate"
+}
 
 [sub_resource type="Resource" id="Resource_mr6iu"]
 script = ExtResource("2_smn81")
-kind = &"light_towers"
+kind = &"scoreboard"
+angle = -34.0
 
 [sub_resource type="Resource" id="Resource_lexrw"]
+script = ExtResource("2_smn81")
+kind = &"slogan_board"
+angle = 34.0
+
+[sub_resource type="Resource" id="Resource_ubcck"]
+script = ExtResource("2_smn81")
+kind = &"light_towers"
+
+[sub_resource type="Resource" id="Resource_pc4ek"]
 script = ExtResource("2_smn81")
 kind = &"skyline"
 params = {
@@ -38,6 +50,7 @@ structure_color = Color(0.7882353, 0.7058824, 0.34509805, 1)
 accent_color = Color(0.49019608, 1, 0.6901961, 1)
 outfield_wall_color = Color(0.22745098, 0.22745098, 0.16470589, 1)
 wall_style = &"iron"
+decks = 3
 home_fan_share = 0.45
 away_fan_share = 0.3
 attendance = 0.82
@@ -45,4 +58,4 @@ night = true
 sponsors = PackedStringArray("ATOMIC FALLS POWER & LIGHT", "MUSHROOM CLOUD MALTS", "FISSION FIZZ", "RAY-GUN RADIO")
 skyline_color = Color(0.23921569, 0.24705882, 0.18039216, 1)
 window_color = Color(0.78431374, 1, 0.84705883, 1)
-pieces = Array[ExtResource("2_smn81")]([SubResource("Resource_f7572"), SubResource("Resource_mr6iu"), SubResource("Resource_lexrw")])
+pieces = Array[ExtResource("2_smn81")]([SubResource("Resource_f7572"), SubResource("Resource_mr6iu"), SubResource("Resource_lexrw"), SubResource("Resource_ubcck"), SubResource("Resource_pc4ek")])

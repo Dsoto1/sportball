@@ -211,13 +211,21 @@ The look is built from layers, so a park (or a future stadium designer) only edi
 - **Setting:** night, turf.
 - **Pieces:** `StadiumDef.pieces`, a list of placed `StadiumPiece`s (kind, spray angle, size, mirrored, settings).
 
-The core (bowl, crowd, batter's eye, dugouts, backstop, wall markers) is always built. Each piece is a module from `StadiumModules.CATALOG`:
+The core is always built:
+
+- the bowl, in 1 to 3 decks, with the home club's wordmarks along each deck front;
+- the crowd and the batter's eye;
+- dugouts (home on first, VISITORS on third);
+- the backstop;
+- the wall's distances and the home club's emblems. Each piece is a module from `StadiumModules.CATALOG`:
 
 | Module | What it is | Settings |
 |---|---|---|
-| `scoreboard` | video board over the stands (the first is the main board) | height |
+| `centerpiece` | board in straightaway center: club name under its emblem, the batter's card | height, frame (board, gate, arch) |
+| `scoreboard` | line-score board over the stands | height |
+| `slogan_board` | lit sign with the emblem, the park's name and the club's slogan | height, text |
 | `wall_scoreboard` | hand-operated board in a wall 6 m or taller | none |
-| `light_towers` | six floodlight towers | height |
+| `light_towers` | six floodlight towers and a pair flanking the centerpiece | height, flank |
 | `skyline` | city ring, windows lit at night | height, count |
 | `halo` | glowing ring on pylons, hung with sponsor boards | height, radius |
 | `bay` | water beyond one side, low stands, boats | boats |

@@ -12,21 +12,30 @@ points = PackedVector3Array(-45, 101, 3.7, -22, 118, 3.7, 0, 125, 3.7, 22, 118, 
 
 [sub_resource type="Resource" id="Resource_k8u6i"]
 script = ExtResource("2_wib25")
-kind = &"scoreboard"
-angle = 27.0
+kind = &"centerpiece"
 
 [sub_resource type="Resource" id="Resource_q8oj0"]
 script = ExtResource("2_wib25")
-kind = &"light_towers"
+kind = &"scoreboard"
+angle = -34.0
 
 [sub_resource type="Resource" id="Resource_kaaf5"]
+script = ExtResource("2_wib25")
+kind = &"slogan_board"
+angle = 34.0
+
+[sub_resource type="Resource" id="Resource_48ww4"]
+script = ExtResource("2_wib25")
+kind = &"light_towers"
+
+[sub_resource type="Resource" id="Resource_1xj3a"]
 script = ExtResource("2_wib25")
 kind = &"skyline"
 params = {
 "height": 0.6
 }
 
-[sub_resource type="Resource" id="Resource_48ww4"]
+[sub_resource type="Resource" id="Resource_taq0n"]
 script = ExtResource("2_wib25")
 kind = &"fountains"
 angle = 14.0
@@ -45,6 +54,7 @@ accent_color = Color(0.43529412, 0.8392157, 1, 1)
 outfield_wall_color = Color(0.08627451, 0.2, 0.41568628, 1)
 foul_rows = 24
 outfield_rows = 5
+decks = 2
 home_fan_share = 0.5
 away_fan_share = 0.25
 attendance = 0.8
@@ -52,4 +62,4 @@ night = true
 sponsors = PackedStringArray("CASCADE COLA", "SPRINKLE & SONS PLUMBING", "BLUE PLAINS BBQ", "MISTY MEADOW DAIRY", "JUBILEE JEWELERS")
 skyline_color = Color(0.14901961, 0.1882353, 0.2901961, 1)
 window_color = Color(0.84705883, 0.9254902, 1, 1)
-pieces = Array[ExtResource("2_wib25")]([SubResource("Resource_k8u6i"), SubResource("Resource_q8oj0"), SubResource("Resource_kaaf5"), SubResource("Resource_48ww4")])
+pieces = Array[ExtResource("2_wib25")]([SubResource("Resource_k8u6i"), SubResource("Resource_q8oj0"), SubResource("Resource_kaaf5"), SubResource("Resource_48ww4"), SubResource("Resource_1xj3a"), SubResource("Resource_taq0n")])

@@ -12,18 +12,27 @@ points = PackedVector3Array(-45, 96, 3.4, -30, 104, 3.4, -15, 112, 3.4, 0, 116, 
 
 [sub_resource type="Resource" id="Resource_fwpx2"]
 script = ExtResource("2_un8dc")
-kind = &"scoreboard"
-angle = 27.0
+kind = &"centerpiece"
 
 [sub_resource type="Resource" id="Resource_8s2kh"]
 script = ExtResource("2_un8dc")
-kind = &"light_towers"
+kind = &"scoreboard"
+angle = -34.0
 
 [sub_resource type="Resource" id="Resource_rkpyr"]
 script = ExtResource("2_un8dc")
-kind = &"skyline"
+kind = &"slogan_board"
+angle = 34.0
 
 [sub_resource type="Resource" id="Resource_rkhve"]
+script = ExtResource("2_un8dc")
+kind = &"light_towers"
+
+[sub_resource type="Resource" id="Resource_iofs5"]
+script = ExtResource("2_un8dc")
+kind = &"skyline"
+
+[sub_resource type="Resource" id="Resource_5ix5a"]
 script = ExtResource("2_un8dc")
 kind = &"halo"
 
@@ -38,9 +47,10 @@ seat_color_alt = Color(0.17254902, 0.101960786, 0.3019608, 1)
 structure_color = Color(0.56078434, 0.5411765, 0.6392157, 1)
 accent_color = Color(1, 0.7882353, 0.2901961, 1)
 outfield_wall_color = Color(0.16470589, 0.10980392, 0.30980393, 1)
+decks = 3
 home_fan_share = 0.62
 attendance = 0.9
 sponsors = PackedStringArray("SPOTLIGHT COLA", "NEON HEIGHTS TRANSIT", "MARQUEE MOTORS", "VELVET ROPE LOUNGE", "GLAM SLAM GUM", "CRT VISION", "HEADLINER HOTELS", "ENCORE AIRWAYS")
 skyline_color = Color(0.16862746, 0.16470589, 0.32156864, 1)
 window_color = Color(1, 0.8235294, 0.47843137, 1)
-pieces = Array[ExtResource("2_un8dc")]([SubResource("Resource_fwpx2"), SubResource("Resource_8s2kh"), SubResource("Resource_rkpyr"), SubResource("Resource_rkhve")])
+pieces = Array[ExtResource("2_un8dc")]([SubResource("Resource_fwpx2"), SubResource("Resource_8s2kh"), SubResource("Resource_rkpyr"), SubResource("Resource_rkhve"), SubResource("Resource_iofs5"), SubResource("Resource_5ix5a")])

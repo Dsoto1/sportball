@@ -12,14 +12,26 @@ points = PackedVector3Array(-45, 85, 4.9, -36, 97, 4.9, -26, 120, 3, -12, 139, 3
 
 [sub_resource type="Resource" id="Resource_tgobb"]
 script = ExtResource("2_olas1")
-kind = &"scoreboard"
-angle = 27.0
+kind = &"centerpiece"
+params = {
+"frame": &"arch"
+}
 
 [sub_resource type="Resource" id="Resource_o5o6h"]
 script = ExtResource("2_olas1")
-kind = &"light_towers"
+kind = &"scoreboard"
+angle = -34.0
 
 [sub_resource type="Resource" id="Resource_b4fev"]
+script = ExtResource("2_olas1")
+kind = &"slogan_board"
+angle = 34.0
+
+[sub_resource type="Resource" id="Resource_2quui"]
+script = ExtResource("2_olas1")
+kind = &"light_towers"
+
+[sub_resource type="Resource" id="Resource_26mby"]
 script = ExtResource("2_olas1")
 kind = &"skyline"
 params = {
@@ -39,6 +51,7 @@ accent_color = Color(1, 0.30980393, 0.48235294, 1)
 outfield_wall_color = Color(0.101960786, 0.23921569, 0.16470589, 1)
 foul_rows = 28
 outfield_rows = 20
+decks = 2
 home_fan_share = 0.45
 away_fan_share = 0.3
 attendance = 0.9
@@ -46,4 +59,4 @@ night = true
 sponsors = PackedStringArray("OLD TOWNE TROLLEY", "HORSESHOE HAMS", "MIDNIGHT MATINEE", "NICKEL ARCADE", "LAMPLIGHTER LAGER")
 skyline_color = Color(0.101960786, 0.12156863, 0.2, 1)
 window_color = Color(1, 0.8784314, 0.627451, 1)
-pieces = Array[ExtResource("2_olas1")]([SubResource("Resource_tgobb"), SubResource("Resource_o5o6h"), SubResource("Resource_b4fev")])
+pieces = Array[ExtResource("2_olas1")]([SubResource("Resource_tgobb"), SubResource("Resource_o5o6h"), SubResource("Resource_b4fev"), SubResource("Resource_2quui"), SubResource("Resource_26mby")])

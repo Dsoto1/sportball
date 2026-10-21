@@ -12,21 +12,33 @@ points = PackedVector3Array(-45, 94.5, 11.3, -30, 101, 11.3, -14, 111, 11.3, -12
 
 [sub_resource type="Resource" id="Resource_oeo3i"]
 script = ExtResource("2_mb518")
-kind = &"scoreboard"
-angle = 27.0
+kind = &"centerpiece"
+params = {
+"frame": &"arch"
+}
 
 [sub_resource type="Resource" id="Resource_cq0mc"]
 script = ExtResource("2_mb518")
-kind = &"light_towers"
+kind = &"scoreboard"
+angle = -34.0
 
 [sub_resource type="Resource" id="Resource_7xix8"]
+script = ExtResource("2_mb518")
+kind = &"slogan_board"
+angle = 34.0
+
+[sub_resource type="Resource" id="Resource_up8hn"]
+script = ExtResource("2_mb518")
+kind = &"light_towers"
+
+[sub_resource type="Resource" id="Resource_hcvew"]
 script = ExtResource("2_mb518")
 kind = &"skyline"
 params = {
 "height": 0.8
 }
 
-[sub_resource type="Resource" id="Resource_up8hn"]
+[sub_resource type="Resource" id="Resource_qnulu"]
 script = ExtResource("2_mb518")
 kind = &"wall_scoreboard"
 angle = -28.0
@@ -44,10 +56,11 @@ accent_color = Color(0.9490196, 0.9019608, 0.78431374, 1)
 outfield_wall_color = Color(0.11372549, 0.32156864, 0.20784314, 1)
 foul_rows = 22
 outfield_rows = 10
+decks = 2
 home_fan_share = 0.5
 away_fan_share = 0.3
 attendance = 0.95
 sponsors = PackedStringArray("PEMBERTON PEANUTS", "COBBLESTONE COFFEE", "LANTERN LAUNDRY", "IRONCLAD INSURANCE", "LEDGER STREET LAGER")
 skyline_color = Color(0.3529412, 0.2901961, 0.28235295, 1)
 window_color = Color(1, 0.88235295, 0.65882355, 1)
-pieces = Array[ExtResource("2_mb518")]([SubResource("Resource_oeo3i"), SubResource("Resource_cq0mc"), SubResource("Resource_7xix8"), SubResource("Resource_up8hn")])
+pieces = Array[ExtResource("2_mb518")]([SubResource("Resource_oeo3i"), SubResource("Resource_cq0mc"), SubResource("Resource_7xix8"), SubResource("Resource_up8hn"), SubResource("Resource_hcvew"), SubResource("Resource_qnulu")])

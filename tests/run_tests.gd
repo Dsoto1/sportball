@@ -6,11 +6,25 @@ extends SceneTree
 const TEST_DIRS: Array[String] = ["res://tests/unit", "res://tests/scenario"]
 
 
+## Counts script errors, so a test that dies on one fails instead of
+## quietly passing the checks it never reached.
+class ErrorCounter extends Logger:
+	var count := 0
+	var last := ""
+
+	func _log_error(_function: String, _file: String, _line: int, code: String, rationale: String, _editor_notify: bool, error_type: int, _script_backtraces: Array[ScriptBacktrace]) -> void:
+		if error_type == ERROR_TYPE_SCRIPT:
+			count += 1
+			last = rationale if not rationale.is_empty() else code
+
+
 func _initialize() -> void:
 	var filter := ""
 	var args := OS.get_cmdline_user_args()
 	if not args.is_empty():
 		filter = args[0]
+	var errors := ErrorCounter.new()
+	OS.add_logger(errors)
 	var total := 0
 	var failed := 0
 	for dir_path in TEST_DIRS:
@@ -29,8 +43,11 @@ func _initialize() -> void:
 					continue
 				total += 1
 				var before := suite.failures.size()
+				var errors_before := errors.count
 				suite.begin("%s::%s" % [file.get_file(), method_name])
 				suite.call(method_name)
+				if errors.count > errors_before:
+					suite.failures.append("%s::%s: script error: %s" % [file.get_file(), method_name, errors.last])
 				if suite.failures.size() > before:
 					failed += 1
 					for i in range(before, suite.failures.size()):

@@ -16,6 +16,9 @@ const DISPLAY_FONT := preload("res://assets/third_party/fonts/bungee/Bungee-Regu
 
 const ROW_DEPTH := 0.9
 const ROW_RISE := 0.45
+## Each deck above the first starts this much higher than the row below it
+## would: its front is the fascia band that carries the club's wordmarks.
+const DECK_JUMP := 2.6
 const ANGLE_STEP := 1.0
 ## Inner edge of the stands (meters from home) by |spray angle| past the
 ## foul poles; inside the poles the bleachers start just behind the wall.
@@ -59,7 +62,8 @@ func build(p_tuning: BaseballTuning, p_def: StadiumDef, home: TeamDef, away: Tea
 	_build_batters_eye()
 	_build_dugouts(home, away)
 	_build_backstop()
-	_build_markers()
+	_build_markers(home)
+	_build_fascia(home)
 	for piece in def.pieces:
 		if piece != null:
 			StadiumModules.build(self, piece, home, away)
@@ -102,6 +106,37 @@ func profile(angle: float) -> Vector3:
 	return Vector3(inner, first, rows)
 
 
+## Rows per deck: the foul stands split evenly into def.decks decks.
+func rows_per_deck() -> int:
+	return maxi(1, ceili(float(def.foul_rows) / maxi(def.decks, 1)))
+
+
+## The last row under a deck front is a walkway: no fans standing in
+## front of the fascia's wordmarks.
+func _is_walkway(angle: float, k: int) -> bool:
+	return absf(angle) > 50.0 and is_deck_front(k + 1)
+
+
+func is_deck_front(k: int) -> bool:
+	return def.decks > 1 and k % rows_per_deck() == 0
+
+
+## Height of row k's tread at a spray angle (p = profile(angle)). The decks
+## step up in the foul stands; the outfield bleachers are one deck, and
+## the jump fades in past the foul poles so the bowl stays closed.
+func row_height(angle: float, p: Vector3, k: int) -> float:
+	var deck := floori(float(k) / rows_per_deck()) if def.decks > 1 else 0
+	return p.y + k * ROW_RISE + deck * DECK_JUMP * smoothstep(45.0, 60.0, absf(angle))
+
+
+## The back and top of the stands at a spray angle: (radius, height of the
+## last row's tread). Modules stand on or behind this.
+func stand_top(angle: float) -> Vector2:
+	var p := profile(angle)
+	var rows := int(p.z)
+	return Vector2(p.x + rows * ROW_DEPTH, row_height(angle, p, rows - 1))
+
+
 ## Open water at this spray angle: within 22 degrees of a bay piece.
 func is_water(angle: float) -> bool:
 	for bay in _water:
@@ -139,16 +174,22 @@ func _build_bowl() -> void:
 				seat = eye
 			var ra := pa.x + k * ROW_DEPTH
 			var rb := pb.x + k * ROW_DEPTH
-			var ha := pa.y + k * ROW_RISE
-			var hb := pb.y + k * ROW_RISE
-			var below_a := 0.0 if k == 0 else ha - ROW_RISE
-			var below_b := 0.0 if k == 0 else hb - ROW_RISE
-			# Riser (the step's face), then the tread (where fans sit).
-			_quad(st, point(a, ra, below_a), point(b, rb, below_b), point(b, rb, hb), point(a, ra, ha), riser if absf(mid) >= BATTERS_EYE else eye)
+			var ha := row_height(a, pa, k)
+			var hb := row_height(b, pb, k)
+			var below_a := 0.0 if k == 0 else row_height(a, pa, k - 1)
+			var below_b := 0.0 if k == 0 else row_height(b, pb, k - 1)
+			# Riser (the step's face), then the tread (where fans sit). A
+			# deck's front is its fascia band, in the park's accent.
+			var face := riser
+			if absf(mid) < BATTERS_EYE:
+				face = eye
+			elif k > 0 and is_deck_front(k):
+				face = def.accent_color.lerp(def.structure_color, 0.25)
+			_quad(st, point(a, ra, below_a), point(b, rb, below_b), point(b, rb, hb), point(a, ra, ha), face)
 			_quad(st, point(a, ra, ha), point(b, rb, hb), point(b, rb + ROW_DEPTH, hb), point(a, ra + ROW_DEPTH, ha), seat)
 		# Back of the stand: a facade down to the ground with a trim band.
-		var top_a := pa.y + (rows - 1) * ROW_RISE
-		var top_b := pb.y + (rows - 1) * ROW_RISE
+		var top_a := row_height(a, pa, rows - 1)
+		var top_b := row_height(b, pb, rows - 1)
 		var back_a := pa.x + rows * ROW_DEPTH
 		var back_b := pb.x + rows * ROW_DEPTH
 		_quad(st, point(a, back_a, top_a), point(b, back_b, top_b), point(b, back_b, top_b + 1.2), point(a, back_a, top_a + 1.2), def.accent_color.darkened(0.2))
@@ -195,8 +236,8 @@ func _build_crowd(home: TeamDef, away: TeamDef) -> void:
 			var step_deg := rad_to_deg(SEAT_SPACING / radius)
 			var s := a
 			while s < a + ANGLE_STEP:
-				if not _is_aisle(s) and absf(s) >= BATTERS_EYE + 1.0 and rng.randf() < def.attendance:
-					seats.append(point(s + rng.randf_range(-0.1, 0.1) * step_deg, radius, p.y + k * ROW_RISE))
+				if not _is_aisle(s) and absf(s) >= BATTERS_EYE + 1.0 and not _is_walkway(a, k) and rng.randf() < def.attendance:
+					seats.append(point(s + rng.randf_range(-0.1, 0.1) * step_deg, radius, row_height(a, p, k)))
 				s += step_deg
 		a += ANGLE_STEP
 	var mm := MultiMesh.new()
@@ -236,16 +277,19 @@ func _build_crowd(home: TeamDef, away: TeamDef) -> void:
 ## A dark wall above the center-field bleachers so the pitch reads cleanly.
 func _build_batters_eye() -> void:
 	var p := profile(0.0)
-	var top := p.y + p.z * ROW_RISE
-	var eye := box(Vector3(2.0 * BATTERS_EYE * PI / 180.0 * (p.x + p.z * ROW_DEPTH), 6.0, 1.0), Color(0.06, 0.1, 0.09))
-	eye.position = point(0.0, p.x + p.z * ROW_DEPTH, top + 3.0)
+	var top := stand_top(0.0)
+	var eye := box(Vector3(2.0 * BATTERS_EYE * PI / 180.0 * top.x, 6.0, 1.0), Color(0.06, 0.1, 0.09))
+	eye.position = point(0.0, top.x, top.y + 3.0 + ROW_RISE)
 	eye.name = "BattersEye"
 
 
 func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
-	# Home team on the first-base side, visitors on third (the reference sheets).
+	# Home on the first-base side, visitors on third (the reference sheets):
+	# the same dugout twice, the home one in its club's colors with its
+	# wordmark and emblem, the visitors' marked VISITORS.
 	for side: float in [-1.0, 1.0]:
-		var club := away if side < 0.0 else home
+		var is_home := side > 0.0
+		var club := home if is_home else away
 		var angle := 82.0 * side
 		var radius := profile(angle).x - 4.5
 		var center := point(angle, radius, 0.0)
@@ -257,13 +301,22 @@ func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
 		back.position = Vector3(0, 1.0, 1.6)
 		var bench := box(Vector3(13.0, 0.5, 1.0), club.secondary_color, dugout)
 		bench.position = Vector3(0, 0.25, 1.0)
-		var roof := box(Vector3(14.6, 0.35, 3.6), club.primary_color, dugout)
+		var roof := box(Vector3(14.6, 0.35, 3.6), home.primary_color if is_home else home.dark_color, dugout)
 		roof.position = Vector3(0, 2.3, 0.2)
+		var plaque := box(Vector3(14.6, 0.9, 0.1), home.dark_color, dugout)
+		plaque.position = Vector3(0, 2.3, -1.98)
+		var glow_strip := box(Vector3(14.0, 0.08, 0.08), Color.WHITE, dugout)
+		glow_strip.position = Vector3(0, 2.05, -1.6)
+		glow_strip.material_override = glow(Color(1.0, 0.92, 0.75), 2.0)
 		var rail := box(Vector3(14.6, 0.12, 0.12), def.accent_color, dugout)
 		rail.position = Vector3(0, 1.1, -1.4)
-		var sign := label(club.team_name.to_upper(), 64, Color.WHITE, dugout)
-		sign.position = Vector3(0, 2.3, -1.65)
+		var sign := label(home.team_name.to_upper() if is_home else "VISITORS", 64, home.highlight_color, dugout)
+		sign.position = Vector3(0, 2.3, -2.05)
 		sign.rotation.y = PI
+		var mark := Emblem.build(club, 1.4, 0.4)
+		mark.position = Vector3(0, 1.4, 1.38)
+		mark.rotation.y = PI
+		dugout.add_child(mark)
 
 
 func _build_backstop() -> void:
@@ -287,15 +340,66 @@ func _build_backstop() -> void:
 	add_child(mi)
 
 
-## Distances painted on the wall, in feet as on any ballpark wall.
-func _build_markers() -> void:
-	for angle: float in [-45.0, -22.0, 0.0, 22.0, 45.0]:
+## The wall's dressing: distances in big numbers (left, center, right) and
+## the home club's emblem near each pole and in the alleys.
+func _build_markers(home: TeamDef) -> void:
+	for angle: float in [-38.0, 0.0, 38.0]:
 		var d := FieldLayout.fence_distance(angle, tuning)
-		var marker := label(str(roundi(d * 3.2808)), 110, def.accent_color)
-		# Flat against the wall: its facing follows the wall's curve here.
+		var h := FieldLayout.fence_height(angle, tuning)
+		var marker := label(str(roundi(d * 3.2808)), 200, def.accent_color)
+		marker.pixel_size = 0.012 * clampf(h / 3.0, 0.5, 1.0)
 		var inward := wall_inward(angle)
-		var spot := point(angle, d, minf(FieldLayout.fence_height(angle, tuning) * 0.55, 2.2)) + inward * 0.7
+		var spot := point(angle, d, minf(h * 0.55, 2.2)) + inward * 0.4
 		marker.look_at_from_position(spot, spot - inward, Vector3.UP)
+	for angle: float in [-43.0, -20.0, 20.0, 43.0]:
+		var h := FieldLayout.fence_height(angle, tuning)
+		if h < 1.2:
+			continue
+		var mark := Emblem.build(home, minf(h * 0.75, 3.2), 0.4)
+		mark.name = "WallEmblem"
+		add_child(mark)
+		var inward := wall_inward(angle)
+		var spot := point(angle, FieldLayout.fence_distance(angle, tuning), minf(h * 0.5, 2.0)) + inward * 0.35
+		mark.look_at_from_position(spot, spot - inward, Vector3.UP)
+
+
+## Club wordmarks along the deck fronts (and the low wall of the first
+## deck), alternating the club name and city, facing the field.
+func _build_fascia(home: TeamDef) -> void:
+	var root := Node3D.new()
+	root.name = "Fascia"
+	add_child(root)
+	var words := [home.team_name.to_upper(), home.city.to_upper()]
+	var n := 0
+	for d in def.decks:
+		var k := d * rows_per_deck()
+		var pixel := 0.014 if d > 0 else 0.009
+		# Letter by letter, each on the band at its own angle, so the words
+		# follow the curve of the stands. About 0.62 em per glyph.
+		var glyph := 110.0 * pixel * 0.62
+		for side: float in [-1.0, 1.0]:
+			var a := 62.0
+			while true:
+				var text: String = words[n % 2]
+				var span := rad_to_deg((text.length() * glyph) / maxf(profile(a * side).x, 10.0))
+				if a + span > 172.0:
+					break
+				var placed := false
+				for i in text.length():
+					var angle := (a + span * (i + 0.5) / text.length()) * side
+					var p := profile(angle)
+					if k >= int(p.z):
+						continue
+					var height := (row_height(angle, p, k) + (0.0 if k == 0 else row_height(angle, p, k - 1))) * 0.5
+					# Seen from the field, the third-base words run toward home.
+					var letter := label(text[i] if side > 0.0 else text[text.length() - 1 - i], 110, home.dark_color if d > 0 else Color.WHITE, root)
+					letter.pixel_size = pixel
+					letter.position = point(angle, p.x + k * ROW_DEPTH - 0.15, height)
+					face_home(letter)
+					placed = true
+				if placed:
+					n += 1
+				a += span + rad_to_deg(6.0 / maxf(profile(a * side).x, 10.0))
 
 
 # --- Scoreboard -----------------------------------------------------------
@@ -355,6 +459,10 @@ func update_scoreboard(state: MatchState, roster: MatchRoster) -> void:
 	var first := maxi(state.inning - 8, 1)  # extra innings scroll the window
 	var lit := {"B": state.balls, "S": state.strikes, "O": state.outs}
 	for board in _boards:
+		if board.has("card"):
+			_fill_card(board["card"], p, state)
+		if not board.has("cells"):
+			continue
 		var cells: Dictionary = board["cells"]
 		for row in 2:
 			var line: Array = state.line_score[row]
@@ -377,6 +485,26 @@ func update_scoreboard(state: MatchState, roster: MatchRoster) -> void:
 				(bulbs[i] as MeshInstance3D).material_override = glow(lamps[k][1], 2.2) if on else GrayboxField._mat(Color(0.12, 0.12, 0.14))
 		if board["batter"] != null:
 			board["batter"].text = "AT BAT  #%d %s" % [p.number, p.display_name.to_upper()] if p != null else ""
+
+
+## The centerpiece's batter card: number, name, position and season line.
+func _fill_card(card: Dictionary, p: PlayerDef, state: MatchState) -> void:
+	if p == null:
+		for key in card:
+			card[key].text = ""
+		return
+	var position: StringName = &"dh"
+	var defense: Dictionary = state.defense[state.batting_team()]
+	for pos: StringName in defense:
+		if defense[pos] == p.id:
+			position = pos
+	var line := SeasonLine.for_player(p)
+	card["number"].text = "#%d" % p.number
+	card["name"].text = p.display_name.to_upper()
+	card["position"].text = String(position).to_upper()
+	card["avg"].text = SeasonLine.avg_text(line["avg"])
+	card["hr"].text = str(line["hr"])
+	card["rbi"].text = str(line["rbi"])
 
 
 # --- Kit for modules --------------------------------------------------------

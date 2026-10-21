@@ -742,3 +742,31 @@ Parks are now built from data layers, so a stadium designer or team designer can
 Reason: Owner request for modular stadium designs as a foundation for a future stadium or team designer.
 
 Affected systems: StadiumDef, StadiumPiece (new), StadiumModules and modules/ (new), Stadium (core plus kit), GrayboxField (`is_roofed`), generate_parks, data/stadiums (regenerated), tests (stadium), README.
+
+## 2026-10-21 - Club Identity and the Reference Sheets' Shared Park
+
+The owner's reference sheets (`docs/stadium_refs/`, four parks so far) give every park the same shared parts and every club a color set and emblem. Both are now in the game.
+
+- **Club identity (TeamDef):**
+  - Six colors: primary, secondary, accent, support, dark, highlight.
+  - A slogan.
+  - An emblem: a badge shape (disc, shield, gear, halo, diamond, laurel, star) and a glyph, drawn in code by `Emblem`. Any club can drop in a finished logo instead (`emblem_texture`).
+  - `tools/generate_teams.gd` holds the table (`IDENTITY`). The Gearheads, Bankers and Gulls use their sheets' hex colors exactly, and the Glitterati their sheet's purple, gold, gray and black. The other seven are drafts until their sheets arrive.
+  - Uniforms follow the new colors, so the Gearheads are now orange and iron gray, the Bankers green and gold, and the Gulls blue and teal.
+- **Shared park (core):**
+  - Tiered decks (`StadiumDef.decks`, 1 to 3), each with a fascia band. The home club's name and city run along it letter by letter, so the words follow the curve. The row under each deck front is a walkway with no fans.
+  - Yellow foul poles with screens.
+  - Big distance numbers and home emblems on the wall.
+  - Home dugout on the first-base side, the visitors' on third marked VISITORS.
+- **New modules:**
+  - `centerpiece`: straightaway center, over the batter's eye. The club name under its emblem and the batter's card (number, name, position, AVG/HR/RBI), framed as a board, gate or arch.
+  - `slogan_board`: a lit sign with the emblem, the park's name and the club's slogan.
+  - Light towers gain a flanking pair.
+  - The line-score board moves to left-center by default.
+- **Season line:** the card's AVG/HR/RBI come from the hitter's ratings (`SeasonLine`). It's for presentation only until there is a season.
+- **Sheet values that don't apply:** the sheets' distances are illustrative. Wall shapes stay as tuned, including the Boilerplate and the Leviathan.
+- **Test runner:** a test that hits a script error now fails. Before, it passed the checks it never reached.
+
+Reason: Owner reference sheets for the Halo Dome, Foundry Field, Ledger Street Park and Pier 9 Ballyard.
+
+Affected systems: TeamDef, Emblem (new), SeasonLine (new), StadiumDef (decks), Stadium (decks, fascia, wall dressing, dugouts), GrayboxField (foul poles), modules (centerpiece, slogan_board, light_towers), generate_teams, generate_parks, data (teams, parks), tests (stadium, runner), tools (emblem_sheet, stadium_tour), README, stadium_refs notes.

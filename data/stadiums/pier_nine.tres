@@ -13,21 +13,30 @@ air_drag_scale = 1.03
 
 [sub_resource type="Resource" id="Resource_4y8qj"]
 script = ExtResource("2_84kiu")
-kind = &"scoreboard"
-angle = 27.0
+kind = &"centerpiece"
 
 [sub_resource type="Resource" id="Resource_o48xx"]
 script = ExtResource("2_84kiu")
-kind = &"light_towers"
+kind = &"scoreboard"
+angle = -34.0
 
 [sub_resource type="Resource" id="Resource_tvncl"]
+script = ExtResource("2_84kiu")
+kind = &"slogan_board"
+angle = 34.0
+
+[sub_resource type="Resource" id="Resource_nhb2p"]
+script = ExtResource("2_84kiu")
+kind = &"light_towers"
+
+[sub_resource type="Resource" id="Resource_suy3x"]
 script = ExtResource("2_84kiu")
 kind = &"skyline"
 params = {
 "height": 0.9
 }
 
-[sub_resource type="Resource" id="Resource_nhb2p"]
+[sub_resource type="Resource" id="Resource_end53"]
 script = ExtResource("2_84kiu")
 kind = &"bay"
 angle = 40.0
@@ -45,10 +54,11 @@ accent_color = Color(1, 0.41960785, 0.2901961, 1)
 outfield_wall_color = Color(0.07450981, 0.1882353, 0.2784314, 1)
 foul_rows = 24
 outfield_rows = 8
+decks = 2
 home_fan_share = 0.45
 away_fan_share = 0.35
 attendance = 0.88
 sponsors = PackedStringArray("SALTWIND SAILS", "PIER 9 OYSTERS", "TIDECALLER TAXI", "BUOY BEVERAGES", "FOGHORN FRIES")
 skyline_color = Color(0.21568628, 0.27450982, 0.36862746, 1)
 window_color = Color(1, 0.9137255, 0.6901961, 1)
-pieces = Array[ExtResource("2_84kiu")]([SubResource("Resource_4y8qj"), SubResource("Resource_o48xx"), SubResource("Resource_tvncl"), SubResource("Resource_nhb2p")])
+pieces = Array[ExtResource("2_84kiu")]([SubResource("Resource_4y8qj"), SubResource("Resource_o48xx"), SubResource("Resource_tvncl"), SubResource("Resource_nhb2p"), SubResource("Resource_suy3x"), SubResource("Resource_end53")])

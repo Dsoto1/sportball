@@ -12,21 +12,33 @@ points = PackedVector3Array(-45, 101, 2.4, -25, 111, 2.4, -8, 123, 2.4, 0, 122, 
 
 [sub_resource type="Resource" id="Resource_llfex"]
 script = ExtResource("2_3mioo")
-kind = &"scoreboard"
-angle = 27.0
+kind = &"centerpiece"
+params = {
+"frame": &"arch"
+}
 
 [sub_resource type="Resource" id="Resource_dhncx"]
 script = ExtResource("2_3mioo")
-kind = &"light_towers"
+kind = &"scoreboard"
+angle = -34.0
 
 [sub_resource type="Resource" id="Resource_50gy8"]
+script = ExtResource("2_3mioo")
+kind = &"slogan_board"
+angle = 34.0
+
+[sub_resource type="Resource" id="Resource_3ko6v"]
+script = ExtResource("2_3mioo")
+kind = &"light_towers"
+
+[sub_resource type="Resource" id="Resource_5iq4d"]
 script = ExtResource("2_3mioo")
 kind = &"skyline"
 params = {
 "height": 0.9
 }
 
-[sub_resource type="Resource" id="Resource_3ko6v"]
+[sub_resource type="Resource" id="Resource_di3l1"]
 script = ExtResource("2_3mioo")
 kind = &"warehouse"
 angle = 45.0
@@ -45,10 +57,11 @@ outfield_wall_color = Color(0.47843137, 0.2, 0.14117648, 1)
 wall_style = &"brick"
 foul_rows = 24
 outfield_rows = 12
+decks = 2
 home_fan_share = 0.5
 away_fan_share = 0.3
 attendance = 0.92
 sponsors = PackedStringArray("ROUNDHOUSE STORAGE CO.", "HARBORLIGHT CRAB SHACK", "BRASS RAIL BITTERS", "OLD LINE LOCKSMITHS", "CANAL STREET CANDY")
 skyline_color = Color(0.31764707, 0.28235295, 0.28235295, 1)
 window_color = Color(1, 0.88235295, 0.65882355, 1)
-pieces = Array[ExtResource("2_3mioo")]([SubResource("Resource_llfex"), SubResource("Resource_dhncx"), SubResource("Resource_50gy8"), SubResource("Resource_3ko6v")])
+pieces = Array[ExtResource("2_3mioo")]([SubResource("Resource_llfex"), SubResource("Resource_dhncx"), SubResource("Resource_50gy8"), SubResource("Resource_3ko6v"), SubResource("Resource_5iq4d"), SubResource("Resource_di3l1")])

@@ -1,6 +1,7 @@
 extends StadiumModule
-## Six floodlight towers behind the stands, their lamp banks aimed at the
-## middle of the field; they blaze at night.
+## Floodlight towers behind the stands, their lamp banks aimed at the
+## middle of the field (they blaze at night): six around the bowl and a
+## pair flanking the centerpiece at +-flank degrees (0 for none).
 
 const ANGLES := [-128.0, -72.0, -32.0, 32.0, 72.0, 128.0]
 
@@ -11,7 +12,11 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	var root := Node3D.new()
 	root.name = stadium.unique_name("LightTowers")
 	stadium.add_child(root)
-	for angle: float in ANGLES:
+	var angles: Array = ANGLES.duplicate()
+	var flank := float(piece.param("flank"))
+	if flank > 0.0:
+		angles.append_array([-flank, flank])
+	for angle: float in angles:
 		var p := stadium.profile(angle)
 		var base := stadium.point(angle, p.x + p.z * Stadium.ROW_DEPTH + 4.0, 0.0)
 		var pole := stadium.box(Vector3(1.4, height, 1.4), def.structure_color.darkened(0.2), root)

@@ -25,6 +25,8 @@ extends Resource
 ## Rows of seats in the foul-territory stands and the outfield bleachers.
 @export var foul_rows: int = 26
 @export var outfield_rows: int = 16
+## Decks in the foul stands (1-3), each with a fascia band of wordmarks.
+@export_range(1, 3) var decks: int = 1
 ## Fans in home colors, away colors and anything else (shares sum to ~1).
 @export var home_fan_share: float = 0.6
 @export var away_fan_share: float = 0.12

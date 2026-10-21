@@ -7,6 +7,7 @@ extends Node3D
 const GRASS := Color(0.17, 0.45, 0.19)
 const TURF := Color(0.07, 0.4, 0.2)
 const DIRT := Color(0.72, 0.43, 0.24)
+const FOUL_POLE := Color(1.0, 0.8, 0.1)
 const CHALK := Color(0.95, 0.95, 0.9)
 const WALL := Color(0.16, 0.22, 0.38)
 const WALL_CAP := Color(0.98, 0.72, 0.15)
@@ -84,8 +85,13 @@ func _build_foul_lines() -> void:
 		var length := FieldLayout.fence_distance(side * _tuning.foul_line_angle, _tuning)
 		var line := _add_box("FoulLine", Vector3(0.12, 0.03, length), dir * length * 0.5 + Vector3(0, 0.03, 0), CHALK)
 		line.look_at_from_position(line.position, line.position + dir, Vector3.UP)
-		var pole := _add_box("FoulPole", Vector3(0.3, 14.0, 0.3), dir * length + Vector3(0, 7.0, 0), WALL_CAP)
+		# Yellow, standing well above the wall, with a screen fin on the fair side.
+		var tall := FieldLayout.fence_height(side * _tuning.foul_line_angle, _tuning) + 13.0
+		var pole := _add_box("FoulPole", Vector3(0.35, tall, 0.35), dir * length + Vector3(0, tall * 0.5, 0), FOUL_POLE)
 		pole.name = "FoulPole"
+		var fair := (FieldLayout.direction_for_spray(side * (_tuning.foul_line_angle - 5.0)) - dir).normalized()
+		var fin := _add_box("FoulPoleScreen", Vector3(0.06, tall * 0.6, 1.1), pole.position + fair * 0.6 + Vector3(0, tall * 0.15, 0), FOUL_POLE)
+		fin.look_at_from_position(fin.position, fin.position + fair, Vector3.UP)
 
 
 func _build_fence() -> void:

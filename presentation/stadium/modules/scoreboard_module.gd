@@ -5,8 +5,8 @@ extends StadiumModule
 
 func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, away: TeamDef) -> void:
 	var def := stadium.def
-	var p := stadium.profile(piece.angle)
-	var center := stadium.point(piece.angle, p.x + p.z * Stadium.ROW_DEPTH + 3.0, p.y + p.z * Stadium.ROW_RISE + float(piece.param("height")) * piece.size)
+	var top := stadium.stand_top(piece.angle)
+	var center := stadium.point(piece.angle, top.x + 3.0, top.y + Stadium.ROW_RISE + float(piece.param("height")) * piece.size)
 	var board := Node3D.new()
 	board.name = stadium.unique_name("Scoreboard")
 	stadium.add_child(board)
