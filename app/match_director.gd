@@ -32,6 +32,14 @@ var roster: MatchRoster
 ## Where the game is played; kept across restarts once picked.
 var park: StadiumDef
 var _park_index := -1
+## The matchup card's choices (kept across restarts): clubs by library
+## index, which row is being changed (0 away, 1 home, 2 venue), and whether
+## the venue still follows the home club's park.
+var _away_index := 0
+var _home_index := 1
+var _card_row := 0
+var _venue_follows_home := true
+var _seed := 0
 
 var _view: MatchView
 var _hud: MatchHud
@@ -95,10 +103,12 @@ func setup(p_content: ContentLibrary, view: MatchView, hud: MatchHud, debug: Deb
 	_debug = debug
 
 
-## A 6-inning exhibition: the first two clubs in the library, away at home.
+## A 6-inning exhibition between the clubs picked on the matchup card
+## (the first two in the library to begin with), away at home.
 func start_match(seed_value: int) -> void:
+	_seed = seed_value
 	rng = MatchRng.new(seed_value)
-	roster = MatchRoster.new(content.teams[0], content.teams[1])
+	roster = MatchRoster.new(content.teams[_away_index], content.teams[_home_index])
 	state = MatchState.from_teams(roster.teams[0], roster.teams[1], content.rules)
 	_event_cursor = 0
 	_input_log.clear()
@@ -109,7 +119,7 @@ func start_match(seed_value: int) -> void:
 	_view.clear_debug_play()
 	_view.set_roster(roster)
 	_hud.set_roster(roster)
-	if _park_index < 0:
+	if _park_index < 0 or _venue_follows_home:
 		_park_index = maxi(content.parks.find(roster.teams[1].stadium_def), 0)
 	_apply_park()
 	_view.reset_for_pitch(state)
@@ -136,29 +146,34 @@ func _show_pregame_card() -> void:
 	var dims := ""
 	if shape != null:
 		dims = "LF %d · CF %d · RF %d ft" % [roundi(shape.distance_at(-45) * 3.2808), roundi(shape.distance_at(0) * 3.2808), roundi(shape.distance_at(45) * 3.2808)]
+	var pick := func(row: int, text: String) -> String:
+		return "<  %s  >" % text if row == _card_row else text
 	_hud.show_card([
-		[away.full_name().to_upper(), MatchHud.text_color(away), 54],
+		[pick.call(0, away.full_name().to_upper()), MatchHud.text_color(away), 54],
 		[away.identity.get_slice(".", 0), Color(0.9, 0.9, 0.9), 18],
 		["at", Color.WHITE, 26],
-		[home.full_name().to_upper(), MatchHud.text_color(home), 54],
+		[pick.call(1, home.full_name().to_upper()), MatchHud.text_color(home), 54],
 		[home.identity.get_slice(".", 0), Color(0.9, 0.9, 0.9), 18],
 		["", Color.WHITE, 12],
-		["%s  %s  %s" % ["<" if content.parks.size() > 1 else "", venue.to_upper(), ">" if content.parks.size() > 1 else ""], MatchHud.text_color(home) if park == home.stadium_def else Color(0.95, 0.95, 0.85), 30],
+		[pick.call(2, venue.to_upper()), MatchHud.text_color(home) if park == home.stadium_def else Color(0.95, 0.95, 0.85), 30],
 		["%s%s" % [park.blurb if park != null else "", ("   ·   " + dims) if dims != "" else ""], Color(0.9, 0.9, 0.9), 18],
 		["Exhibition · %d innings · %s rules" % [content.rules.innings, content.rules.display_name], Color.WHITE, 20],
 		["Mercy rule at %d runs after %d · runner on second in extras · %ds pitch clock" % [content.rules.mercy_runs, content.rules.mercy_after_inning, roundi(content.rules.pitch_clock)], Color(0.85, 0.85, 0.85), 16],
 	])
-	_hud.show_prompt("Play as the %s (bat first) {swing_contact}        Play as the %s (field first) {swing_power}        Venue {sideways}" % [away.team_name.to_upper(), home.team_name.to_upper()])
+	_hud.show_prompt("Play as the %s (bat first) {swing_contact}        Play as the %s (field first) {swing_power}        Pick away, home, venue {move}" % [away.team_name.to_upper(), home.team_name.to_upper()])
 
 
 func _process_pregame() -> void:
-	var turn := int(Input.is_action_just_pressed(&"aim_right")) - int(Input.is_action_just_pressed(&"aim_left"))
-	if turn != 0 and content.parks.size() > 1:
-		_park_index = posmod(_park_index + turn, content.parks.size())
-		_apply_park()
-		_view.reset_for_pitch(state)
+	var row := int(Input.is_action_just_pressed(&"aim_down")) - int(Input.is_action_just_pressed(&"aim_up"))
+	if row != 0:
+		_card_row = posmod(_card_row + row, 3)
 		_view.sfx.play(&"ui_tick")
 		_show_pregame_card()
+	var turn := int(Input.is_action_just_pressed(&"aim_right")) - int(Input.is_action_just_pressed(&"aim_left"))
+	if turn != 0:
+		_change_card_row(turn)
+		_view.sfx.play(&"ui_tick")
+		return
 	var pick := -1
 	if Input.is_action_just_pressed(&"swing_contact"):
 		pick = MatchState.AWAY
@@ -173,6 +188,35 @@ func _process_pregame() -> void:
 	var hint := "You bat first: swing as the white ring closes on the plate" if pick == MatchState.AWAY else "You pitch first: aim, then stop the meter in the white band"
 	_hud.show_callout("PLAY BALL", "You are the %s. %s" % [roster.teams[pick].full_name(), hint], 3.0)
 	_enter_pre_pitch()
+
+
+## Steps the matchup card's selected row: the away club, the home club
+## (never the same club twice; the venue follows a new home club unless it
+## was picked by hand) or the venue.
+func _change_card_row(turn: int) -> void:
+	var count := content.teams.size()
+	match _card_row:
+		0, 1:
+			if count < 2:
+				return
+			var index := _away_index if _card_row == 0 else _home_index
+			var other := _home_index if _card_row == 0 else _away_index
+			index = posmod(index + turn, count)
+			if index == other:
+				index = posmod(index + turn, count)
+			if _card_row == 0:
+				_away_index = index
+			else:
+				_home_index = index
+			start_match(_seed)
+		2:
+			if content.parks.size() < 2:
+				return
+			_park_index = posmod(_park_index + turn, content.parks.size())
+			_venue_follows_home = content.parks[_park_index] == roster.teams[1].stadium_def
+			_apply_park()
+			_view.reset_for_pitch(state)
+			_show_pregame_card()
 
 
 func user_is_batting() -> bool:

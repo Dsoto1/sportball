@@ -667,3 +667,29 @@ Decision:
 Reason: Owner's go-ahead to let the swing numbers affect the hitting.
 
 Affected systems: SwingProfile (new, rules), SwingIntent, Ratings, ContactResolver, BaseballTuning (Swing Signature group), PlayerSwing and BattingStyles (read the rules' numbers), tests, README park table.
+
+## 2026-10-21 - Eleven Clubs, Each With Its Own Park
+
+Decision:
+- **Nine new clubs,** one at home in each formerly neutral park. Each has a city, name, colors matching its park, a mascot, a rival, an identity, an AI personality and a playing style suited to the park:
+
+  | Club | Park | Style |
+  |---|---|---|
+  | Brickhaven Bankers | Ledger Street | patience and doubles off the Leviathan |
+  | Tidewater Gulls | Pier 9 | left-handed pull power at the bay |
+  | Copper Mesa Comets | The Kiln | speed and triples |
+  | Frostgate Yetis | The Icebox | contact, sinkers, gloves |
+  | Atomic Falls Neutrons | Reactor Park | all-or-nothing power, flamethrowers |
+  | Midtown Lamplighters | The Horseshoe | pull hitters, crafty arms |
+  | Ironbridge Conductors | Warehouse Row | left-handed line drives |
+  | Cascade City Swans | Fountain Gardens | pitching and defense |
+  | Vaultborough Safecrackers | The Vault | turf speed and steals; rivals the Bankers |
+
+- **Rosters are generated** (`tools/generate_teams.gd`): a 12-hitter, 5-pitcher template shifted by each club's style mods, a steady per-player variation, team repertoires (balanced, sinkers, heat or crafty), original names that never repeat on a club, and themed nicknames. The Gearheads and Glitterati stay hand-written.
+- **Matchup card:** ↑/↓ picks a row (away club, home club, venue) and ←/→ changes it. The venue follows the home club's park unless picked by hand. Choices persist across restarts.
+- **Balance:** a round robin (`tools/league_report.gd`, 240 games per club, each club at its own park) puts every club between .425 and .562. That's a competitive league with contenders and strugglers. The first pass ran .381 to .588; the Swans, Yetis, Conductors, Lamplighters and Safecrackers were retuned.
+- **Docs:** the parks' blurbs and `docs/STADIUM_REFS.md` name their home clubs.
+
+Reason: Owner request that each team have its own unique stadium; with 11 parks and 2 clubs, the owner chose nine new clubs.
+
+Affected systems: generate_teams (league table, roster builder), data/teams (9 new), generate_parks (home blurbs), ContentLibrary, MatchDirector (club and venue picker), tests (league), tools (league_report, swing_report), README, STADIUM_REFS.

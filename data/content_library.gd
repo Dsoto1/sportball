@@ -20,6 +20,15 @@ const PARKS_DIR := "res://data/stadiums"
 const TEAM_PATHS: Array[String] = [
 	"res://data/teams/gearheads.tres",
 	"res://data/teams/glitterati.tres",
+	"res://data/teams/bankers.tres",
+	"res://data/teams/gulls.tres",
+	"res://data/teams/comets.tres",
+	"res://data/teams/yetis.tres",
+	"res://data/teams/neutrons.tres",
+	"res://data/teams/lamplighters.tres",
+	"res://data/teams/conductors.tres",
+	"res://data/teams/swans.tres",
+	"res://data/teams/safecrackers.tres",
 ]
 ## Every field position a defense must fill.
 const FIELD_POSITIONS: Array[StringName] = [&"p", &"c", &"1b", &"2b", &"ss", &"3b", &"lf", &"cf", &"rf"]

@@ -1,0 +1,299 @@
+[gd_resource type="Resource" script_class="TeamDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/player_def.gd" id="1_fygbu"]
+[ext_resource type="Script" path="res://data/defs/team_def.gd" id="2_q6ltg"]
+[ext_resource type="Resource" path="res://data/stadiums/ledger_street.tres" id="3_5l6ik"]
+
+[sub_resource type="Resource" id="Resource_igpot"]
+script = ExtResource("1_fygbu")
+id = &"bhb_carraway"
+display_name = "Clem Carraway"
+nickname = "Interest"
+number = 1
+positions = Array[StringName]([&"cf", &"lf"])
+contact = 68
+eye = 75
+speed = 73
+arm = 60
+glove = 74
+
+[sub_resource type="Resource" id="Resource_d6f2f"]
+script = ExtResource("1_fygbu")
+id = &"bhb_sutter"
+display_name = "Rollo Sutter"
+nickname = "Ledger"
+number = 3
+positions = Array[StringName]([&"ss", &"2b"])
+contact = 69
+power = 54
+eye = 68
+speed = 66
+arm = 74
+glove = 79
+
+[sub_resource type="Resource" id="Resource_86qi6"]
+script = ExtResource("1_fygbu")
+id = &"bhb_blackwood"
+display_name = "Elsie Blackwood"
+nickname = "Penny"
+number = 8
+positions = Array[StringName]([&"rf", &"lf"])
+contact = 68
+power = 67
+eye = 75
+speed = 53
+arm = 74
+glove = 57
+
+[sub_resource type="Resource" id="Resource_s8h5y"]
+script = ExtResource("1_fygbu")
+id = &"bhb_stillwater"
+display_name = "Tad Stillwater"
+nickname = "Vault"
+number = 25
+bats = &"L"
+positions = Array[StringName]([&"1b"])
+contact = 66
+power = 86
+eye = 71
+speed = 29
+arm = 52
+glove = 56
+
+[sub_resource type="Resource" id="Resource_7quvq"]
+script = ExtResource("1_fygbu")
+id = &"bhb_barlow"
+display_name = "Flo Barlow"
+nickname = "Dividend"
+number = 10
+positions = Array[StringName]([&"3b", &"1b"])
+contact = 66
+power = 64
+eye = 70
+speed = 44
+arm = 71
+glove = 69
+
+[sub_resource type="Resource" id="Resource_hmasi"]
+script = ExtResource("1_fygbu")
+id = &"bhb_sinclair"
+display_name = "Vern Sinclair"
+nickname = "Escrow"
+number = 31
+positions = Array[StringName]([&"1b", &"lf"])
+contact = 65
+power = 69
+eye = 60
+speed = 37
+arm = 54
+glove = 40
+
+[sub_resource type="Resource" id="Resource_4icq3"]
+script = ExtResource("1_fygbu")
+id = &"bhb_ashgrove"
+display_name = "Hattie Ashgrove"
+nickname = "Teller"
+number = 16
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"lf", &"rf"])
+contact = 68
+power = 53
+eye = 66
+speed = 59
+arm = 57
+glove = 55
+
+[sub_resource type="Resource" id="Resource_4r4vc"]
+script = ExtResource("1_fygbu")
+id = &"bhb_sayers"
+display_name = "Wes Sayers"
+nickname = "Mortgage"
+number = 4
+positions = Array[StringName]([&"2b", &"ss"])
+contact = 73
+power = 46
+eye = 73
+speed = 55
+arm = 60
+glove = 68
+
+[sub_resource type="Resource" id="Resource_vowk2"]
+script = ExtResource("1_fygbu")
+id = &"bhb_montclair"
+display_name = "Jo Montclair"
+nickname = "Collateral"
+number = 26
+positions = Array[StringName]([&"c"])
+contact = 62
+power = 51
+eye = 65
+speed = 24
+arm = 68
+glove = 61
+
+[sub_resource type="Resource" id="Resource_8sw06"]
+script = ExtResource("1_fygbu")
+id = &"bhb_rosewood"
+display_name = "Zora Rosewood"
+nickname = "Audit"
+number = 14
+bats = &"L"
+positions = Array[StringName]([&"2b", &"3b", &"ss"])
+contact = 67
+power = 39
+eye = 71
+speed = 59
+arm = 60
+glove = 61
+
+[sub_resource type="Resource" id="Resource_57r72"]
+script = ExtResource("1_fygbu")
+id = &"bhb_delgado"
+display_name = "Lottie Delgado"
+nickname = "Coupon"
+number = 20
+positions = Array[StringName]([&"lf", &"cf", &"rf"])
+contact = 68
+power = 41
+eye = 66
+speed = 67
+arm = 57
+glove = 68
+
+[sub_resource type="Resource" id="Resource_u81t3"]
+script = ExtResource("1_fygbu")
+id = &"bhb_ridley"
+display_name = "Juno Ridley"
+nickname = "Pinstripe"
+number = 23
+bats = &"L"
+positions = Array[StringName]([&"c", &"1b"])
+contact = 52
+power = 53
+eye = 54
+speed = 20
+arm = 68
+glove = 57
+
+[sub_resource type="Resource" id="Resource_blxf8"]
+script = ExtResource("1_fygbu")
+id = &"bhb_oyelaran"
+display_name = "Merritt Oyelaran"
+nickname = "Gold Standard"
+number = 34
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 61
+control = 71
+stuff = 57
+stamina = 75
+pitches = Array[StringName]([&"fastball", &"slider", &"changeup", &"curveball"])
+
+[sub_resource type="Resource" id="Resource_s6fon"]
+script = ExtResource("1_fygbu")
+id = &"bhb_ravenswood"
+display_name = "Alder Ravenswood"
+nickname = "Compound"
+number = 42
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 63
+control = 71
+stuff = 59
+stamina = 40
+
+[sub_resource type="Resource" id="Resource_u8tk3"]
+script = ExtResource("1_fygbu")
+id = &"bhb_yilmaz"
+display_name = "Odie Yilmaz"
+nickname = "Tax Man"
+number = 48
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 57
+control = 69
+stuff = 53
+stamina = 38
+pitches = Array[StringName]([&"sinker", &"curveball", &"changeup"])
+
+[sub_resource type="Resource" id="Resource_h0v4q"]
+script = ExtResource("1_fygbu")
+id = &"bhb_quimby"
+display_name = "Birdie Quimby"
+nickname = "Fine Print"
+number = 52
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 55
+control = 59
+stuff = 64
+stamina = 36
+pitches = Array[StringName]([&"cutter", &"slider", &"splitter"])
+
+[sub_resource type="Resource" id="Resource_gc24d"]
+script = ExtResource("1_fygbu")
+id = &"bhb_villanueva"
+display_name = "Percy Villanueva"
+nickname = "Bottom Line"
+number = 61
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 72
+control = 70
+stuff = 62
+stamina = 28
+pitches = Array[StringName]([&"fastball", &"splitter"])
+
+[resource]
+script = ExtResource("2_q6ltg")
+id = &"bankers"
+city = "Brickhaven"
+team_name = "Bankers"
+abbreviation = "BHB"
+primary_color = Color(0.12156863, 0.41960785, 0.27058825, 1)
+secondary_color = Color(0.9490196, 0.9019608, 0.78431374, 1)
+accent_color = Color(0.5411765, 0.29411766, 0.23529412, 1)
+mascot = "Ledger, a monocled piggy bank"
+stadium = "Ledger Street Park"
+stadium_def = ExtResource("3_5l6ik")
+identity = "Old-money patience in the oldest park in the league. They work counts, take walks and line doubles off the Leviathan in left. Fans keep score in pencil and boo the wave."
+rival = &"conductors"
+roster = Array[ExtResource("1_fygbu")]([SubResource("Resource_igpot"), SubResource("Resource_d6f2f"), SubResource("Resource_86qi6"), SubResource("Resource_s8h5y"), SubResource("Resource_7quvq"), SubResource("Resource_hmasi"), SubResource("Resource_4icq3"), SubResource("Resource_4r4vc"), SubResource("Resource_vowk2"), SubResource("Resource_8sw06"), SubResource("Resource_57r72"), SubResource("Resource_u81t3"), SubResource("Resource_blxf8"), SubResource("Resource_s6fon"), SubResource("Resource_u8tk3"), SubResource("Resource_h0v4q"), SubResource("Resource_gc24d")])
+batting_order = Array[StringName]([&"bhb_carraway", &"bhb_sutter", &"bhb_blackwood", &"bhb_stillwater", &"bhb_barlow", &"bhb_sinclair", &"bhb_ashgrove", &"bhb_sayers", &"bhb_montclair"])
+lineup_positions = Array[StringName]([&"cf", &"ss", &"rf", &"1b", &"3b", &"dh", &"lf", &"2b", &"c"])
+starting_pitcher = &"bhb_oyelaran"
+bullpen = Array[StringName]([&"bhb_ravenswood", &"bhb_yilmaz", &"bhb_quimby", &"bhb_villanueva"])
+swing_aggression = 0.85
+chase_scale = 0.7
+power_swing_rate = 0.38
+runner_aggression = -0.1
+edge_bias_scale = 1.1
+steal_rate = 0.6
+bunt_rate = 0.4

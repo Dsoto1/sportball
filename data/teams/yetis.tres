@@ -1,0 +1,299 @@
+[gd_resource type="Resource" script_class="TeamDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/player_def.gd" id="1_38eo3"]
+[ext_resource type="Script" path="res://data/defs/team_def.gd" id="2_smxsl"]
+[ext_resource type="Resource" path="res://data/stadiums/the_icebox.tres" id="3_rwk0i"]
+
+[sub_resource type="Resource" id="Resource_8kr4q"]
+script = ExtResource("1_38eo3")
+id = &"fgy_crumley"
+display_name = "Cal Crumley"
+nickname = "Snowplow"
+number = 1
+positions = Array[StringName]([&"cf", &"lf"])
+contact = 73
+power = 42
+eye = 66
+speed = 82
+arm = 59
+glove = 83
+
+[sub_resource type="Resource" id="Resource_m3da8"]
+script = ExtResource("1_38eo3")
+id = &"fgy_tolliver"
+display_name = "Rafe Tolliver"
+nickname = "Frostbite"
+number = 3
+bats = &"L"
+positions = Array[StringName]([&"ss", &"2b"])
+contact = 74
+power = 36
+eye = 61
+speed = 76
+arm = 75
+glove = 89
+
+[sub_resource type="Resource" id="Resource_on0m5"]
+script = ExtResource("1_38eo3")
+id = &"fgy_chandler"
+display_name = "Dash Chandler"
+nickname = "Icicle"
+number = 8
+bats = &"L"
+positions = Array[StringName]([&"rf", &"lf"])
+contact = 77
+power = 62
+eye = 63
+speed = 54
+arm = 70
+glove = 69
+
+[sub_resource type="Resource" id="Resource_u12gr"]
+script = ExtResource("1_38eo3")
+id = &"fgy_tamberlane"
+display_name = "Ruby Tamberlane"
+nickname = "Avalanche"
+number = 25
+positions = Array[StringName]([&"1b"])
+contact = 65
+power = 74
+eye = 65
+speed = 34
+arm = 54
+glove = 61
+
+[sub_resource type="Resource" id="Resource_l2vi0"]
+script = ExtResource("1_38eo3")
+id = &"fgy_bramble"
+display_name = "Emmett Bramble"
+nickname = "Tundra"
+number = 10
+positions = Array[StringName]([&"3b", &"1b"])
+contact = 67
+power = 63
+eye = 56
+speed = 49
+arm = 65
+glove = 74
+
+[sub_resource type="Resource" id="Resource_vjiie"]
+script = ExtResource("1_38eo3")
+id = &"fgy_strickland"
+display_name = "Tess Strickland"
+nickname = "Blizzard"
+number = 31
+positions = Array[StringName]([&"1b", &"lf"])
+contact = 66
+power = 60
+eye = 57
+speed = 45
+arm = 48
+glove = 48
+
+[sub_resource type="Resource" id="Resource_j1llf"]
+script = ExtResource("1_38eo3")
+id = &"fgy_beckwith"
+display_name = "Gil Beckwith"
+nickname = "Mitten"
+number = 16
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"lf", &"rf"])
+contact = 74
+power = 48
+eye = 62
+speed = 60
+arm = 61
+glove = 67
+
+[sub_resource type="Resource" id="Resource_4njf0"]
+script = ExtResource("1_38eo3")
+id = &"fgy_springfield"
+display_name = "Vida Springfield"
+nickname = "Sleet"
+number = 4
+bats = &"L"
+positions = Array[StringName]([&"2b", &"ss"])
+contact = 72
+power = 32
+eye = 60
+speed = 69
+arm = 55
+glove = 82
+
+[sub_resource type="Resource" id="Resource_apgys"]
+script = ExtResource("1_38eo3")
+id = &"fgy_ballantine"
+display_name = "Iggy Ballantine"
+nickname = "Permafrost"
+number = 26
+bats = &"L"
+positions = Array[StringName]([&"c"])
+contact = 60
+power = 41
+eye = 56
+speed = 31
+arm = 67
+glove = 68
+
+[sub_resource type="Resource" id="Resource_hp3bm"]
+script = ExtResource("1_38eo3")
+id = &"fgy_shackleford"
+display_name = "Winnie Shackleford"
+nickname = "Hailstorm"
+number = 14
+positions = Array[StringName]([&"2b", &"3b", &"ss"])
+contact = 67
+power = 38
+eye = 64
+speed = 64
+arm = 61
+glove = 77
+
+[sub_resource type="Resource" id="Resource_uqwth"]
+script = ExtResource("1_38eo3")
+id = &"fgy_abernathy"
+display_name = "Kip Abernathy"
+nickname = "Igloo"
+number = 20
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"lf", &"cf", &"rf"])
+contact = 75
+power = 32
+eye = 58
+speed = 75
+arm = 57
+glove = 76
+
+[sub_resource type="Resource" id="Resource_ij6pk"]
+script = ExtResource("1_38eo3")
+id = &"fgy_saltonstall"
+display_name = "Ozzie Saltonstall"
+nickname = "Whiteout"
+number = 23
+positions = Array[StringName]([&"c", &"1b"])
+contact = 56
+power = 46
+eye = 54
+speed = 30
+arm = 65
+glove = 67
+
+[sub_resource type="Resource" id="Resource_hqurl"]
+script = ExtResource("1_38eo3")
+id = &"fgy_haverford"
+display_name = "Lyle Haverford"
+nickname = "Polar"
+number = 34
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 62
+control = 78
+stuff = 62
+stamina = 75
+pitches = Array[StringName]([&"sinker", &"changeup", &"slider", &"curveball"])
+
+[sub_resource type="Resource" id="Resource_46ie3"]
+script = ExtResource("1_38eo3")
+id = &"fgy_rockwell"
+display_name = "Mack Rockwell"
+nickname = "Snowdrift"
+number = 42
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 51
+control = 65
+stuff = 62
+stamina = 40
+pitches = Array[StringName]([&"sinker", &"slider", &"changeup"])
+
+[sub_resource type="Resource" id="Resource_ihd1j"]
+script = ExtResource("1_38eo3")
+id = &"fgy_brannigan"
+display_name = "Mina Brannigan"
+nickname = "Glacier"
+number = 48
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+control = 68
+stuff = 61
+stamina = 38
+pitches = Array[StringName]([&"sinker", &"cutter", &"curveball"])
+
+[sub_resource type="Resource" id="Resource_pbpfh"]
+script = ExtResource("1_38eo3")
+id = &"fgy_redfern"
+display_name = "Ansel Redfern"
+nickname = "Cold Snap"
+number = 52
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 58
+control = 68
+stuff = 71
+stamina = 36
+pitches = Array[StringName]([&"sinker", &"splitter", &"slider"])
+
+[sub_resource type="Resource" id="Resource_0u10k"]
+script = ExtResource("1_38eo3")
+id = &"fgy_zapata"
+display_name = "Opal Zapata"
+nickname = "Deep Freeze"
+number = 61
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 69
+control = 73
+stuff = 63
+stamina = 28
+pitches = Array[StringName]([&"sinker", &"cutter"])
+
+[resource]
+script = ExtResource("2_smxsl")
+id = &"yetis"
+city = "Frostgate"
+team_name = "Yetis"
+abbreviation = "FGY"
+primary_color = Color(0.22745098, 0.43137255, 0.61960787, 1)
+secondary_color = Color(0.95686275, 0.972549, 0.9843137, 1)
+accent_color = Color(0.62352943, 0.9098039, 1, 1)
+mascot = "Mitts, a shaggy yeti in earmuffs"
+stadium = "The Icebox"
+stadium_def = ExtResource("3_rwk0i")
+identity = "Cold-weather grinders. Contact hitters who foul off everything, sinkerballers who live on ground balls, and gloves that never drop a thing. In the heavy air of the Icebox, nothing comes easy."
+rival = &"comets"
+roster = Array[ExtResource("1_38eo3")]([SubResource("Resource_8kr4q"), SubResource("Resource_m3da8"), SubResource("Resource_on0m5"), SubResource("Resource_u12gr"), SubResource("Resource_l2vi0"), SubResource("Resource_vjiie"), SubResource("Resource_j1llf"), SubResource("Resource_4njf0"), SubResource("Resource_apgys"), SubResource("Resource_hp3bm"), SubResource("Resource_uqwth"), SubResource("Resource_ij6pk"), SubResource("Resource_hqurl"), SubResource("Resource_46ie3"), SubResource("Resource_ihd1j"), SubResource("Resource_pbpfh"), SubResource("Resource_0u10k")])
+batting_order = Array[StringName]([&"fgy_crumley", &"fgy_tolliver", &"fgy_chandler", &"fgy_tamberlane", &"fgy_bramble", &"fgy_strickland", &"fgy_beckwith", &"fgy_springfield", &"fgy_ballantine"])
+lineup_positions = Array[StringName]([&"cf", &"ss", &"rf", &"1b", &"3b", &"dh", &"lf", &"2b", &"c"])
+starting_pitcher = &"fgy_haverford"
+bullpen = Array[StringName]([&"fgy_rockwell", &"fgy_brannigan", &"fgy_redfern", &"fgy_zapata"])
+swing_aggression = 0.9
+chase_scale = 0.8
+power_swing_rate = 0.28
+edge_bias_scale = 1.15
+bullpen_hook = 0.55

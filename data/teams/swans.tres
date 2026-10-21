@@ -1,0 +1,302 @@
+[gd_resource type="Resource" script_class="TeamDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/player_def.gd" id="1_bkrj8"]
+[ext_resource type="Script" path="res://data/defs/team_def.gd" id="2_fkac3"]
+[ext_resource type="Resource" path="res://data/stadiums/fountain_gardens.tres" id="3_oidiw"]
+
+[sub_resource type="Resource" id="Resource_j1n20"]
+script = ExtResource("1_bkrj8")
+id = &"ccs_ridley"
+display_name = "Bea Ridley"
+nickname = "Ballet"
+number = 1
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"cf", &"lf"])
+contact = 72
+power = 38
+eye = 67
+speed = 75
+arm = 70
+glove = 78
+
+[sub_resource type="Resource" id="Resource_84d0x"]
+script = ExtResource("1_bkrj8")
+id = &"ccs_oyelaran"
+display_name = "Orrin Oyelaran"
+nickname = "Cascade"
+number = 3
+bats = &"L"
+positions = Array[StringName]([&"ss", &"2b"])
+contact = 67
+power = 38
+eye = 62
+speed = 75
+arm = 75
+glove = 90
+
+[sub_resource type="Resource" id="Resource_3n7pg"]
+script = ExtResource("1_bkrj8")
+id = &"ccs_ravenswood"
+display_name = "Cal Ravenswood"
+nickname = "Feather"
+number = 8
+positions = Array[StringName]([&"rf", &"lf"])
+contact = 60
+power = 64
+eye = 62
+speed = 53
+arm = 79
+glove = 70
+
+[sub_resource type="Resource" id="Resource_mn5g0"]
+script = ExtResource("1_bkrj8")
+id = &"ccs_yilmaz"
+display_name = "Rafe Yilmaz"
+nickname = "Grace"
+number = 25
+positions = Array[StringName]([&"1b"])
+contact = 58
+power = 73
+eye = 59
+speed = 41
+arm = 58
+glove = 59
+
+[sub_resource type="Resource" id="Resource_dsjg8"]
+script = ExtResource("1_bkrj8")
+id = &"ccs_quimby"
+display_name = "Dash Quimby"
+nickname = "Lily Pad"
+number = 10
+bats = &"L"
+positions = Array[StringName]([&"3b", &"1b"])
+contact = 62
+power = 60
+eye = 51
+speed = 43
+arm = 81
+glove = 70
+
+[sub_resource type="Resource" id="Resource_nuw85"]
+script = ExtResource("1_bkrj8")
+id = &"ccs_villanueva"
+display_name = "Ruby Villanueva"
+nickname = "Pirouette"
+number = 31
+positions = Array[StringName]([&"1b", &"lf"])
+contact = 61
+power = 64
+eye = 55
+speed = 35
+arm = 56
+glove = 51
+
+[sub_resource type="Resource" id="Resource_h2bai"]
+script = ExtResource("1_bkrj8")
+id = &"ccs_pemberton"
+display_name = "Emmett Pemberton"
+nickname = "Silk"
+number = 16
+positions = Array[StringName]([&"lf", &"rf"])
+contact = 65
+power = 48
+eye = 56
+speed = 57
+arm = 65
+glove = 66
+
+[sub_resource type="Resource" id="Resource_qq03q"]
+script = ExtResource("1_bkrj8")
+id = &"ccs_takahashi"
+display_name = "Tess Takahashi"
+nickname = "Swan Song"
+number = 4
+positions = Array[StringName]([&"2b", &"ss"])
+contact = 67
+power = 41
+eye = 57
+speed = 64
+arm = 62
+glove = 79
+
+[sub_resource type="Resource" id="Resource_xudyc"]
+script = ExtResource("1_bkrj8")
+id = &"ccs_oakes"
+display_name = "Gil Oakes"
+nickname = "Duchess"
+number = 26
+positions = Array[StringName]([&"c"])
+contact = 56
+power = 40
+eye = 47
+speed = 38
+arm = 79
+glove = 77
+
+[sub_resource type="Resource" id="Resource_qcold"]
+script = ExtResource("1_bkrj8")
+id = &"ccs_rasmussen"
+display_name = "Vida Rasmussen"
+nickname = "Reflection"
+number = 14
+bats = &"L"
+positions = Array[StringName]([&"2b", &"3b", &"ss"])
+contact = 58
+power = 38
+eye = 54
+speed = 61
+arm = 61
+glove = 76
+
+[sub_resource type="Resource" id="Resource_hd151"]
+script = ExtResource("1_bkrj8")
+id = &"ccs_nightingale"
+display_name = "Iggy Nightingale"
+nickname = "Waltz"
+number = 20
+positions = Array[StringName]([&"lf", &"cf", &"rf"])
+contact = 64
+power = 41
+eye = 49
+speed = 70
+arm = 69
+glove = 73
+
+[sub_resource type="Resource" id="Resource_1i4fq"]
+script = ExtResource("1_bkrj8")
+id = &"ccs_petrakis"
+display_name = "Winnie Petrakis"
+nickname = "Ripple"
+number = 23
+bats = &"L"
+positions = Array[StringName]([&"c", &"1b"])
+contact = 54
+power = 44
+eye = 42
+speed = 25
+arm = 74
+glove = 64
+
+[sub_resource type="Resource" id="Resource_fx3hh"]
+script = ExtResource("1_bkrj8")
+id = &"ccs_moonlight"
+display_name = "Kip Moonlight"
+nickname = "Plume"
+number = 34
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 61
+control = 67
+stuff = 70
+stamina = 75
+pitches = Array[StringName]([&"fastball", &"slider", &"changeup", &"curveball"])
+
+[sub_resource type="Resource" id="Resource_4imf3"]
+script = ExtResource("1_bkrj8")
+id = &"ccs_nakagawa"
+display_name = "Ozzie Nakagawa"
+nickname = "Serenade"
+number = 42
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 62
+control = 66
+stuff = 71
+stamina = 40
+
+[sub_resource type="Resource" id="Resource_y8gx5"]
+script = ExtResource("1_bkrj8")
+id = &"ccs_mcallister"
+display_name = "Lyle McAllister"
+nickname = "Fountain"
+number = 48
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 58
+control = 66
+stuff = 67
+stamina = 38
+pitches = Array[StringName]([&"sinker", &"curveball", &"changeup"])
+
+[sub_resource type="Resource" id="Resource_yo5ji"]
+script = ExtResource("1_bkrj8")
+id = &"ccs_lindqvist"
+display_name = "Mack Lindqvist"
+nickname = "Elegance"
+number = 52
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 61
+control = 61
+stuff = 72
+stamina = 36
+pitches = Array[StringName]([&"cutter", &"slider", &"splitter"])
+
+[sub_resource type="Resource" id="Resource_6sd4d"]
+script = ExtResource("1_bkrj8")
+id = &"ccs_mallory"
+display_name = "Mina Mallory"
+nickname = "Curtsy"
+number = 61
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 70
+control = 64
+stuff = 73
+stamina = 28
+pitches = Array[StringName]([&"fastball", &"splitter"])
+
+[resource]
+script = ExtResource("2_fkac3")
+id = &"swans"
+city = "Cascade City"
+team_name = "Swans"
+abbreviation = "CCS"
+primary_color = Color(0.11764706, 0.30980393, 0.6901961, 1)
+secondary_color = Color(0.96862745, 0.96862745, 0.98039216, 1)
+accent_color = Color(0.43529412, 0.8392157, 1, 1)
+mascot = "Duchess, an elegant swan in a tiara"
+stadium = "Fountain Gardens"
+stadium_def = ExtResource("3_oidiw")
+identity = "Graceful pitching and defense in the most beautiful park in the league. Deep staff, slick gloves, strong arms, and just enough offense. Every win feels like a ballet."
+rival = &"gulls"
+roster = Array[ExtResource("1_bkrj8")]([SubResource("Resource_j1n20"), SubResource("Resource_84d0x"), SubResource("Resource_3n7pg"), SubResource("Resource_mn5g0"), SubResource("Resource_dsjg8"), SubResource("Resource_nuw85"), SubResource("Resource_h2bai"), SubResource("Resource_qq03q"), SubResource("Resource_xudyc"), SubResource("Resource_qcold"), SubResource("Resource_hd151"), SubResource("Resource_1i4fq"), SubResource("Resource_fx3hh"), SubResource("Resource_4imf3"), SubResource("Resource_y8gx5"), SubResource("Resource_yo5ji"), SubResource("Resource_6sd4d")])
+batting_order = Array[StringName]([&"ccs_ridley", &"ccs_oyelaran", &"ccs_ravenswood", &"ccs_yilmaz", &"ccs_quimby", &"ccs_villanueva", &"ccs_pemberton", &"ccs_takahashi", &"ccs_oakes"])
+lineup_positions = Array[StringName]([&"cf", &"ss", &"rf", &"1b", &"3b", &"dh", &"lf", &"2b", &"c"])
+starting_pitcher = &"ccs_moonlight"
+bullpen = Array[StringName]([&"ccs_nakagawa", &"ccs_mcallister", &"ccs_lindqvist", &"ccs_mallory"])
+swing_aggression = 0.95
+chase_scale = 0.9
+power_swing_rate = 0.33
+runner_aggression = 0.05
+edge_bias_scale = 1.1
+bullpen_hook = 0.5
+steal_rate = 1.1
+bunt_rate = 0.8

@@ -1,0 +1,297 @@
+[gd_resource type="Resource" script_class="TeamDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/player_def.gd" id="1_jfopm"]
+[ext_resource type="Script" path="res://data/defs/team_def.gd" id="2_n31fn"]
+[ext_resource type="Resource" path="res://data/stadiums/the_vault.tres" id="3_jy7id"]
+
+[sub_resource type="Resource" id="Resource_auvsl"]
+script = ExtResource("1_jfopm")
+id = &"vbs_jaramillo"
+display_name = "Ansel Jaramillo"
+nickname = "Lockpick"
+number = 1
+positions = Array[StringName]([&"cf", &"lf"])
+contact = 71
+power = 29
+eye = 60
+speed = 92
+arm = 57
+glove = 71
+
+[sub_resource type="Resource" id="Resource_73e7w"]
+script = ExtResource("1_jfopm")
+id = &"vbs_lockwood"
+display_name = "Opal Lockwood"
+nickname = "Getaway"
+number = 3
+bats = &"L"
+positions = Array[StringName]([&"ss", &"2b"])
+contact = 75
+power = 31
+eye = 60
+speed = 83
+arm = 67
+glove = 74
+
+[sub_resource type="Resource" id="Resource_14rsx"]
+script = ExtResource("1_jfopm")
+id = &"vbs_hashimoto"
+display_name = "Boone Hashimoto"
+nickname = "Tumbler"
+number = 8
+positions = Array[StringName]([&"rf", &"lf"])
+contact = 73
+power = 51
+eye = 59
+speed = 66
+arm = 70
+glove = 59
+
+[sub_resource type="Resource" id="Resource_op7lo"]
+script = ExtResource("1_jfopm")
+id = &"vbs_langtry"
+display_name = "Quill Langtry"
+nickname = "Combination"
+number = 25
+positions = Array[StringName]([&"1b"])
+contact = 64
+power = 68
+eye = 51
+speed = 51
+arm = 55
+glove = 56
+
+[sub_resource type="Resource" id="Resource_mr6k4"]
+script = ExtResource("1_jfopm")
+id = &"vbs_fontaine"
+display_name = "Clem Fontaine"
+nickname = "Heist"
+number = 10
+bats = &"L"
+positions = Array[StringName]([&"3b", &"1b"])
+contact = 65
+eye = 55
+speed = 59
+arm = 68
+glove = 62
+
+[sub_resource type="Resource" id="Resource_iiytl"]
+script = ExtResource("1_jfopm")
+id = &"vbs_kettering"
+display_name = "Rollo Kettering"
+nickname = "Alibi"
+number = 31
+bats = &"L"
+positions = Array[StringName]([&"1b", &"lf"])
+contact = 66
+power = 53
+eye = 53
+arm = 48
+glove = 42
+
+[sub_resource type="Resource" id="Resource_fi8fj"]
+script = ExtResource("1_jfopm")
+id = &"vbs_duquesne"
+display_name = "Elsie Duquesne"
+nickname = "Ski Mask"
+number = 16
+bats = &"L"
+positions = Array[StringName]([&"lf", &"rf"])
+contact = 62
+power = 35
+eye = 57
+speed = 81
+arm = 60
+glove = 55
+
+[sub_resource type="Resource" id="Resource_8d6sw"]
+script = ExtResource("1_jfopm")
+id = &"vbs_ingram"
+display_name = "Tad Ingram"
+nickname = "Stethoscope"
+number = 4
+positions = Array[StringName]([&"2b", &"ss"])
+contact = 65
+power = 25
+eye = 63
+speed = 85
+arm = 62
+glove = 65
+
+[sub_resource type="Resource" id="Resource_tptlj"]
+script = ExtResource("1_jfopm")
+id = &"vbs_bonaventure"
+display_name = "Flo Bonaventure"
+nickname = "Crowbar"
+number = 26
+bats = &"L"
+positions = Array[StringName]([&"c"])
+contact = 60
+power = 28
+eye = 47
+speed = 52
+arm = 73
+glove = 67
+
+[sub_resource type="Resource" id="Resource_bolbu"]
+script = ExtResource("1_jfopm")
+id = &"vbs_hargrove"
+display_name = "Vern Hargrove"
+nickname = "Loot"
+number = 14
+bats = &"L"
+positions = Array[StringName]([&"2b", &"3b", &"ss"])
+contact = 65
+power = 20
+eye = 54
+speed = 79
+arm = 55
+glove = 70
+
+[sub_resource type="Resource" id="Resource_5r00n"]
+script = ExtResource("1_jfopm")
+id = &"vbs_zimmerly"
+display_name = "Hattie Zimmerly"
+nickname = "Fast Hands"
+number = 20
+positions = Array[StringName]([&"lf", &"cf", &"rf"])
+contact = 62
+power = 33
+eye = 52
+speed = 88
+arm = 55
+glove = 67
+
+[sub_resource type="Resource" id="Resource_mphr5"]
+script = ExtResource("1_jfopm")
+id = &"vbs_hadley"
+display_name = "Wes Hadley"
+nickname = "Jackpot"
+number = 23
+positions = Array[StringName]([&"c", &"1b"])
+contact = 52
+power = 29
+eye = 42
+speed = 47
+arm = 68
+glove = 62
+
+[sub_resource type="Resource" id="Resource_wjbh1"]
+script = ExtResource("1_jfopm")
+id = &"vbs_woodruff"
+display_name = "Jo Woodruff"
+nickname = "Inside Job"
+number = 34
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 62
+control = 66
+stuff = 60
+stamina = 75
+pitches = Array[StringName]([&"changeup", &"curveball", &"sinker", &"junkball"])
+
+[sub_resource type="Resource" id="Resource_gq2oa"]
+script = ExtResource("1_jfopm")
+id = &"vbs_goodnight"
+display_name = "Zora Goodnight"
+nickname = "Smoke Bomb"
+number = 42
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 59
+control = 61
+stuff = 57
+stamina = 40
+pitches = Array[StringName]([&"cutter", &"changeup", &"curveball"])
+
+[sub_resource type="Resource" id="Resource_kq403"]
+script = ExtResource("1_jfopm")
+id = &"vbs_wildfire"
+display_name = "Lottie Wildfire"
+nickname = "Safehouse"
+number = 48
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 61
+control = 67
+stuff = 59
+stamina = 38
+pitches = Array[StringName]([&"sinker", &"curveball", &"changeup"])
+
+[sub_resource type="Resource" id="Resource_oe5xt"]
+script = ExtResource("1_jfopm")
+id = &"vbs_fitzwater"
+display_name = "Juno Fitzwater"
+nickname = "Midnight Run"
+number = 52
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 58
+control = 56
+stuff = 69
+stamina = 36
+pitches = Array[StringName]([&"slider", &"changeup", &"junkball"])
+
+[sub_resource type="Resource" id="Resource_emwji"]
+script = ExtResource("1_jfopm")
+id = &"vbs_whitlock"
+display_name = "Merritt Whitlock"
+nickname = "Clean Getaway"
+number = 61
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 66
+control = 58
+stuff = 69
+stamina = 28
+pitches = Array[StringName]([&"cutter", &"curveball", &"splitter"])
+
+[resource]
+script = ExtResource("2_n31fn")
+id = &"safecrackers"
+city = "Vaultborough"
+team_name = "Safecrackers"
+abbreviation = "VBS"
+primary_color = Color(0.3529412, 0.38431373, 0.44705883, 1)
+secondary_color = Color(1, 0.3529412, 0.8156863, 1)
+accent_color = Color(0.08235294, 0.08235294, 0.09411765, 1)
+mascot = "Tumbler, a masked safecracker with a stethoscope"
+stadium = "The Vault"
+stadium_def = ExtResource("3_jy7id")
+identity = "Turf burglars. Slap the ball into the carpet, run before anyone blinks, steal every base that isn't bolted down. In the Vault, grounders scoot through and so do they."
+rival = &"bankers"
+roster = Array[ExtResource("1_jfopm")]([SubResource("Resource_auvsl"), SubResource("Resource_73e7w"), SubResource("Resource_14rsx"), SubResource("Resource_op7lo"), SubResource("Resource_mr6k4"), SubResource("Resource_iiytl"), SubResource("Resource_fi8fj"), SubResource("Resource_8d6sw"), SubResource("Resource_tptlj"), SubResource("Resource_bolbu"), SubResource("Resource_5r00n"), SubResource("Resource_mphr5"), SubResource("Resource_wjbh1"), SubResource("Resource_gq2oa"), SubResource("Resource_kq403"), SubResource("Resource_oe5xt"), SubResource("Resource_emwji")])
+batting_order = Array[StringName]([&"vbs_jaramillo", &"vbs_lockwood", &"vbs_hashimoto", &"vbs_langtry", &"vbs_fontaine", &"vbs_kettering", &"vbs_duquesne", &"vbs_ingram", &"vbs_bonaventure"])
+lineup_positions = Array[StringName]([&"cf", &"ss", &"rf", &"1b", &"3b", &"dh", &"lf", &"2b", &"c"])
+starting_pitcher = &"vbs_woodruff"
+bullpen = Array[StringName]([&"vbs_goodnight", &"vbs_wildfire", &"vbs_fitzwater", &"vbs_whitlock"])
+chase_scale = 0.9
+power_swing_rate = 0.25
+runner_aggression = 0.4
+steal_rate = 3.0

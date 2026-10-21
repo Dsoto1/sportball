@@ -1,0 +1,302 @@
+[gd_resource type="Resource" script_class="TeamDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/player_def.gd" id="1_elqju"]
+[ext_resource type="Script" path="res://data/defs/team_def.gd" id="2_4ltum"]
+[ext_resource type="Resource" path="res://data/stadiums/the_kiln.tres" id="3_nicer"]
+
+[sub_resource type="Resource" id="Resource_dnd82"]
+script = ExtResource("1_elqju")
+id = &"cmc_duquesne"
+display_name = "Cass Duquesne"
+nickname = "Tumbleweed"
+number = 1
+bats = &"L"
+positions = Array[StringName]([&"cf", &"lf"])
+contact = 71
+power = 36
+eye = 62
+speed = 91
+arm = 59
+glove = 76
+
+[sub_resource type="Resource" id="Resource_0ephc"]
+script = ExtResource("1_elqju")
+id = &"cmc_ingram"
+display_name = "Remi Ingram"
+nickname = "Mirage"
+number = 3
+positions = Array[StringName]([&"ss", &"2b"])
+contact = 64
+power = 44
+eye = 63
+speed = 88
+arm = 70
+glove = 85
+
+[sub_resource type="Resource" id="Resource_wn0ow"]
+script = ExtResource("1_elqju")
+id = &"cmc_bonaventure"
+display_name = "Dot Bonaventure"
+nickname = "Sidewinder"
+number = 8
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"rf", &"lf"])
+contact = 64
+power = 64
+eye = 54
+speed = 71
+arm = 76
+glove = 70
+
+[sub_resource type="Resource" id="Resource_rkkb4"]
+script = ExtResource("1_elqju")
+id = &"cmc_hargrove"
+display_name = "Sal Hargrove"
+nickname = "Cactus"
+number = 25
+positions = Array[StringName]([&"1b"])
+contact = 59
+power = 77
+eye = 51
+speed = 52
+arm = 55
+glove = 63
+
+[sub_resource type="Resource" id="Resource_5mmfu"]
+script = ExtResource("1_elqju")
+id = &"cmc_zimmerly"
+display_name = "Etta Zimmerly"
+nickname = "Heatwave"
+number = 10
+positions = Array[StringName]([&"3b", &"1b"])
+contact = 65
+power = 55
+eye = 49
+speed = 67
+arm = 73
+glove = 65
+
+[sub_resource type="Resource" id="Resource_0v31a"]
+script = ExtResource("1_elqju")
+id = &"cmc_hadley"
+display_name = "Theo Hadley"
+nickname = "Dust Storm"
+number = 31
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"1b", &"lf"])
+contact = 61
+power = 61
+arm = 45
+glove = 48
+
+[sub_resource type="Resource" id="Resource_72w17"]
+script = ExtResource("1_elqju")
+id = &"cmc_woodruff"
+display_name = "Greta Woodruff"
+nickname = "Meteor"
+number = 16
+positions = Array[StringName]([&"lf", &"rf"])
+contact = 65
+power = 43
+eye = 57
+speed = 81
+arm = 60
+glove = 61
+
+[sub_resource type="Resource" id="Resource_8tn2v"]
+script = ExtResource("1_elqju")
+id = &"cmc_goodnight"
+display_name = "Walt Goodnight"
+nickname = "Roadrunner"
+number = 4
+positions = Array[StringName]([&"2b", &"ss"])
+contact = 69
+power = 31
+eye = 54
+speed = 83
+arm = 64
+glove = 80
+
+[sub_resource type="Resource" id="Resource_edtuq"]
+script = ExtResource("1_elqju")
+id = &"cmc_wildfire"
+display_name = "Inez Wildfire"
+nickname = "Sundial"
+number = 26
+bats = &"L"
+positions = Array[StringName]([&"c"])
+contact = 57
+power = 38
+eye = 45
+speed = 43
+arm = 71
+glove = 64
+
+[sub_resource type="Resource" id="Resource_kk826"]
+script = ExtResource("1_elqju")
+id = &"cmc_fitzwater"
+display_name = "Yates Fitzwater"
+nickname = "Canyon"
+number = 14
+positions = Array[StringName]([&"2b", &"3b", &"ss"])
+contact = 65
+power = 37
+eye = 53
+speed = 78
+arm = 65
+glove = 75
+
+[sub_resource type="Resource" id="Resource_5jkcx"]
+script = ExtResource("1_elqju")
+id = &"cmc_whitlock"
+display_name = "Kit Whitlock"
+nickname = "Scorcher"
+number = 20
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"lf", &"cf", &"rf"])
+contact = 64
+power = 31
+eye = 53
+speed = 89
+arm = 56
+glove = 74
+
+[sub_resource type="Resource" id="Resource_2i6j4"]
+script = ExtResource("1_elqju")
+id = &"cmc_farrow"
+display_name = "Fern Farrow"
+nickname = "Coyote"
+number = 23
+bats = &"L"
+positions = Array[StringName]([&"c", &"1b"])
+contact = 47
+power = 47
+eye = 48
+speed = 46
+arm = 63
+glove = 67
+
+[sub_resource type="Resource" id="Resource_4f3qt"]
+script = ExtResource("1_elqju")
+id = &"cmc_waverly"
+display_name = "Mabel Waverly"
+nickname = "Stardust"
+number = 34
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 59
+control = 63
+stuff = 68
+stamina = 75
+pitches = Array[StringName]([&"fastball", &"slider", &"changeup", &"curveball"])
+
+[sub_resource type="Resource" id="Resource_ooiwc"]
+script = ExtResource("1_elqju")
+id = &"cmc_ellery"
+display_name = "Abe Ellery"
+nickname = "Prospector"
+number = 42
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 56
+control = 58
+stuff = 65
+stamina = 40
+
+[sub_resource type="Resource" id="Resource_5oqim"]
+script = ExtResource("1_elqju")
+id = &"cmc_vanderpool"
+display_name = "Nate Vanderpool"
+nickname = "Buckshot"
+number = 48
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 54
+control = 60
+stuff = 63
+stamina = 38
+pitches = Array[StringName]([&"sinker", &"curveball", &"changeup"])
+
+[sub_resource type="Resource" id="Resource_pjmml"]
+script = ExtResource("1_elqju")
+id = &"cmc_dunmore"
+display_name = "Bea Dunmore"
+nickname = "Tailwind"
+number = 52
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 61
+control = 59
+stuff = 61
+stamina = 36
+pitches = Array[StringName]([&"cutter", &"slider", &"splitter"])
+
+[sub_resource type="Resource" id="Resource_jcyur"]
+script = ExtResource("1_elqju")
+id = &"cmc_underhill"
+display_name = "Orrin Underhill"
+nickname = "Afterburn"
+number = 61
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 63
+control = 55
+stuff = 66
+stamina = 28
+pitches = Array[StringName]([&"fastball", &"splitter"])
+
+[resource]
+script = ExtResource("2_4ltum")
+id = &"comets"
+city = "Copper Mesa"
+team_name = "Comets"
+abbreviation = "CMC"
+primary_color = Color(0.12156863, 0.64705884, 0.5882353, 1)
+secondary_color = Color(0.72156864, 0.4, 0.18431373, 1)
+accent_color = Color(0.94509804, 0.8862745, 0.76862746, 1)
+mascot = "Blaze, a comet in mirrored sunglasses"
+stadium = "The Kiln"
+stadium_def = ExtResource("3_nicer")
+identity = "Desert speedsters in a canyon of an outfield. They turn gappers into triples, run on everything and track down fly balls nobody else could reach. The thin air does the rest."
+rival = &"yetis"
+roster = Array[ExtResource("1_elqju")]([SubResource("Resource_dnd82"), SubResource("Resource_0ephc"), SubResource("Resource_wn0ow"), SubResource("Resource_rkkb4"), SubResource("Resource_5mmfu"), SubResource("Resource_0v31a"), SubResource("Resource_72w17"), SubResource("Resource_8tn2v"), SubResource("Resource_edtuq"), SubResource("Resource_kk826"), SubResource("Resource_5jkcx"), SubResource("Resource_2i6j4"), SubResource("Resource_4f3qt"), SubResource("Resource_ooiwc"), SubResource("Resource_5oqim"), SubResource("Resource_pjmml"), SubResource("Resource_jcyur")])
+batting_order = Array[StringName]([&"cmc_duquesne", &"cmc_ingram", &"cmc_bonaventure", &"cmc_hargrove", &"cmc_zimmerly", &"cmc_hadley", &"cmc_woodruff", &"cmc_goodnight", &"cmc_wildfire"])
+lineup_positions = Array[StringName]([&"cf", &"ss", &"rf", &"1b", &"3b", &"dh", &"lf", &"2b", &"c"])
+starting_pitcher = &"cmc_waverly"
+bullpen = Array[StringName]([&"cmc_ellery", &"cmc_vanderpool", &"cmc_dunmore", &"cmc_underhill"])
+chase_scale = 0.95
+power_swing_rate = 0.32
+runner_aggression = 0.35
+steal_rate = 2.2
+bunt_rate = 0.6

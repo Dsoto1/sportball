@@ -1,0 +1,297 @@
+[gd_resource type="Resource" script_class="TeamDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/player_def.gd" id="1_6ymiq"]
+[ext_resource type="Script" path="res://data/defs/team_def.gd" id="2_n7uoj"]
+[ext_resource type="Resource" path="res://data/stadiums/the_horseshoe.tres" id="3_ov3vl"]
+
+[sub_resource type="Resource" id="Resource_ni7yj"]
+script = ExtResource("1_6ymiq")
+id = &"mtl_guzman"
+display_name = "Birdie Guzmán"
+nickname = "Gaslight"
+number = 1
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"cf", &"lf"])
+contact = 72
+power = 41
+eye = 60
+speed = 87
+arm = 57
+glove = 67
+
+[sub_resource type="Resource" id="Resource_i0g3j"]
+script = ExtResource("1_6ymiq")
+id = &"mtl_kinsley"
+display_name = "Percy Kinsley"
+nickname = "Wick"
+number = 3
+positions = Array[StringName]([&"ss", &"2b"])
+contact = 66
+power = 43
+eye = 62
+speed = 78
+arm = 69
+glove = 81
+
+[sub_resource type="Resource" id="Resource_xac7t"]
+script = ExtResource("1_6ymiq")
+id = &"mtl_esposito"
+display_name = "Cleo Esposito"
+nickname = "Nightcap"
+number = 8
+positions = Array[StringName]([&"rf", &"lf"])
+contact = 66
+power = 71
+eye = 61
+speed = 58
+arm = 72
+glove = 63
+
+[sub_resource type="Resource" id="Resource_4s1g0"]
+script = ExtResource("1_6ymiq")
+id = &"mtl_jessup"
+display_name = "Rhea Jessup"
+nickname = "Lantern"
+number = 25
+positions = Array[StringName]([&"1b"])
+contact = 65
+power = 81
+eye = 55
+speed = 36
+arm = 48
+glove = 53
+
+[sub_resource type="Resource" id="Resource_ou5sl"]
+script = ExtResource("1_6ymiq")
+id = &"mtl_castellanos"
+display_name = "Ellis Castellanos"
+nickname = "Moonbeam"
+number = 10
+bats = &"L"
+positions = Array[StringName]([&"3b", &"1b"])
+contact = 64
+power = 68
+eye = 54
+speed = 49
+arm = 67
+glove = 64
+
+[sub_resource type="Resource" id="Resource_vitr3"]
+script = ExtResource("1_6ymiq")
+id = &"mtl_huckabee"
+display_name = "Sully Huckabee"
+nickname = "Streetlight"
+number = 31
+bats = &"L"
+positions = Array[StringName]([&"1b", &"lf"])
+contact = 59
+power = 72
+eye = 56
+speed = 41
+arm = 51
+glove = 45
+
+[sub_resource type="Resource" id="Resource_001vp"]
+script = ExtResource("1_6ymiq")
+id = &"mtl_achterberg"
+display_name = "Felix Achterberg"
+nickname = "Midnight"
+number = 16
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"lf", &"rf"])
+contact = 62
+power = 55
+eye = 55
+speed = 62
+arm = 58
+glove = 59
+
+[sub_resource type="Resource" id="Resource_ahh3n"]
+script = ExtResource("1_6ymiq")
+id = &"mtl_halfpenny"
+display_name = "Tilly Halfpenny"
+nickname = "Sparkler"
+number = 4
+bats = &"L"
+positions = Array[StringName]([&"2b", &"ss"])
+contact = 60
+power = 43
+eye = 60
+speed = 64
+arm = 59
+glove = 67
+
+[sub_resource type="Resource" id="Resource_vafwg"]
+script = ExtResource("1_6ymiq")
+id = &"mtl_yardley"
+display_name = "Harlan Yardley"
+nickname = "Neon"
+number = 26
+bats = &"L"
+positions = Array[StringName]([&"c"])
+contact = 54
+power = 46
+eye = 55
+speed = 31
+arm = 70
+glove = 58
+
+[sub_resource type="Resource" id="Resource_o6fyy"]
+script = ExtResource("1_6ymiq")
+id = &"mtl_granger"
+display_name = "Wanda Granger"
+nickname = "Owl"
+number = 14
+positions = Array[StringName]([&"2b", &"3b", &"ss"])
+contact = 63
+power = 43
+eye = 52
+speed = 64
+arm = 64
+glove = 67
+
+[sub_resource type="Resource" id="Resource_sfwhy"]
+script = ExtResource("1_6ymiq")
+id = &"mtl_winterbottom"
+display_name = "Jasper Winterbottom"
+nickname = "Curtain Call"
+number = 20
+positions = Array[StringName]([&"lf", &"cf", &"rf"])
+contact = 56
+power = 42
+eye = 59
+speed = 69
+arm = 62
+glove = 60
+
+[sub_resource type="Resource" id="Resource_o4yj6"]
+script = ExtResource("1_6ymiq")
+id = &"mtl_gallagher"
+display_name = "Zeke Gallagher"
+nickname = "Matinee"
+number = 23
+positions = Array[StringName]([&"c", &"1b"])
+contact = 47
+eye = 46
+speed = 29
+arm = 61
+glove = 56
+
+[sub_resource type="Resource" id="Resource_4vqnw"]
+script = ExtResource("1_6ymiq")
+id = &"mtl_wickersham"
+display_name = "Lenny Wickersham"
+nickname = "Flicker"
+number = 34
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 52
+control = 61
+stuff = 67
+stamina = 75
+pitches = Array[StringName]([&"changeup", &"curveball", &"sinker", &"junkball"])
+
+[sub_resource type="Resource" id="Resource_e8w5q"]
+script = ExtResource("1_6ymiq")
+id = &"mtl_fennimore"
+display_name = "Rudy Fennimore"
+nickname = "Torch"
+number = 42
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 55
+control = 62
+stuff = 59
+stamina = 40
+pitches = Array[StringName]([&"cutter", &"changeup", &"curveball"])
+
+[sub_resource type="Resource" id="Resource_u32a8"]
+script = ExtResource("1_6ymiq")
+id = &"mtl_westbrook"
+display_name = "Marlo Westbrook"
+nickname = "Ember"
+number = 48
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+control = 61
+stuff = 65
+stamina = 38
+pitches = Array[StringName]([&"sinker", &"curveball", &"changeup"])
+
+[sub_resource type="Resource" id="Resource_es55s"]
+script = ExtResource("1_6ymiq")
+id = &"mtl_fairbanks"
+display_name = "Ada Fairbanks"
+nickname = "Last Call"
+number = 52
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 52
+control = 55
+stuff = 69
+stamina = 36
+pitches = Array[StringName]([&"slider", &"changeup", &"junkball"])
+
+[sub_resource type="Resource" id="Resource_aw2qr"]
+script = ExtResource("1_6ymiq")
+id = &"mtl_wainwright"
+display_name = "Nell Wainwright"
+nickname = "Encore Bell"
+number = 61
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 62
+control = 59
+stuff = 71
+stamina = 28
+pitches = Array[StringName]([&"cutter", &"curveball", &"splitter"])
+
+[resource]
+script = ExtResource("2_n7uoj")
+id = &"lamplighters"
+city = "Midtown"
+team_name = "Lamplighters"
+abbreviation = "MTL"
+primary_color = Color(0.47843137, 0.12156863, 0.23921569, 1)
+secondary_color = Color(1, 0.30980393, 0.48235294, 1)
+accent_color = Color(0.9490196, 0.91764706, 0.84705883, 1)
+mascot = "Wick, a gas lamp in a top hat"
+stadium = "The Horseshoe"
+stadium_def = ExtResource("3_ov3vl")
+identity = "Night owls of the Horseshoe. They pull everything down the 279-foot lines, run down the endless center field and win late. Old-time ball under the lights, with a brass band."
+rival = &"neutrons"
+roster = Array[ExtResource("1_6ymiq")]([SubResource("Resource_ni7yj"), SubResource("Resource_i0g3j"), SubResource("Resource_xac7t"), SubResource("Resource_4s1g0"), SubResource("Resource_ou5sl"), SubResource("Resource_vitr3"), SubResource("Resource_001vp"), SubResource("Resource_ahh3n"), SubResource("Resource_vafwg"), SubResource("Resource_o6fyy"), SubResource("Resource_sfwhy"), SubResource("Resource_o4yj6"), SubResource("Resource_4vqnw"), SubResource("Resource_e8w5q"), SubResource("Resource_u32a8"), SubResource("Resource_es55s"), SubResource("Resource_aw2qr")])
+batting_order = Array[StringName]([&"mtl_guzman", &"mtl_kinsley", &"mtl_esposito", &"mtl_jessup", &"mtl_castellanos", &"mtl_huckabee", &"mtl_achterberg", &"mtl_halfpenny", &"mtl_yardley"])
+lineup_positions = Array[StringName]([&"cf", &"ss", &"rf", &"1b", &"3b", &"dh", &"lf", &"2b", &"c"])
+starting_pitcher = &"mtl_wickersham"
+bullpen = Array[StringName]([&"mtl_fennimore", &"mtl_westbrook", &"mtl_fairbanks", &"mtl_wainwright"])
+power_swing_rate = 0.4
+runner_aggression = 0.1
+bullpen_hook = 0.65
+bunt_rate = 0.5

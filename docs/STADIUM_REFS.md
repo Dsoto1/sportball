@@ -48,75 +48,84 @@ Prompts for one reference image per ballpark in `tools/generate_parks.gd`.
 > accents, steel light towers, smokestacks and warehouses of a river town
 > low on the horizon. Warm late-afternoon light.
 
-### 3. Ledger Street Park (neutral)
+### 3. Ledger Street Park (Brickhaven Bankers home)
 
-> LEDGER STREET PARK, a cozy old city ballpark wedged into its block.
+> LEDGER STREET PARK, home of the Brickhaven Bankers (old-money, green
+> and cream), a cozy old city ballpark wedged into its block.
 > Short left field with THE LEVIATHAN: a towering 37-foot dark green wall
 > with a hand-operated scoreboard built into it. Right-center bends out
 > into a deep triangle; right field has a very low wall. Dark green
 > seats, red-brick facades, cream trim, narrow city streets and brick
 > rowhouses beyond. Daytime.
 
-### 4. Pier 9 Ballyard (neutral)
+### 4. Pier 9 Ballyard (Tidewater Gulls home)
 
-> PIER 9 BALLYARD, a waterfront ballpark. Short porch in right field
+> PIER 9 BALLYARD, home of the Tidewater Gulls (navy and coral), a
+> waterfront ballpark. Short porch in right field
 > with a low wall, and beyond it open bay water with small boats bobbing
 > (home runs splash into the bay). Deep left-center. Navy blue seats,
 > warm off-white concrete and steel, coral-orange accents, a harbor city
 > skyline across the water. Bright afternoon.
 
-### 5. The Kiln (neutral)
+### 5. The Kiln (Copper Mesa Comets home)
 
-> THE KILN, a desert ballpark in thin hot air. A huge, deep outfield like
+> THE KILN, home of the Copper Mesa Comets (turquoise and copper), a
+> desert ballpark in thin hot air. A huge, deep outfield like
 > a canyon, walled in warm red brick. Terracotta and burnt-orange seats,
 > sandstone concrete, turquoise neon accents. Low adobe town and red
 > desert mesas on the horizon, heat shimmer, a few tall saguaro cacti
 > beyond the wall. Clear blazing afternoon.
 
-### 6. The Icebox (neutral)
+### 6. The Icebox (Frostgate Yetis home)
 
-> THE ICEBOX, a cold northern ballpark. Symmetrical field, every
+> THE ICEBOX, home of the Frostgate Yetis (steel blue and white), a cold
+> northern ballpark. Symmetrical field, every
 > outfield wall covered in dense green ivy. Slate-blue seats, pale steel
 > gray structure, icy cyan neon accents. Pine trees and snowy hills
 > beyond, fans in winter coats and hats, a crisp overcast sky with light
 > breath fog. Cool daylight.
 
-### 7. Reactor Park (neutral, night)
+### 7. Reactor Park (Atomic Falls Neutrons home, night)
 
-> REACTOR PARK, an atomic-age ballpark at night. Odd angles in the
+> REACTOR PARK, home of the Atomic Falls Neutrons (black and mint), an
+> atomic-age ballpark at night. Odd angles in the
 > outfield wall and a deep notch in center field behind a taller reactor
 > wall; riveted iron walls. Charcoal seats, yellow-gold structure, glowing
 > mint-green neon. Cooling towers and a power plant beyond the outfield,
 > a dark city skyline with lit windows. Floodlights blazing, night sky.
 
-### 8. The Horseshoe (neutral, night)
+### 8. The Horseshoe (Midtown Lamplighters home, night)
 
-> THE HORSESHOE, a classic horseshoe-shaped ballpark at night. Very
+> THE HORSESHOE, home of the Midtown Lamplighters (maroon and pink), a
+> classic horseshoe-shaped ballpark at night. Very
 > short foul lines (about 280 feet) and an enormous center field (about
 > 480 feet), the double-decked stands curving around in a horseshoe.
 > Deep navy seats, cream concrete, hot-pink neon accents, a dark green
 > padded wall. Floodlights blazing, a lit city skyline beyond.
 
-### 9. Warehouse Row (neutral)
+### 9. Warehouse Row (Ironbridge Conductors home)
 
-> WAREHOUSE ROW, a ballpark built into an old rail district. A 25-foot
+> WAREHOUSE ROW, home of the Ironbridge Conductors (gold and dark green),
+> a ballpark built into an old rail district. A 25-foot
 > red-brick wall in right field, and right behind the right-field stands
 > a very long, tall old brick warehouse with rows of windows and its name
 > painted along the top ("ROUNDHOUSE"), running parallel to the
 > right-field line. Forest green seats, dark iron structure, amber
 > lights. Daytime.
 
-### 10. Fountain Gardens (neutral, night)
+### 10. Fountain Gardens (Cascade City Swans home, night)
 
-> FOUNTAIN GARDENS, a big, symmetric, fair ballpark at night. Beyond the
+> FOUNTAIN GARDENS, home of the Cascade City Swans (royal blue and white),
+> a big, symmetric, fair ballpark at night. Beyond the
 > outfield wall in both power alleys, wide pools with water cascades and
 > rows of dancing fountain jets, lit pale blue. Royal blue seats, bright
 > white structure, sky-blue neon accents, low outfield bleachers so the
 > fountains show. Floodlights, a calm city beyond.
 
-### 11. The Vault (neutral, dome)
+### 11. The Vault (Vaultborough Safecrackers home, dome)
 
-> THE VAULT, a sealed indoor dome stadium on bright green artificial
+> THE VAULT, home of the Vaultborough Safecrackers (slate and magenta), a
+> sealed indoor dome stadium on bright green artificial
 > turf with crisp 5-yard seams (no mowing stripes). A huge ribbed dome
 > roof overhead with catwalk rings and banks of lights, a glowing pink
 > crown light at the top. Dark slate seats, cool steel-gray structure,

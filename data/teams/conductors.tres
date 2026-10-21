@@ -1,0 +1,299 @@
+[gd_resource type="Resource" script_class="TeamDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/player_def.gd" id="1_qv427"]
+[ext_resource type="Script" path="res://data/defs/team_def.gd" id="2_eb44o"]
+[ext_resource type="Resource" path="res://data/stadiums/warehouse_row.tres" id="3_fe3f6"]
+
+[sub_resource type="Resource" id="Resource_sahln"]
+script = ExtResource("1_qv427")
+id = &"ibc_eastwick"
+display_name = "Benny Eastwick"
+nickname = "Caboose"
+number = 1
+positions = Array[StringName]([&"cf", &"lf"])
+contact = 71
+power = 37
+eye = 61
+speed = 83
+arm = 67
+glove = 76
+
+[sub_resource type="Resource" id="Resource_x2nav"]
+script = ExtResource("1_qv427")
+id = &"ibc_valentine"
+display_name = "Pearl Valentine"
+nickname = "Whistle"
+number = 3
+positions = Array[StringName]([&"ss", &"2b"])
+contact = 74
+power = 42
+eye = 67
+speed = 77
+arm = 72
+glove = 71
+
+[sub_resource type="Resource" id="Resource_4yixl"]
+script = ExtResource("1_qv427")
+id = &"ibc_delacroix"
+display_name = "Cass Delacroix"
+nickname = "Boxcar"
+number = 8
+bats = &"L"
+positions = Array[StringName]([&"rf", &"lf"])
+contact = 71
+power = 70
+eye = 65
+speed = 57
+arm = 74
+glove = 64
+
+[sub_resource type="Resource" id="Resource_5x7o5"]
+script = ExtResource("1_qv427")
+id = &"ibc_treadwell"
+display_name = "Remi Treadwell"
+nickname = "Switchman"
+number = 25
+positions = Array[StringName]([&"1b"])
+contact = 68
+power = 83
+eye = 59
+speed = 38
+glove = 57
+
+[sub_resource type="Resource" id="Resource_s8cqb"]
+script = ExtResource("1_qv427")
+id = &"ibc_cobblestone"
+display_name = "Dot Cobblestone"
+nickname = "Express"
+number = 10
+bats = &"L"
+positions = Array[StringName]([&"3b", &"1b"])
+contact = 73
+power = 69
+eye = 60
+arm = 71
+glove = 67
+
+[sub_resource type="Resource" id="Resource_4dfbk"]
+script = ExtResource("1_qv427")
+id = &"ibc_thistlewood"
+display_name = "Sal Thistlewood"
+nickname = "Freight"
+number = 31
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"1b", &"lf"])
+contact = 71
+power = 73
+eye = 57
+speed = 42
+glove = 48
+
+[sub_resource type="Resource" id="Resource_iy3ux"]
+script = ExtResource("1_qv427")
+id = &"ibc_carraway"
+display_name = "Etta Carraway"
+nickname = "Signal"
+number = 16
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"lf", &"rf"])
+contact = 65
+power = 55
+eye = 54
+speed = 62
+arm = 55
+glove = 61
+
+[sub_resource type="Resource" id="Resource_0ue24"]
+script = ExtResource("1_qv427")
+id = &"ibc_sutter"
+display_name = "Theo Sutter"
+nickname = "Coal Car"
+number = 4
+bats = &"L"
+positions = Array[StringName]([&"2b", &"ss"])
+contact = 74
+power = 40
+eye = 57
+speed = 61
+arm = 65
+glove = 66
+
+[sub_resource type="Resource" id="Resource_pv8es"]
+script = ExtResource("1_qv427")
+id = &"ibc_blackwood"
+display_name = "Greta Blackwood"
+nickname = "Turntable"
+number = 26
+positions = Array[StringName]([&"c"])
+contact = 60
+eye = 53
+speed = 35
+arm = 66
+glove = 64
+
+[sub_resource type="Resource" id="Resource_6ab5b"]
+script = ExtResource("1_qv427")
+id = &"ibc_stillwater"
+display_name = "Walt Stillwater"
+nickname = "Brakeman"
+number = 14
+bats = &"L"
+positions = Array[StringName]([&"2b", &"3b", &"ss"])
+contact = 68
+power = 37
+eye = 53
+speed = 58
+arm = 63
+glove = 63
+
+[sub_resource type="Resource" id="Resource_0t1vn"]
+script = ExtResource("1_qv427")
+id = &"ibc_barlow"
+display_name = "Inez Barlow"
+nickname = "Timetable"
+number = 20
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"lf", &"cf", &"rf"])
+contact = 73
+power = 46
+eye = 61
+speed = 73
+arm = 62
+glove = 66
+
+[sub_resource type="Resource" id="Resource_2e8y1"]
+script = ExtResource("1_qv427")
+id = &"ibc_sinclair"
+display_name = "Yates Sinclair"
+nickname = "Locomotive"
+number = 23
+bats = &"L"
+positions = Array[StringName]([&"c", &"1b"])
+contact = 56
+power = 48
+eye = 52
+speed = 27
+arm = 65
+glove = 56
+
+[sub_resource type="Resource" id="Resource_qpult"]
+script = ExtResource("1_qv427")
+id = &"ibc_ashgrove"
+display_name = "Kit Ashgrove"
+nickname = "Sleeper"
+number = 34
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 64
+control = 70
+stuff = 69
+stamina = 75
+pitches = Array[StringName]([&"fastball", &"slider", &"changeup", &"curveball"])
+
+[sub_resource type="Resource" id="Resource_qd2qb"]
+script = ExtResource("1_qv427")
+id = &"ibc_sayers"
+display_name = "Fern Sayers"
+nickname = "Junction"
+number = 42
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 66
+control = 70
+stuff = 60
+stamina = 40
+
+[sub_resource type="Resource" id="Resource_6ld3n"]
+script = ExtResource("1_qv427")
+id = &"ibc_montclair"
+display_name = "Mabel Montclair"
+nickname = "Semaphore"
+number = 48
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 62
+control = 70
+stuff = 56
+stamina = 38
+pitches = Array[StringName]([&"sinker", &"curveball", &"changeup"])
+
+[sub_resource type="Resource" id="Resource_3v77p"]
+script = ExtResource("1_qv427")
+id = &"ibc_rosewood"
+display_name = "Abe Rosewood"
+nickname = "Steam"
+number = 52
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 60
+control = 60
+stuff = 67
+stamina = 36
+pitches = Array[StringName]([&"cutter", &"slider", &"splitter"])
+
+[sub_resource type="Resource" id="Resource_4uveq"]
+script = ExtResource("1_qv427")
+id = &"ibc_delgado"
+display_name = "Nate Delgado"
+nickname = "Full Throttle"
+number = 61
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 73
+control = 67
+stuff = 61
+stamina = 28
+pitches = Array[StringName]([&"fastball", &"splitter"])
+
+[resource]
+script = ExtResource("2_eb44o")
+id = &"conductors"
+city = "Ironbridge"
+team_name = "Conductors"
+abbreviation = "IBC"
+primary_color = Color(0.84313726, 0.6039216, 0.11764706, 1)
+secondary_color = Color(0.12156863, 0.30980393, 0.20392157, 1)
+accent_color = Color(0.10980392, 0.10980392, 0.10980392, 1)
+mascot = "Chug, a little steam engine"
+stadium = "Warehouse Row"
+stadium_def = ExtResource("3_fe3f6")
+identity = "Railyard line-drive machine, always on schedule. Left-handed hitters spray liners off the brick wall in right; nobody chases and nobody panics. Train whistles after every double."
+rival = &"bankers"
+roster = Array[ExtResource("1_qv427")]([SubResource("Resource_sahln"), SubResource("Resource_x2nav"), SubResource("Resource_4yixl"), SubResource("Resource_5x7o5"), SubResource("Resource_s8cqb"), SubResource("Resource_4dfbk"), SubResource("Resource_iy3ux"), SubResource("Resource_0ue24"), SubResource("Resource_pv8es"), SubResource("Resource_6ab5b"), SubResource("Resource_0t1vn"), SubResource("Resource_2e8y1"), SubResource("Resource_qpult"), SubResource("Resource_qd2qb"), SubResource("Resource_6ld3n"), SubResource("Resource_3v77p"), SubResource("Resource_4uveq")])
+batting_order = Array[StringName]([&"ibc_eastwick", &"ibc_valentine", &"ibc_delacroix", &"ibc_treadwell", &"ibc_cobblestone", &"ibc_thistlewood", &"ibc_carraway", &"ibc_sutter", &"ibc_blackwood"])
+lineup_positions = Array[StringName]([&"cf", &"ss", &"rf", &"1b", &"3b", &"dh", &"lf", &"2b", &"c"])
+starting_pitcher = &"ibc_ashgrove"
+bullpen = Array[StringName]([&"ibc_sayers", &"ibc_montclair", &"ibc_rosewood", &"ibc_delgado"])
+swing_aggression = 0.95
+chase_scale = 0.8
+power_swing_rate = 0.34
+runner_aggression = 0.05
+edge_bias_scale = 1.05
+bunt_rate = 0.6

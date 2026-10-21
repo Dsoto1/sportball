@@ -1,0 +1,298 @@
+[gd_resource type="Resource" script_class="TeamDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/player_def.gd" id="1_aqlw1"]
+[ext_resource type="Script" path="res://data/defs/team_def.gd" id="2_pm8kl"]
+[ext_resource type="Resource" path="res://data/stadiums/reactor_park.tres" id="3_dx3xm"]
+
+[sub_resource type="Resource" id="Resource_tu57k"]
+script = ExtResource("1_aqlw1")
+id = &"afn_radcliffe"
+display_name = "Boone Radcliffe"
+nickname = "Meltdown"
+number = 1
+positions = Array[StringName]([&"cf", &"lf"])
+contact = 53
+power = 55
+eye = 54
+speed = 72
+arm = 57
+glove = 69
+
+[sub_resource type="Resource" id="Resource_me04w"]
+script = ExtResource("1_aqlw1")
+id = &"afn_wojcik"
+display_name = "Quill Wójcik"
+nickname = "Fission"
+number = 3
+positions = Array[StringName]([&"ss", &"2b"])
+contact = 61
+power = 55
+eye = 49
+speed = 72
+arm = 73
+glove = 81
+
+[sub_resource type="Resource" id="Resource_coyj6"]
+script = ExtResource("1_aqlw1")
+id = &"afn_pettibone"
+display_name = "Clem Pettibone"
+nickname = "Gamma"
+number = 8
+positions = Array[StringName]([&"rf", &"lf"])
+contact = 49
+power = 75
+eye = 57
+speed = 55
+arm = 74
+glove = 66
+
+[sub_resource type="Resource" id="Resource_rykm2"]
+script = ExtResource("1_aqlw1")
+id = &"afn_uchenna"
+display_name = "Rollo Uchenna"
+nickname = "Half-Life"
+number = 25
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"1b"])
+power = 93
+eye = 55
+speed = 30
+arm = 54
+glove = 53
+
+[sub_resource type="Resource" id="Resource_27hfg"]
+script = ExtResource("1_aqlw1")
+id = &"afn_ormsby"
+display_name = "Elsie Ormsby"
+nickname = "Isotope"
+number = 10
+bats = &"L"
+positions = Array[StringName]([&"3b", &"1b"])
+power = 73
+eye = 48
+speed = 47
+arm = 67
+glove = 68
+
+[sub_resource type="Resource" id="Resource_l3cbt"]
+script = ExtResource("1_aqlw1")
+id = &"afn_szabo"
+display_name = "Tad Szabo"
+nickname = "Reactor"
+number = 31
+positions = Array[StringName]([&"1b", &"lf"])
+contact = 52
+power = 83
+eye = 45
+speed = 34
+arm = 46
+glove = 44
+
+[sub_resource type="Resource" id="Resource_b1gel"]
+script = ExtResource("1_aqlw1")
+id = &"afn_northcott"
+display_name = "Flo Northcott"
+nickname = "Fallout"
+number = 16
+positions = Array[StringName]([&"lf", &"rf"])
+contact = 51
+power = 67
+eye = 43
+speed = 56
+arm = 63
+glove = 59
+
+[sub_resource type="Resource" id="Resource_fjwki"]
+script = ExtResource("1_aqlw1")
+id = &"afn_quintero"
+display_name = "Vern Quintero"
+nickname = "Uranium"
+number = 4
+positions = Array[StringName]([&"2b", &"ss"])
+contact = 51
+power = 54
+eye = 52
+speed = 57
+arm = 57
+glove = 66
+
+[sub_resource type="Resource" id="Resource_bdteu"]
+script = ExtResource("1_aqlw1")
+id = &"afn_mulberry"
+display_name = "Hattie Mulberry"
+nickname = "Critical Mass"
+number = 26
+positions = Array[StringName]([&"c"])
+contact = 40
+power = 63
+eye = 41
+speed = 30
+arm = 73
+glove = 63
+
+[sub_resource type="Resource" id="Resource_mgxbb"]
+script = ExtResource("1_aqlw1")
+id = &"afn_okonkwo"
+display_name = "Wes Okonkwo"
+nickname = "Particle"
+number = 14
+positions = Array[StringName]([&"2b", &"3b", &"ss"])
+contact = 49
+power = 53
+eye = 53
+speed = 56
+arm = 60
+glove = 65
+
+[sub_resource type="Resource" id="Resource_dpvr5"]
+script = ExtResource("1_aqlw1")
+id = &"afn_merriweather"
+display_name = "Jo Merriweather"
+nickname = "Chain Reaction"
+number = 20
+bats = &"L"
+positions = Array[StringName]([&"lf", &"cf", &"rf"])
+contact = 46
+power = 55
+eye = 46
+speed = 64
+arm = 55
+glove = 61
+
+[sub_resource type="Resource" id="Resource_al5hd"]
+script = ExtResource("1_aqlw1")
+id = &"afn_moreau"
+display_name = "Zora Moreau"
+nickname = "Megaton"
+number = 23
+bats = &"L"
+positions = Array[StringName]([&"c", &"1b"])
+contact = 44
+power = 57
+eye = 44
+speed = 29
+arm = 65
+glove = 62
+
+[sub_resource type="Resource" id="Resource_xhp2j"]
+script = ExtResource("1_aqlw1")
+id = &"afn_marchetti"
+display_name = "Lottie Marchetti"
+nickname = "Geiger"
+number = 34
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 75
+control = 59
+stuff = 59
+stamina = 75
+pitches = Array[StringName]([&"fastball", &"slider", &"splitter", &"curveball"])
+
+[sub_resource type="Resource" id="Resource_424xt"]
+script = ExtResource("1_aqlw1")
+id = &"afn_kowalczyk"
+display_name = "Juno Kowalczyk"
+nickname = "Plutonium"
+number = 42
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 75
+control = 57
+stuff = 59
+stamina = 40
+pitches = Array[StringName]([&"fastball", &"slider"])
+
+[sub_resource type="Resource" id="Resource_ievf4"]
+script = ExtResource("1_aqlw1")
+id = &"afn_loveless"
+display_name = "Merritt Loveless"
+nickname = "Supernova"
+number = 48
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 67
+control = 53
+stuff = 62
+stamina = 38
+pitches = Array[StringName]([&"fastball", &"cutter", &"splitter"])
+
+[sub_resource type="Resource" id="Resource_hgwe3"]
+script = ExtResource("1_aqlw1")
+id = &"afn_iwamoto"
+display_name = "Alder Iwamoto"
+nickname = "Cyclotron"
+number = 52
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 77
+control = 55
+stuff = 63
+stamina = 36
+pitches = Array[StringName]([&"fastball", &"curveball", &"slider"])
+
+[sub_resource type="Resource" id="Resource_gbkms"]
+script = ExtResource("1_aqlw1")
+id = &"afn_larkspur"
+display_name = "Odie Larkspur"
+nickname = "Mushroom Cloud"
+number = 61
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 81
+control = 53
+stuff = 59
+stamina = 28
+pitches = Array[StringName]([&"fastball", &"splitter"])
+
+[resource]
+script = ExtResource("2_pm8kl")
+id = &"neutrons"
+city = "Atomic Falls"
+team_name = "Neutrons"
+abbreviation = "AFN"
+primary_color = Color(0.14901961, 0.14901961, 0.14901961, 1)
+secondary_color = Color(0.49019608, 1, 0.6901961, 1)
+accent_color = Color(0.8901961, 0.7882353, 0.30980393, 1)
+mascot = "Glowy, a friendly glowing atom"
+stadium = "Reactor Park"
+stadium_def = ExtResource("3_dx3xm")
+identity = "All-or-nothing power plant. Every swing is a meltdown, every pitcher throws gas, and nobody bothers to bunt. They strike out a ton and hit the scoreboard more than anyone."
+rival = &"lamplighters"
+roster = Array[ExtResource("1_aqlw1")]([SubResource("Resource_tu57k"), SubResource("Resource_me04w"), SubResource("Resource_coyj6"), SubResource("Resource_rykm2"), SubResource("Resource_27hfg"), SubResource("Resource_l3cbt"), SubResource("Resource_b1gel"), SubResource("Resource_fjwki"), SubResource("Resource_bdteu"), SubResource("Resource_mgxbb"), SubResource("Resource_dpvr5"), SubResource("Resource_al5hd"), SubResource("Resource_xhp2j"), SubResource("Resource_424xt"), SubResource("Resource_ievf4"), SubResource("Resource_hgwe3"), SubResource("Resource_gbkms")])
+batting_order = Array[StringName]([&"afn_radcliffe", &"afn_wojcik", &"afn_pettibone", &"afn_uchenna", &"afn_ormsby", &"afn_szabo", &"afn_northcott", &"afn_quintero", &"afn_mulberry"])
+lineup_positions = Array[StringName]([&"cf", &"ss", &"rf", &"1b", &"3b", &"dh", &"lf", &"2b", &"c"])
+starting_pitcher = &"afn_marchetti"
+bullpen = Array[StringName]([&"afn_kowalczyk", &"afn_loveless", &"afn_iwamoto", &"afn_larkspur"])
+swing_aggression = 1.15
+chase_scale = 1.3
+power_swing_rate = 0.52
+runner_aggression = -0.2
+edge_bias_scale = 0.85
+bullpen_hook = 0.7
+steal_rate = 0.4
+bunt_rate = 0.15

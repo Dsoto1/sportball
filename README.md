@@ -8,8 +8,9 @@ Current state: **Phase 1 — Baseball Vertical Slice**, with a first art pass
 with their own walls, air and turf, a reactive crowd and live scoreboard,
 field surfaces, fonts, button icons and sound;
 every third-party asset is in `docs/13_ASSET_MANIFEST.md`). A 6-inning
-exhibition between the **Rustwater Gearheads** and the **Neon Heights
-Glitterati** (yes, Who's on first) under arcade rules. See [`docs/PHASE1_REPORT.md`](docs/PHASE1_REPORT.md)
+exhibition between any two of eleven clubs, each at home in its own park
+(the **Rustwater Gearheads** and **Neon Heights Glitterati**, yes, Who's on
+first, plus nine more), under arcade rules. See [`docs/PHASE1_REPORT.md`](docs/PHASE1_REPORT.md)
 and the earlier [`docs/PHASE0_REPORT.md`](docs/PHASE0_REPORT.md).
 
 ## Run
@@ -21,8 +22,9 @@ godot --path .                      # random seed (printed to the console)
 godot --path . -- --seed=1234       # reproduce a logged match
 ```
 
-On the matchup card, ← / → picks the ballpark (eleven of them, see below),
-then pick your club: J / click / A for the Gearheads (you
+On the matchup card, ↑ / ↓ chooses a row and ← / → changes it: the away
+club, the home club, and the venue (the home club's park unless you change
+it). Then pick your side: J / click / A for the Gearheads (you
 bat first), K / right-click / X for the Glitterati (you field first). Tab /
 Back switches sides mid-game.
 
@@ -157,6 +159,27 @@ Bindings live in `project.godot` as semantic actions. To change them, edit
 the table in `tools/generate_input_map.gd` and run
 `godot --headless --path . -s res://tools/generate_input_map.gd`.
 
+## Clubs
+
+| Club | Home park | Style |
+|---|---|---|
+| Rustwater Gearheads | Foundry Field | small ball: steals, bunts, gloves |
+| Neon Heights Glitterati | The Halo Dome | power and showboating (Who's on first) |
+| Brickhaven Bankers | Ledger Street Park | patient, doubles off the Leviathan |
+| Tidewater Gulls | Pier 9 Ballyard | left-handed pull power at the bay |
+| Copper Mesa Comets | The Kiln | speed, gappers into triples |
+| Frostgate Yetis | The Icebox | contact, sinkers, gloves |
+| Atomic Falls Neutrons | Reactor Park | all-or-nothing power, flamethrowers |
+| Midtown Lamplighters | The Horseshoe | pull hitters, crafty arms |
+| Ironbridge Conductors | Warehouse Row | left-handed line drives |
+| Cascade City Swans | Fountain Gardens | pitching and defense |
+| Vaultborough Safecrackers | The Vault | turf speed, slaps, steals |
+
+Rosters for the nine new clubs come from `tools/generate_teams.gd` (a lineup
+template shifted by each club's style, steady per-player variation,
+original names). `tools/league_report.gd` plays a round robin; over 240
+games each the clubs land between .425 and .562.
+
 ## Ballparks
 
 Each park's walls, wall heights, air and surface are rules: fly balls,
@@ -206,6 +229,7 @@ godot --path . --resolution 420x420 --fixed-fps 60 -s res://tools/batter_closeup
 godot --headless --path . -s res://tools/foot_diagram_data.gd | grep '^{' > feet.json && python3 tools/draw_foot_diagram.py feet.json feet.png   # top-down foot placement per style
 godot --headless --path . -s res://tools/elbow_check.gd -- [lefty] [verbose <style>]   # how close elbows come to the body, per style
 godot --headless --path . -s res://tools/swing_report.gd   # every hitter's swing: style, bat speed, attack angle, direction, tilt
+godot --headless --path . -s res://tools/league_report.gd -- 12 0 1   # round robin standings (slice it: -- 12 <k> 4, then -- merge files)
 godot --headless --path . --fixed-fps 60 -s res://tools/playtest_bot.gd -- 900   # drive the real scene with fake input (append `"" home` to field first)
 ```
 

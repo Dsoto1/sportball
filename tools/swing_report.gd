@@ -5,8 +5,8 @@ extends SceneTree
 func _init() -> void:
 	var content := ContentLibrary.load_default()
 	print("%-22s %-3s %-9s %5s %5s %9s %5s" % ["hitter", "B", "style", "mph", "AA", "dir", "tilt"])
-	for team_id: StringName in [&"gearheads", &"glitterati"]:
-		for p: PlayerDef in content.team(team_id).roster:
+	for team: TeamDef in content.teams:
+		for p: PlayerDef in team.roster:
 			if p.is_pitcher():
 				continue
 			var style := BattingStyles.for_player(p)
