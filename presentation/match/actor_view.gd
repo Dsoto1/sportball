@@ -14,6 +14,11 @@ const BODY := preload("res://assets/third_party/quaternius/universal-animation-l
 ## wrist at y = -0.95, about 1.9 units tall.
 const GLOVE := preload("res://assets/generated/artlist/glove/glove.glb")
 const GLOVE_SCALE := 0.15
+const BACK_FONT := preload("res://assets/third_party/fonts/bungee/Bungee-Regular.ttf")
+## Rest-pose (skeleton space, m) spots: the number between the shoulder
+## blades, the crown of the head. +X is the body's left, +Z its front.
+const BACK_NUMBER_AT := Vector3(0.0, 1.3, -0.175)
+const CROWN := Vector3(0.0, 1.68, 0.0)
 const BLEND := 0.12
 ## Arcade proportions: broader and a little bigger than the mannequin, so
 ## players read from the high field camera.
@@ -33,6 +38,13 @@ var _glove: Node3D
 ## Throwing hand (right for a righty): holds the bat's handle and the ball.
 var _grip: BoneAttachment3D
 var _lefty := false
+var _kit: ShaderMaterial
+var _skeleton: Skeleton3D
+## Batting helmet (with ear flap) for batters and runners, cap for fielders.
+var _helmet: Node3D
+var _cap: Node3D
+var _back: Label3D
+var _grip_ik: BatGrip
 var _twist := 0.0
 var _tag: Label3D
 var _clock := 0.0
@@ -51,7 +63,11 @@ func setup(color: Color, tag: String) -> void:
 	add_child(_model)
 	_player = _model.find_child("AnimationPlayer") as AnimationPlayer
 	_mesh = _model.find_child("Mannequin") as MeshInstance3D
+	_mesh.mesh = UniformLook.mesh_for(_mesh)
+	_kit = UniformLook.material()
+	_mesh.material_override = _kit
 	var skeleton := _model.find_child("Skeleton3D") as Skeleton3D
+	_skeleton = skeleton
 	_player.add_animation_library(BaseballMoves.LIBRARY, BaseballMoves.library(skeleton, _player))
 	var attach := BoneAttachment3D.new()
 	attach.bone_name = "hand_l"
@@ -66,6 +82,14 @@ func setup(color: Color, tag: String) -> void:
 	grip.bone_name = "hand_r"
 	skeleton.add_child(grip)
 	_grip = grip
+	_build_headwear(skeleton)
+	_back = Label3D.new()
+	_back.font = BACK_FONT
+	_back.font_size = 72
+	_back.pixel_size = 0.0035
+	_back.outline_size = 10
+	_back.double_sided = false
+	_attach(skeleton, "spine_03", _back, Transform3D(Basis(Vector3.UP, PI), BACK_NUMBER_AT))
 	_tag = Label3D.new()
 	_tag.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	_tag.position.y = 2.55
@@ -83,9 +107,13 @@ func set_tag_visible(value: bool) -> void:
 	_tag.visible = value
 
 
-## Fielders wear a glove; batters and runners do not.
+## Fielders wear a glove and a cap; batters and runners wear batting
+## gloves and a helmet.
 func set_glove_visible(value: bool) -> void:
 	_glove.visible = value
+	_cap.visible = value
+	_helmet.visible = not value
+	_kit.set_shader_parameter("gloved", not value)
 	if _pose <= Pose.IDLE:
 		_play(_idle_clip(), 1.0, 0.0)
 
@@ -97,6 +125,9 @@ func set_lefty(value: bool) -> void:
 	_lefty = value
 	_hand.bone_name = "hand_r" if value else "hand_l"
 	_grip.bone_name = "hand_l" if value else "hand_r"
+	# The helmet's ear flap covers the ear toward the pitcher.
+	_helmet.get_node("FlapLeft").visible = not value
+	_helmet.get_node("FlapRight").visible = value
 	_clip = &""
 	_play(_idle_clip(), 1.0, 0.0)
 
@@ -113,13 +144,50 @@ func set_twist(degrees: float) -> void:
 	_model.rotation.y = PI + deg_to_rad(degrees)
 
 
-## Uniform in the team's main color, joints and trim in its second color.
-func set_look(color: Color, tag: String, trim: Color = Color(0, 0, 0, 0)) -> void:
-	var main := GrayboxField._mat(color)
-	main.roughness = 0.7
-	_mesh.set_surface_override_material(0, main)
-	_mesh.set_surface_override_material(1, GrayboxField._mat(trim if trim.a > 0.0 else color.darkened(0.35)))
+## The team's kit: jersey, helmet and cap in its main color, sleeve
+## trim, belt, batting gloves and socks from its second color; home whites
+## or road grays.
+func set_look(color: Color, tag: String, trim: Color = Color(0, 0, 0, 0), home: bool = true) -> void:
+	var second := trim if trim.a > 0.0 else color.darkened(0.35)
+	_kit.set_shader_parameter("jersey", color)
+	_kit.set_shader_parameter("trim", second)
+	_kit.set_shader_parameter("socks", color.darkened(0.25))
+	_kit.set_shader_parameter("pants", Color(0.94, 0.93, 0.89) if home else Color(0.66, 0.67, 0.7))
+	for gear: Node3D in [_helmet, _cap]:
+		for part in gear.find_children("*", "MeshInstance3D", true, false):
+			if part.has_meta("team_part"):
+				var shell := GrayboxField._mat(color if part.get_meta("team_part") == "main" else second)
+				shell.roughness = 0.25 if gear == _helmet else 0.8
+				shell.metallic_specular = 0.7
+				part.material_override = shell
+	_back.modulate = second.lightened(0.25)
+	_back.outline_modulate = color.darkened(0.5)
 	_tag.text = tag
+
+
+## Who wears the kit: skin tone from his id, number on his back.
+func set_player(id: String, number: int) -> void:
+	_kit.set_shader_parameter("skin", UniformLook.skin_for(id))
+	_back.text = str(number) if number >= 0 else ""
+
+
+## Hands on the bat (batter at the plate): the IK holds both hands on the
+## handle and places the bat, pointing along direction (world), hands gap
+## meters apart. Pass bat = null to let go.
+func grip_bat(bat: Node3D, direction: Vector3 = Vector3.FORWARD, gap: float = 0.1) -> void:
+	if bat == null:
+		if _grip_ik != null:
+			_grip_ik.active = false
+		return
+	if _grip_ik == null:
+		_grip_ik = BatGrip.new()
+		_grip_ik.name = "BatGrip"
+		_skeleton.add_child(_grip_ik)
+	_grip_ik.active = true
+	_grip_ik.bat = bat
+	_grip_ik.direction = direction
+	_grip_ik.gap = gap
+	_grip_ik.lefty = _lefty
 
 
 ## Crouching roles (catcher) idle in a crouch.
@@ -189,9 +257,80 @@ func animate(pose: Pose, delta: float, speed: float = 0.0, juke: bool = false, p
 	_model.position.x = _sway
 
 
+## Hangs a node on a bone at a rest-pose spot (skeleton space).
+func _attach(skeleton: Skeleton3D, bone: String, node: Node3D, at: Transform3D) -> BoneAttachment3D:
+	var attach := BoneAttachment3D.new()
+	attach.bone_name = bone
+	skeleton.add_child(attach)
+	attach.add_child(node)
+	node.transform = skeleton.get_bone_global_rest(skeleton.find_bone(bone)).affine_inverse() * at
+	return attach
+
+
+## A glossy batting helmet (shell, brim, ear flap on the left for a righty)
+## and a soft cap (crown, button, long brim), both on the head.
+func _build_headwear(skeleton: Skeleton3D) -> void:
+	_helmet = Node3D.new()
+	_helmet.name = "Helmet"
+	# The head is a narrow egg: about 0.17 m wide, 0.23 deep, top at 1.83.
+	_helmet_part(_helmet, _dome(0.105, 0.165), Vector3(0, 0, -0.005), Vector3(1, 1, 1.28), "main")
+	_helmet_part(_helmet, _disc(0.07, 0.014), Vector3(0, 0.005, 0.135), Vector3(1.2, 1.0, 0.8), "main")
+	for side: float in [1.0, -1.0]:
+		# Skeleton +X is the body's left.
+		var flap := Node3D.new()
+		flap.name = "FlapLeft" if side > 0.0 else "FlapRight"
+		_helmet.add_child(flap)
+		var shell := _helmet_part(flap, _dome(0.06, 0.03), Vector3(0.085 * side, -0.06, 0.025), Vector3(1.0, 1.0, 1.15), "main")
+		shell.rotation.z = -PI * 0.5 * side
+		var hole := _helmet_part(flap, _disc(0.026, 0.01), Vector3(0.116 * side, -0.055, 0.02), Vector3.ONE, "trim")
+		hole.rotation.z = PI * 0.5
+	_helmet.get_node("FlapRight").visible = false
+	_attach(skeleton, "Head", _helmet, Transform3D(Basis.IDENTITY, CROWN))
+	_cap = Node3D.new()
+	_cap.name = "Cap"
+	_helmet_part(_cap, _dome(0.098, 0.14), Vector3(0, 0.01, 0.0), Vector3(1, 1, 1.24), "main")
+	_helmet_part(_cap, _disc(0.014, 0.014), Vector3(0, 0.15, 0.0), Vector3.ONE, "trim")
+	var brim := _helmet_part(_cap, _disc(0.075, 0.01), Vector3(0, 0.02, 0.15), Vector3(1.05, 1.0, 1.0), "trim")
+	brim.rotation.x = 0.12
+	_attach(skeleton, "Head", _cap, Transform3D(Basis.IDENTITY, CROWN))
+	_cap.visible = false
+
+
+func _helmet_part(parent: Node3D, mesh: Mesh, at: Vector3, size: Vector3, part: String) -> MeshInstance3D:
+	var mi := MeshInstance3D.new()
+	mi.mesh = mesh
+	mi.position = at
+	mi.scale = size
+	mi.set_meta("team_part", part)
+	mi.material_override = GrayboxField._mat(Color.GRAY)
+	parent.add_child(mi)
+	return mi
+
+
+static func _dome(radius: float, height: float) -> SphereMesh:
+	var dome := SphereMesh.new()
+	dome.radius = radius
+	dome.height = height  # a hemisphere's height is the dome's own height
+	dome.is_hemisphere = true
+	dome.radial_segments = 24
+	dome.rings = 8
+	return dome
+
+
+static func _disc(radius: float, thickness: float) -> CylinderMesh:
+	var disc := CylinderMesh.new()
+	disc.top_radius = radius
+	disc.bottom_radius = radius
+	disc.height = thickness
+	disc.radial_segments = 24
+	return disc
+
+
 ## Holds a timed move at a point on its 0..length progress clock.
 func _scrub(move: String, progress: float, length: float) -> void:
-	_play(BaseballMoves.clip(move, _lefty), 0.0)
+	# No cross-fade: a blend only advances while the clip plays, and a
+	# scrubbed clip stands still, so it would never finish blending in.
+	_play(BaseballMoves.clip(move, _lefty), 0.0, 0.0)
 	_player.seek(clampf(progress, 0.0, length), true)
 
 

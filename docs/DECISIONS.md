@@ -479,3 +479,23 @@ Decision:
 Reason: Owner direction to prioritize gloves, balls and bats and to save credits.
 
 Affected systems: MatchView (ball material and spin, bat), BatMesh, ball and bat shaders, tests.
+
+## 2026-10-21 - Ballplayer Kits, Headwear and the Batter's Grip
+
+Decision:
+- **Kits:** the mannequin's mesh is copied once with each vertex tagged by body region, from its strongest bone and rest height (`UniformLook`). A uniform shader colors the regions:
+  - Jersey with sleeve trim, a belt, pants (home whites, road grays), team socks and black cleats.
+  - Skin from one of six tones picked steadily from the player's id.
+  - Batting gloves for batters and runners, bare hands for fielders.
+- **Headwear and numbers:**
+  - A glossy batting helmet with brim and an ear flap on the side facing the pitcher (mirrored for lefties) for batters and runners.
+  - A soft cap with a long brim for fielders.
+  - The player's number on his back in the team's colors.
+- **Grip:** `BatGrip`, a SkeletonModifier3D, runs two-bone IK after the animation. It puts the bottom hand near the knob and the top hand just above it (spread apart for a bunt), and it places the bat itself, so the bat never floats off the hands.
+- **Bat and ball look:** grip tape in the batting club's second color. Each pitch spins its own way (`PitchSpin`): fastball backspin, curveball topspin, slider and cutter near-bullet spin, splitter tumble, knuckler barely turning. Rates are slowed so the seams read at 60 fps.
+- **Fix:** scrubbed moves (swing, pitch, throw) no longer cross-fade in. A blend only advances while a clip plays, so at speed 0 the batter stayed in his stance while the bat swung. The swing, the pitcher's windup and fielders' throws now all play in the game.
+- **Tool:** `tools/batter_closeup.gd` shoots the batter up close, or a swing sequence.
+
+Reason: Owner request to improve the batter (clothing, skin, holding the bat properly), team-colored grip tape and pitch spin.
+
+Affected systems: UniformLook, uniform shader, BatGrip, PitchSpin, ActorView (kit, headwear, numbers, grip), MatchView (kits, grip, tape, spin), MatchDirector (pitch family to the view), tests.

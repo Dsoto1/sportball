@@ -434,7 +434,7 @@ func _process_pitch_flight(_delta: float) -> void:
 	# Flight runs on the same clock the swing is judged on.
 	var flight := float(_now_usec() - _pitch_release_usec) / 1000000.0
 	var family := content.pitch(_pitch.family_id)
-	_view.show_pitch(_pitch, minf(flight, travel), family.tell_color, family.tell_trail)
+	_view.show_pitch(_pitch, minf(flight, travel), family.tell_color, family.tell_trail, family)
 	for base: int in _steals:
 		_view.set_runner_off_base(state.runner_on(base), base, _steal_head(base, minf(flight, travel)))
 	var timing := flight - travel

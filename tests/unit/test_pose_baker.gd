@@ -51,3 +51,23 @@ func test_every_move_is_baked_for_both_hands() -> void:
 	check_eq(lib.get_animation(&"Pitch").length, BaseballMoves.PITCH_LENGTH, "pitch runs through its follow-through")
 	check(lib.get_animation(&"Stance").loop_mode == Animation.LOOP_LINEAR, "the stance loops")
 	model.free()
+
+
+func test_uniform_regions_follow_the_body() -> void:
+	check_eq(UniformLook.region_for("Head", Vector3(0, 1.7, 0)), UniformLook.Region.SKIN, "head is skin")
+	check_eq(UniformLook.region_for("spine_02", Vector3(0, 1.2, 0)), UniformLook.Region.JERSEY, "chest is jersey")
+	check_eq(UniformLook.region_for("pelvis", Vector3(0, 0.96, 0)), UniformLook.Region.BELT, "belt at the waist")
+	check_eq(UniformLook.region_for("thigh_l", Vector3(0.1, 0.7, 0)), UniformLook.Region.PANTS, "thighs in pants")
+	check_eq(UniformLook.region_for("calf_r", Vector3(-0.1, 0.2, 0)), UniformLook.Region.SOCKS, "socks below the knee")
+	check_eq(UniformLook.region_for("foot_l", Vector3(0.1, 0.05, 0)), UniformLook.Region.CLEATS, "cleats")
+	check_eq(UniformLook.region_for("upperarm_r", Vector3(-0.25, 1.44, 0)), UniformLook.Region.JERSEY, "sleeve")
+	check_eq(UniformLook.region_for("lowerarm_r", Vector3(-0.6, 1.44, 0)), UniformLook.Region.SKIN, "bare forearm")
+	check_eq(UniformLook.region_for("index_02_l", Vector3(0.8, 1.44, 0)), UniformLook.Region.HANDS, "hands")
+
+
+func test_every_pitch_has_a_spin() -> void:
+	for family: PitchFamilyDef in content().pitches:
+		var spin := PitchSpin.for_family(family)
+		check_near((spin[0] as Vector3).length(), 1.0, 0.001, "%s spin axis is a direction" % family.id)
+		check(float(spin[1]) > 0.0 and float(spin[1]) < 70.0, "%s spins at a readable rate" % family.id)
+	check(float(PitchSpin.BY_FAMILY[&"junkball"][1]) < 5.0, "the knuckler barely turns over")

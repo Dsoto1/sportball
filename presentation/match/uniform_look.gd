@@ -1,0 +1,87 @@
+class_name UniformLook
+extends RefCounted
+## Paints the mannequin as a ballplayer: a copy of its mesh where every
+## vertex carries its body region (in UV2.x, an exact float) from its strongest bone
+## and its rest-pose height, read by the uniform shader. Built once and
+## shared; each player's colors live in his own material.
+
+const SHADER := preload("res://presentation/match/uniform.gdshader")
+enum Region { JERSEY, TRIM, BELT, PANTS, SOCKS, CLEATS, SKIN, HANDS }
+## Rest-pose heights (m): jersey tucks in above the belt, pants end below
+## the knee, sleeves end partway down the upper arm.
+const BELT_TOP := 0.99
+const BELT_BOTTOM := 0.94
+const SOCK_TOP := 0.37
+const SLEEVE_END := 0.33
+const CUFF := 0.03
+## Kept a little deep: the ballpark sun and sky light wash pale tones out.
+const SKIN_TONES := [Color(0.86, 0.66, 0.52), Color(0.78, 0.56, 0.4), Color(0.66, 0.45, 0.3),
+	Color(0.52, 0.34, 0.22), Color(0.4, 0.26, 0.17), Color(0.3, 0.19, 0.12)]
+
+static var _mesh: ArrayMesh
+
+
+## The region-painted copy of the mannequin mesh (same skinning).
+static func mesh_for(source: MeshInstance3D) -> ArrayMesh:
+	if _mesh != null:
+		return _mesh
+	var src := source.mesh
+	var names := PackedStringArray()
+	for b in source.skin.get_bind_count():
+		names.append(String(source.skin.get_bind_name(b)))
+	_mesh = ArrayMesh.new()
+	for s in src.get_surface_count():
+		var arrays := src.surface_get_arrays(s)
+		var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+		var bones: PackedInt32Array = arrays[Mesh.ARRAY_BONES]
+		var weights: PackedFloat32Array = arrays[Mesh.ARRAY_WEIGHTS]
+		var per := bones.size() / verts.size()
+		var regions := PackedVector2Array()
+		regions.resize(verts.size())
+		for i in verts.size():
+			var best := 0
+			for k in per:
+				if weights[i * per + k] > weights[i * per + best]:
+					best = k
+			var region := region_for(names[bones[i * per + best]], verts[i])
+			regions[i] = Vector2(float(region), 0.0)
+		arrays[Mesh.ARRAY_TEX_UV2] = regions
+		_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	return _mesh
+
+
+## Body region for a vertex from its strongest bone and rest position.
+static func region_for(bone: String, rest: Vector3) -> Region:
+	if bone == "Head" or bone == "neck_01":
+		return Region.SKIN
+	if bone.begins_with("hand") or bone.begins_with("index") or bone.begins_with("middle") \
+			or bone.begins_with("ring") or bone.begins_with("pinky") or bone.begins_with("thumb"):
+		return Region.HANDS
+	if bone.begins_with("lowerarm"):
+		return Region.SKIN
+	if bone.begins_with("upperarm"):
+		var out := absf(rest.x)
+		if out > SLEEVE_END + CUFF:
+			return Region.SKIN
+		return Region.TRIM if out > SLEEVE_END else Region.JERSEY
+	if bone.begins_with("foot") or bone.begins_with("ball"):
+		return Region.CLEATS
+	if bone.begins_with("calf"):
+		return Region.PANTS if rest.y > SOCK_TOP else Region.SOCKS
+	if bone.begins_with("thigh"):
+		return Region.PANTS
+	# Torso and hips: jersey, belt, pants by height.
+	if rest.y >= BELT_TOP:
+		return Region.JERSEY
+	return Region.BELT if rest.y >= BELT_BOTTOM else Region.PANTS
+
+
+## A skin tone picked steadily from a player's id.
+static func skin_for(id: String) -> Color:
+	return SKIN_TONES[absi(hash(id)) % SKIN_TONES.size()]
+
+
+static func material() -> ShaderMaterial:
+	var m := ShaderMaterial.new()
+	m.shader = SHADER
+	return m

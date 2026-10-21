@@ -48,6 +48,9 @@ var _landing_hint: MeshInstance3D
 var _field_focus := Vector3(0.0, 0.0, -42.0)
 ## Seconds a swing takes to come through the zone and follow through.
 const SWING_TIME := 0.28
+## Hands apart on the handle (m): together to swing, spread to bunt.
+const SWING_GRIP := 0.09
+const BUNT_GRIP := 0.3
 const BALL_SHADER := preload("res://presentation/props/baseball.gdshader")
 ## How fast the ball tumbles (radians per meter travelled), so its seams spin.
 const BALL_SPIN := 9.0
@@ -64,6 +67,10 @@ var _windup := -1.0
 ## View clock when the pitcher let go (his follow-through), or -1.
 var _follow_start := -1.0
 var _last_ball_position := Vector3.ZERO
+## [axis, rate] while a pitch is in flight (its own spin), else empty.
+var _pitch_spin: Array = []
+## Whether the batting side is the home club (home whites, road grays).
+var _batting_home := false
 var _aim: Node3D
 var _aim_shaft: MeshInstance3D
 var _aim_head: MeshInstance3D
@@ -150,17 +157,24 @@ func reset_for_pitch(state: MatchState) -> void:
 	_rundown_zoom = false
 	for i in _fielders.size():
 		_fielders[i].reset_pose()
-		_fielders[i].set_look(fielding_color, _fielder_tag(state, tuning.fielder_ids[i]), fielding_trim)
+		_fielders[i].set_look(fielding_color, _fielder_tag(state, tuning.fielder_ids[i]), fielding_trim, state.fielding_team() == MatchState.HOME)
+		var fielder_id: StringName = state.defense[state.fielding_team()].get(tuning.fielder_ids[i], &"") if _roster != null else &""
+		var fielder_def := _roster.player(fielder_id) if fielder_id != &"" else null
+		_fielders[i].set_player(String(fielder_id) if fielder_def != null else String(tuning.fielder_ids[i]), fielder_def.number if fielder_def != null else -1)
 		_fielders[i].position = FieldLayout.fielder_spot(i, tuning)
 		_fielders[i].face(Vector3.ZERO)
 		_fielders[i].set_crouch(tuning.fielder_ids[i] == &"c")
 	_clear_runners()
+	_batting_home = state.batting_team() == MatchState.HOME
 	var batter := _runner_actor(state.current_batter(), batting_color, batting_trim)
 	_batter_id = state.current_batter()
 	batter.set_tag_visible(_camera_mode != CameraMode.BAT)
 	var hitter := _roster.player(state.current_batter()) if _roster != null else null
 	_bats_left = hitter != null and hitter.bats_left()
 	batter.set_lefty(_bats_left)
+	# The bat's grip tape is the batting club's second color.
+	var tape := batting_trim if batting_trim.a > 0.0 else batting_color.darkened(0.4)
+	(_bat_pivot.get_node("BatMesh").material_override as ShaderMaterial).set_shader_parameter("tape", tape)
 	var pitcher_index := tuning.fielder_ids.find(&"p")
 	var pitcher_def := _roster.player(state.pitcher(state.fielding_team())) if _roster != null else null
 	if pitcher_index >= 0:
@@ -171,6 +185,7 @@ func reset_for_pitch(state: MatchState) -> void:
 	set_aim_preview(false)
 	_windup = -1.0
 	_follow_start = -1.0
+	_pitch_spin = []
 	_timing_ring.visible = false
 	for base in [1, 2, 3]:
 		var id := state.runner_on(base)
@@ -191,6 +206,8 @@ func reset_for_pitch(state: MatchState) -> void:
 ## The batter's bat: shown in his stance until the ball is put in play.
 func set_bat(visible_now: bool) -> void:
 	_bat_pivot.visible = visible_now
+	if not visible_now:
+		_drop_bat()
 	_bat_swing_start = -1.0
 	_bat_bunt = false
 
@@ -285,7 +302,8 @@ func show_timing_ring(u: float) -> void:
 
 
 ## tell: the pitch family's colour and trail length (batter's read).
-func show_pitch(pitch: PitchResult, t: float, tell_color: Color = Color.WHITE, tell_trail: int = 0) -> void:
+func show_pitch(pitch: PitchResult, t: float, tell_color: Color = Color.WHITE, tell_trail: int = 0, family: PitchFamilyDef = null) -> void:
+	_pitch_spin = PitchSpin.for_family(family) if family != null else []
 	_ball.position = pitch.position_at(t)
 	_update_shadow()
 	for i in _trail.size():
@@ -327,13 +345,16 @@ const COVER_PREFERENCE := {1: [&"1b", &"p", &"2b"], 2: [&"2b", &"ss"], 3: [&"3b"
 
 func show_play(bip: BallInPlay, t: float, play: LivePlay, outcome: PlayOutcome, live: LiveFielding = null, selected_runner: StringName = &"") -> void:
 	_zone.visible = false
-	_bat_pivot.visible = false
+	if _bat_pivot.visible:
+		_bat_pivot.visible = false
+		_drop_bat()
 	_aim.visible = false
 	for ghost in _trail:
 		ghost.visible = false
 	_timing_ring.visible = false
 	_windup = -1.0
 	_follow_start = -1.0
+	_pitch_spin = []
 	var fielding := bip.fielding
 	var secured := play != null and play.ball != LivePlay.Ball.LOOSE
 	_ball.position = play.ball_position() if play != null else bip.trajectory.position_at(t)
@@ -535,10 +556,21 @@ func _spin_ball() -> void:
 	var distance := moved.length()
 	if distance < 0.001 or distance > 5.0:
 		return
+	if not _pitch_spin.is_empty():
+		# A pitch keeps the spin its family puts on it.
+		_ball.rotate(_pitch_spin[0], _pitch_spin[1] * get_process_delta_time())
+		return
 	var axis := moved.cross(Vector3.UP)
 	if axis.length() < 0.0001:
 		axis = Vector3.RIGHT
 	_ball.rotate(axis.normalized(), -distance * BALL_SPIN)
+
+
+## The batter lets go of the bat (he runs, or the bat is put away).
+func _drop_bat() -> void:
+	var batter: ActorView = _runners.get(_batter_id)
+	if batter != null:
+		batter.grip_bat(null)
 
 
 func _update_bat() -> void:
@@ -573,6 +605,11 @@ func _update_bat() -> void:
 	var y := deg_to_rad(yaw)
 	var e := deg_to_rad(lift)
 	var dir := Vector3(cos(e) * cos(y) * side, sin(e), cos(e) * sin(y))
+	if batter != null:
+		# His hands hold the handle; the grip places the bat (choked
+		# together to swing, spread apart to bunt).
+		batter.grip_bat(_bat_pivot, dir, BUNT_GRIP if _bat_bunt else SWING_GRIP)
+		return
 	_bat_pivot.look_at(_bat_pivot.global_position + dir, Vector3.UP)
 
 
@@ -738,9 +775,10 @@ func _runner_actor(id: StringName, color: Color, trim: Color = Color(0, 0, 0, 0)
 	actor.setup(color, String(id).get_slice("_", 1))
 	actor.set_glove_visible(false)
 	if p != null:
-		actor.set_look(color, "#%d %s" % [p.number, p.display_name.to_upper()], trim)
-	elif trim.a > 0.0:
-		actor.set_look(color, String(id).get_slice("_", 1), trim)
+		actor.set_look(color, "#%d %s" % [p.number, p.display_name.to_upper()], trim, _batting_home)
+	else:
+		actor.set_look(color, String(id).get_slice("_", 1), trim, _batting_home)
+	actor.set_player(String(id), p.number if p != null else -1)
 	_runners[id] = actor
 	return actor
 
