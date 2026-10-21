@@ -47,7 +47,11 @@ var _control_ring: MeshInstance3D
 var _landing_hint: MeshInstance3D
 var _field_focus := Vector3(0.0, 0.0, -42.0)
 ## Seconds a swing takes to come through the zone and follow through.
-const SWING_TIME := 0.28
+## The swing from the press: the barrel reaches the ball
+## BattingStyles.CONTACT_AT into it (60 ms), the rest is follow-through.
+const SWING_TIME := 0.3
+## Frames of the barrel's swoosh.
+const TRAIL_LENGTH := 10
 ## Hands apart on the handle (m): together to swing, spread to bunt.
 const SWING_GRIP := 0.09
 const BUNT_GRIP := 0.3
@@ -61,6 +65,20 @@ const HANDS_BREAK := 0.55
 var _bat_pivot: Node3D
 var _bat_swing_start := -1.0
 var _bat_bunt := false
+## Approach clock 0..1 (stance, load, stride), and the pitch's flight
+## progress driving it (-1 when no pitch is in the air).
+var _approach := 0.0
+var _pitch_u := -1.0
+## Bat (yaw, lift) this frame, and where the swing started from.
+var _bat_now := Vector2(100, 50)
+var _swing_from := Vector2(100, 50)
+var _contact_tier := 0
+var _trail_mesh: ImmediateMesh
+var _trail_points: Array = []
+var _trail_color := Color(1, 1, 1, 0.55)
+var _tossing := false
+var _toss_velocity := Vector3.ZERO
+var _toss_spin := Vector3.ZERO
 var _view_clock := 0.0
 var _timing_ring: MeshInstance3D
 var _windup := -1.0
@@ -182,6 +200,9 @@ func reset_for_pitch(state: MatchState) -> void:
 	batter.position = _batter_spot()
 	batter.face(batter.position + (Vector3.LEFT if _bats_left else Vector3.RIGHT))  # square to the plate
 	set_bat(true)
+	_pitch_u = -1.0
+	_contact_tier = 0
+	batter.style = BattingStyles.for_player(hitter)
 	set_aim_preview(false)
 	_windup = -1.0
 	_follow_start = -1.0
@@ -206,6 +227,9 @@ func reset_for_pitch(state: MatchState) -> void:
 ## The batter's bat: shown in his stance until the ball is put in play.
 func set_bat(visible_now: bool) -> void:
 	_bat_pivot.visible = visible_now
+	_tossing = false
+	_approach = 0.0
+	_trail_points.clear()
 	if not visible_now:
 		_drop_bat()
 	_bat_swing_start = -1.0
@@ -264,8 +288,11 @@ func contact_feedback(location: Vector2, tier: int) -> void:
 	if tier != ContactFeedback.Tier.MISS:
 		# Wood under the synthesized crack: fuller the better the contact.
 		sfx.play(&"bat", -8.0 + 2.0 * tier, lerpf(0.85, 1.05, tier / 4.0))
+	_contact_tier = tier
 	if tier < ContactFeedback.Tier.SOLID:
 		return
+	# The swoosh lights up on a barreled ball.
+	_trail_color = Color(1.0, 0.85, 0.3, 0.9) if tier == ContactFeedback.Tier.SWEET else Color(1, 1, 1, 0.75)
 	# Camera punch: a quick zoom-in kick and shake, bigger on the barrel.
 	_punch_start = _view_clock
 	_punch_strength = 1.0 if tier == ContactFeedback.Tier.SWEET else 0.5
@@ -276,9 +303,12 @@ func contact_feedback(location: Vector2, tier: int) -> void:
 	_flash_start = _view_clock
 
 
-## Plays the swing (on contact and on a miss alike).
+## Plays the swing (on contact and on a miss alike): from his stride, the
+## barrel reaches the zone CONTACT_AT into it, right on the press.
 func swing_bat() -> void:
 	_bat_swing_start = _view_clock
+	_swing_from = _bat_now
+	_trail_color = Color(1, 1, 1, 0.55)
 
 
 ## Pitcher's windup, 0..1, or -1 when not winding up. The ball sits in his
@@ -303,6 +333,7 @@ func show_timing_ring(u: float) -> void:
 
 ## tell: the pitch family's colour and trail length (batter's read).
 func show_pitch(pitch: PitchResult, t: float, tell_color: Color = Color.WHITE, tell_trail: int = 0, family: PitchFamilyDef = null) -> void:
+	_pitch_u = t / maxf(pitch.travel_time, 0.01)
 	_pitch_spin = PitchSpin.for_family(family) if family != null else []
 	_ball.position = pitch.position_at(t)
 	_update_shadow()
@@ -345,9 +376,8 @@ const COVER_PREFERENCE := {1: [&"1b", &"p", &"2b"], 2: [&"2b", &"ss"], 3: [&"3b"
 
 func show_play(bip: BallInPlay, t: float, play: LivePlay, outcome: PlayOutcome, live: LiveFielding = null, selected_runner: StringName = &"") -> void:
 	_zone.visible = false
-	if _bat_pivot.visible:
-		_bat_pivot.visible = false
-		_drop_bat()
+	if _bat_pivot.visible and not _tossing:
+		_toss_bat()
 	_aim.visible = false
 	for ghost in _trail:
 		ghost.visible = false
@@ -574,43 +604,120 @@ func _drop_bat() -> void:
 
 
 func _update_bat() -> void:
+	if _tossing:
+		_update_toss(get_process_delta_time())
+		return
 	if not _bat_pivot.visible:
 		return
 	var batter: ActorView = _runners.get(_batter_id)
-	if batter != null:
-		var delta := get_process_delta_time()
-		if _bat_bunt:
+	var delta := get_process_delta_time()
+	var style: StringName = batter.style if batter != null else &"classic"
+	var side := -1.0 if _bats_left else 1.0
+	# The approach: he loads as the pitcher delivers and strides as the ball
+	# comes, then holds, cocked. A take lets it go and settles back.
+	var target := 0.0
+	if _windup >= 0.0:
+		target = BattingStyles.LOAD_AT * smoothstep(0.35, 1.0, _windup)
+	elif _pitch_u >= 0.0:
+		target = lerpf(BattingStyles.LOAD_AT, 1.0, clampf(_pitch_u / 0.5, 0.0, 1.0))
+		if _pitch_u >= 1.0 and _bat_swing_start < 0.0:
+			target = 0.0
+	_approach = move_toward(_approach, target, delta * (6.0 if target > _approach else 2.5))
+	var bat := BattingStyles.approach_bat(style, _approach, _view_clock)
+	var gap := SWING_GRIP
+	var one_hand := false
+	if _bat_bunt:
+		bat = Vector2(0.0, 6.0)  # flat across the front of the plate
+		gap = BUNT_GRIP
+		if batter != null:
 			batter.animate(ActorView.Pose.BUNT, delta)
-		elif _bat_swing_start >= 0.0:
-			batter.animate(ActorView.Pose.SWING, delta, 0.0, false, (_view_clock - _bat_swing_start) / SWING_TIME)
+	elif _bat_swing_start >= 0.0:
+		var p := (_view_clock - _bat_swing_start) / SWING_TIME
+		bat = BattingStyles.swing_bat(style, p, _swing_from)
+		one_hand = bool(BattingStyles.BAT[style]["one_hand"]) and p > 0.5
+		if batter != null:
+			batter.animate(ActorView.Pose.SWING, delta, 0.0, false, p)
+	elif batter != null:
+		if _approach > 0.001:
+			batter.animate(ActorView.Pose.APPROACH, delta, 0.0, false, _approach)
 		else:
 			batter.animate(ActorView.Pose.BAT_STANCE, delta)
-	var side := -1.0 if _bats_left else 1.0
-	_bat_pivot.position = _batter_spot() + Vector3(0.3 * side, 1.0, 0.05)
-	if batter != null:
-		_bat_pivot.position = batter.grip_position()
+	_bat_now = bat
 	# Yaw 90 = barrel back toward the catcher, 0 = across the plate, -90 =
-	# toward the pitcher. Elevation in degrees above level.
-	var yaw := 100.0 + sin(_view_clock * 3.0) * 6.0  # stance with a waggle
-	var lift := 50.0
-	if _bat_bunt:
-		yaw = 0.0  # held flat across the front of the plate
-		lift = 6.0
-		_bat_pivot.position += Vector3(0.0, -0.1, -0.35)
-	elif _bat_swing_start >= 0.0:
-		var p := clampf((_view_clock - _bat_swing_start) / SWING_TIME, 0.0, 1.0)
-		var eased := p * p * (3.0 - 2.0 * p)
-		yaw = lerpf(100.0, -170.0, eased)
-		lift = lerpf(50.0, 5.0, minf(p * 2.0, 1.0)) if p < 0.5 else lerpf(5.0, 40.0, (p - 0.5) * 2.0)
-	var y := deg_to_rad(yaw)
-	var e := deg_to_rad(lift)
+	# toward the pitcher. Lift in degrees above level.
+	var y := deg_to_rad(bat.x)
+	var e := deg_to_rad(bat.y)
 	var dir := Vector3(cos(e) * cos(y) * side, sin(e), cos(e) * sin(y))
 	if batter != null:
-		# His hands hold the handle; the grip places the bat (choked
-		# together to swing, spread apart to bunt).
-		batter.grip_bat(_bat_pivot, dir, BUNT_GRIP if _bat_bunt else SWING_GRIP)
+		# His hands hold the handle; the grip places the bat.
+		batter.grip_bat(_bat_pivot, dir, gap, one_hand, float(BattingStyles.BAT[style]["choke"]))
+	else:
+		_bat_pivot.position = _batter_spot() + Vector3(0.3 * side, 1.0, 0.05)
+		_bat_pivot.look_at(_bat_pivot.global_position + dir, Vector3.UP)
+	_update_trail()
+
+
+## The barrel's swoosh: a ribbon through the last few spots of the bat,
+## from just above the hands to the end of the barrel, fading behind.
+func _update_trail() -> void:
+	var swinging := _bat_swing_start >= 0.0 and _view_clock - _bat_swing_start < SWING_TIME * 0.75
+	var tip := _bat_pivot.global_transform * Vector3(0, 0, -BatMesh.LENGTH + 0.06)
+	var mid := _bat_pivot.global_transform * Vector3(0, 0, -0.45)
+	if swinging:
+		_trail_points.push_front([mid, tip])
+		if _trail_points.size() > TRAIL_LENGTH:
+			_trail_points.pop_back()
+	elif not _trail_points.is_empty():
+		_trail_points.pop_back()
+	_trail_mesh.clear_surfaces()
+	if _trail_points.size() < 2:
 		return
-	_bat_pivot.look_at(_bat_pivot.global_position + dir, Vector3.UP)
+	_trail_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLE_STRIP)
+	for i in _trail_points.size():
+		var fade := 1.0 - float(i) / _trail_points.size()
+		var c := Color(_trail_color, _trail_color.a * fade)
+		_trail_mesh.surface_set_color(Color(c, 0.0))
+		_trail_mesh.surface_add_vertex(_trail_points[i][0])
+		_trail_mesh.surface_set_color(c)
+		_trail_mesh.surface_add_vertex(_trail_points[i][1])
+	_trail_mesh.surface_end()
+
+
+## The bat leaves his hands when the ball is put in play: tossed aside on
+## most hits, flipped high on one he barreled.
+func _toss_bat() -> void:
+	var batter: ActorView = _runners.get(_batter_id)
+	_drop_bat()
+	_tossing = true
+	var side := -1.0 if _bats_left else 1.0
+	var big := _contact_tier >= ContactFeedback.Tier.SWEET
+	# Toward the first-base side for a righty, high and spinning for a flip.
+	_toss_velocity = Vector3(side * (1.2 if big else 2.4), 5.5 if big else 1.6, 0.9 if big else 0.4)
+	_toss_spin = Vector3(side * (14.0 if big else 4.0), 2.0, 3.0 if big else 1.0)
+	if batter == null:
+		_tossing = false
+		_bat_pivot.visible = false
+
+
+func _update_toss(delta: float) -> void:
+	_toss_velocity.y -= 9.8 * delta
+	var p := _bat_pivot.global_position + _toss_velocity * delta
+	if p.y < 0.06:
+		p.y = 0.06
+		# A dead bounce, then it lies still on the dirt.
+		_toss_velocity = Vector3(_toss_velocity.x * 0.4, absf(_toss_velocity.y) * 0.25, _toss_velocity.z * 0.4)
+		_toss_spin *= 0.4
+		if _toss_velocity.length() < 0.4:
+			_toss_velocity = Vector3.ZERO
+			_toss_spin = Vector3.ZERO
+			var flat := _bat_pivot.global_transform.basis.z
+			flat.y = 0.0
+			if flat.length() > 0.01:
+				_bat_pivot.look_at(p - flat, Vector3.UP)
+	_bat_pivot.global_position = p
+	if _toss_spin.length() > 0.0:
+		_bat_pivot.rotate(_toss_spin.normalized(), _toss_spin.length() * delta)
+	_update_trail()
 
 
 func _update_windup(delta: float) -> void:
@@ -681,6 +788,19 @@ func _build_bat() -> void:
 	bat.position = Vector3(0.0, 0.0, 0.06)
 	bat.material_override = BatMesh.material()
 	_bat_pivot.add_child(bat)
+	var trail := MeshInstance3D.new()
+	trail.name = "BatTrail"
+	_trail_mesh = ImmediateMesh.new()
+	trail.mesh = _trail_mesh
+	var trail_mat := StandardMaterial3D.new()
+	trail_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	trail_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	trail_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	trail_mat.vertex_color_use_as_albedo = true
+	trail_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	trail.material_override = trail_mat
+	trail.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(trail)
 	_timing_ring = _ring(Color(1, 1, 1, 0.8))
 	_timing_ring.position = Vector3(0.0, (tuning.zone_top + tuning.zone_bottom) * 0.5, 0.04)
 	_timing_ring.visible = false

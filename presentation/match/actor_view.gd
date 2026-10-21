@@ -7,7 +7,7 @@ extends Node3D
 ## Gameplay decides where everyone is; this only picks a clip per pose,
 ## matches run cycles to speed and keeps the glove on the hand. Visual only.
 
-enum Pose { IDLE, RUN, TURN, CHASE, TAG, THROW, DOWN, SLIDE, BAT_STANCE, SWING, CELEBRATE, BUNT, PITCH, SCOOP, CATCH_HIGH, DIVE, LEAD }
+enum Pose { IDLE, RUN, TURN, CHASE, TAG, THROW, DOWN, SLIDE, BAT_STANCE, SWING, CELEBRATE, BUNT, PITCH, SCOOP, CATCH_HIGH, DIVE, LEAD, APPROACH, FINISH }
 
 const BODY := preload("res://assets/third_party/quaternius/universal-animation-library/UAL1_Standard.glb")
 ## The player's body: Quaternius Universal Base Characters (CC0), on the
@@ -58,6 +58,8 @@ var _helmet: Node3D
 var _cap: Node3D
 var _back: Label3D
 var _grip_ik: BatGrip
+## How this batter stands and swings (BattingStyles).
+var style: StringName = &"classic"
 var _twist := 0.0
 var _tag: Label3D
 var _clock := 0.0
@@ -204,7 +206,7 @@ func set_player(id: String, number: int) -> void:
 ## Hands on the bat (batter at the plate): the IK holds both hands on the
 ## handle and places the bat, pointing along direction (world), hands gap
 ## meters apart. Pass bat = null to let go.
-func grip_bat(bat: Node3D, direction: Vector3 = Vector3.FORWARD, gap: float = 0.1) -> void:
+func grip_bat(bat: Node3D, direction: Vector3 = Vector3.FORWARD, gap: float = 0.1, one_hand: bool = false, choke: float = 0.0) -> void:
 	if bat == null:
 		if _grip_ik != null:
 			_grip_ik.active = false
@@ -218,6 +220,8 @@ func grip_bat(bat: Node3D, direction: Vector3 = Vector3.FORWARD, gap: float = 0.
 	_grip_ik.direction = direction
 	_grip_ik.gap = gap
 	_grip_ik.lefty = _lefty
+	_grip_ik.one_hand = one_hand
+	_grip_ik.choke = choke
 
 
 ## Crouching roles (catcher) idle in a crouch.
@@ -248,8 +252,8 @@ func hand_position() -> Vector3:
 
 
 ## Drives the body toward a pose. speed (m/s) matches run cycles; juke adds
-## a side-to-side feint; progress scrubs the timed moves: THROW and SWING
-## 0..1, PITCH 0..BaseballMoves.PITCH_LENGTH (release at 1).
+## a side-to-side feint; progress scrubs the timed moves: THROW, SWING and
+## APPROACH 0..1, PITCH 0..BaseballMoves.PITCH_LENGTH (release at 1).
 func animate(pose: Pose, delta: float, speed: float = 0.0, juke: bool = false, progress: float = 0.0) -> void:
 	_clock += delta
 	var fresh := pose != _pose
@@ -265,11 +269,16 @@ func animate(pose: Pose, delta: float, speed: float = 0.0, juke: bool = false, p
 		Pose.THROW:
 			_scrub("Throw", progress, 1.0)
 		Pose.SWING:
-			_scrub("Swing", progress, 1.0)
+			_scrub("Swing_%s" % style, progress, 1.0)
+		Pose.APPROACH:
+			_scrub("Approach_%s" % style, progress, 1.0)
+		Pose.FINISH:
+			# Admiring it: holds the end of his swing.
+			_scrub("Swing_%s" % style, 1.0, 1.0)
 		Pose.PITCH:
 			_scrub("Pitch", progress, BaseballMoves.PITCH_LENGTH)
 		Pose.BAT_STANCE:
-			_play(BaseballMoves.clip("Stance", _lefty), 1.0)
+			_play(BaseballMoves.clip("Stance_%s" % style, _lefty), 1.0)
 		Pose.BUNT:
 			_play(BaseballMoves.clip("Bunt", _lefty), 1.6)
 		Pose.LEAD:

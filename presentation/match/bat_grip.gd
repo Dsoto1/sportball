@@ -14,6 +14,11 @@ var direction := Vector3.FORWARD
 var gap := 0.1
 ## Lefties: the left hand is on top.
 var lefty := false
+## The top hand has let go (a one-hand finish).
+var one_hand := false
+## Hands choked up the handle (m): the knob sits this far below the
+## bottom hand.
+var choke := 0.0
 
 
 func _process_modification_with_delta(_delta: float) -> void:
@@ -31,9 +36,10 @@ func _process_modification_with_delta(_delta: float) -> void:
 	var bottom_target := mid - d * spread * 0.5
 	var top_target := mid + d * spread * 0.5
 	_reach(sk, bottom_side, bottom_target)
-	_reach(sk, top_side, top_target)
+	if not one_hand:
+		_reach(sk, top_side, top_target)
 	var up := Vector3.UP if absf(direction.normalized().dot(Vector3.UP)) < 0.98 else Vector3.FORWARD
-	bat.global_transform = Transform3D(Basis.looking_at(direction, up), xf * bottom_target)
+	bat.global_transform = Transform3D(Basis.looking_at(direction, up), xf * bottom_target - direction.normalized() * choke)
 
 
 ## Two-bone IK for one arm: the wrist lands on target, elbow bent down and out.

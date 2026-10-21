@@ -14,6 +14,9 @@ extends Resource
 @export var positions: Array[StringName] = []
 
 @export_group("Hitting and Running")
+## How he stands and swings (BattingStyles: classic, crouch, open, leg_kick,
+## wrap, slap); empty picks one that suits his ratings.
+@export var batting_style: StringName = &""
 @export_range(0, 100) var contact: int = 50
 @export_range(0, 100) var power: int = 50
 ## Plate discipline: how well the AI reads pitches when this player bats.

@@ -59,6 +59,10 @@ func runner_cue(play: LivePlay, r: LivePlay.Runner) -> Dictionary:
 				cue["pose"] = ActorView.Pose.TURN
 			elif _sliding(play, r):
 				cue["pose"] = ActorView.Pose.SLIDE
+			elif paused and r.is_batter:
+				# The batter holds his finish a beat before he drops the bat
+				# and runs.
+				cue["pose"] = ActorView.Pose.FINISH
 			else:
 				cue["pose"] = ActorView.Pose.RUN if not paused else ActorView.Pose.IDLE
 			cue["juke"] = r.id == rundown_runner and play.ball == LivePlay.Ball.HELD \

@@ -71,3 +71,39 @@ func test_every_pitch_has_a_spin() -> void:
 		check_near((spin[0] as Vector3).length(), 1.0, 0.001, "%s spin axis is a direction" % family.id)
 		check(float(spin[1]) > 0.0 and float(spin[1]) < 70.0, "%s spins at a readable rate" % family.id)
 	check(float(PitchSpin.BY_FAMILY[&"junkball"][1]) < 5.0, "the knuckler barely turns over")
+
+
+func test_every_batting_style_is_baked() -> void:
+	var model := _rig()
+	var lib := BaseballMoves.library(model.find_child("Skeleton3D") as Skeleton3D, model.find_child("AnimationPlayer") as AnimationPlayer)
+	for style: StringName in BattingStyles.ORDER:
+		for move in ["Stance_%s", "Approach_%s", "Swing_%s"]:
+			check(lib.has_animation(StringName(move % style)), "%s baked" % (move % style))
+			check(lib.has_animation(StringName((move % style) + "_L")), "%s lefty baked" % (move % style))
+		check(BattingStyles.BAT.has(style), "%s has a bat setup" % style)
+	model.free()
+
+
+func test_the_barrel_is_square_at_contact() -> void:
+	for style: StringName in BattingStyles.ORDER:
+		var start := BattingStyles.approach_bat(style, 1.0, 0.0)
+		var at := BattingStyles.swing_bat(style, BattingStyles.CONTACT_AT, start)
+		check_near(at.x, 0.0, 0.5, "%s: barrel across the plate at contact" % style)
+		var finish := BattingStyles.swing_bat(style, 1.0, start)
+		check_eq(finish.x, float(BattingStyles.BAT[style]["finish_yaw"]), "%s: sweeps through to its finish" % style)
+	check(MatchView.SWING_TIME * BattingStyles.CONTACT_AT < 0.08, "contact lands within 80 ms of the press")
+
+
+func test_styles_suit_the_hitter() -> void:
+	var slugger := PlayerDef.new()
+	slugger.id = &"x_slugger"
+	slugger.power = 90
+	check([&"leg_kick", &"wrap"].has(BattingStyles.for_player(slugger)), "sluggers load big")
+	var slapper := PlayerDef.new()
+	slapper.id = &"x_slapper"
+	slapper.power = 35
+	slapper.contact = 80
+	slapper.speed = 85
+	check([&"slap", &"open"].has(BattingStyles.for_player(slapper)), "quick contact hitters slap")
+	slapper.batting_style = &"crouch"
+	check_eq(BattingStyles.for_player(slapper), &"crouch", "a set style wins")

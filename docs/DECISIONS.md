@@ -511,3 +511,28 @@ Decision:
 Reason: Owner request to improve the batter (clothing, skin, faces) using the Universal Base Characters pack.
 
 Affected systems: ActorView (body, hair, beard), uniform shader (textured skin), UniformLook (hair colors), asset manifest.
+
+## 2026-10-21 - Batting Styles, a Timed Approach and the Payoff on Contact
+
+Decision:
+- **Six batting styles** (`BattingStyles`), each its own stance, grip, load, stride and finish:
+  - Classic.
+  - Crouch: deep and wide.
+  - Open: front foot pulled away from the plate, toe tap to close.
+  - Leg Kick: big front-knee lift and long stride.
+  - Bat Wrap: bat cocked behind the head, one-hand finish.
+  - Slap: choked up, short stride, compact level finish.
+  - Each style bakes its own stance loop, approach and swing (plus lefty copies). Its bat setup (angle, waggle, load, finish, one hand, choke) drives the bat.
+- **Who swings how:** a player's `batting_style` if set. Otherwise one that suits his ratings: big power gets the leg kick or the wrap; fast, contact-first, low-power hitters get the slap or the open stance; everyone else is spread over classic, crouch and open, steady per player.
+- **The approach is timed to the pitch:** he loads as the pitcher winds up (peak at the release) and strides as the ball comes (landing halfway in), then holds, cocked. A take lets it go and settles back.
+- **The swing is timed to the press:** a press is the moment of contact in the rules. The swing now starts from the stride, and the barrel is square across the plate 60 ms after the press (it used to arrive about 120 ms late), then follows through.
+- **The payoff:**
+  - A swoosh trail behind the barrel, gold on a barreled ball.
+  - The bat leaves his hands when the ball is put in play: tossed aside on most hits, flipped high and spinning on a barreled one.
+  - He holds his finish for the start delay before he runs.
+  - This sits on top of the existing hit stop, crack, flash, camera kick and crowd.
+- **Tool:** `tools/batter_closeup.gd -- out swing <style> [flip]` renders a style's sequence from stance to finish (and the flip).
+
+Reason: Owner request to nail down the swing: different batter styles (stance, grip, wind-up, stride) and a satisfying crack on a good hit.
+
+Affected systems: BattingStyles, BaseballMoves (style moves), ActorView (approach, finish, style), BatGrip (one hand, choke), MatchView (approach clock, style bat path, trail, bat toss), PlayAnimator (finish hold), PlayerDef.batting_style, tests.

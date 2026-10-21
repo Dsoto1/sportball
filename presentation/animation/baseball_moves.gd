@@ -23,8 +23,10 @@ static func library(skeleton: Skeleton3D, player: AnimationPlayer) -> AnimationL
 	var fist := player.get_animation(&"Punch_Jab") if player.has_animation(&"Punch_Jab") else null
 	var baker := PoseBaker.new(skeleton, fist)
 	_library = AnimationLibrary.new()
-	for move: String in MOVES:
-		var spec: Dictionary = MOVES[move]
+	var all := MOVES.duplicate()
+	all.merge(BattingStyles.moves())
+	for move: String in all:
+		var spec: Dictionary = all[move]
 		var keys: Array = spec["keys"]
 		var loop: bool = spec.get("loop", false)
 		var length: float = spec.get("length", -1.0)

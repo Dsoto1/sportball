@@ -201,7 +201,7 @@ godot --headless --path . -s res://tools/pitch_report.gd -- 300 1         # usag
 godot --headless --path . -s res://tools/park_report.gd -- 80             # how each ballpark plays
 godot --path . --resolution 1280x720 -s res://tools/stadium_tour.gd -- /tmp/shots [park_id]   # screenshots of a park
 godot --path . --resolution 360x420 -s res://tools/pose_gallery.gd -- /tmp/poses [lefty]      # every baked baseball move
-godot --path . --resolution 420x420 --fixed-fps 60 -s res://tools/batter_closeup.gd -- /tmp/b [swing]   # the batter up close
+godot --path . --resolution 420x420 --fixed-fps 60 -s res://tools/batter_closeup.gd -- /tmp/b [swing <style> [flip]]   # the batter up close, a style's swing
 godot --headless --path . --fixed-fps 60 -s res://tools/playtest_bot.gd -- 900   # drive the real scene with fake input (append `"" home` to field first)
 ```
 
