@@ -7,7 +7,8 @@ extends SceneTree
 ## pitch), then the swing through contact to the finish. A style
 ## (BattingStyles.ORDER) overrides the batter's own. Pass `flip` as the
 ## style argument's neighbour (swing <style> flip) to barrel it and watch
-## the bat flip after contact, or `pitcher` to watch from the mound.
+## the bat flip after contact, `pitcher` to watch from the mound, or
+## `slowmo` for the whip from the press to contact at quarter speed.
 const AROUND := [Vector3(1.6, 1.3, -1.2), Vector3(-2.6, 1.4, 1.2), Vector3(0.0, 1.5, 3.2)]
 const SWING_FROM := Vector3(3.2, 1.3, -1.4)
 ## Frames (at 60 fps) of the sequence: windup from WINDUP_FROM, the pitch
@@ -25,6 +26,8 @@ var _swing := false
 var _style: StringName = &""
 var _flip := false
 const FLIP_SHOTS := [140, 150, 160, 172, 186, 205, 230]
+## With `slowmo`: from the press to just past contact at quarter speed.
+const SLOWMO_SHOTS := [132, 137, 139, 141, 143, 145, 147, 150, 156]
 
 
 func _initialize() -> void:
@@ -85,6 +88,10 @@ func _swing_sequence(at: Vector3) -> bool:
 	if _frames == PRESS:
 		_view.swing_bat()
 	var shots: Array = FLIP_SHOTS if _flip else SHOTS
+	if OS.get_cmdline_user_args().has("slowmo"):
+		# Quarter speed from just before the press: the whip, frame by frame.
+		Engine.time_scale = 0.25 if _frames >= PRESS - 1 else 1.0
+		shots = SLOWMO_SHOTS
 	if _flip and _frames == PRESS + 4:
 		_view.contact_feedback(Vector2(0.0, 0.8), ContactFeedback.Tier.SWEET)
 	if _flip and _frames == PRESS + 18:

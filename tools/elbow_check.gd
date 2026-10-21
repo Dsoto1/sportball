@@ -4,7 +4,7 @@ extends SceneTree
 ## forearm comes to the torso. Clearance < 1.0 means inside the keep-out
 ## (PoseBaker.TORSO_HALF_WIDTH / _DEPTH). Headless:
 ##   godot --headless --path . -s res://tools/elbow_check.gd [-- [lefty] [verbose <style>]]
-const SAMPLES := [["stance", 0.0], ["load", 0.5], ["stride", 0.85], ["swing", 0.0], ["swing", 0.2], ["swing", 0.35], ["swing", 0.5], ["swing", 0.7], ["swing", 1.0]]
+const SAMPLES := [["stance", 0.0], ["load", 0.5], ["stride", 0.85], ["swing", 0.0], ["swing", 0.06], ["swing", 0.11], ["swing", 0.16], ["swing", 0.2], ["swing", 0.35], ["swing", 0.5], ["swing", 0.7], ["swing", 1.0]]
 var _actor: ActorView
 var _bat: Node3D
 var _style := 0

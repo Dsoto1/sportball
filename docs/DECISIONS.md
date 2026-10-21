@@ -577,3 +577,24 @@ Decision:
 Reason: Owner request that elbows look right on stances and swings, not inside the body.
 
 Affected systems: PoseBaker, BatGrip, BaseballMoves (contact, extension), BattingStyles, ActorView (base character node owners), tests, tools.
+
+## 2026-10-21 - Bat Lag
+
+Decision:
+- **Bat lag:** from the owner's swing-sequence reference (`docs/swing_sequence_reference.jpg`), the barrel no longer sweeps straight from the shoulder to the ball. The hands lead and the barrel drops into the slot behind and below them (knob at the ball), a little over halfway from the press to contact, having come only a third of the way around. Then it whips through to the ball at the style's attack direction and angle.
+- **Depth per style:** how deep the barrel drops (`slot_lift`):
+
+  | Style | Barrel below level |
+  |---|---|
+  | Leg Kick | 35° |
+  | Classic, Open | 25° |
+  | Crouch, Bat Wrap | 20° |
+  | Slap | 10° (short and direct) |
+
+- **Unchanged:** contact still lands 60 ms after the press.
+- **Ignored:** the reference's duplicated plates and boxes, and the batter drifting across them, are AI artifacts; the spec's locked world rules stand.
+- **Tools:** `batter_closeup.gd ... slowmo` shows the whip at quarter speed, and `elbow_check.gd` now samples the slot.
+
+Reason: Owner reference image of a full swing sequence.
+
+Affected systems: BattingStyles (slot), tests, tools.

@@ -95,6 +95,12 @@ func test_the_barrel_is_square_at_contact() -> void:
 		var finish := BattingStyles.swing_bat(style, 1.0, start)
 		check_eq(finish.x, float(BattingStyles.BAT[style]["finish_yaw"]), "%s: sweeps through to its finish" % style)
 	check(MatchView.SWING_TIME * BattingStyles.CONTACT_AT < 0.08, "contact lands within 80 ms of the press")
+	for style: StringName in BattingStyles.ORDER:
+		var start := BattingStyles.approach_bat(style, 1.0, 0.0)
+		var slot := BattingStyles.swing_bat(style, BattingStyles.CONTACT_AT * BattingStyles.SLOT_AT, start)
+		var attack := float(BattingStyles.BAT[style]["attack_yaw"])
+		check(slot.y < 0.0, "%s: the barrel drops below the hands into the slot" % style)
+		check(slot.x > attack + 40.0, "%s: and lags well behind them" % style)
 	check(float(BattingStyles.BAT[&"slap"]["attack_yaw"]) > 5.0, "the slap goes the other way")
 	check(float(BattingStyles.BAT[&"leg_kick"]["attack_lift"]) > float(BattingStyles.BAT[&"slap"]["attack_lift"]), "the slugger swings up, the slapper flat")
 
