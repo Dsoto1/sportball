@@ -138,7 +138,8 @@ func test_styles_obey_the_batters_box() -> void:
 				var at: Vector3 = pose.get(foot, BaseballMoves.STANCE[foot])
 				# Body space: +Z toward the plate.
 				check(at.z < BattingStyles.PLATE_CLEAR, "%s %s: %s stays off the plate" % [style, key, foot])
-				check(absf(at.x) < 0.7, "%s %s: %s stays in the box" % [style, key, foot])
+				# Body +X is toward the pitcher (P() flips right to -X).
+				check(-at.x > BattingStyles.BOX_TOWARD_PITCHER and -at.x < BattingStyles.BOX_TOWARD_CATCHER, "%s %s: %s stays in the box (%.2f)" % [style, key, foot, -at.x])
 		# The rear foot is anchored through the load.
 		check_eq(p["load"].get("foot_r", BaseballMoves.STANCE["foot_r"]), p["stance"].get("foot_r", BaseballMoves.STANCE["foot_r"]), "%s: rear foot anchored through the load" % style)
 		# The lead foot strides toward the pitcher, not across the plate.
@@ -249,3 +250,25 @@ func test_every_hitter_has_his_own_swing_in_league_range() -> void:
 	check(PlayerSwing.for_player(slugger, &"classic")["bat_speed"] > PlayerSwing.for_player(slapper, &"classic")["bat_speed"], "power swings the bat faster")
 	var profile := PlayerSwing.for_player(slugger, &"classic")
 	check(PlayerSwing.swing_speed(profile, true) > PlayerSwing.swing_speed(profile, false), "a power swing is faster than a contact swing")
+
+
+## The stances match Statcast's batting-stance tracking.
+func test_stances_match_statcast() -> void:
+	var inch := 0.0254
+	for style: StringName in BattingStyles.ORDER:
+		var p := BattingStyles.poses(style)
+		var l: Vector3 = p["stance"]["foot_l"]
+		var r: Vector3 = p["stance"]["foot_r"]
+		var width := Vector2(l.x - r.x, l.z - r.z).length()
+		check(width > 22.0 * inch and width < 38.0 * inch, "%s: stance width in the league's range (%.0f in)" % [style, width / inch])
+		var plant: Vector3 = p["stride"]["foot_l"]
+		var stride := plant.x - l.x
+		check(stride > 7.0 * inch and stride < 26.0 * inch, "%s: stride in the league's range (%.0f in)" % [style, stride / inch])
+		var spread := Vector2(plant.x - r.x, plant.z - r.z).length()
+		check(spread > 33.0 * inch and spread < 52.0 * inch, "%s: feet at contact in the league's range (%.0f in)" % [style, spread / inch])
+		# Open: the lead foot set back from the plate (lower forward).
+		check(l.z <= r.z, "%s: square or open, like most hitters" % style)
+	var classic := BattingStyles.FEET[&"classic"]
+	check_near(float(classic["width"]) / inch, 30.0, 2.0, "classic stands at the league's median width")
+	check_near(float(classic["stride"]) / inch, 12.0, 4.0, "and strides like the median hitter")
+	check(float(BattingStyles.FEET[&"open"]["open"]) >= 25.0, "the open stance is among the league's most open")

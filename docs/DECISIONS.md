@@ -693,3 +693,26 @@ Decision:
 Reason: Owner request that each team have its own unique stadium; with 11 parks and 2 clubs, the owner chose nine new clubs.
 
 Affected systems: generate_teams (league table, roster builder), data/teams (9 new), generate_parks (home blurbs), ContentLibrary, MatchDirector (club and venue picker), tests (league), tools (league_report, swing_report), README, STADIUM_REFS.
+
+## Batting stances calibrated to Statcast
+
+The six styles' feet come from Baseball Savant's batting-stance tracking (229 MLB hitters), not from eyeballed numbers. One table drives every phase: `BattingStyles.FEET` (width, open angle, stride).
+
+| Style | Width | Open | Stride | Based on |
+|---|---|---|---|---|
+| Classic | 30 in | 8° | 12 in | the median hitter |
+| Crouch | 32 in | 5° | 11 in | the wide end |
+| Open | 29 in | 30° | 12 in | the most open tenth |
+| Leg Kick | 27 in | 10° | 19 in | the longest strides |
+| Bat Wrap | 30 in | 10° | 12 in | median feet (the difference is in the hands) |
+| Slap | 24 in | 12° | 10 in | narrow and short |
+
+- **League ranges as tests:** width 22–38 in, stride 7–26 in, 33–52 in between the feet at contact (the league's average is 42 in), every style square or open.
+- **Weight shift:** from the plant on, the hips (and the hands with them, so the arms keep their shape) travel 45% of the stride toward the pitcher.
+- **Plant and pivot:** the lead foot lands nearly square (6° open) and braces. The back foot pivots up on its toe at contact and rises to the finish.
+- **Where he stands:** the right-hander's hips are 27 in off the plate's inside edge and 28 in behind its front (`BATTER_SPOT` (−0.91, 0, 0.49)). That puts the back foot deep in the box, like most hitters, and clear of the catcher.
+- **Diagram:** `docs/batting_feet_savant.png` (top-down, via `tools/foot_diagram_data.gd` and `tools/draw_foot_diagram.py`).
+
+Reason: Owner request to calibrate the stances from Savant.
+
+Affected systems: BattingStyles (FEET, _place_feet, box limits), MatchView (BATTER_SPOT), tests (stances match Statcast, box), foot diagram tool.

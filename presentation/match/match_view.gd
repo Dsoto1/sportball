@@ -8,7 +8,9 @@ enum CameraMode { BAT, PITCH, FIELD }
 
 const AWAY_COLOR := Color(0.85, 0.22, 0.2)
 const HOME_COLOR := Color(0.18, 0.42, 0.9)
-const BATTER_SPOT := Vector3(-0.85, 0.0, 0.15)
+## Where a right-handed batter stands (his hips), from Statcast's stance
+## tracking: 27 in off the plate's inside edge and 28 in behind its front.
+const BATTER_SPOT := Vector3(-0.91, 0.0, 0.49)
 const CAMERA_SPOTS := {
 	# Telephoto from behind and right of the plate: batter on the left,
 	# pitcher and zone large and clear.

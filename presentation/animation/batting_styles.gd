@@ -27,10 +27,38 @@ const CONTACT_AT := 0.2
 ## A one-hand finish lets the top hand go only after this (well past contact).
 const ONE_HAND_RELEASE := 0.5
 ## Body space (m, forward = toward the plate): no foot may reach the plate.
-## The batter stands 0.85 m from its middle; its near edge is 0.63 away.
-const PLATE_CLEAR := 0.45
+## The batter stands 0.91 m from its middle; its near edge is 0.69 away.
+const PLATE_CLEAR := 0.5
+## The batter's box in his body space (m along the pitcher axis, - toward
+## the pitcher): 6 ft long, centered on the plate, with him standing 0.49 m
+## behind the plate's middle.
+const BOX_TOWARD_PITCHER := -1.4
+const BOX_TOWARD_CATCHER := 0.42
 ## The lead hand sits at least this far in front of him (m) before the swing.
 const HANDS_OUT := 0.2
+## Feet per style, fit to Statcast's batting-stance tracking (229 MLB
+## hitters, Baseball Savant): stance width (m between the feet), stance
+## angle (degrees open: the lead foot set back from the plate) and stride
+## (m the lead foot travels toward the pitcher). League: width 30 in (0.76),
+## 10-90% 23-37 in; angle 10 open (median), 10% open 30+; stride 16 in
+## (0.40) average, 8-25 in; 42 in between the feet at contact.
+## Classic is the median hitter, Crouch the wide end, Open the most open
+## tenth, Leg Kick the longest strides, Slap narrow and short; Bat Wrap's
+## difference is in the hands.
+const FEET := {
+	&"classic": {"width": 0.76, "open": 8.0, "stride": 0.31},
+	&"crouch": {"width": 0.82, "open": 5.0, "stride": 0.28},
+	&"open": {"width": 0.74, "open": 30.0, "stride": 0.30},
+	&"leg_kick": {"width": 0.68, "open": 10.0, "stride": 0.49},
+	&"wrap": {"width": 0.76, "open": 10.0, "stride": 0.31},
+	&"slap": {"width": 0.62, "open": 12.0, "stride": 0.26},
+}
+## Where the feet line sits (m toward the plate from his spot), how square
+## the lead foot plants (degrees still open), and how much of the stride
+## his hips travel (weight shift).
+const FOOT_LINE := 0.02
+const PLANT_OPEN := 6.0
+const WEIGHT_SHIFT := 0.45
 ## How open the lead foot lands at the plant (degrees toward the pitcher).
 const LEAD_TOE := 30.0
 
@@ -161,6 +189,13 @@ static func poses(style: StringName) -> Dictionary:
 				"foot_l": P(-0.4, 0.1, 0.08), "hips": Vector3(6, 62, 0), "chest": Vector3(10, 30, 0), "head": Vector3(-5, -10, 0),
 				"hand_r": P(-0.32, 1.25, 0.22), "hand_l": P(-0.36, 1.2, 0.18),
 			})
+	# Own copies: the styles share dictionaries (and BaseballMoves' consts).
+	stance = stance.duplicate(true)
+	load = load.duplicate(true)
+	stride = stride.duplicate(true)
+	contact = contact.duplicate(true)
+	extend = extend.duplicate(true)
+	finish = finish.duplicate(true)
 	# Hands: out in front of the chest while he waits, loads and strides, so
 	# the lead forearm crosses the chest with room instead of on it.
 	for pose: Dictionary in [stance, load, stride]:
@@ -177,8 +212,57 @@ static func poses(style: StringName) -> Dictionary:
 	for pose: Dictionary in [stride, contact, extend, finish]:
 		pose.get_or_add("toe_l", LEAD_TOE)
 	stride.get_or_add("toe_r", 0.0)
+	_place_feet(style, stance, load, stride, contact, extend, finish)
 	var bob := _with(stance, {"drop": float(stance.get("drop", 0.0)) + 0.02})
 	return {"stance": stance, "bob": bob, "load": load, "stride": stride, "contact": contact, "extend": extend, "finish": finish}
+
+
+## Feet from FEET (Statcast-measured): the stance is the style's width and
+## open angle around his spot; the load lifts, taps or barely moves the
+## lead foot; the stride carries it toward the pitcher and plants it nearly
+## square; the rear foot stays put, then pivots up on its toe. The hips
+## carry his weight forward over the stride.
+static func _place_feet(style: StringName, stance: Dictionary, load: Dictionary, stride: Dictionary,
+		contact: Dictionary, extend: Dictionary, finish: Dictionary) -> void:
+	var f: Dictionary = FEET[style]
+	var half := float(f["width"]) * 0.5
+	var open := deg_to_rad(float(f["open"]))
+	var rear := Vector2(half * cos(open), FOOT_LINE + half * sin(open))  # (right, forward)
+	var lead := Vector2(-half * cos(open), FOOT_LINE - half * sin(open))
+	var plant_r := lead.x - float(f["stride"])
+	var plant := Vector2(plant_r, rear.y - (rear.x - plant_r) * tan(deg_to_rad(PLANT_OPEN)))
+	stance["foot_l"] = P(lead.x, 0.1, lead.y)
+	stance["foot_r"] = P(rear.x, 0.1, rear.y)
+	stance["toe_l"] = float(f["open"])
+	match style:
+		&"leg_kick":
+			# The knee comes up high and the foot is drawn back under him.
+			load["foot_l"] = P(lead.x + 0.26, 0.52, lead.y + 0.1)
+			load["toe_l"] = float(f["open"])
+		&"open":
+			# A toe tap closes him up, level with the back foot.
+			load["foot_l"] = P(lead.x + 0.06, 0.17, rear.y - 0.02)
+			load["toe_l"] = 0.0
+		&"slap":
+			load["foot_l"] = P(lead.x + 0.02, 0.12, lead.y)
+			load["toe_l"] = float(f["open"])
+		_:
+			# Lead heel comes up as he gathers.
+			load["foot_l"] = P(lead.x + 0.03, 0.13, lead.y)
+			load["toe_l"] = float(f["open"])
+	load["foot_r"] = stance["foot_r"]
+	var weight := P(-float(f["stride"]) * WEIGHT_SHIFT, 0, 0)
+	for pose: Dictionary in [stride, contact, extend, finish]:
+		pose["foot_l"] = P(plant.x, 0.1, plant.y)
+		# The hands ride along with the hips, so the arms keep their shape.
+		pose["shift"] = (pose.get("shift", Vector3.ZERO) as Vector3) + weight
+		for hand in ["hand_l", "hand_r"]:
+			if pose.has(hand):
+				pose[hand] = (pose[hand] as Vector3) + weight
+	stride["foot_r"] = stance["foot_r"]
+	contact["foot_r"] = P(rear.x - 0.04, 0.14, rear.y)
+	extend["foot_r"] = contact["foot_r"]
+	finish["foot_r"] = P(rear.x - 0.14, 0.18, rear.y + 0.02)
 
 
 ## The baked moves for every style: {name: {keys, loop}} like MOVES.

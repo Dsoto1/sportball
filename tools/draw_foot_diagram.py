@@ -20,7 +20,7 @@ NAMES = {"classic": "1. CLASSIC", "crouch": "2. CROUCH", "open": "3. OPEN",
 # Body space (m) of a right-handed batter at his spot: forward = toward the
 # plate, right = toward the catcher. The plate's middle is 0.85 m forward
 # and 0.15 m toward the pitcher (BATTER_SPOT in match_view.gd).
-PLATE_F, PLATE_R = 0.85, -0.15
+PLATE_F, PLATE_R = 0.91, -0.49
 FOOT_LEN, FOOT_W = 0.27, 0.10
 ORIGIN = (250, 380)  # where the batter's spot is drawn
 
