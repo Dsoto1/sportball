@@ -7,7 +7,7 @@ extends SceneTree
 ## pitch), then the swing through contact to the finish. A style
 ## (BattingStyles.ORDER) overrides the batter's own. Pass `flip` as the
 ## style argument's neighbour (swing <style> flip) to barrel it and watch
-## the bat flip after contact.
+## the bat flip after contact, or `pitcher` to watch from the mound.
 const AROUND := [Vector3(1.6, 1.3, -1.2), Vector3(-2.6, 1.4, 1.2), Vector3(0.0, 1.5, 3.2)]
 const SWING_FROM := Vector3(3.2, 1.3, -1.4)
 ## Frames (at 60 fps) of the sequence: windup from WINDUP_FROM, the pitch
@@ -32,7 +32,7 @@ func _initialize() -> void:
 	_swing = OS.get_cmdline_user_args().size() > 1
 	if OS.get_cmdline_user_args().size() > 2:
 		_style = StringName(OS.get_cmdline_user_args()[2])
-	_flip = OS.get_cmdline_user_args().size() > 3
+	_flip = OS.get_cmdline_user_args().has("flip")
 	root.add_child(load("res://app/main.tscn").instantiate())
 
 
@@ -68,7 +68,11 @@ func _process(_d: float) -> bool:
 ## Fakes a windup and a pitch so he loads and strides, presses swing, and
 ## saves frames from his stance to his finish.
 func _swing_sequence(at: Vector3) -> bool:
-	_cam.position = at + SWING_FROM
+	# Face him whichever side he bats from (or watch from the pitcher).
+	var from := SWING_FROM * Vector3(-1.0 if _view._bats_left else 1.0, 1.0, 1.0)
+	if OS.get_cmdline_user_args().has("pitcher"):
+		from = Vector3(0.9 if _view._bats_left else -0.9, 1.4, -3.4)
+	_cam.position = at + from
 	_cam.look_at(at + Vector3(0, 1.1, 0))
 	var batter: ActorView = _view._runners.get(_view._batter_id)
 	if batter != null and _style != &"":

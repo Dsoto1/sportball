@@ -106,7 +106,7 @@ func solve(pose: Dictionary) -> Dictionary:
 			"upperarm_l", "upperarm_r", "thigh_l", "thigh_r":
 				var end := "hand" + bone.right(2) if bone.begins_with("upper") else "foot" + bone.right(2)
 				if pose.has(end):
-					_solve_chain(end, g.origin, pose, targets)
+					_solve_chain(end, g.origin, pose, targets, _torso(global, hips * chest))
 		if targets.has(bone):
 			g.basis = _aim(g.basis, i, targets[bone])
 		elif bone.begins_with("foot"):
@@ -151,7 +151,7 @@ func bake(keys: Array, loop: bool = false, length: float = -1.0) -> Animation:
 
 ## Two-bone IK: picks directions for the upper and lower bone so the end
 ## (wrist or ankle) lands on the target, bending toward the pole.
-func _solve_chain(end: String, root: Vector3, pose: Dictionary, targets: Dictionary) -> void:
+func _solve_chain(end: String, root: Vector3, pose: Dictionary, targets: Dictionary, torso: Array = []) -> void:
 	var chain: Array = CHAINS[end]
 	var upper := _skeleton.find_bone(chain[0])
 	var lower := _skeleton.find_bone(chain[1])
@@ -163,14 +163,72 @@ func _solve_chain(end: String, root: Vector3, pose: Dictionary, targets: Diction
 	var n := to.normalized()
 	var default_pole := P(0, -1, 0.3) if end.begins_with("hand") else P(0, 0, 1)
 	var pole: Vector3 = pose.get(chain[3], default_pole)
-	var m := (pole - n * pole.dot(n))
+	var elbow := bend(root, pose[end], a, b, pole, torso if end.begins_with("hand") else [])
+	targets[chain[0]] = (elbow - root).normalized()
+	targets[chain[1]] = (root + n * d - elbow).normalized()
+
+
+## Torso keep-out for the arms (skeleton space): elbows and forearms stay
+## outside an elliptic cylinder from the low spine to the neck, this wide
+## (side to side) and deep (front to back), skin plus a little room.
+const TORSO_HALF_WIDTH := 0.2
+const TORSO_HALF_DEPTH := 0.16
+
+
+## Elbow for a two-bone arm (or knee for a leg) from root toward target,
+## bending toward pole. With a torso ([base, top, side axis, front axis]),
+## the bend swings around the root-target line, closest to the pole first,
+## until the elbow and the forearm clear the torso.
+static func bend(root: Vector3, target: Vector3, a: float, b: float, pole: Vector3, torso: Array = []) -> Vector3:
+	var to := target - root
+	var d := clampf(to.length(), absf(a - b) + 0.01, a + b - 0.001)
+	var n := to.normalized()
+	var m := pole - n * pole.dot(n)
 	if m.length() < 0.001:
 		m = n.cross(Vector3.RIGHT).cross(n)
 	m = m.normalized()
 	var cos_a := clampf((a * a + d * d - b * b) / (2.0 * a * d), -1.0, 1.0)
-	var elbow := root + a * (cos_a * n + sqrt(1.0 - cos_a * cos_a) * m)
-	targets[chain[0]] = (elbow - root).normalized()
-	targets[chain[1]] = (root + n * d - elbow).normalized()
+	var sin_a := sqrt(1.0 - cos_a * cos_a)
+	var wrist := root + n * d
+	var elbow := root + a * (cos_a * n + sin_a * m)
+	if torso.is_empty():
+		return elbow
+	var best := elbow
+	var best_clear := -INF
+	for k in 19:
+		var turn := deg_to_rad(20.0 * ceilf(k / 2.0) * (1.0 if k % 2 == 1 else -1.0))
+		var e := root + a * (cos_a * n + sin_a * m.rotated(n, turn))
+		var clear := minf(torso_clearance(e, torso), torso_clearance((e + wrist) * 0.5, torso))
+		if clear >= 1.0:
+			return e
+		if clear > best_clear:
+			best_clear = clear
+			best = e
+	return best
+
+
+## How far a point sits outside the torso keep-out: < 1 is inside.
+static func torso_clearance(p: Vector3, torso: Array) -> float:
+	var base: Vector3 = torso[0]
+	var axis: Vector3 = torso[1] - base
+	var t := (p - base).dot(axis) / maxf(axis.length_squared(), 0.0001)
+	if t > 1.0:
+		# Above the shoulders (arms overhead, beside the head): not the chest.
+		return INF
+	t = maxf(t, 0.0)
+	var v := p - (base + axis * t)
+	var x := v.dot(torso[2]) / TORSO_HALF_WIDTH
+	var z := v.dot(torso[3]) / TORSO_HALF_DEPTH
+	return sqrt(x * x + z * z)
+
+
+## The torso keep-out for a pose being solved: low spine to neck, turned
+## with the chest.
+func _torso(global: Dictionary, chest_turn: Quaternion) -> Array:
+	var base: Vector3 = (global["spine_01"] as Transform3D).origin
+	var top: Vector3 = (global["neck_01"] as Transform3D).origin
+	# Skeleton +X is the body's side axis, +Z its front.
+	return [base, top, Basis(chest_turn) * Vector3.RIGHT, Basis(chest_turn) * Vector3.BACK]
 
 
 ## Rotates a bone's global basis so it points along dir (shortest arc).

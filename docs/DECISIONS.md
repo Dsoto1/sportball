@@ -563,3 +563,17 @@ Affected systems: BattingStyles, MatchView (one-hand release constant), tests, d
   - Strides are longer but keep the spec's order: leg kick about 30 cm, classic, crouch and wrap about 18 cm, open about 16 cm, slap about 12 cm.
   - Finishes sit a little lower so the planted foot stays on the ground.
   - New tests: every placed foot is within the leg's reach, and the lead foot stays planted and braced.
+
+## 2026-10-21 - Elbows Stay Out of the Body
+
+Decision:
+- **Torso-aware elbows:** the arm IK (`PoseBaker.bend`, used by both the baked poses and the batter's live `BatGrip`) bends each elbow toward its pole. If that buries the elbow or forearm in the torso, it swings the bend around the shoulder-to-wrist line, nearest the pole first, until both clear a keep-out around the chest. The keep-out is an elliptic cylinder from the low spine to the neck, 0.20 m wide and 0.16 m deep from the spine axis, skin plus a little room; arms above the shoulders are not counted.
+- **The grip's elbows turn with the chest:** they hang down and out to their own side and a little behind, measured in the chest's frame. The old pole was fixed in space and folded the rear elbow inward as the shoulders turned.
+- **Real hip-shoulder separation at contact:** hips about 50° open with shoulders about 35° (the leg kick 58° and 34°). The shoulders used to run ahead of the hips to about 80° and wrap the lead arm across the chest.
+- **Hands out front:** before the swing the lead hand sits at least 0.2 m in front of him. The leg kick's finish carries the hands farther out, and the wrap's released hand drops out in front, not across the belly.
+- **Measured:** `tools/elbow_check.gd` drives every style through the stance, approach and swing with the grip on. Its lowest clearance went from 0.38 (deep in the chest) to 0.83, which is the lead upper arm resting on the chest at contact, as real hitters keep it.
+- **Tests:** the solver swings a buried elbow clear without changing arm lengths, and every baked pose (batting, pitching, throwing, fielding) keeps its elbows and forearms off the body.
+
+Reason: Owner request that elbows look right on stances and swings, not inside the body.
+
+Affected systems: PoseBaker, BatGrip, BaseballMoves (contact, extension), BattingStyles, ActorView (base character node owners), tests, tools.

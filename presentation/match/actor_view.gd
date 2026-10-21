@@ -303,6 +303,7 @@ func _wear(skeleton: Skeleton3D, scene: PackedScene, wanted: String) -> MeshInst
 	var source := scene.instantiate()
 	var found: MeshInstance3D = null
 	for mi: MeshInstance3D in source.find_children("*", "MeshInstance3D", true, false):
+		mi.owner = null
 		mi.get_parent().remove_child(mi)
 		skeleton.add_child(mi)
 		mi.transform = Transform3D.IDENTITY

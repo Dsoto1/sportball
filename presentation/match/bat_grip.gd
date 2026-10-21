@@ -53,17 +53,16 @@ func _reach(sk: Skeleton3D, side: String, target: Vector3) -> void:
 	var s := gu.origin
 	var a := s.distance_to(gl.origin)
 	var b := gl.origin.distance_to(gh.origin)
-	var to := target - s
-	var dist := clampf(to.length(), absf(a - b) + 0.001, a + b - 0.001)
-	var n := to.normalized()
-	# Skeleton space: +X is the body's left, so "out" flips per arm.
-	var pole := Vector3(0.6 if side == "l" else -0.6, -1.0, -0.2)
-	var m := pole - n * pole.dot(n)
-	if m.length() < 0.001:
-		m = Vector3.DOWN
-	m = m.normalized()
-	var cos_a := clampf((a * a + dist * dist - b * b) / (2.0 * a * dist), -1.0, 1.0)
-	var elbow := s + a * (cos_a * n + sqrt(1.0 - cos_a * cos_a) * m)
+	# The chest's own frame (it turns through the swing): side, up, front.
+	var spine := sk.get_bone_global_pose(sk.find_bone("spine_01")).origin
+	var neck := sk.get_bone_global_pose(sk.find_bone("neck_01")).origin
+	var across := (sk.get_bone_global_pose(sk.find_bone("upperarm_l")).origin - sk.get_bone_global_pose(sk.find_bone("upperarm_r")).origin).normalized()
+	var up := (neck - spine).normalized()
+	var front := across.cross(up).normalized()
+	# Elbows hang down and out to their own side, a little behind the body,
+	# and swing clear of the chest if that would bury them.
+	var pole := across * (0.6 if side == "l" else -0.6) - up - front * 0.2
+	var elbow := PoseBaker.bend(s, target, a, b, pole, [spine, neck, across, front])
 	var parent_g := sk.get_bone_global_pose(sk.get_bone_parent(upper))
 	var new_upper := Basis(Quaternion((gl.origin - s).normalized(), (elbow - s).normalized())) * gu.basis
 	sk.set_bone_pose_rotation(upper, (parent_g.basis.inverse() * new_upper).get_rotation_quaternion())

@@ -167,3 +167,48 @@ func test_style_feet_are_reachable() -> void:
 				var at := (bones[foot] as Transform3D).origin
 				check(at.distance_to(pose[foot]) < 0.03, "%s %s: %s reaches its spot (%.3f m off)" % [style, key, foot, at.distance_to(pose[foot])])
 	model.free()
+
+
+func test_elbows_swing_clear_of_the_torso() -> void:
+	# A torso at the origin, a shoulder at its left edge, the hand reaching
+	# across the chest, the bend asked to point straight into the body.
+	var torso := [Vector3(0, 1.0, 0), Vector3(0, 1.5, 0), Vector3.RIGHT, Vector3.BACK]
+	var shoulder := Vector3(0.19, 1.44, 0.0)
+	var hand := Vector3(-0.1, 1.3, 0.32)
+	var into := Vector3(-1, 0, -0.2)
+	var plain := PoseBaker.bend(shoulder, hand, 0.27, 0.27, into)
+	check(PoseBaker.torso_clearance(plain, torso) < 1.0, "the setup really buries the elbow")
+	var cleared := PoseBaker.bend(shoulder, hand, 0.27, 0.27, into, torso)
+	check(PoseBaker.torso_clearance(cleared, torso) >= 1.0, "the solver swings it clear")
+	check_near(cleared.distance_to(shoulder), 0.27, 0.001, "upper arm keeps its length")
+	check_near(cleared.distance_to(hand), 0.27, 0.001, "and so does the forearm")
+
+
+## Every baked pose (batting, pitching, throwing, fielding) keeps its elbows
+## and forearms off the chest: clearance above 0.6 of the keep-out (inside
+## 1.0 is the margin over the skin; the lead arm may rest on the chest).
+func test_baked_elbows_stay_out_of_the_body() -> void:
+	var model := _rig()
+	var poses := {}
+	for move: String in BaseballMoves.MOVES:
+		for k: Array in BaseballMoves.MOVES[move]["keys"]:
+			poses["%s@%s" % [move, k[0]]] = k[1]
+	for style: StringName in BattingStyles.ORDER:
+		var p := BattingStyles.poses(style)
+		for key: String in p:
+			poses["%s %s" % [style, key]] = p[key]
+	for name: String in poses:
+		var pose: Dictionary = poses[name]
+		if not pose.has("hand_l"):
+			continue
+		var bones := _posed(model, pose)
+		var o := func(bone: String) -> Vector3: return (bones[bone] as Transform3D).origin
+		var across: Vector3 = (o.call("upperarm_l") - o.call("upperarm_r")).normalized()
+		var up: Vector3 = (o.call("neck_01") - o.call("spine_01")).normalized()
+		var torso := [o.call("spine_01"), o.call("neck_01"), across, across.cross(up).normalized()]
+		for side in ["l", "r"]:
+			var elbow: Vector3 = o.call("lowerarm_" + side)
+			var wrist: Vector3 = o.call("hand_" + side)
+			var c := minf(PoseBaker.torso_clearance(elbow, torso), PoseBaker.torso_clearance((elbow + wrist) * 0.5, torso))
+			check(c > 0.6, "%s: %s elbow/forearm off the body (%.2f)" % [name, side, c])
+	model.free()

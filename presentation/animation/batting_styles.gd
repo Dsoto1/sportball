@@ -21,6 +21,8 @@ const ONE_HAND_RELEASE := 0.5
 ## Body space (m, forward = toward the plate): no foot may reach the plate.
 ## The batter stands 0.85 m from its middle; its near edge is 0.63 away.
 const PLATE_CLEAR := 0.45
+## The lead hand sits at least this far in front of him (m) before the swing.
+const HANDS_OUT := 0.2
 ## How open the lead foot lands at the plant (degrees toward the pitcher).
 const LEAD_TOE := 30.0
 
@@ -117,9 +119,12 @@ static func poses(style: StringName) -> Dictionary:
 				"hand_r": P(0.28, 1.5, 0.0), "hand_l": P(0.22, 1.44, 0.04),
 			})
 			stride = _with(stride, {"drop": 0.22, "foot_l": P(-0.64, 0.1, 0.06)})
-			contact = _with(contact, {"drop": 0.22, "foot_l": P(-0.64, 0.1, 0.06), "hips": Vector3(8, 58, 0)})
+			contact = _with(contact, {"drop": 0.22, "foot_l": P(-0.64, 0.1, 0.06), "hips": Vector3(8, 58, 0), "chest": Vector3(18, -24, 0), "head": Vector3(-5, -4, 0)})
 			extend = _with(extend, {"drop": 0.24, "foot_l": P(-0.64, 0.1, 0.06)})
-			finish = _with(finish, {"drop": 0.26, "foot_l": P(-0.64, 0.1, 0.06), "hips": Vector3(4, 90, 0)})
+			# The big turn carries the hands farther out, so the arms fold
+			# outside the body.
+			finish = _with(finish, {"drop": 0.26, "foot_l": P(-0.64, 0.1, 0.06), "hips": Vector3(4, 90, 0),
+				"hand_r": P(-0.42, 1.58, -0.02), "hand_l": P(-0.46, 1.52, -0.05)})
 		&"wrap":
 			stance = _with(stance, {
 				"chest": Vector3(12, -24, 0),
@@ -127,7 +132,7 @@ static func poses(style: StringName) -> Dictionary:
 			})
 			load = _with(load, {"hand_r": P(0.18, 1.54, -0.04), "hand_l": P(0.13, 1.48, 0.0), "elbow_r": P(1, 0.2, -0.4)})
 			# One-hand finish: the top hand lets go and drops to his side.
-			finish = _with(finish, {"hand_r": P(0.05, 1.05, 0.25), "elbow_r": P(1, -0.5, 0), "chest": Vector3(0, 50, -5)})
+			finish = _with(finish, {"hand_r": P(0.02, 1.05, 0.42), "elbow_r": P(1, -0.6, 0.3), "chest": Vector3(0, 50, -5)})
 		&"slap":
 			stance = _with(stance, {
 				"drop": 0.14, "chest": Vector3(16, -12, 0),
@@ -138,13 +143,20 @@ static func poses(style: StringName) -> Dictionary:
 			})
 			load = _with(stance, {"hips": Vector3(10, -8, 0), "chest": Vector3(16, -20, 0), "hand_r": P(0.18, 1.2, 0.22), "hand_l": P(0.12, 1.15, 0.25)})
 			stride = _with(stride, {"drop": 0.15, "foot_l": P(-0.4, 0.1, 0.08), "foot_r": P(0.3, 0.1, -0.02), "hand_r": P(0.16, 1.18, 0.2), "hand_l": P(0.1, 1.13, 0.23)})
-			contact = _with(contact, {"foot_l": P(-0.4, 0.1, 0.08), "hips": Vector3(8, 40, 0), "chest": Vector3(16, 22, 0)})
-			extend = _with(extend, {"foot_l": P(-0.4, 0.1, 0.08), "hips": Vector3(6, 55, 0), "chest": Vector3(12, 30, 0)})
+			contact = _with(contact, {"foot_l": P(-0.4, 0.1, 0.08), "hips": Vector3(8, 40, 0), "chest": Vector3(16, -8, 0), "head": Vector3(-5, -2, 0)})
+			extend = _with(extend, {"foot_l": P(-0.4, 0.1, 0.08), "hips": Vector3(6, 55, 0), "chest": Vector3(12, 0, 0), "head": Vector3(-5, -25, 0)})
 			# Compact: hands stay level and out front, he's already leaving the box.
 			finish = _with(contact, {
 				"foot_l": P(-0.4, 0.1, 0.08), "hips": Vector3(6, 62, 0), "chest": Vector3(10, 30, 0), "head": Vector3(-5, -10, 0),
 				"hand_r": P(-0.32, 1.25, 0.22), "hand_l": P(-0.36, 1.2, 0.18),
 			})
+	# Hands: out in front of the chest while he waits, loads and strides, so
+	# the lead forearm crosses the chest with room instead of on it.
+	for pose: Dictionary in [stance, load, stride]:
+		var out := HANDS_OUT - (pose["hand_l"] as Vector3).z
+		if out > 0.0:
+			pose["hand_l"] = (pose["hand_l"] as Vector3) + Vector3(0, 0, out)
+			pose["hand_r"] = (pose["hand_r"] as Vector3) + Vector3(0, 0, out)
 	# Feet: square to the plate while he waits and loads; from the plant on,
 	# the lead foot lands a third open and braces there (it must not spin
 	# with the hips), while the back foot pivots (its own toe_r per pose).
