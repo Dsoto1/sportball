@@ -53,15 +53,40 @@ params = {
 [sub_resource type="Resource" id="Resource_bdrrb"]
 script = ExtResource("2_wib25")
 kind = &"trees"
-angle = 45.0
+angle = 22.0
 mirrored = true
 params = {
-"count": 6,
-"kind": &"round",
+"count": 8,
+"kind": &"blossom",
 "span": 30.0
 }
 
 [sub_resource type="Resource" id="Resource_4ub2c"]
+script = ExtResource("2_wib25")
+kind = &"trees"
+angle = 4.0
+mirrored = true
+params = {
+"count": 4,
+"kind": &"cypress",
+"span": 8.0
+}
+
+[sub_resource type="Resource" id="Resource_o7030"]
+script = ExtResource("2_wib25")
+kind = &"statue"
+angle = 16.0
+mirrored = true
+params = {
+"figure": &"figure"
+}
+
+[sub_resource type="Resource" id="Resource_xncfn"]
+script = ExtResource("2_wib25")
+kind = &"conservatory"
+angle = 42.0
+
+[sub_resource type="Resource" id="Resource_vtwq7"]
 script = ExtResource("2_wib25")
 kind = &"flags"
 angle = -50.0
@@ -70,7 +95,7 @@ params = {
 "span": 100.0
 }
 
-[sub_resource type="Resource" id="Resource_o7030"]
+[sub_resource type="Resource" id="Resource_2eyij"]
 script = ExtResource("2_wib25")
 kind = &"water"
 params = {
@@ -84,21 +109,20 @@ params = {
 script = ExtResource("3_hice1")
 id = &"fountain_gardens"
 display_name = "Fountain Gardens"
-blurb = "Swans home · big, symmetric and fair, fountains dancing beyond the wall"
+blurb = "Swans home · big, symmetric and fair: garden terraces, fountains and blossoms beyond the wall"
 field_shape = SubResource("Resource_4qmnk")
-seat_color = Color(0.11764706, 0.24705882, 0.47843137, 1)
-seat_color_alt = Color(0.09019608, 0.19607843, 0.3882353, 1)
-structure_color = Color(0.8980392, 0.9098039, 0.93333334, 1)
-accent_color = Color(0.43529412, 0.8392157, 1, 1)
-outfield_wall_color = Color(0.08627451, 0.2, 0.41568628, 1)
+seat_color = Color(0.11372549, 0.2901961, 0.20784314, 1)
+seat_color_alt = Color(0.08627451, 0.23529412, 0.16862746, 1)
+structure_color = Color(0.9098039, 0.8862745, 0.8156863, 1)
+accent_color = Color(0.83137256, 0.6862745, 0.21568628, 1)
+outfield_wall_color = Color(0.078431375, 0.3529412, 0.23137255, 1)
 foul_rows = 24
 outfield_rows = 5
 decks = 2
 home_fan_share = 0.5
 away_fan_share = 0.25
 attendance = 0.8
-night = true
 sponsors = PackedStringArray("CASCADE COLA", "SPRINKLE & SONS PLUMBING", "BLUE PLAINS BBQ", "MISTY MEADOW DAIRY", "JUBILEE JEWELERS")
 skyline_color = Color(0.14901961, 0.1882353, 0.2901961, 1)
 window_color = Color(0.84705883, 0.9254902, 1, 1)
-pieces = Array[ExtResource("2_wib25")]([SubResource("Resource_k8u6i"), SubResource("Resource_q8oj0"), SubResource("Resource_kaaf5"), SubResource("Resource_48ww4"), SubResource("Resource_1xj3a"), SubResource("Resource_taq0n"), SubResource("Resource_0ixp3"), SubResource("Resource_bdrrb"), SubResource("Resource_4ub2c"), SubResource("Resource_o7030")])
+pieces = Array[ExtResource("2_wib25")]([SubResource("Resource_k8u6i"), SubResource("Resource_q8oj0"), SubResource("Resource_kaaf5"), SubResource("Resource_48ww4"), SubResource("Resource_1xj3a"), SubResource("Resource_taq0n"), SubResource("Resource_0ixp3"), SubResource("Resource_bdrrb"), SubResource("Resource_4ub2c"), SubResource("Resource_o7030"), SubResource("Resource_xncfn"), SubResource("Resource_vtwq7"), SubResource("Resource_2eyij")])

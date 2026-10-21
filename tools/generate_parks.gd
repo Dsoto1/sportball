@@ -96,24 +96,24 @@ const PARKS := [
 		"skyline_color": Color("1a1f33"), "window_color": Color("ffe0a0"), "skyline_height": 1.2,
 	},
 	{
-		"id": &"warehouse_row", "decks": 2, "frame": &"arch", "display_name": "Warehouse Row",
+		"id": &"warehouse_row", "decks": 2, "frame": &"gate", "clock": true, "display_name": "Warehouse Row",
 		"blurb": "Conductors home · a 25-foot brick wall in right and the old Roundhouse warehouse looming over it",
 		"shape": [[-45, 101, 2.4], [-25, 111, 2.4], [-8, 123, 2.4], [0, 122, 2.4], [14, 115, 2.4], [20, 112, 2.4], [21.5, 110, 7.6], [45, 97, 7.6]], "air": 1.0,
-		"seat_color": Color("1f5a3a"), "seat_color_alt": Color("184a2f"), "structure_color": Color("4a3f3a"), "accent_color": Color("ff9b3d"),
-		"outfield_wall_color": Color("7a3324"), "wall_style": &"brick", "home_fan_share": 0.5, "away_fan_share": 0.3, "attendance": 0.92,
+		"seat_color": Color("8a2a2a"), "seat_color_alt": Color("6e2121"), "structure_color": Color("6e3a2c"), "accent_color": Color("d4a017"),
+		"outfield_wall_color": Color("1f3a3c"), "wall_style": &"brick", "home_fan_share": 0.5, "away_fan_share": 0.3, "attendance": 0.92,
 		"foul_rows": 24, "outfield_rows": 12,
-		"pieces": [[&"warehouse", 45.0], [&"flags", -50.0, {"span": 90.0, "count": 10}], [&"water", 20.0, {"distance": 230.0, "width": 60.0}], [&"bridge", -15.0, {"distance": 180.0, "length": 200.0}]],
+		"pieces": [[&"warehouse", 45.0], [&"warehouse", -45.0, {"text": "CARGO BUILDS CITIES", "length": 180.0}], [&"viaduct", 16.0, {"span": 34.0, "height": 20.0}], [&"cranes", 30.0, {"span": 20.0, "count": 2}], [&"smokestacks", 40.0, {"span": 8.0, "count": 1, "height": 35.0}], [&"bunting", 50.0, {"span": 260.0}], [&"water", 20.0, {"distance": 230.0, "width": 60.0}], [&"bridge", -15.0, {"distance": 180.0, "length": 200.0}]],
 		"sponsors": ["ROUNDHOUSE STORAGE CO.", "HARBORLIGHT CRAB SHACK", "BRASS RAIL BITTERS", "OLD LINE LOCKSMITHS", "CANAL STREET CANDY"],
 		"skyline_color": Color("514848"), "window_color": Color("ffe1a8"), "skyline_height": 0.9,
 	},
 	{
 		"id": &"fountain_gardens", "decks": 2, "frame": &"board", "display_name": "Fountain Gardens",
-		"blurb": "Swans home · big, symmetric and fair, fountains dancing beyond the wall",
+		"blurb": "Swans home · big, symmetric and fair: garden terraces, fountains and blossoms beyond the wall",
 		"shape": [[-45, 101, 3.7], [-22, 118, 3.7], [0, 125, 3.7], [22, 118, 3.7], [45, 101, 3.7]], "air": 1.0,
-		"seat_color": Color("1e3f7a"), "seat_color_alt": Color("173263"), "structure_color": Color("e5e8ee"), "accent_color": Color("6fd6ff"),
-		"outfield_wall_color": Color("16336a"), "wall_style": &"padded", "home_fan_share": 0.5, "away_fan_share": 0.25, "attendance": 0.8,
-		"foul_rows": 24, "outfield_rows": 5, "night": true,
-		"pieces": [[&"fountains", 14.0, {}, true], [&"waterfalls", 9.0, {"height": 22.0}, true], [&"trees", 45.0, {"span": 30.0, "count": 6, "kind": &"round"}, true], [&"flags", -50.0, {"span": 100.0, "count": 10}], [&"water", 0.0, {"style": &"moat", "gap": 20.0, "width": 16.0, "glow": 0.5}]],
+		"seat_color": Color("1d4a35"), "seat_color_alt": Color("163c2b"), "structure_color": Color("e8e2d0"), "accent_color": Color("d4af37"),
+		"outfield_wall_color": Color("145a3b"), "wall_style": &"padded", "home_fan_share": 0.5, "away_fan_share": 0.25, "attendance": 0.8,
+		"foul_rows": 24, "outfield_rows": 5,
+		"pieces": [[&"fountains", 14.0, {}, true], [&"waterfalls", 9.0, {"height": 22.0}, true], [&"trees", 22.0, {"span": 30.0, "count": 8, "kind": &"blossom"}, true], [&"trees", 4.0, {"span": 8.0, "count": 4, "kind": &"cypress"}, true], [&"statue", 16.0, {"figure": &"figure"}, true], [&"conservatory", 42.0], [&"flags", -50.0, {"span": 100.0, "count": 10}], [&"water", 0.0, {"style": &"moat", "gap": 20.0, "width": 16.0, "glow": 0.5}]],
 		"sponsors": ["CASCADE COLA", "SPRINKLE & SONS PLUMBING", "BLUE PLAINS BBQ", "MISTY MEADOW DAIRY", "JUBILEE JEWELERS"],
 		"skyline_color": Color("26304a"), "window_color": Color("d8ecff"), "skyline_height": 0.6,
 	},
@@ -152,6 +152,8 @@ func _init() -> void:
 				params["height"] = tall
 			if kind == &"centerpiece" and spec["frame"] != &"board":
 				params["frame"] = spec["frame"]
+			if kind == &"centerpiece" and spec.get("clock", false):
+				params["clock"] = true
 			park.add_piece(kind, NAN, params)
 		for p in spec.get("pieces", []):
 			park.add_piece(p[0], p[1] if p.size() > 1 else NAN, p[2] if p.size() > 2 else {}, p[3] if p.size() > 3 else false)
@@ -159,7 +161,7 @@ func _init() -> void:
 		if not problems.is_empty():
 			push_error("%s: %s" % [park.id, ", ".join(problems)])
 		for key in spec:
-			if key in ["shape", "air", "surface", "pieces", "standard", "skyline_height", "frame"]:
+			if key in ["shape", "air", "surface", "pieces", "standard", "skyline_height", "frame", "clock"]:
 				continue
 			var value: Variant = spec[key]
 			park.set(key, PackedStringArray(value) if key == "sponsors" else value)

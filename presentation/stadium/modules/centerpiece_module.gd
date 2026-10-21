@@ -1,6 +1,7 @@
 extends StadiumModule
 ## The centerpiece in straightaway center, over the batter's eye: the home
-## club's name under its emblem and the batter's card (number, name,
+## club's name under its emblem (or a station clock, with "clock") and
+## the batter's card (number, name,
 ## position, AVG / HR / RBI), framed as a plain board, an iron gate or an
 ## arch in the park's materials.
 
@@ -54,9 +55,27 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	trim.material_override = Stadium.glow(def.accent_color, 1.6)
 	var screen := stadium.box(Vector3(34.0, 20.0, 0.2), home.dark_color, board)
 	screen.position = Vector3(0, 0, 0.0)
-	var emblem := Emblem.build(home, 9.0, 0.6)
-	emblem.position = Vector3(0, 15.5, 0.2)
-	board.add_child(emblem)
+	if bool(piece.param("clock")):
+		# A station clock crowns it; the emblem moves beside the name.
+		var face := Scenery.cylinder(board, 4.2, 4.2, 0.6, Color(0.96, 0.94, 0.86), 32)
+		face.rotation.x = PI * 0.5
+		face.position = Vector3(0, 16.0, 0.0)
+		face.material_override = Stadium.glow(Color(0.98, 0.95, 0.82), 0.8)
+		var rim := Scenery.cylinder(board, 4.7, 4.7, 0.4, def.accent_color, 32)
+		rim.rotation.x = PI * 0.5
+		rim.position = Vector3(0, 16.0, -0.3)
+		for hand in [[2.6, 0.0], [3.6, 70.0]]:
+			var h := stadium.box(Vector3(0.35, hand[0], 0.1), Color(0.1, 0.1, 0.1), board)
+			h.rotation.z = deg_to_rad(hand[1])
+			h.position = Vector3(0, 16.0, 0.4) + Vector3(-sin(h.rotation.z), cos(h.rotation.z), 0) * hand[0] * 0.5
+		for side: float in [-1.0, 1.0]:
+			var mark := Emblem.build(home, 4.0, 0.6)
+			mark.position = Vector3(side * 13.5, 7.0, 0.2)
+			board.add_child(mark)
+	else:
+		var emblem := Emblem.build(home, 9.0, 0.6)
+		emblem.position = Vector3(0, 15.5, 0.2)
+		board.add_child(emblem)
 	var name := stadium.label(home.team_name.to_upper(), 300, home.sign_color(), board)
 	name.position = Vector3(0, 7.0, 0.2)
 	var city := stadium.label(home.city.to_upper(), 120, home.highlight_color, board)

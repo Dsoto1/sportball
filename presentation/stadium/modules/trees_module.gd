@@ -1,6 +1,6 @@
 extends StadiumModule
 ## A grove beyond the stands, from the piece's angle across "span" degrees:
-## palms, pines, cacti or round shade trees.
+## palms, pines, cacti, round shade trees, cypresses or blossoming trees.
 
 
 func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef) -> void:
@@ -44,6 +44,15 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 					var elbow := Scenery.cylinder(tree, 0.6, 0.6, 1.8, Color(0.3, 0.55, 0.32), 8)
 					elbow.rotation.z = PI * 0.5
 					elbow.position = Vector3(arm_side * 1.0, 4.2 + arm_side, 0.0)
+			&"cypress":
+				var spire := Scenery.cylinder(tree, 1.6, 0.2, 14.0, Color(0.1, 0.3, 0.18), 10)
+				spire.position.y = 7.5
+			&"blossom":
+				var trunk := Scenery.cylinder(tree, 0.5, 0.35, 5.0, Color(0.33, 0.24, 0.2), 8)
+				trunk.position.y = 2.5
+				for c in 3:
+					var puff := Scenery.sphere(tree, 3.0 - c * 0.5, Color(0.96, 0.66, 0.8).lightened(c * 0.08))
+					puff.position = Vector3(cos(c * 2.1) * 1.6, 7.0 + c * 0.8, sin(c * 2.1) * 1.6)
 			_:
 				var trunk := Scenery.cylinder(tree, 0.6, 0.45, 6.0, Color(0.38, 0.27, 0.18), 8)
 				trunk.position.y = 3.0

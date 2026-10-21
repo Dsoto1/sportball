@@ -14,7 +14,8 @@ points = PackedVector3Array(-45, 101, 2.4, -25, 111, 2.4, -8, 123, 2.4, 0, 122, 
 script = ExtResource("2_3mioo")
 kind = &"centerpiece"
 params = {
-"frame": &"arch"
+"clock": true,
+"frame": &"gate"
 }
 
 [sub_resource type="Resource" id="Resource_dhncx"]
@@ -45,14 +46,50 @@ angle = 45.0
 
 [sub_resource type="Resource" id="Resource_8s8n4"]
 script = ExtResource("2_3mioo")
-kind = &"flags"
-angle = -50.0
+kind = &"warehouse"
+angle = -45.0
 params = {
-"count": 10,
-"span": 90.0
+"length": 180.0,
+"text": "CARGO BUILDS CITIES"
 }
 
 [sub_resource type="Resource" id="Resource_nehh2"]
+script = ExtResource("2_3mioo")
+kind = &"viaduct"
+angle = 16.0
+params = {
+"height": 20.0,
+"span": 34.0
+}
+
+[sub_resource type="Resource" id="Resource_eebaf"]
+script = ExtResource("2_3mioo")
+kind = &"cranes"
+angle = 30.0
+params = {
+"count": 2,
+"span": 20.0
+}
+
+[sub_resource type="Resource" id="Resource_t0e0d"]
+script = ExtResource("2_3mioo")
+kind = &"smokestacks"
+angle = 40.0
+params = {
+"count": 1,
+"height": 35.0,
+"span": 8.0
+}
+
+[sub_resource type="Resource" id="Resource_1sk07"]
+script = ExtResource("2_3mioo")
+kind = &"bunting"
+angle = 50.0
+params = {
+"span": 260.0
+}
+
+[sub_resource type="Resource" id="Resource_fx584"]
 script = ExtResource("2_3mioo")
 kind = &"water"
 angle = 20.0
@@ -61,7 +98,7 @@ params = {
 "width": 60.0
 }
 
-[sub_resource type="Resource" id="Resource_eebaf"]
+[sub_resource type="Resource" id="Resource_i7bf1"]
 script = ExtResource("2_3mioo")
 kind = &"bridge"
 angle = -15.0
@@ -76,11 +113,11 @@ id = &"warehouse_row"
 display_name = "Warehouse Row"
 blurb = "Conductors home · a 25-foot brick wall in right and the old Roundhouse warehouse looming over it"
 field_shape = SubResource("Resource_wdxq1")
-seat_color = Color(0.12156863, 0.3529412, 0.22745098, 1)
-seat_color_alt = Color(0.09411765, 0.2901961, 0.18431373, 1)
-structure_color = Color(0.2901961, 0.24705882, 0.22745098, 1)
-accent_color = Color(1, 0.60784316, 0.23921569, 1)
-outfield_wall_color = Color(0.47843137, 0.2, 0.14117648, 1)
+seat_color = Color(0.5411765, 0.16470589, 0.16470589, 1)
+seat_color_alt = Color(0.43137255, 0.12941177, 0.12941177, 1)
+structure_color = Color(0.43137255, 0.22745098, 0.17254902, 1)
+accent_color = Color(0.83137256, 0.627451, 0.09019608, 1)
+outfield_wall_color = Color(0.12156863, 0.22745098, 0.23529412, 1)
 wall_style = &"brick"
 foul_rows = 24
 outfield_rows = 12
@@ -91,4 +128,4 @@ attendance = 0.92
 sponsors = PackedStringArray("ROUNDHOUSE STORAGE CO.", "HARBORLIGHT CRAB SHACK", "BRASS RAIL BITTERS", "OLD LINE LOCKSMITHS", "CANAL STREET CANDY")
 skyline_color = Color(0.31764707, 0.28235295, 0.28235295, 1)
 window_color = Color(1, 0.88235295, 0.65882355, 1)
-pieces = Array[ExtResource("2_3mioo")]([SubResource("Resource_llfex"), SubResource("Resource_dhncx"), SubResource("Resource_50gy8"), SubResource("Resource_3ko6v"), SubResource("Resource_5iq4d"), SubResource("Resource_di3l1"), SubResource("Resource_8s8n4"), SubResource("Resource_nehh2"), SubResource("Resource_eebaf")])
+pieces = Array[ExtResource("2_3mioo")]([SubResource("Resource_llfex"), SubResource("Resource_dhncx"), SubResource("Resource_50gy8"), SubResource("Resource_3ko6v"), SubResource("Resource_5iq4d"), SubResource("Resource_di3l1"), SubResource("Resource_8s8n4"), SubResource("Resource_nehh2"), SubResource("Resource_eebaf"), SubResource("Resource_t0e0d"), SubResource("Resource_1sk07"), SubResource("Resource_fx584"), SubResource("Resource_i7bf1")])

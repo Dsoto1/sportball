@@ -198,7 +198,7 @@ hitter's own swing (bat speed, attack angle, pull) in play:
 | Reactor Park | night game; odd angles, a 427 ft center-field notch | 5.40 | 1.08 | 1.87 | 1.28 |
 | The Horseshoe | night game; 279 / 266 ft lines, a 482 ft center field | 5.47 | 0.45 | 0.98 | 1.40 |
 | Warehouse Row | 25 ft brick wall in right, the Roundhouse warehouse beyond it | 5.47 | 1.10 | 2.05 | 0.85 |
-| Fountain Gardens | night game; big and fair, fountains beyond the wall | 4.85 | 0.85 | 1.18 | 1.32 |
+| Fountain Gardens | big and fair; garden terraces, fountains and blossoms beyond the wall | 4.85 | 0.85 | 1.18 | 1.32 |
 | The Vault | sealed dome on fast turf | 5.60 | 0.98 | 2.33 | 0.45 |
 
 ### Building a park
@@ -221,7 +221,7 @@ The core is always built:
 
 | Module | What it is | Settings |
 |---|---|---|
-| `centerpiece` | board in straightaway center: club name under its emblem, the batter's card | height, frame (board, gate, arch) |
+| `centerpiece` | board in straightaway center: club name under its emblem (or a station clock), the batter's card | height, frame (board, gate, arch), clock |
 | `scoreboard` | line-score board over the stands | height |
 | `slogan_board` | lit sign with the emblem, the park's name and the club's slogan | height, text |
 | `wall_scoreboard` | hand-operated board in a wall 6 m or taller | none |
@@ -233,7 +233,8 @@ The core is always built:
 | `fountains` | pools with cascades and jets beyond the wall | span, basins |
 | `dome` | sealed roof; the park plays indoors | rise |
 | `waterfalls` | waterfall behind the outfield stands, into a pool (or a frozen ice fall) | height, width, frozen |
-| `trees` | grove across a span: palms, pines, cacti, round trees | span, count, kind |
+| `trees` | grove across a span: palms, pines, cacti, round, cypress, blossom | span, count, kind |
+| `conservatory` | glass greenhouse dome on a stone drum | radius |
 | `smokestacks` | smokestacks with smoke, or cooling towers with steam (tintable) | span, count, height, style, tint |
 | `cranes` | lattice gantry cranes | span, count, height |
 | `lighthouse` | striped lighthouse on a rock | height |

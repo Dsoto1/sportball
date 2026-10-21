@@ -885,3 +885,28 @@ Affected systems: generate_teams (identity), generate_parks, StadiumDef (ground_
 Reason: Owner reference sheets for Reactor Park and the Horseshoe.
 
 Affected systems: generate_teams, generate_parks, Emblem (atom), modules (pipes, viaduct, lamps, bunting new; smokestacks tint), catalog, data, README, notes.
+
+## 2026-10-21 - Warehouse Row and Fountain Gardens Sheets; Two Proposed Clubs
+
+- **Colors:**
+  - The Conductors take their sheet's colors, and their slogan becomes "All Aboard".
+  - The Swans take theirs too, mapped to six roles: green, swan white, blossom pink, stone gray, evergreen, royal gold. Their emblem becomes a gold laurel "S".
+- **Warehouse Row:**
+  - brick warehouses on both lines;
+  - an elevated train on a viaduct beyond right, with cranes and a stack;
+  - bunting, and a dark teal wall;
+  - a gate centerpiece crowned by a station clock (`centerpiece` gains a `clock` setting);
+  - the river and the iron bridge stay.
+- **Fountain Gardens:**
+  - now a day game, as on its sheet;
+  - blossoming trees and cypresses (new tree kinds);
+  - white statues;
+  - a greenhouse dome (`conservatory`, new);
+  - the cascades, fountains and moat stay;
+  - ivory, green and gold.
+- **Bug fixed:** `Stadium.profile` didn't wrap angles past ±180°, so a moat starting at center field drew a strip of water across the infield on the third-base side, at the Halo Dome and Fountain Gardens. Angles now wrap, with a test.
+- **Proposed clubs:** the batch also held sheets for two clubs not in the league, the Sailport Privateers and the Redrock Rangers. They're saved under `docs/stadium_refs/proposed/` for the owner to decide.
+
+Reason: Owner reference sheets.
+
+Affected systems: generate_teams, generate_parks, modules (centerpiece clock, trees kinds, conservatory new), Stadium.profile, tests, README, notes.

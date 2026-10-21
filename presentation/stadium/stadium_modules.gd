@@ -16,7 +16,7 @@ const CATALOG := {
 		"name": "Centerpiece", "category": &"boards", "unique": true, "placed": false,
 		"about": "The board in straightaway center: club name under its emblem and the batter's card. Framed as a board, gate or arch.",
 		"angle": 0.0, "angle_range": [0.0, 0.0],
-		"params": {"height": [17.0, 12.0, 28.0], "frame": [&"board"]},
+		"params": {"height": [17.0, 12.0, 28.0], "frame": [&"board"], "clock": [false]},
 		"choices": {"frame": [&"board", &"gate", &"arch"]},
 		"script": preload("res://presentation/stadium/modules/centerpiece_module.gd"),
 	},
@@ -96,10 +96,10 @@ const CATALOG := {
 	},
 	&"trees": {
 		"name": "Trees", "category": &"scenery", "unique": false, "placed": true,
-		"about": "A grove behind the stands across span degrees: palms, pines, cacti or round shade trees.",
+		"about": "A grove behind the stands across span degrees: palms, pines, cacti, round shade trees, cypresses or blossoming trees.",
 		"angle": -45.0, "angle_range": [-180.0, 180.0],
 		"params": {"span": [30.0, -120.0, 120.0], "count": [8, 1, 30], "kind": [&"palm"]},
-		"choices": {"kind": [&"palm", &"pine", &"cactus", &"round"]},
+		"choices": {"kind": [&"palm", &"pine", &"cactus", &"round", &"cypress", &"blossom"]},
 		"script": preload("res://presentation/stadium/modules/trees_module.gd"),
 	},
 	&"smokestacks": {
@@ -218,6 +218,13 @@ const CATALOG := {
 		"angle": 55.0, "angle_range": [-180.0, 180.0],
 		"params": {"span": [250.0, -360.0, 360.0], "every": [9.0, 3.0, 30.0], "club_colors": [false]},
 		"script": preload("res://presentation/stadium/modules/bunting_module.gd"),
+	},
+	&"conservatory": {
+		"name": "Conservatory", "category": &"landmark", "unique": false, "placed": true,
+		"about": "A glass greenhouse dome on a stone base behind the stands, glowing softly inside.",
+		"angle": 40.0, "angle_range": [-180.0, 180.0],
+		"params": {"radius": [12.0, 6.0, 24.0]},
+		"script": preload("res://presentation/stadium/modules/conservatory_module.gd"),
 	},
 	&"dome": {
 		"name": "Dome", "category": &"structure", "unique": true, "placed": false,

@@ -21,6 +21,8 @@ docs/*.jpg -filter -diff -merge binary
 docs/*.png -filter -diff -merge binary
 docs/stadium_refs/*.jpg -filter -diff -merge binary
 docs/stadium_refs/*.png -filter -diff -merge binary
+docs/stadium_refs/**/*.jpg -filter -diff -merge binary
+docs/stadium_refs/**/*.png -filter -diff -merge binary
 
 # This remote does not accept Git LFS pushes (DECISIONS 2026-10-21), so
 # runtime assets are plain git objects under a size budget instead.

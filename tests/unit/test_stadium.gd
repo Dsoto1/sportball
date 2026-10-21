@@ -311,3 +311,12 @@ func test_water_sits_beyond_the_stands() -> void:
 			st.free()
 	check(content().park(&"pier_nine").pieces_of(&"water").size() > 0, "Pier 9 sits in the harbor")
 	check(content().park(&"the_kiln").pieces_of(&"water").is_empty(), "the desert park stays dry")
+
+
+func test_angles_wrap_around_home() -> void:
+	var st := _build_park(&"fountain_gardens")
+	for angle in [190.0, 270.0, 350.0, -200.0]:
+		check_near(st.profile(angle).x, st.profile(wrapf(angle, -180.0, 180.0)).x, 0.001, "%d° is the same stand as %d°" % [angle, wrapf(angle, -180.0, 180.0)])
+	for angle in range(0, 360, 10):
+		check(st.stand_top(angle).x > 40.0, "the stands never collapse onto the field at %d°" % angle)
+	st.free()

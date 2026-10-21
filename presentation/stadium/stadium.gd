@@ -85,6 +85,7 @@ func _process(delta: float) -> void:
 ## Inner edge radius, first row height and row count at a spray angle.
 ## Modules use it to stand behind or on top of the stands.
 func profile(angle: float) -> Vector3:
+	angle = wrapf(angle, -180.0, 180.0)
 	var a := absf(angle)
 	var inner := 0.0
 	if a <= 45.0:

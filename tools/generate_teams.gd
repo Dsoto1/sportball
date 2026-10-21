@@ -110,7 +110,8 @@ const REPERTOIRES := {
 ## support, dark, highlight), slogan and emblem [shape, glyph]. Clubs with an
 ## owner reference sheet (docs/stadium_refs) use its colors exactly; the
 ## rest are drafts until theirs arrive. Sheets so far: Glitterati,
-## Gearheads, Bankers, Gulls, Comets, Yetis, Neutrons, Lamplighters.
+## Gearheads, Bankers, Gulls, Comets, Yetis, Neutrons, Lamplighters,
+## Conductors, Swans.
 const IDENTITY := {
 	&"glitterati": {"colors": ["4b2a7b", "d9a93a", "9b5cff", "a7a9b4", "141019", "f4f1fa"],
 		"slogan": "Bigger Brighter Together", "emblem": [&"halo", "*"]},
@@ -128,10 +129,10 @@ const IDENTITY := {
 		"slogan": "Critical Mass", "emblem": [&"atom", ""]},
 	&"lamplighters": {"colors": ["0b2a4a", "f0c04b", "b61e2e", "f6e7c3", "3a3f47", "ffe7a3"],
 		"slogan": "Light Up the Night", "emblem": [&"shield", "ML"]},
-	&"conductors": {"colors": ["d79a1e", "1f4f34", "1c1c1c", "8a3a2a", "121212", "f6ead0"],
+	&"conductors": {"colors": ["b2222b", "3b6ea5", "d4a017", "7a7d85", "1b1b1b", "e5e5e3"],
 		"slogan": "All Aboard", "emblem": [&"gear", "IC"]},
-	&"swans": {"colors": ["1e4fb0", "f7f7fa", "6fd6ff", "c9a548", "0f1d3d", "ffffff"],
-		"slogan": "Grace Under Pressure", "emblem": [&"shield", "S"]},
+	&"swans": {"colors": ["145a3b", "f4f1e8", "f3a7c4", "a7a7af", "0b2e1f", "d4af37"],
+		"slogan": "Grace Under Pressure", "emblem": [&"laurel", "S"]},
 	&"safecrackers": {"colors": ["5a6272", "ff5ad0", "151518", "9aa3b5", "0c0c10", "f3f0f7"],
 		"slogan": "Crack the Code", "emblem": [&"gear", "V"]},
 }

@@ -133,6 +133,37 @@ points. The Foundry sheet also has a six-color team set.
   - Dark: Iron Gray #3A3F47
   - Highlight: Warm Light #FFE7A3
 
+## 09 Warehouse Row
+
+- An industrial rail yard: brick warehouses on both lines ("CARGO BUILDS CITIES" in left), steel bridges and gantries, cranes, a working elevated train beyond right, bunting, vintage ads and murals on a dark teal wall.
+- A gate centerpiece crowned by a station clock, with a hand-operated league scoreboard under it.
+- Team colors:
+  - Primary: Iron Red #B2222B
+  - Secondary: Steel Blue #3B6EA5
+  - Accent: Brass Gold #D4A017
+  - Support: Smoke Gray #7A7D85
+  - Dark: Charcoal Black #1B1B1B
+  - Highlight: Steam White (cut off; #E5E5E3 used)
+
+## 10 Fountain Gardens
+
+- A daytime garden park: tiered fountains and cascades flanking the centerpiece, blossoming trees, cypresses, white statues on terraces, a greenhouse dome in right, ivory balustrades, flags.
+- A green wall with swans.
+- Team colors (the sheet lists seven; the six roles take):
+  - Primary: Garden Green #145A3B
+  - Secondary: Swan White #F4F1E8
+  - Accent: Blossom Pink #F3A7C4
+  - Support: Stone Gray #A7A7AF
+  - Dark: Evergreen #0B2E1F
+  - Highlight: Royal Gold #D4AF37
+
+## Proposed new clubs (`proposed/`, not in the league)
+
+- **Sailport Privateers, The Blackwater Park:** a pirate harbor fortress with ships, a lighthouse, waterfalls and caves.
+- **Redrock Rangers, Canyon Rim Park:** a canyon mining town with rock arches, a trestle and a train.
+
+Waiting on the owner's call. The Vault (the Safecrackers' dome) sheet hasn't come yet.
+
 ## Built so far
 
 - Club identity: six colors per club (exact for the clubs with sheets), a slogan and an emblem.
@@ -169,6 +200,11 @@ points. The Foundry sheet also has a six-color team set.
   - bunting (also at Ledger Street);
   - green-tinted steam;
   - an atom emblem shape.
+- From the Warehouse Row and Fountain Gardens sheets:
+  - a station clock on the centerpiece;
+  - blossoming trees and cypresses;
+  - a conservatory dome;
+  - a second warehouse with its own sign.
 - Water from the aerial panels:
   - the Halo Dome: glowing canals around the plaza;
   - Foundry: a river behind the outfield with its bridge;
