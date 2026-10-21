@@ -598,3 +598,32 @@ Decision:
 Reason: Owner reference image of a full swing sequence.
 
 Affected systems: BattingStyles (slot), tests, tools.
+
+## 2026-10-21 - Swings Tuned to Statcast
+
+Decision:
+- **Anchors:** from the owner's Baseball Savant swing references:
+  - MLB average: attack angle 10°, attack direction 2° pull, swing path tilt 32°.
+  - Turang (compact): 4°, 11° oppo, 30°.
+  - Muncy, Langford, Hoskins, Ohtani (power): 16–19°, 1–7°, 34–36°.
+- **Attack angle (upward):** Leg Kick 18°, Bat Wrap 16°, Classic and Open 10°, Crouch 8°, Slap 4°. The old values were all too flat: 0–12°.
+- **Attack direction:** Slap 11° oppo; Leg Kick 6° and Bat Wrap 5° pull; Open 3° pull; Classic and Crouch 2° pull.
+- **Swing path tilt** is now measured from the bat path itself (`BattingStyles.swing_tilt`). Each style's slot depth is tuned to hit its target:
+
+  | Style | Target tilt | Barrel drop in the slot |
+  |---|---|---|
+  | Slap | 30° | 40° below level |
+  | Crouch | 30° | 59° |
+  | Classic | 32° | 60° |
+  | Open | 32° | 57° |
+  | Bat Wrap | 32° | 80° |
+  | Leg Kick | 36° | 70° |
+
+  The old tilts were 10–25°, flatter than any big-league swing.
+- **Checked:** the barrel tip stays at least 0.45 m off the ground, and the elbows are unchanged.
+- **Tests:** they hold the tilts and attack angles to the anchors.
+- **Visual only:** where the ball goes is still decided by the player's aim and timing, not by these angles.
+
+Reason: Owner reference images of Statcast swing metrics.
+
+Affected systems: BattingStyles, tests, elbow_check (tip height).

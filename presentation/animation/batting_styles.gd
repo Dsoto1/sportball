@@ -12,9 +12,12 @@ extends RefCounted
 
 ## Bat lag: the barrel is in the slot this far from the press to contact,
 ## having come only this share of the way around; its depth per style is
-## BAT slot_lift (degrees below level).
+## BAT slot_lift (degrees below level). The slot depths are tuned so the
+## swing path's tilt into contact (swing_tilt) lands on Statcast-like
+## targets (TILT): MLB average 32, compact swings 30, big power 36.
 const SLOT_AT := 0.55
 const SLOT_YAW_SHARE := 0.35
+const TILT := {&"classic": 32.0, &"crouch": 30.0, &"open": 32.0, &"leg_kick": 36.0, &"wrap": 32.0, &"slap": 30.0}
 
 ## Approach clock: the load peaks at the pitcher's release, the stride
 ## lands at STRIDE_AT, then he holds, cocked, until he swings or takes.
@@ -47,12 +50,12 @@ const NAMES := {&"classic": "Classic", &"crouch": "Crouch", &"open": "Open", &"l
 ## lets the top hand go after contact. choke (m) moves the hands up the
 ## handle.
 const BAT := {
-	&"classic": {"slot_lift": -25.0, "yaw": 100.0, "lift": 50.0, "load_yaw": 15.0, "load_lift": 5.0, "waggle": 6.0, "attack_yaw": 0.0, "attack_lift": 6.0, "finish_yaw": -170.0, "finish_lift": 40.0, "one_hand": false, "choke": 0.0},
-	&"crouch": {"slot_lift": -20.0, "yaw": 105.0, "lift": 38.0, "load_yaw": 12.0, "load_lift": 0.0, "waggle": 4.0, "attack_yaw": 0.0, "attack_lift": 3.0, "finish_yaw": -165.0, "finish_lift": 30.0, "one_hand": false, "choke": 0.0},
-	&"open": {"slot_lift": -25.0, "yaw": 92.0, "lift": 58.0, "load_yaw": 20.0, "load_lift": 2.0, "waggle": 9.0, "attack_yaw": -3.0, "attack_lift": 6.0, "finish_yaw": -170.0, "finish_lift": 42.0, "one_hand": false, "choke": 0.0},
-	&"leg_kick": {"slot_lift": -35.0, "yaw": 100.0, "lift": 62.0, "load_yaw": 28.0, "load_lift": 8.0, "waggle": 3.0, "attack_yaw": -6.0, "attack_lift": 12.0, "finish_yaw": -185.0, "finish_lift": 48.0, "one_hand": false, "choke": 0.0},
-	&"wrap": {"slot_lift": -20.0, "yaw": 145.0, "lift": 28.0, "load_yaw": 15.0, "load_lift": 0.0, "waggle": 2.0, "attack_yaw": -5.0, "attack_lift": 9.0, "finish_yaw": -180.0, "finish_lift": 25.0, "one_hand": true, "choke": 0.0},
-	&"slap": {"slot_lift": -10.0, "yaw": 80.0, "lift": 32.0, "load_yaw": 6.0, "load_lift": 0.0, "waggle": 10.0, "attack_yaw": 12.0, "attack_lift": 0.0, "finish_yaw": -110.0, "finish_lift": 12.0, "one_hand": false, "choke": 0.08},
+	&"classic": {"slot_lift": -60.0, "yaw": 100.0, "lift": 50.0, "load_yaw": 15.0, "load_lift": 5.0, "waggle": 6.0, "attack_yaw": -2.0, "attack_lift": 10.0, "finish_yaw": -170.0, "finish_lift": 40.0, "one_hand": false, "choke": 0.0},
+	&"crouch": {"slot_lift": -59.0, "yaw": 105.0, "lift": 38.0, "load_yaw": 12.0, "load_lift": 0.0, "waggle": 4.0, "attack_yaw": -2.0, "attack_lift": 8.0, "finish_yaw": -165.0, "finish_lift": 30.0, "one_hand": false, "choke": 0.0},
+	&"open": {"slot_lift": -57.0, "yaw": 92.0, "lift": 58.0, "load_yaw": 20.0, "load_lift": 2.0, "waggle": 9.0, "attack_yaw": -3.0, "attack_lift": 10.0, "finish_yaw": -170.0, "finish_lift": 42.0, "one_hand": false, "choke": 0.0},
+	&"leg_kick": {"slot_lift": -70.0, "yaw": 100.0, "lift": 62.0, "load_yaw": 28.0, "load_lift": 8.0, "waggle": 3.0, "attack_yaw": -6.0, "attack_lift": 18.0, "finish_yaw": -185.0, "finish_lift": 48.0, "one_hand": false, "choke": 0.0},
+	&"wrap": {"slot_lift": -80.0, "yaw": 145.0, "lift": 28.0, "load_yaw": 15.0, "load_lift": 0.0, "waggle": 2.0, "attack_yaw": -5.0, "attack_lift": 16.0, "finish_yaw": -180.0, "finish_lift": 25.0, "one_hand": true, "choke": 0.0},
+	&"slap": {"slot_lift": -40.0, "yaw": 80.0, "lift": 32.0, "load_yaw": 6.0, "load_lift": 0.0, "waggle": 10.0, "attack_yaw": 11.0, "attack_lift": 4.0, "finish_yaw": -110.0, "finish_lift": 12.0, "one_hand": false, "choke": 0.08},
 }
 
 
@@ -194,6 +197,24 @@ static func approach_bat(style: StringName, a: float, clock: float) -> Vector2:
 	var load := smoothstep(0.0, LOAD_AT, a) * (1.0 - 0.6 * smoothstep(LOAD_AT, STRIDE_AT, a))
 	var waggle := sin(clock * 3.0) * float(b["waggle"]) * (1.0 - smoothstep(0.0, 0.3, a))
 	return Vector2(float(b["yaw"]) + float(b["load_yaw"]) * load + waggle, float(b["lift"]) + float(b["load_lift"]) * load)
+
+
+## Statcast-style "swing path tilt" (degrees, 0 flat, 90 vertical): how
+## steep the plane the barrel travels in is on its way into contact, for a
+## right-handed batter, measured from the bat path itself.
+static func swing_tilt(style: StringName) -> float:
+	var start := approach_bat(style, 1.0, 0.0)
+	var d1 := direction(swing_bat(style, CONTACT_AT * 0.85, start))
+	var d2 := direction(swing_bat(style, CONTACT_AT, start))
+	var n := d1.cross(d2).normalized()
+	return rad_to_deg(acos(clampf(absf(n.y), 0.0, 1.0)))
+
+
+## World direction (right-handed batter) of a bat at (yaw, lift) degrees.
+static func direction(bat: Vector2, side: float = 1.0) -> Vector3:
+	var y := deg_to_rad(bat.x)
+	var e := deg_to_rad(bat.y)
+	return Vector3(cos(e) * cos(y) * side, sin(e), cos(e) * sin(y))
 
 
 ## Bat (yaw, lift) through the swing (p = 0..1) from where it started.

@@ -2,7 +2,8 @@ extends SceneTree
 ## Drives a batter through every style's stance, approach and swing (with
 ## the bat grip IK on, as in a game) and reports how close each elbow and
 ## forearm comes to the torso. Clearance < 1.0 means inside the keep-out
-## (PoseBaker.TORSO_HALF_WIDTH / _DEPTH). Headless:
+## (PoseBaker.TORSO_HALF_WIDTH / _DEPTH). Also the lowest the barrel's
+## tip gets (m above the ground). Headless:
 ##   godot --headless --path . -s res://tools/elbow_check.gd [-- [lefty] [verbose <style>]]
 const SAMPLES := [["stance", 0.0], ["load", 0.5], ["stride", 0.85], ["swing", 0.0], ["swing", 0.06], ["swing", 0.11], ["swing", 0.16], ["swing", 0.2], ["swing", 0.35], ["swing", 0.5], ["swing", 0.7], ["swing", 1.0]]
 var _actor: ActorView
@@ -73,9 +74,12 @@ func _process(delta: float) -> bool:
 			if c < worst:
 				worst = c
 				where = "%s_%s at %s %.2f" % [p[0], side_name, s[0], s[1]]
-	var prev: Dictionary = _worst.get(style, {"clear": INF})
+	var prev: Dictionary = _worst.get(style, {"clear": INF, "tip": INF})
+	var tip := (_bat.global_transform * Vector3(0, 0, -BatMesh.LENGTH + 0.06)).y
 	if worst < float(prev["clear"]):
-		_worst[style] = {"clear": snappedf(worst, 0.01), "where": where}
+		prev = {"clear": snappedf(worst, 0.01), "where": where, "tip": prev["tip"]}
+	prev["tip"] = snappedf(minf(float(prev["tip"]), tip), 0.01)
+	_worst[style] = prev
 	_sample += 1
 	if _sample >= SAMPLES.size():
 		_sample = 0
