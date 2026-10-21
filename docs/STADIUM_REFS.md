@@ -89,7 +89,6 @@ Below the panels:
 
 **Optional kit pieces, each park picks a few:**
 
-- **Centerpiece:** a video board, gate or arch in center.
 - **Waterfalls:** beside the centerpiece.
 - **Trees:** palms, pines or cacti behind the outfield.
 - **Banner flagpoles:** along the top of the stands.
@@ -105,7 +104,7 @@ Below the panels:
 
 **Kit picks per park:**
 
-| Park | Decks | Centerpiece | Optional pieces | Signature |
+| Park | Decks | Centerpiece frame | Optional pieces | Signature |
 |---|---|---|---|---|
 | The Halo Dome | 3 | video board | waterfalls, palms, flagpoles, airships | the halo ring |
 | Foundry Field | 2 | iron gate | smokestacks, cranes, truss canopies, river and bridge | the Boilerplate wall |
@@ -118,6 +117,8 @@ Below the panels:
 | Warehouse Row | 2 | brick arch | flagpoles, lattice towers | the Roundhouse warehouse |
 | Fountain Gardens | 2 | video board | waterfalls, flagpoles | the fountain pools |
 | The Vault | 3 | video board | (indoors) | the dome roof |
+
+The centerpiece frame is how the center scoreboard is framed: a plain video board, a gate or an arch.
 
 Each park keeps its wall shape, wall heights and signature from its park
 block below, even where a kit piece could hide them.
