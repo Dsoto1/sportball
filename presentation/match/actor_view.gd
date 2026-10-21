@@ -10,6 +10,17 @@ extends Node3D
 enum Pose { IDLE, RUN, TURN, CHASE, TAG, THROW, DOWN, SLIDE, BAT_STANCE, SWING, CELEBRATE, BUNT, PITCH, SCOOP, CATCH_HIGH, DIVE, LEAD }
 
 const BODY := preload("res://assets/third_party/quaternius/universal-animation-library/UAL1_Standard.glb")
+## The player's body: Quaternius Universal Base Characters (CC0), on the
+## same skeleton as the animation library, with a buzz cut and, for some, a
+## beard.
+const BASE_DIR := "res://assets/third_party/quaternius/universal-base-characters/"
+const BASE_BODY := preload(BASE_DIR + "Superhero_Male_FullBody.gltf")
+const HAIR := preload(BASE_DIR + "Hair_Buzzed.gltf")
+const BEARD := preload(BASE_DIR + "Hair_Beard.gltf")
+const SKIN_TEX := preload(BASE_DIR + "T_Superhero_Male_Light.png")
+const SKIN_NORMAL := preload(BASE_DIR + "T_Superhero_Male_Normal.png")
+## Share of players with a beard.
+const BEARD_SHARE := 0.35
 ## Fielder's glove (Artlist AI, see the asset manifest): fingers along +Y,
 ## wrist at y = -0.95, about 1.9 units tall.
 const GLOVE := preload("res://assets/generated/artlist/glove/glove.glb")
@@ -20,9 +31,9 @@ const BACK_FONT := preload("res://assets/third_party/fonts/bungee/Bungee-Regular
 const BACK_NUMBER_AT := Vector3(0.0, 1.3, -0.175)
 const CROWN := Vector3(0.0, 1.68, 0.0)
 const BLEND := 0.12
-## Arcade proportions: broader and a little bigger than the mannequin, so
-## players read from the high field camera.
-const BUILD := Vector3(1.35, 1.12, 1.35)
+## Arcade proportions: a little broader and bigger than life, so players
+## read from the high field camera (the base character is already athletic).
+const BUILD := Vector3(1.15, 1.08, 1.15)
 ## Ground speed (m/s) the jog and sprint cycles are animated at.
 ## Moves that play once and hold their last frame, by pose.
 const ONE_SHOTS := {Pose.TAG: "Tag", Pose.SLIDE: "Slide", Pose.SCOOP: "Scoop", Pose.CATCH_HIGH: "Catch_High", Pose.DIVE: "Dive"}
@@ -39,6 +50,8 @@ var _glove: Node3D
 var _grip: BoneAttachment3D
 var _lefty := false
 var _kit: ShaderMaterial
+var _hair: MeshInstance3D
+var _beard: MeshInstance3D
 var _skeleton: Skeleton3D
 ## Batting helmet (with ear flap) for batters and runners, cap for fielders.
 var _helmet: Node3D
@@ -62,12 +75,20 @@ func setup(color: Color, tag: String) -> void:
 	_model.scale = BUILD
 	add_child(_model)
 	_player = _model.find_child("AnimationPlayer") as AnimationPlayer
-	_mesh = _model.find_child("Mannequin") as MeshInstance3D
-	_mesh.mesh = UniformLook.mesh_for(_mesh)
-	_kit = UniformLook.material()
-	_mesh.material_override = _kit
 	var skeleton := _model.find_child("Skeleton3D") as Skeleton3D
 	_skeleton = skeleton
+	# The library's mannequin only lends its skeleton and clips; the base
+	# character's body (same bones) is worn on it.
+	(_model.find_child("Mannequin") as MeshInstance3D).visible = false
+	_mesh = _wear(skeleton, BASE_BODY, "SuperHero_Male")
+	_mesh.mesh = UniformLook.mesh_for(_mesh)
+	_kit = UniformLook.material()
+	_kit.set_shader_parameter("textured_skin", true)
+	_kit.set_shader_parameter("skin_tex", SKIN_TEX)
+	_kit.set_shader_parameter("skin_normal", SKIN_NORMAL)
+	_mesh.material_override = _kit
+	_hair = _wear(skeleton, HAIR, "")
+	_beard = _wear(skeleton, BEARD, "")
 	_player.add_animation_library(BaseballMoves.LIBRARY, BaseballMoves.library(skeleton, _player))
 	var attach := BoneAttachment3D.new()
 	attach.bone_name = "hand_l"
@@ -165,9 +186,18 @@ func set_look(color: Color, tag: String, trim: Color = Color(0, 0, 0, 0), home: 
 	_tag.text = tag
 
 
-## Who wears the kit: skin tone from his id, number on his back.
+## Who wears the kit: skin tone, hair color and beard from his id, number
+## on his back.
 func set_player(id: String, number: int) -> void:
 	_kit.set_shader_parameter("skin", UniformLook.skin_for(id))
+	var hair_mat := StandardMaterial3D.new()
+	hair_mat.albedo_color = UniformLook.hair_for(id)
+	hair_mat.roughness = 0.8
+	for mi in [_hair, _beard]:
+		if mi != null:
+			mi.material_override = hair_mat
+	if _beard != null:
+		_beard.visible = float(absi(hash(id + "beard")) % 100) / 100.0 < BEARD_SHARE
 	_back.text = str(number) if number >= 0 else ""
 
 
@@ -255,6 +285,23 @@ func animate(pose: Pose, delta: float, speed: float = 0.0, juke: bool = false, p
 	var target := sin(_clock * 9.0) * 0.22 if juke else 0.0
 	_sway = lerpf(_sway, target, 1.0 - exp(-delta * 14.0))
 	_model.position.x = _sway
+
+
+## Moves the meshes of a base-character scene onto this skeleton (same
+## bone names, so its skin binds there). Returns the named one, or the
+## first. The scene itself is discarded.
+func _wear(skeleton: Skeleton3D, scene: PackedScene, wanted: String) -> MeshInstance3D:
+	var source := scene.instantiate()
+	var found: MeshInstance3D = null
+	for mi: MeshInstance3D in source.find_children("*", "MeshInstance3D", true, false):
+		mi.get_parent().remove_child(mi)
+		skeleton.add_child(mi)
+		mi.transform = Transform3D.IDENTITY
+		mi.skeleton = NodePath("..")
+		if found == null or mi.name == wanted:
+			found = mi
+	source.free()
+	return found
 
 
 ## Hangs a node on a bone at a rest-pose spot (skeleton space).

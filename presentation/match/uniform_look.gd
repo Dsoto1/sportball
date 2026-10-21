@@ -76,6 +76,14 @@ static func region_for(bone: String, rest: Vector3) -> Region:
 	return Region.BELT if rest.y >= BELT_BOTTOM else Region.PANTS
 
 
+const HAIR_COLORS := [Color(0.08, 0.06, 0.05), Color(0.2, 0.12, 0.07), Color(0.38, 0.24, 0.12), Color(0.6, 0.44, 0.24), Color(0.5, 0.18, 0.08)]
+
+
+## A hair color picked steadily from a player's id.
+static func hair_for(id: String) -> Color:
+	return HAIR_COLORS[absi(hash(id + "hair")) % HAIR_COLORS.size()]
+
+
 ## A skin tone picked steadily from a player's id.
 static func skin_for(id: String) -> Color:
 	return SKIN_TONES[absi(hash(id)) % SKIN_TONES.size()]

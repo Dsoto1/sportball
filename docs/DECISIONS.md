@@ -499,3 +499,15 @@ Decision:
 Reason: Owner request to improve the batter (clothing, skin, holding the bat properly), team-colored grip tape and pitch spin.
 
 Affected systems: UniformLook, uniform shader, BatGrip, PitchSpin, ActorView (kit, headwear, numbers, grip), MatchView (kits, grip, tape, spin), MatchDirector (pitch family to the view), tests.
+
+## 2026-10-21 - Players on the Quaternius Base Character
+
+Decision:
+- **Body:** every player wears the Universal Base Characters male body (CC0), with real eyes, eyebrows, a buzz cut and, for about a third of players, a beard. It uses the same 65-bone skeleton as the animation library, so the body's meshes are moved onto the library's skeleton at load (`ActorView._wear`). Every baked move, the bat grip IK and the headwear work unchanged. The library's mannequin mesh is hidden.
+- **Kit and skin:** the uniform shader paints the clothes by region as before. Skin regions use the pack's own skin texture and normal map (face, lips, knuckles), tinted from its typical color to each player's tone. Hair color comes from the player's id.
+- **Build:** arcade build eased to 1.15 × 1.08, since the base body is already athletic.
+- **Fetching:** the 129 MB pack came straight from itch.io, as the Expedition project does. The zip stays out of the repo; 4 MB of it is committed, with textures downscaled to 1024 px.
+
+Reason: Owner request to improve the batter (clothing, skin, faces) using the Universal Base Characters pack.
+
+Affected systems: ActorView (body, hair, beard), uniform shader (textured skin), UniformLook (hair colors), asset manifest.
