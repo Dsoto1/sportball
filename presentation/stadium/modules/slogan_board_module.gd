@@ -26,10 +26,14 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	var text := str(piece.param("text"))
 	if text.is_empty():
 		text = def.display_name
-	var title := stadium.label(text.to_upper(), 150, home.sign_color(), sign)
+	# Long names shrink so each word stays whole on its line.
+	var longest := 0
+	for word in text.split(" "):
+		longest = maxi(longest, word.length())
+	var title := stadium.label(text.to_upper(), mini(150, int(1500.0 / maxi(longest, 1))), home.sign_color(), sign)
 	title.position = Vector3(2.5, 2.2, 0.2)
 	title.width = 1200.0
-	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD
 	if not home.slogan.is_empty():
 		var line := stadium.label(home.slogan, 90, home.highlight_color, sign)
 		line.position = Vector3(0, -4.2, 0.2)

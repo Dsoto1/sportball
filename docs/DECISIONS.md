@@ -960,3 +960,16 @@ To bring the parks closer to the reference sheets, the stadiums now use free ass
 Reason: Owner request to use free assets to bring the parks closer to the reference sheets.
 
 Affected systems: StadiumSurfaces, ModelKit (new), StadiumDef (surfaces, facade_color), Stadium (bowl facade and ground meshes, box surfaces), GrayboxField (walls), many modules, generate_parks, data, tests, manifest, README.
+
+## 2026-10-21 - The Vault, Sheet Version 2
+
+- **Vault changes:** the owner's revised Vault sheet keeps the palette and layout, so the changes are small:
+  - the line-score board comes out (the centerpiece carries the batter);
+  - a "VAULTBOROUGH SAFECRACKERS" sign stands in left-center beside the vault door (moved to -37°);
+  - the "THE VAULT" slogan board stays in right.
+- **Sign text:** long names on slogan boards now shrink to fit and wrap only between words.
+- **New club noted:** the Pinecrest Loggers (Timberfall Park) sheet is saved under `docs/stadium_refs/proposed/`, not built.
+
+Reason: Owner reference sheet.
+
+Affected systems: generate_parks, slogan board module, stadium_refs notes.

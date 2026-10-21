@@ -21,29 +21,33 @@ params = {
 
 [sub_resource type="Resource" id="Resource_4i8r7"]
 script = ExtResource("2_b78mq")
-kind = &"scoreboard"
-angle = -34.0
-
-[sub_resource type="Resource" id="Resource_t1ilx"]
-script = ExtResource("2_b78mq")
 kind = &"slogan_board"
 angle = 34.0
 
-[sub_resource type="Resource" id="Resource_pt7r0"]
+[sub_resource type="Resource" id="Resource_t1ilx"]
 script = ExtResource("2_b78mq")
 kind = &"light_towers"
 
-[sub_resource type="Resource" id="Resource_ysqj7"]
+[sub_resource type="Resource" id="Resource_pt7r0"]
 script = ExtResource("2_b78mq")
 kind = &"skyline"
 params = {
 "height": 1.3
 }
 
-[sub_resource type="Resource" id="Resource_mjxe6"]
+[sub_resource type="Resource" id="Resource_ysqj7"]
 script = ExtResource("2_b78mq")
 kind = &"vault_door"
-angle = -34.0
+angle = -37.0
+
+[sub_resource type="Resource" id="Resource_mjxe6"]
+script = ExtResource("2_b78mq")
+kind = &"slogan_board"
+angle = -21.0
+params = {
+"height": 10.0,
+"text": "Vaultborough Safecrackers"
+}
 
 [sub_resource type="Resource" id="Resource_mtp5g"]
 script = ExtResource("2_b78mq")

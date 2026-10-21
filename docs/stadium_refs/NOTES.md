@@ -163,6 +163,10 @@ points. The Foundry sheet also has a six-color team set.
   - a giant bank-vault door in a tall wall over left field;
   - searchlights, catwalks, an elevated train and an arched bridge;
   - a dense Art Deco skyline, bunting.
+- Version 2 of the sheet (same colors):
+  - the line-score board is gone (the centerpiece carries the batter);
+  - a big "VAULTBOROUGH SAFECRACKERS" sign stands beside the vault door in left-center, and "THE VAULT" in right;
+  - lookout and security towers, catwalks.
 - The sheet's very tall left-field wall stays out, by the rule that the sheets don't change field dimensions. The Vault keeps its walls and fast turf. The door stands behind the left-field stands instead.
 - Team colors:
   - Primary: Gunmetal Gray #2B2F3A
@@ -179,6 +183,8 @@ points. The Foundry sheet also has a six-color team set.
 
 - **Sandstone Legion:** a Roman colosseum park with sandstone arcades, flaming braziers, statues, red banners and twin waterfalls.
 - **Tidal Reign, Harbor Stadium:** a nautical harbor with cliffs, waterfalls, a lighthouse and tall ships, a trident emblem.
+
+- **Pinecrest Loggers, Timberfall Park:** a mountain lumber town with waterfalls, a sawmill wheel, a log crane, timber stacks and pines.
 
 Owner's rule: new clubs and parks are noted here for later; the eleven listed parks come first. The Vault (the Safecrackers' dome) sheet hasn't come yet.
 
