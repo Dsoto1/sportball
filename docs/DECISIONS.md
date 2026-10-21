@@ -694,7 +694,7 @@ Reason: Owner request that each team have its own unique stadium; with 11 parks 
 
 Affected systems: generate_teams (league table, roster builder), data/teams (9 new), generate_parks (home blurbs), ContentLibrary, MatchDirector (club and venue picker), tests (league), tools (league_report, swing_report), README, STADIUM_REFS.
 
-## Batting stances calibrated to Statcast
+## 2026-10-21 - Batting Stances Calibrated to Statcast
 
 The six styles' feet come from Baseball Savant's batting-stance tracking (229 MLB hitters), not from eyeballed numbers. One table drives every phase: `BattingStyles.FEET` (width, open angle, stride).
 
