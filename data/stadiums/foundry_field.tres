@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="StadiumDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="1_db2jj"]
+
+[resource]
+script = ExtResource("1_db2jj")
+id = &"foundry_field"
+display_name = "Foundry Field"
+seat_color = Color(0.41960785, 0.22745098, 0.13333334, 1)
+seat_color_alt = Color(0.30980393, 0.16862746, 0.09803922, 1)
+structure_color = Color(0.5411765, 0.49019608, 0.4392157, 1)
+accent_color = Color(1, 0.5411765, 0.16470589, 1)
+outfield_wall_color = Color(0.11372549, 0.16470589, 0.2901961, 1)
+away_fan_share = 0.15
+attendance = 0.7
+sponsors = PackedStringArray("RIVET & SONS HARDWARE", "RUSTWATER FERRY", "SPROCKET DINER", "LUGNUT BREWS")
+skyline_color = Color(0.2901961, 0.2509804, 0.2509804, 1)
+window_color = Color(1, 0.7019608, 0.36078432, 1)

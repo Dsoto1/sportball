@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="StadiumDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="1_j5paa"]
+
+[resource]
+script = ExtResource("1_j5paa")
+id = &"halo_dome"
+display_name = "The Halo Dome"
+seat_color = Color(0.23921569, 0.14117648, 0.4, 1)
+seat_color_alt = Color(0.17254902, 0.101960786, 0.3019608, 1)
+structure_color = Color(0.56078434, 0.5411765, 0.6392157, 1)
+accent_color = Color(1, 0.7882353, 0.2901961, 1)
+outfield_wall_color = Color(0.16470589, 0.10980392, 0.30980393, 1)
+home_fan_share = 0.62
+attendance = 0.9
+halo = true
+sponsors = PackedStringArray("SPOTLIGHT COLA", "NEON HEIGHTS TRANSIT", "MARQUEE MOTORS", "VELVET ROPE LOUNGE", "GLAM SLAM GUM", "CRT VISION", "HEADLINER HOTELS", "ENCORE AIRWAYS")
+skyline_color = Color(0.16862746, 0.16470589, 0.32156864, 1)
+window_color = Color(1, 0.8235294, 0.47843137, 1)

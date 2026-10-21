@@ -398,3 +398,24 @@ Decision:
 Reason: The owner approved characters and animations for the first art pass. The capsules were the biggest visual gap.
 
 Affected systems: ActorView, MatchView (batter grip, twist, gloves), asset manifest, bot (mid-swing screenshots).
+
+## 2026-10-21 - The Halo Dome (First Stadium)
+
+Decision:
+- **Built in code** (`presentation/stadium/stadium.gd`) from a new `StadiumDef` resource (`data/stadiums/`, generated with the teams).
+- **Why no imported stadium:** signature stadium landmarks are custom work per `14_ASSET_SOURCES.md`, so no third-party stadium or prop assets were imported.
+- **Both parks have data:** the Glitterati's Halo Dome hosts this exhibition, and the Gearheads' Foundry Field is defined for later.
+- **Seating bowl:**
+  - A stepped bowl wraps the field: outfield bleachers above the wall and deeper foul-territory stands that curve in behind home, with aisles every 8°.
+  - A dark batter's eye replaces seats within 6° of center so the pitch stays readable.
+  - The stands stay behind the wall in fair territory and at least 24 m behind home (the batting camera sits 9 m back).
+- **Crowd:** about 14,000 billboard fans in one MultiMesh, shirts by home, away and neutral shares, drawn by a silhouette shader. They sway at rest and jump, with arms up, on big moments: `MatchView.cheer()` drives both the crowd and the roar.
+- **Scoreboard (right-center):** a live line score (a 9-inning window that scrolls in extras), R/H/E, ball-strike-out lamps and the batter, updated from MatchState.
+- **Field-level pieces:** dugouts in team colors (home on the third-base side), a backstop net, light towers and wall distance markers in feet that follow the wall's curve.
+- **Halo Dome identity:** a glowing halo ring 58 m up on four pylons, hung with boards for fictional sponsors (original names only), and a Neon Heights skyline with procedural windows.
+- **Cost:** about 105k bowl vertices, 14k fans, built in about 90 ms.
+- **`tools/stadium_tour.gd`** screenshots the landmarks.
+
+Reason: Owner request to build the stadium. The roadmap's Phase 1 asks for one graybox or modular stadium, and the art direction asks for a ballpark that is also a concert venue and an amusement park.
+
+Affected systems: StadiumDef, TeamDef.stadium_def, generate_teams, Stadium, crowd and skyline shaders, MatchView (stadium, cheer, scoreboard), MatchDirector, tests.

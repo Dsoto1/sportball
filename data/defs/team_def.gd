@@ -12,6 +12,8 @@ extends Resource
 @export var accent_color: Color = Color.GRAY
 @export var mascot: String
 @export var stadium: String
+## Look of the home park (presentation only).
+@export var stadium_def: StadiumDef
 @export_multiline var identity: String
 @export var rival: StringName
 

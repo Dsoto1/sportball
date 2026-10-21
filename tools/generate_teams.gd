@@ -37,6 +37,11 @@ const TEAMS := [
 		],
 		"order": [&"rwg_calloway", &"rwg_brightwater", &"rwg_paskett", &"rwg_mahoney", &"rwg_inkwell", &"rwg_corrigan", &"rwg_varga", &"rwg_mott", &"rwg_ferrow"],
 		"lineup_positions": [&"cf", &"ss", &"2b", &"1b", &"3b", &"dh", &"lf", &"rf", &"c"],
+		"park": {"id": &"foundry_field", "display_name": "Foundry Field", "seat_color": Color("6b3a22"), "seat_color_alt": Color("4f2b19"),
+			"structure_color": Color("8a7d70"), "accent_color": Color("ff8a2a"), "outfield_wall_color": Color("1d2a4a"),
+			"home_fan_share": 0.6, "away_fan_share": 0.15, "attendance": 0.7, "halo": false,
+			"sponsors": (["RIVET & SONS HARDWARE", "RUSTWATER FERRY", "SPROCKET DINER", "LUGNUT BREWS"]),
+			"skyline_color": Color("4a4040"), "window_color": Color("ffb35c")},
 		"ai": {"swing_aggression": 0.95, "chase_scale": 0.75, "power_swing_rate": 0.36, "runner_aggression": 0.2, "edge_bias_scale": 1.1, "bullpen_hook": 0.55, "steal_rate": 2.5, "bunt_rate": 0.7},
 	},
 	{
@@ -69,6 +74,11 @@ const TEAMS := [
 		],
 		"order": [&"nhg_i_dont_care", &"nhg_because", &"nhg_who", &"nhg_vandermeer", &"nhg_lux", &"nhg_i_dont_know", &"nhg_why", &"nhg_what", &"nhg_today"],
 		"lineup_positions": [&"ss", &"cf", &"1b", &"rf", &"dh", &"3b", &"lf", &"2b", &"c"],
+		"park": {"id": &"halo_dome", "display_name": "The Halo Dome", "seat_color": Color("3d2466"), "seat_color_alt": Color("2c1a4d"),
+			"structure_color": Color("8f8aa3"), "accent_color": Color("ffc94a"), "outfield_wall_color": Color("2a1c4f"),
+			"home_fan_share": 0.62, "away_fan_share": 0.12, "attendance": 0.9, "halo": true,
+			"sponsors": (["SPOTLIGHT COLA", "NEON HEIGHTS TRANSIT", "MARQUEE MOTORS", "VELVET ROPE LOUNGE", "GLAM SLAM GUM", "CRT VISION", "HEADLINER HOTELS", "ENCORE AIRWAYS"]),
+			"skyline_color": Color("2b2a52"), "window_color": Color("ffd27a")},
 		"ai": {"swing_aggression": 1.1, "chase_scale": 1.3, "power_swing_rate": 0.43, "runner_aggression": -0.1, "edge_bias_scale": 0.9, "bullpen_hook": 0.8, "steal_rate": 0.5, "bunt_rate": 0.25},
 	},
 ]
@@ -111,6 +121,13 @@ func _init() -> void:
 			team.bullpen.append(t["pitchers"][i][0])
 		for key in t["ai"]:
 			team.set(key, t["ai"][key])
+		if t.has("park"):
+			var park := StadiumDef.new()
+			for key in t["park"]:
+				var value: Variant = t["park"][key]
+				park.set(key, PackedStringArray(value) if key == "sponsors" else value)
+			ResourceSaver.save(park, "res://data/stadiums/%s.tres" % park.id)
+			team.stadium_def = load("res://data/stadiums/%s.tres" % park.id)
 		var path := "res://data/teams/%s.tres" % team.id
 		var err := ResourceSaver.save(team, path)
 		print("%s -> %s (%s)" % [team.full_name(), path, error_string(err)])

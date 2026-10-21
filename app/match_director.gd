@@ -135,7 +135,7 @@ func _process_pregame() -> void:
 	user_team = pick
 	_hud.show_card([])
 	_view.sfx.play(&"ui_confirm")
-	_view.sfx.cheer(0.5)
+	_view.cheer(0.5)
 	var hint := "You bat first: swing as the white ring closes on the plate" if pick == MatchState.AWAY else "You pitch first: aim, then stop the meter in the white band"
 	_hud.show_callout("PLAY BALL", "You are the %s. %s" % [roster.teams[pick].full_name(), hint], 3.0)
 	_enter_pre_pitch()
@@ -234,6 +234,7 @@ func _process(delta: float) -> void:
 			pass
 	_drain_events()
 	_hud.show_state(state, user_team)
+	_view.update_scoreboard(state)
 	_update_debug()
 
 
@@ -676,17 +677,17 @@ func _drain_events() -> void:
 		_debug.push_event(event)
 		match event.type:
 			DomainEvent.PLATE_APPEARANCE_ENDED:
-				_view.sfx.cheer(CROWD.get(event.data["result"], 0.0))
+				_view.cheer(CROWD.get(event.data["result"], 0.0))
 				if event.data["result"] == &"strikeout":
 					_hud.show_callout("STRUCK OUT", _timing_detail())
 				elif event.data["result"] == &"walk":
 					_hud.show_callout("WALK")
 			DomainEvent.RUN_SCORED:
-				_view.sfx.cheer(0.75)
+				_view.cheer(0.75)
 			DomainEvent.STOLEN_BASE:
-				_view.sfx.cheer(0.4)
+				_view.cheer(0.4)
 			DomainEvent.PICKED_OFF, DomainEvent.CAUGHT_STEALING:
-				_view.sfx.cheer(0.5)
+				_view.cheer(0.5)
 			DomainEvent.HALF_INNING_ENDED:
 				_hud.show_callout("SIDE RETIRED", "%d run%s" % [event.data["runs"], "" if event.data["runs"] == 1 else "s"])
 			DomainEvent.SUBSTITUTION:

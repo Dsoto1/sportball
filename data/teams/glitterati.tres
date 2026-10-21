@@ -1,10 +1,11 @@
 [gd_resource type="Resource" script_class="TeamDef" format=3]
 
-[ext_resource type="Script" path="res://data/defs/player_def.gd" id="1_6bpj7"]
-[ext_resource type="Script" path="res://data/defs/team_def.gd" id="2_spcjn"]
+[ext_resource type="Script" path="res://data/defs/player_def.gd" id="1_spcjn"]
+[ext_resource type="Script" path="res://data/defs/team_def.gd" id="2_ig2kl"]
+[ext_resource type="Resource" path="res://data/stadiums/halo_dome.tres" id="3_utsep"]
 
-[sub_resource type="Resource" id="Resource_ig2kl"]
-script = ExtResource("1_6bpj7")
+[sub_resource type="Resource" id="Resource_pcwrs"]
+script = ExtResource("1_spcjn")
 id = &"nhg_i_dont_care"
 display_name = "I Don't Care"
 nickname = "Velvet"
@@ -17,8 +18,8 @@ speed = 76
 arm = 70
 glove = 66
 
-[sub_resource type="Resource" id="Resource_utsep"]
-script = ExtResource("1_6bpj7")
+[sub_resource type="Resource" id="Resource_0p3a3"]
+script = ExtResource("1_spcjn")
 id = &"nhg_because"
 display_name = "Because"
 nickname = "Flashbulb"
@@ -32,8 +33,8 @@ speed = 85
 arm = 64
 glove = 62
 
-[sub_resource type="Resource" id="Resource_pcwrs"]
-script = ExtResource("1_6bpj7")
+[sub_resource type="Resource" id="Resource_fji72"]
+script = ExtResource("1_spcjn")
 id = &"nhg_who"
 display_name = "Who"
 nickname = "The Marquee"
@@ -47,8 +48,8 @@ eye = 60
 speed = 36
 glove = 52
 
-[sub_resource type="Resource" id="Resource_0p3a3"]
-script = ExtResource("1_6bpj7")
+[sub_resource type="Resource" id="Resource_nj2fp"]
+script = ExtResource("1_spcjn")
 id = &"nhg_vandermeer"
 display_name = "Roxy Vandermeer"
 nickname = "Encore"
@@ -61,8 +62,8 @@ speed = 55
 arm = 76
 glove = 58
 
-[sub_resource type="Resource" id="Resource_fji72"]
-script = ExtResource("1_6bpj7")
+[sub_resource type="Resource" id="Resource_6xho3"]
+script = ExtResource("1_spcjn")
 id = &"nhg_lux"
 display_name = "Bruno Lux"
 nickname = "Penthouse"
@@ -74,8 +75,8 @@ speed = 30
 arm = 45
 glove = 40
 
-[sub_resource type="Resource" id="Resource_nj2fp"]
-script = ExtResource("1_6bpj7")
+[sub_resource type="Resource" id="Resource_6jpy8"]
+script = ExtResource("1_spcjn")
 id = &"nhg_i_dont_know"
 display_name = "I Don't Know"
 nickname = "Paparazzi"
@@ -88,8 +89,8 @@ speed = 48
 arm = 72
 glove = 60
 
-[sub_resource type="Resource" id="Resource_6xho3"]
-script = ExtResource("1_6bpj7")
+[sub_resource type="Resource" id="Resource_k4ys7"]
+script = ExtResource("1_spcjn")
 id = &"nhg_why"
 display_name = "Why"
 nickname = "Silver Screen"
@@ -104,8 +105,8 @@ speed = 60
 arm = 58
 glove = 56
 
-[sub_resource type="Resource" id="Resource_6jpy8"]
-script = ExtResource("1_6bpj7")
+[sub_resource type="Resource" id="Resource_05lvy"]
+script = ExtResource("1_spcjn")
 id = &"nhg_what"
 display_name = "What"
 nickname = "Sequins"
@@ -118,8 +119,8 @@ speed = 68
 arm = 60
 glove = 64
 
-[sub_resource type="Resource" id="Resource_k4ys7"]
-script = ExtResource("1_6bpj7")
+[sub_resource type="Resource" id="Resource_71x34"]
+script = ExtResource("1_spcjn")
 id = &"nhg_today"
 display_name = "Today"
 nickname = "Red Carpet"
@@ -132,8 +133,8 @@ speed = 32
 arm = 68
 glove = 58
 
-[sub_resource type="Resource" id="Resource_05lvy"]
-script = ExtResource("1_6bpj7")
+[sub_resource type="Resource" id="Resource_fpb3s"]
+script = ExtResource("1_spcjn")
 id = &"nhg_sato"
 display_name = "Remy Sato"
 nickname = "Spotlight"
@@ -147,8 +148,8 @@ speed = 66
 arm = 60
 glove = 56
 
-[sub_resource type="Resource" id="Resource_71x34"]
-script = ExtResource("1_6bpj7")
+[sub_resource type="Resource" id="Resource_kkpbi"]
+script = ExtResource("1_spcjn")
 id = &"nhg_belmonte"
 display_name = "Coco Belmonte"
 nickname = "Champagne"
@@ -160,8 +161,8 @@ speed = 58
 arm = 64
 glove = 60
 
-[sub_resource type="Resource" id="Resource_fpb3s"]
-script = ExtResource("1_6bpj7")
+[sub_resource type="Resource" id="Resource_l55ut"]
+script = ExtResource("1_spcjn")
 id = &"nhg_halloran"
 display_name = "Fritz Halloran"
 nickname = "Velvet Rope"
@@ -174,8 +175,8 @@ speed = 28
 arm = 62
 glove = 52
 
-[sub_resource type="Resource" id="Resource_kkpbi"]
-script = ExtResource("1_6bpj7")
+[sub_resource type="Resource" id="Resource_4vses"]
+script = ExtResource("1_spcjn")
 id = &"nhg_tomorrow"
 display_name = "Tomorrow"
 nickname = "Headliner"
@@ -191,8 +192,8 @@ stuff = 66
 stamina = 70
 pitches = Array[StringName]([&"fastball", &"slider", &"splitter", &"showstopper"])
 
-[sub_resource type="Resource" id="Resource_l55ut"]
-script = ExtResource("1_6bpj7")
+[sub_resource type="Resource" id="Resource_4d3g8"]
+script = ExtResource("1_spcjn")
 id = &"nhg_crisp"
 display_name = "Monty Crisp"
 nickname = "Cue Card"
@@ -211,8 +212,8 @@ stuff = 66
 stamina = 40
 pitches = Array[StringName]([&"fastball", &"curveball", &"changeup"])
 
-[sub_resource type="Resource" id="Resource_4vses"]
-script = ExtResource("1_6bpj7")
+[sub_resource type="Resource" id="Resource_im68u"]
+script = ExtResource("1_spcjn")
 id = &"nhg_kahn"
 display_name = "Desiree Kahn"
 nickname = "Standing Ovation"
@@ -228,8 +229,8 @@ control = 48
 stuff = 60
 stamina = 38
 
-[sub_resource type="Resource" id="Resource_4d3g8"]
-script = ExtResource("1_6bpj7")
+[sub_resource type="Resource" id="Resource_n8d2q"]
+script = ExtResource("1_spcjn")
 id = &"nhg_platinum"
 display_name = "Ziggy Platinum"
 nickname = "Glam Slam"
@@ -247,8 +248,8 @@ stuff = 72
 stamina = 36
 pitches = Array[StringName]([&"sinker", &"slider", &"curveball"])
 
-[sub_resource type="Resource" id="Resource_im68u"]
-script = ExtResource("1_6bpj7")
+[sub_resource type="Resource" id="Resource_mqoub"]
+script = ExtResource("1_spcjn")
 id = &"nhg_gloss"
 display_name = "Maximilian Gloss"
 nickname = "The Finale"
@@ -265,7 +266,7 @@ stamina = 28
 pitches = Array[StringName]([&"fastball", &"splitter"])
 
 [resource]
-script = ExtResource("2_spcjn")
+script = ExtResource("2_ig2kl")
 id = &"glitterati"
 city = "Neon Heights"
 team_name = "Glitterati"
@@ -275,9 +276,10 @@ secondary_color = Color(0.8509804, 0.6627451, 0.22745098, 1)
 accent_color = Color(0.95686275, 0.94509804, 0.98039216, 1)
 mascot = "Monsieur Marquee, a top-hatted spotlight"
 stadium = "The Halo Dome"
+stadium_def = ExtResource("3_utsep")
 identity = "Glamorous sky-city darlings everyone loves to hate. Power, home runs and bat flips, bought with big contracts. Celebrity showboating: fireworks on every homer and a red-carpet entrance. Their lineup is a running vaudeville act: Who plays first, What is on second, I Don't Know is on third, Why in left, Because in center, Tomorrow pitches and Today catches. Nobody has ever named the right fielder."
 rival = &"gearheads"
-roster = Array[ExtResource("1_6bpj7")]([SubResource("Resource_ig2kl"), SubResource("Resource_utsep"), SubResource("Resource_pcwrs"), SubResource("Resource_0p3a3"), SubResource("Resource_fji72"), SubResource("Resource_nj2fp"), SubResource("Resource_6xho3"), SubResource("Resource_6jpy8"), SubResource("Resource_k4ys7"), SubResource("Resource_05lvy"), SubResource("Resource_71x34"), SubResource("Resource_fpb3s"), SubResource("Resource_kkpbi"), SubResource("Resource_l55ut"), SubResource("Resource_4vses"), SubResource("Resource_4d3g8"), SubResource("Resource_im68u")])
+roster = Array[ExtResource("1_spcjn")]([SubResource("Resource_pcwrs"), SubResource("Resource_0p3a3"), SubResource("Resource_fji72"), SubResource("Resource_nj2fp"), SubResource("Resource_6xho3"), SubResource("Resource_6jpy8"), SubResource("Resource_k4ys7"), SubResource("Resource_05lvy"), SubResource("Resource_71x34"), SubResource("Resource_fpb3s"), SubResource("Resource_kkpbi"), SubResource("Resource_l55ut"), SubResource("Resource_4vses"), SubResource("Resource_4d3g8"), SubResource("Resource_im68u"), SubResource("Resource_n8d2q"), SubResource("Resource_mqoub")])
 batting_order = Array[StringName]([&"nhg_i_dont_care", &"nhg_because", &"nhg_who", &"nhg_vandermeer", &"nhg_lux", &"nhg_i_dont_know", &"nhg_why", &"nhg_what", &"nhg_today"])
 lineup_positions = Array[StringName]([&"ss", &"cf", &"1b", &"rf", &"dh", &"3b", &"lf", &"2b", &"c"])
 starting_pitcher = &"nhg_tomorrow"

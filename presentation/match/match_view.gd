@@ -21,6 +21,8 @@ var tuning: BaseballTuning
 var debug_visible := true
 
 var _field: GrayboxField
+## The home team's park around the field (null until a roster is set).
+var _stadium: Stadium
 var _camera: Camera3D
 var _camera_mode := CameraMode.BAT
 var _ball: MeshInstance3D
@@ -638,6 +640,27 @@ func set_throw_target(base: int) -> void:
 
 func set_roster(roster: MatchRoster) -> void:
 	_roster = roster
+	var home := roster.teams[MatchState.HOME]
+	if _stadium != null:
+		_stadium.queue_free()
+		_stadium = null
+	if home.stadium_def != null:
+		_stadium = Stadium.new()
+		_stadium.name = "Stadium"
+		add_child(_stadium)
+		_stadium.build(tuning, home.stadium_def, home, roster.teams[MatchState.AWAY])
+
+
+## The crowd reacts to a moment (0..1): the roar and the fans jumping.
+func cheer(level: float) -> void:
+	sfx.cheer(level)
+	if _stadium != null:
+		_stadium.cheer(level)
+
+
+func update_scoreboard(state: MatchState) -> void:
+	if _stadium != null:
+		_stadium.update_scoreboard(state, _roster)
 
 
 func _batter_spot() -> Vector3:

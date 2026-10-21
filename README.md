@@ -4,7 +4,8 @@ Stylized retro-futurist arcade baseball. **Godot 4.7.2 stable + GDScript.**
 The design brief lives in [`docs/`](docs/00_AGENT_START_HERE.md); start there.
 
 Current state: **Phase 1 — Baseball Vertical Slice**, with a first art pass
-(rigged players, field surfaces, fonts, button icons, sound and crowd;
+(rigged players, the Halo Dome stadium with a reactive crowd and live
+scoreboard, field surfaces, fonts, button icons and sound;
 every third-party asset is in `docs/13_ASSET_MANIFEST.md`). A 6-inning
 exhibition between the **Rustwater Gearheads** and the **Neon Heights
 Glitterati** (yes, Who's on first) under arcade rules. See [`docs/PHASE1_REPORT.md`](docs/PHASE1_REPORT.md)
@@ -175,6 +176,7 @@ resources in `data/pitches/`.
 godot --headless --path . -s res://tools/sim_report.gd -- 100 1           # AI-vs-AI rates over 100 matches
 godot --headless --path . -s res://tools/launch_angle_report.gd           # hit rate by launch angle
 godot --headless --path . -s res://tools/pitch_report.gd -- 300 1         # usage and results per pitch type
+godot --path . --resolution 1280x720 -s res://tools/stadium_tour.gd -- /tmp/shots   # screenshots of the stadium
 godot --headless --path . --fixed-fps 60 -s res://tools/playtest_bot.gd -- 900   # drive the real scene with fake input (append `"" home` to field first)
 ```
 
