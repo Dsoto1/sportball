@@ -2,13 +2,18 @@
 
 ## Instructions for the image agent
 
-Using this document, generate **11 separate images, one per park** in
-"Park blocks" below. For each image, combine the "Shared block" with that
-park's block. Do not put several parks in one image, and do not render any
-of this document's text, headings or labels into the images. Name each
-image after its park, numbered as listed (for example `01_halo_dome.png`,
-`02_foundry_field.png`, … `11_the_vault.png`). Skip the "Optional extra
-shots" unless asked.
+Using this document, make **11 reference sheets, one per park** in "Park
+blocks" below. Each sheet combines the "Shared block", the "Sheet layout",
+the "Shared kit" and that park's block. Do not put several parks on one
+sheet. Name each sheet after its park, numbered as listed (for example
+`01_halo_dome.png`, `02_foundry_field.png`, … `11_the_vault.png`).
+
+**Continuity matters more than variety.** The game builds every park from
+the same set of parts, so all 11 sheets must clearly be the same kinds of
+pieces restyled: same camera views, the same field, the same stand
+structure, and landmarks chosen from the shared kit. What changes between
+parks is the materials, colors, emblem, the number and size of parts, and
+the park's one signature piece.
 
 ## About these prompts
 
@@ -36,6 +41,74 @@ Prompts for one reference image per ballpark in `tools/generate_parks.gd`.
 > No real team names, logos, sponsors or real stadium likeness. Any
 > signage uses invented brand names in simple shapes, no readable small
 > text.
+
+## Sheet layout (identical on every sheet)
+
+A 3:2 sheet with a title strip and ten labeled panels in this order. Every
+sheet uses the same camera position and lens for each panel, so panel 3
+of one park can be compared with panel 3 of another.
+
+1. **Establishing view:** high behind home plate, the whole field, stands and what is beyond the outfield (the large top-left panel).
+2. **Main scoreboard:** front-on: park name, both clubs' line scores (innings 1-9, R H E), the batter's portrait, number, name, position, AVG/HR/RBI, ball/strike/out dots and a base diamond.
+3. **From the pitcher's mound:** looking in at home plate, the backstop and the stands behind it.
+4. **Home plate close-up:** low, looking out to center field.
+5. **First-base view:** from first base, looking down the right-field line to the foul pole.
+6. **Third-base view:** from third base, looking down the left-field line to the foul pole.
+7. **Outfield wall and centerpiece:** front-on to center field: the wall, its distance plaques, the batter's eye and the centerpiece.
+8. **Home dugout:** front-on, in the home club's colors and emblem.
+9. **Away dugout:** front-on, the same structure in neutral colors with the visitors' emblem on a banner.
+10. **Press box:** the announcer's booth behind home, from outside.
+
+Bottom strip: the club's emblem, name, a one-line identity, four color swatches (primary, secondary, accent, dark) and a one-line stadium theme.
+
+## Shared kit (every park is built from these)
+
+**Every park has, restyled in its materials:**
+
+- **The field:** mowed grass stripes (or turf at the Vault), brown dirt infield, white lines and bases, the same dimensions look.
+- **Stands:** tiered decks (1 to 3, by park) wrapping from foul pole to foul pole behind home, each deck with a glowing fascia band along its front carrying club wordmarks. Lower bleachers in the outfield.
+- **Outfield wall:** padded, iron, brick or ivy, with emblem and wordmark panels, distances on dark plaques, yellow foul poles.
+- **Batter's eye:** a dark, plain block in straightaway center (hedge, panels or glass).
+- **Main scoreboard:** the same layout and stat set everywhere, framed in the park's materials with the emblem on top.
+- **Video board:** a second, smaller screen near the centerpiece showing the batter.
+- **Dugouts:** the same shape at every park: bat rack, helmet shelves, a lit roof edge, the emblem on the back wall.
+- **Press box:** a glass booth behind home with the emblem above.
+- **Light banks:** on towers (outdoor parks) or hung from the roof (the Vault).
+
+**Optional kit pieces, each park picks a few:**
+
+- **Centerpiece:** a video board, gate or arch in center.
+- **Waterfalls:** beside the centerpiece.
+- **Trees:** palms, pines or cacti behind the outfield.
+- **Banner flagpoles:** along the top of the stands.
+- **Truss canopies:** over the upper deck.
+- **Smokestacks:** with smoke.
+- **Cranes and lattice towers.**
+- **Water:** a bay, river or pools, with boats or a bridge.
+- **Airships:** in the sky.
+- **Halo ring.**
+- **Long warehouse.**
+- **Fountain pools.**
+- **Dome roof.**
+
+**Kit picks per park:**
+
+| Park | Decks | Centerpiece | Optional pieces | Signature |
+|---|---|---|---|---|
+| The Halo Dome | 3 | video board | waterfalls, palms, flagpoles, airships | the halo ring |
+| Foundry Field | 2 | iron gate | smokestacks, cranes, truss canopies, river and bridge | the Boilerplate wall |
+| Ledger Street Park | 2 | clock arch | flagpoles, truss canopies | the Leviathan wall and its hand scoreboard |
+| Pier 9 Ballyard | 2 | video board | flagpoles, palms | the bay with boats |
+| The Kiln | 2 | adobe arch | cacti, flagpoles | the canyon outfield |
+| The Icebox | 2 | video board | pines, flagpoles | the ivy walls |
+| Reactor Park | 3 | reactor gate | smokestacks (cooling towers), lattice towers | the center-field notch |
+| The Horseshoe | 2 | clock arch | flagpoles, truss canopies | the horseshoe double deck |
+| Warehouse Row | 2 | brick arch | flagpoles, lattice towers | the Roundhouse warehouse |
+| Fountain Gardens | 2 | video board | waterfalls, flagpoles | the fountain pools |
+| The Vault | 3 | video board | (indoors) | the dome roof |
+
+Each park keeps its wall shape, wall heights and signature from its park
+block below, even where a kit piece could hide them.
 
 ## Park blocks
 
