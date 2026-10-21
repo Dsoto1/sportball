@@ -202,10 +202,10 @@ static func approach_bat(style: StringName, a: float, clock: float) -> Vector2:
 ## Statcast-style "swing path tilt" (degrees, 0 flat, 90 vertical): how
 ## steep the plane the barrel travels in is on its way into contact, for a
 ## right-handed batter, measured from the bat path itself.
-static func swing_tilt(style: StringName) -> float:
+static func swing_tilt(style: StringName, profile: Dictionary = {}) -> float:
 	var start := approach_bat(style, 1.0, 0.0)
-	var d1 := direction(swing_bat(style, CONTACT_AT * 0.85, start))
-	var d2 := direction(swing_bat(style, CONTACT_AT, start))
+	var d1 := direction(swing_bat(style, CONTACT_AT * 0.85, start, profile))
+	var d2 := direction(swing_bat(style, CONTACT_AT, start, profile))
 	var n := d1.cross(d2).normalized()
 	return rad_to_deg(acos(clampf(absf(n.y), 0.0, 1.0)))
 
@@ -217,9 +217,28 @@ static func direction(bat: Vector2, side: float = 1.0) -> Vector3:
 	return Vector3(cos(e) * cos(y) * side, sin(e), cos(e) * sin(y))
 
 
+## How deep the barrel must drop into the slot for a style's swing to have
+## this tilt with these attack numbers (profile: attack_yaw, attack_lift).
+static func slot_for_tilt(style: StringName, tilt: float, profile: Dictionary = {}) -> float:
+	var lo := -5.0
+	var hi := -89.0
+	var probe := profile.duplicate()
+	for i in 24:
+		var mid := (lo + hi) * 0.5
+		probe["slot_lift"] = mid
+		if swing_tilt(style, probe) < tilt:
+			lo = mid
+		else:
+			hi = mid
+	return (lo + hi) * 0.5
+
+
 ## Bat (yaw, lift) through the swing (p = 0..1) from where it started.
-static func swing_bat(style: StringName, p: float, start: Vector2) -> Vector2:
-	var b: Dictionary = BAT[style]
+## profile (PlayerSwing) can override the style's attack_yaw, attack_lift
+## and slot_lift with a hitter's own.
+static func swing_bat(style: StringName, p: float, start: Vector2, profile: Dictionary = {}) -> Vector2:
+	var b: Dictionary = BAT[style].duplicate()
+	b.merge(profile, true)
 	p = clampf(p, 0.0, 1.0)
 	var attack := Vector2(float(b["attack_yaw"]), float(b["attack_lift"]))
 	if p < CONTACT_AT:

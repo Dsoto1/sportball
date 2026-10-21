@@ -627,3 +627,18 @@ Decision:
 Reason: Owner reference images of Statcast swing metrics.
 
 Affected systems: BattingStyles, tests, elbow_check (tip height).
+
+## 2026-10-21 - Every Hitter's Own Swing (Statcast Signatures)
+
+Decision:
+- **`PlayerSwing`:** each hitter has his own bat speed, attack angle, attack direction and swing path tilt.
+  - It starts from his style, then power adds bat speed and loft (high contact trims bat speed a little), plus a small fixed variation per player.
+  - It's clamped to the league's real range, per the owner's Baseball Savant references (`baseballsavant.mlb.com/leaderboard/bat-tracking/swing-path-attack-angle`): bat speed 62–81 mph, attack angle 0–20°, direction from 15° pull (Paredes) to 11° oppo (Turang), tilt 22–46°. League averages are 72 mph, 10°, 2° pull and 32°.
+- **The bat path follows it:** his slot depth is solved for his own tilt. A power swing is 3 mph faster and a contact swing 2 mph slower. Bat speed sets how fast the bat whips through the follow-through; contact still lands 60 ms after the press.
+- **Readout:** the contact callout reads like Savant, e.g. "· 104 mph, 22° · bat 76 mph, 9° attack" (exit velocity and launch angle, then this swing's bat speed and attack angle). The play recap shows mph, degrees and feet instead of m/s and meters. Physics stays SI.
+- **Presentation only:** where the ball goes is still decided by aim, timing and the contact model.
+- **Tool:** `tools/swing_report.gd` prints every hitter's signature.
+
+Reason: Owner's Statcast references (Vlad Jr., Paredes, Turang, Muncy, Langford, Hoskins, Ohtani) and the leaderboard: field variety for swings like player variety.
+
+Affected systems: PlayerSwing, BattingStyles (profile-aware path, slot for tilt), MatchView (profile, follow-through speed, readout), MatchDirector (power flag, readout, recap units), ContactFeedback (mph), tests, tools.

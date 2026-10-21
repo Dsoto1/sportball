@@ -204,6 +204,7 @@ godot --path . --resolution 360x420 -s res://tools/pose_gallery.gd -- /tmp/poses
 godot --path . --resolution 420x420 --fixed-fps 60 -s res://tools/batter_closeup.gd -- /tmp/b [swing <style> [flip]]   # the batter up close, a style's swing
 godot --headless --path . -s res://tools/foot_diagram_data.gd | grep '^{' > feet.json && python3 tools/draw_foot_diagram.py feet.json feet.png   # top-down foot placement per style
 godot --headless --path . -s res://tools/elbow_check.gd -- [lefty] [verbose <style>]   # how close elbows come to the body, per style
+godot --headless --path . -s res://tools/swing_report.gd   # every hitter's swing: style, bat speed, attack angle, direction, tilt
 godot --headless --path . --fixed-fps 60 -s res://tools/playtest_bot.gd -- 900   # drive the real scene with fake input (append `"" home` to field first)
 ```
 

@@ -485,7 +485,12 @@ func _show_contact_feedback(call_text: String) -> void:
 		head = call_text
 	elif call_text != "":
 		head = "%s %s" % [head, call_text]
-	_hud.show_callout(head, f["detail"], 2.2)
+	var detail: String = f["detail"]
+	# Statcast-style: what the bat did, next to what the ball did.
+	var readout := _view.swing_readout()
+	if not readout.is_empty() and _contact.swing_type != SwingIntent.Type.BUNT and _contact.outcome in [ContactResult.Outcome.IN_PLAY, ContactResult.Outcome.FOUL]:
+		detail += " · bat %d mph, %d° attack" % [roundi(readout["bat_speed"]), roundi(readout["attack_angle"])]
+	_hud.show_callout(head, detail, 2.2)
 	_view.contact_feedback(_pitch.location, f["tier"])
 	if _phase == Phase.BALL_IN_PLAY:
 		_hit_stop = HIT_STOP.get(f["tier"], 0.0)
@@ -497,7 +502,7 @@ func _resolve_swing(swing: SwingIntent) -> void:
 	if swing.type == SwingIntent.Type.BUNT:
 		_view.bunt_bat()
 	elif swing.type != SwingIntent.Type.NONE:
-		_view.swing_bat()
+		_view.swing_bat(swing.type == SwingIntent.Type.POWER)
 
 
 func _apply_call() -> String:
@@ -665,7 +670,8 @@ func _field_focus(t: float) -> Vector3:
 func _finish_play(outcome: PlayOutcome) -> void:
 	_outcome = outcome
 	_log({"outcome": _outcome.kind, "throws": _outcome.throws.map(func(leg: Dictionary) -> int: return leg["base"]), "runs": _outcome.runs.size(), "outs": _outcome.outs.size()})
-	var detail := "%.1f m/s  %d°  %.0f m" % [_contact.exit_velocity, roundi(_contact.launch_angle), _bip.trajectory.distance()]
+	# Savant units: exit velocity in mph, launch angle, distance in feet.
+	var detail := "%d mph  %d°  %d ft" % [roundi(_contact.exit_velocity * ContactFeedback.MPH), roundi(_contact.launch_angle), roundi(_bip.trajectory.distance() * 3.28084)]
 	var text := String(_outcome.kind).replace("_", " ").to_upper()
 	if _bip.is_pickoff():
 		text = "PICKED OFF!" if not _outcome.outs.is_empty() else "SAFE"

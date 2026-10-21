@@ -29,6 +29,10 @@ static func tier(contact: ContactResult) -> Tier:
 
 ## {headline, detail, tier}. headline is empty except for a sweet-spot hit
 ## (kept rare, per the UI brief); detail always explains the swing.
+## Meters per second to miles per hour (display only; physics stays SI).
+const MPH := 2.23694
+
+
 static func describe(contact: ContactResult, tuning: BaseballTuning) -> Dictionary:
 	var t := tier(contact)
 	var ms := roundi(contact.timing_offset * 1000.0)
@@ -51,7 +55,7 @@ static func describe(contact: ContactResult, tuning: BaseballTuning) -> Dictiona
 		var where := "toward third" if contact.spray_angle < -8.0 else ("toward first" if contact.spray_angle > 8.0 else "back to the pitcher")
 		var bunt_detail := "%s · %s" % [bunt, timing]
 		if contact.outcome == ContactResult.Outcome.IN_PLAY:
-			bunt_detail += " · %s, %.0f m/s" % [where, contact.exit_velocity]
+			bunt_detail += " · %s, %d mph" % [where, roundi(contact.exit_velocity * MPH)]
 		return {"headline": "", "detail": bunt_detail, "tier": Tier.MISS if contact.outcome != ContactResult.Outcome.IN_PLAY else Tier.OK}
 	var label: String = {
 		Tier.MISS: "MISSED",
@@ -65,5 +69,6 @@ static func describe(contact: ContactResult, tuning: BaseballTuning) -> Dictiona
 		headline = "CRUSHED!" if contact.swing_type == SwingIntent.Type.POWER else "BARRELED!"
 	var detail := "%s · %s · %s" % [label, timing, spot]
 	if t != Tier.MISS and contact.outcome == ContactResult.Outcome.IN_PLAY:
-		detail += " · %.0f m/s, %d°" % [contact.exit_velocity, roundi(contact.launch_angle)]
+		# Exit velocity and launch angle, in the units fans read them in.
+		detail += " · %d mph, %d°" % [roundi(contact.exit_velocity * MPH), roundi(contact.launch_angle)]
 	return {"headline": headline, "detail": detail, "tier": t}

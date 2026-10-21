@@ -73,6 +73,9 @@ var _pitch_u := -1.0
 var _bat_now := Vector2(100, 50)
 var _swing_from := Vector2(100, 50)
 var _contact_tier := 0
+## The batter's swing signature (PlayerSwing) and this swing's bat speed.
+var _swing_profile: Dictionary = {}
+var _swing_mph := 72.0
 var _trail_mesh: ImmediateMesh
 var _trail_points: Array = []
 var _trail_color := Color(1, 1, 1, 0.55)
@@ -203,6 +206,7 @@ func reset_for_pitch(state: MatchState) -> void:
 	_pitch_u = -1.0
 	_contact_tier = 0
 	batter.style = BattingStyles.for_player(hitter)
+	_swing_profile = PlayerSwing.for_player(hitter, batter.style)
 	set_aim_preview(false)
 	_windup = -1.0
 	_follow_start = -1.0
@@ -305,9 +309,10 @@ func contact_feedback(location: Vector2, tier: int) -> void:
 
 ## Plays the swing (on contact and on a miss alike): from his stride, the
 ## barrel reaches the zone CONTACT_AT into it, right on the press.
-func swing_bat() -> void:
+func swing_bat(power: bool = false) -> void:
 	_bat_swing_start = _view_clock
 	_swing_from = _bat_now
+	_swing_mph = PlayerSwing.swing_speed(_swing_profile, power) if not _swing_profile.is_empty() else PlayerSwing.LEAGUE_BAT_SPEED
 	_trail_color = Color(1, 1, 1, 0.55)
 
 
@@ -632,8 +637,8 @@ func _update_bat() -> void:
 		if batter != null:
 			batter.animate(ActorView.Pose.BUNT, delta)
 	elif _bat_swing_start >= 0.0:
-		var p := (_view_clock - _bat_swing_start) / SWING_TIME
-		bat = BattingStyles.swing_bat(style, p, _swing_from)
+		var p := _swing_progress()
+		bat = BattingStyles.swing_bat(style, p, _swing_from, _swing_profile)
 		one_hand = bool(BattingStyles.BAT[style]["one_hand"]) and p > BattingStyles.ONE_HAND_RELEASE
 		if batter != null:
 			batter.animate(ActorView.Pose.SWING, delta, 0.0, false, p)
@@ -655,6 +660,23 @@ func _update_bat() -> void:
 		_bat_pivot.position = _batter_spot() + Vector3(0.3 * side, 1.0, 0.05)
 		_bat_pivot.look_at(_bat_pivot.global_position + dir, Vector3.UP)
 	_update_trail()
+
+
+## Swing clock (0..1): contact always lands CONTACT_AT in, on the press's
+## timing; after it a faster bat whips through the follow-through sooner.
+func _swing_progress() -> float:
+	var t := _view_clock - _bat_swing_start
+	var at := SWING_TIME * BattingStyles.CONTACT_AT
+	if t <= at:
+		return t / SWING_TIME
+	return BattingStyles.CONTACT_AT + (t - at) / SWING_TIME * (_swing_mph / PlayerSwing.LEAGUE_BAT_SPEED)
+
+
+## The last swing in Statcast terms: {bat_speed mph, attack_angle deg}.
+func swing_readout() -> Dictionary:
+	if _swing_profile.is_empty():
+		return {}
+	return {"bat_speed": _swing_mph, "attack_angle": float(_swing_profile["attack_lift"])}
 
 
 ## The barrel's swoosh: a ribbon through the last few spots of the bat,

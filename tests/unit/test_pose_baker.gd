@@ -226,3 +226,26 @@ func test_baked_elbows_stay_out_of_the_body() -> void:
 			var c := minf(PoseBaker.torso_clearance(elbow, torso), PoseBaker.torso_clearance((elbow + wrist) * 0.5, torso))
 			check(c > 0.6, "%s: %s elbow/forearm off the body (%.2f)" % [name, side, c])
 	model.free()
+
+
+func test_every_hitter_has_his_own_swing_in_league_range() -> void:
+	var seen := {}
+	for team_id: StringName in [&"gearheads", &"glitterati"]:
+		var team := content().team(team_id)
+		for p: PlayerDef in team.roster:
+			var style := BattingStyles.for_player(p)
+			var s := PlayerSwing.for_player(p, style)
+			check(s["bat_speed"] >= PlayerSwing.BAT_SPEED.x and s["bat_speed"] <= PlayerSwing.BAT_SPEED.y, "%s bat speed in range" % p.id)
+			check(s["attack_lift"] >= 0.0 and s["attack_lift"] <= 20.0, "%s attack angle in range" % p.id)
+			check_near(BattingStyles.swing_tilt(style, s), float(s["tilt"]), 1.0, "%s: his slot gives his tilt" % p.id)
+			seen["%.1f" % s["attack_lift"]] = true
+	check(seen.size() > 8, "hitters swing differently (%d distinct attack angles)" % seen.size())
+	var slugger := PlayerDef.new()
+	slugger.id = &"x_big"
+	slugger.power = 95
+	var slapper := PlayerDef.new()
+	slapper.id = &"x_small"
+	slapper.power = 25
+	check(PlayerSwing.for_player(slugger, &"classic")["bat_speed"] > PlayerSwing.for_player(slapper, &"classic")["bat_speed"], "power swings the bat faster")
+	var profile := PlayerSwing.for_player(slugger, &"classic")
+	check(PlayerSwing.swing_speed(profile, true) > PlayerSwing.swing_speed(profile, false), "a power swing is faster than a contact swing")
