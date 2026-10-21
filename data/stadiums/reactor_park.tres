@@ -67,6 +67,15 @@ params = {
 "span": 100.0
 }
 
+[sub_resource type="Resource" id="Resource_3c86f"]
+script = ExtResource("2_smn81")
+kind = &"water"
+angle = 25.0
+params = {
+"distance": 200.0,
+"width": 55.0
+}
+
 [resource]
 script = ExtResource("3_d8aau")
 id = &"reactor_park"
@@ -87,4 +96,4 @@ night = true
 sponsors = PackedStringArray("ATOMIC FALLS POWER & LIGHT", "MUSHROOM CLOUD MALTS", "FISSION FIZZ", "RAY-GUN RADIO")
 skyline_color = Color(0.23921569, 0.24705882, 0.18039216, 1)
 window_color = Color(0.78431374, 1, 0.84705883, 1)
-pieces = Array[ExtResource("2_smn81")]([SubResource("Resource_f7572"), SubResource("Resource_mr6iu"), SubResource("Resource_lexrw"), SubResource("Resource_ubcck"), SubResource("Resource_pc4ek"), SubResource("Resource_6tw7a"), SubResource("Resource_rqh0y"), SubResource("Resource_5b7v7")])
+pieces = Array[ExtResource("2_smn81")]([SubResource("Resource_f7572"), SubResource("Resource_mr6iu"), SubResource("Resource_lexrw"), SubResource("Resource_ubcck"), SubResource("Resource_pc4ek"), SubResource("Resource_6tw7a"), SubResource("Resource_rqh0y"), SubResource("Resource_5b7v7"), SubResource("Resource_3c86f")])

@@ -66,6 +66,16 @@ params = {
 "span": 100.0
 }
 
+[sub_resource type="Resource" id="Resource_yath7"]
+script = ExtResource("2_un8dc")
+kind = &"water"
+params = {
+"gap": 24.0,
+"glow": 1.2,
+"style": &"moat",
+"width": 12.0
+}
+
 [resource]
 script = ExtResource("3_bqeas")
 id = &"halo_dome"
@@ -83,4 +93,4 @@ attendance = 0.9
 sponsors = PackedStringArray("SPOTLIGHT COLA", "NEON HEIGHTS TRANSIT", "MARQUEE MOTORS", "VELVET ROPE LOUNGE", "GLAM SLAM GUM", "CRT VISION", "HEADLINER HOTELS", "ENCORE AIRWAYS")
 skyline_color = Color(0.16862746, 0.16470589, 0.32156864, 1)
 window_color = Color(1, 0.8235294, 0.47843137, 1)
-pieces = Array[ExtResource("2_un8dc")]([SubResource("Resource_fwpx2"), SubResource("Resource_8s2kh"), SubResource("Resource_rkpyr"), SubResource("Resource_rkhve"), SubResource("Resource_iofs5"), SubResource("Resource_5ix5a"), SubResource("Resource_6b8ye"), SubResource("Resource_mt3jj"), SubResource("Resource_ejy07"), SubResource("Resource_pjoj3")])
+pieces = Array[ExtResource("2_un8dc")]([SubResource("Resource_fwpx2"), SubResource("Resource_8s2kh"), SubResource("Resource_rkpyr"), SubResource("Resource_rkhve"), SubResource("Resource_iofs5"), SubResource("Resource_5ix5a"), SubResource("Resource_6b8ye"), SubResource("Resource_mt3jj"), SubResource("Resource_ejy07"), SubResource("Resource_pjoj3"), SubResource("Resource_yath7")])

@@ -79,6 +79,14 @@ const CATALOG := {
 		"params": {"span": [26.0, 8.0, 40.0], "basins": [10, 2, 16]},
 		"script": preload("res://presentation/stadium/modules/fountains_module.gd"),
 	},
+	&"water": {
+		"name": "Water", "category": &"backdrop", "unique": false, "placed": true,
+		"about": "A river (a straight band across the angle, distance m out) or a moat (gap m behind the stands, across span degrees; wide for harbor water). Glow lights it like a neon canal.",
+		"angle": 0.0, "angle_range": [-180.0, 180.0],
+		"params": {"style": [&"river"], "distance": [200.0, 60.0, 600.0], "width": [60.0, 6.0, 500.0], "gap": [12.0, 0.0, 120.0], "span": [360.0, -360.0, 360.0], "glow": [0.0, 0.0, 3.0]},
+		"choices": {"style": [&"river", &"moat"]},
+		"script": preload("res://presentation/stadium/modules/water_module.gd"),
+	},
 	&"waterfalls": {
 		"name": "Waterfall", "category": &"scenery", "unique": false, "placed": true,
 		"about": "A waterfall behind the outfield stands spilling into a pool. Mirror it to flank the centerpiece.",
@@ -151,7 +159,7 @@ const CATALOG := {
 		"name": "Bridge", "category": &"scenery", "unique": false, "placed": true,
 		"about": "A long arched bridge across the river behind the stands.",
 		"angle": 35.0, "angle_range": [-180.0, 180.0],
-		"params": {"distance": [110.0, 50.0, 300.0], "length": [220.0, 100.0, 400.0]},
+		"params": {"distance": [110.0, 30.0, 300.0], "length": [220.0, 60.0, 400.0]},
 		"script": preload("res://presentation/stadium/modules/bridge_module.gd"),
 	},
 	&"dome": {

@@ -107,6 +107,11 @@ points. The Foundry sheet also has a six-color team set.
   - statues (the Bankers' bulls);
   - a bridge over a river.
 - Each park picks from these per its sheet or the kit table.
+- Water from the aerial panels:
+  - the Halo Dome: glowing canals around the plaza;
+  - Foundry: a river behind the outfield with its bridge;
+  - Ledger Street: a canal along the first-base side with a small bridge;
+  - Pier 9: harbor water on every side but behind left-center.
 
 ## What to build
 

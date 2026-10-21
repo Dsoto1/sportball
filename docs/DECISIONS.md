@@ -804,3 +804,32 @@ Every park also has flags. The parks without sheets are drafts.
 Reason: Owner reference sheets; build the shared scenery now so later sheets mostly pick and tune.
 
 Affected systems: modules (ten new, Scenery helper), StadiumModules catalog, generate_parks, data/stadiums, README, stadium_refs notes.
+
+## 2026-10-21 - Water Around the Parks
+
+The sheets' aerial panels show water around several parks. A `water` module now covers it:
+
+- **River:** a straight band across an angle, with its near bank a set distance out.
+- **Moat:** a band a set gap behind the stands, across any span (a full ring, or very wide for open harbor).
+- **Glow:** optional. A faint glow by day, lit up at night.
+
+It sits over the ground beyond the stands and never under them (tested). Bridges now run out from the park and center themselves on a river at their angle.
+
+Judgment per park:
+
+| Park | Water | Why |
+|---|---|---|
+| The Halo Dome | a glowing canal ring | sheet: neon canals around the plaza |
+| Foundry Field | a river behind the outfield, the bridge over it | sheet: riverfront |
+| Ledger Street Park | a canal along the first-base side, a small bridge | sheet |
+| Pier 9 Ballyard | the bay plus harbor water around all but left-center | sheet |
+| Reactor Park | a river beyond right field | Atomic Falls; the plant draws on it |
+| Warehouse Row | a river behind center, an iron bridge over it | the Ironbridge Conductors |
+| Fountain Gardens | a reflecting moat | fits the fountains |
+| The Kiln, the Icebox, the Horseshoe, the Vault | none | desert, snow, city block, indoors |
+
+Water is also a deeper harbor blue now, for the bay and the fountain pools too.
+
+Reason: Owner request to add the sheets' water features where they belong.
+
+Affected systems: modules (water new, bridge, Scenery.water_band), StadiumModules catalog, Stadium (water color), generate_parks, data/stadiums, tests, README, notes.

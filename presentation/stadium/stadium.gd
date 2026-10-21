@@ -27,7 +27,7 @@ const BATTERS_EYE := 6.0
 const AISLE_EVERY := 8.0
 const SEAT_SPACING := 0.62
 const FIELD_CENTER := Vector3(0.0, 0.0, -45.0)
-const WATER := Color(0.12, 0.4, 0.58)
+const WATER := Color(0.06, 0.22, 0.36)
 ## How far out the bay reaches (meters from home).
 const WATER_EDGE := 420.0
 

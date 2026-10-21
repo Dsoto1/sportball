@@ -294,3 +294,20 @@ func test_foul_poles_are_yellow_and_tall() -> void:
 		check(c.r > 0.9 and c.g > 0.7 and c.b < 0.3, "yellow")
 		check((pole.mesh as BoxMesh).size.y > FieldLayout.fence_height(45.0, tuning()) + 10.0, "well above the wall")
 	field.free()
+
+
+func test_water_sits_beyond_the_stands() -> void:
+	for park in content().parks:
+		for water in park.pieces_of(&"water"):
+			var st := Stadium.new()
+			st.build(content().tuning_for(park), park, content().team(&"glitterati"), content().team(&"gearheads"))
+			var wet := 0
+			for angle in range(-180, 180, 5):
+				var band := Scenery.water_band(st, water, angle)
+				if band.y > band.x:
+					wet += 1
+					check(band.x >= st.stand_top(angle).x, "%s: water behind the stands at %d°" % [park.id, angle])
+			check(wet > 0, "%s: its water shows somewhere" % park.id)
+			st.free()
+	check(content().park(&"pier_nine").pieces_of(&"water").size() > 0, "Pier 9 sits in the harbor")
+	check(content().park(&"the_kiln").pieces_of(&"water").is_empty(), "the desert park stays dry")

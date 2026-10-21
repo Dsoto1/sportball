@@ -241,7 +241,8 @@ The core is always built:
 | `flying_craft` | saucer cars or blimps over the skyline | count, style |
 | `flags` | flagpoles along the top of the stands in club colors | span, count |
 | `statue` | bronze bull or figure on a pedestal atop the stands | figure |
-| `bridge` | arched bridge over a river behind the stands | distance, length |
+| `water` | a straight river or a moat around the stands (wide for harbor water), optionally glowing | style, distance, width, gap, span, glow |
+| `bridge` | arched bridge running out from the park; centers itself on a river there | distance, length |
 
 - **Placing pieces:** `park.add_piece(&"warehouse", -45.0, {"text": "LOFTS"})`.
 - **Checking a design:** `park.validate()` lists problems: unknown modules, settings out of range, two of a one-per-park piece, a dome with light towers, a wall scoreboard on a low wall, no scoreboard.

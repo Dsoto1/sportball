@@ -52,6 +52,24 @@ params = {
 "span": 90.0
 }
 
+[sub_resource type="Resource" id="Resource_nehh2"]
+script = ExtResource("2_3mioo")
+kind = &"water"
+angle = 20.0
+params = {
+"distance": 230.0,
+"width": 60.0
+}
+
+[sub_resource type="Resource" id="Resource_eebaf"]
+script = ExtResource("2_3mioo")
+kind = &"bridge"
+angle = -15.0
+params = {
+"distance": 180.0,
+"length": 200.0
+}
+
 [resource]
 script = ExtResource("3_m4u46")
 id = &"warehouse_row"
@@ -73,4 +91,4 @@ attendance = 0.92
 sponsors = PackedStringArray("ROUNDHOUSE STORAGE CO.", "HARBORLIGHT CRAB SHACK", "BRASS RAIL BITTERS", "OLD LINE LOCKSMITHS", "CANAL STREET CANDY")
 skyline_color = Color(0.31764707, 0.28235295, 0.28235295, 1)
 window_color = Color(1, 0.88235295, 0.65882355, 1)
-pieces = Array[ExtResource("2_3mioo")]([SubResource("Resource_llfex"), SubResource("Resource_dhncx"), SubResource("Resource_50gy8"), SubResource("Resource_3ko6v"), SubResource("Resource_5iq4d"), SubResource("Resource_di3l1"), SubResource("Resource_8s8n4")])
+pieces = Array[ExtResource("2_3mioo")]([SubResource("Resource_llfex"), SubResource("Resource_dhncx"), SubResource("Resource_50gy8"), SubResource("Resource_3ko6v"), SubResource("Resource_5iq4d"), SubResource("Resource_di3l1"), SubResource("Resource_8s8n4"), SubResource("Resource_nehh2"), SubResource("Resource_eebaf")])
