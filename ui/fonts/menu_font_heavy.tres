@@ -1,0 +1,9 @@
+[gd_resource type="FontVariation" format=3]
+
+[ext_resource type="FontFile" path="res://assets/third_party/fonts/mplus1/MPLUS1.ttf" id="1_15bly"]
+
+[resource]
+base_font = ExtResource("1_15bly")
+variation_opentype = {
+2003265652: 800
+}

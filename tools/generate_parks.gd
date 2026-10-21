@@ -75,7 +75,7 @@ const PARKS := [
 	},
 	{
 		"id": &"the_horseshoe", "display_name": "The Horseshoe",
-		"blurb": "Neutral · night ball in a horseshoe: 279-foot lines, a 483-foot center field",
+		"blurb": "Neutral · night ball in a horseshoe: 279-foot lines, a 482-foot center field",
 		"shape": [[-45, 85, 4.9], [-36, 97, 4.9], [-26, 120, 3.0], [-12, 139, 3.0], [0, 147, 3.0], [12, 139, 3.0], [26, 119, 3.0], [36, 94, 3.4], [45, 81, 3.4]], "air": 1.0,
 		"seat_color": Color("1b2a4a"), "seat_color_alt": Color("142038"), "structure_color": Color("d8d0bc"), "accent_color": Color("ff4f7b"),
 		"outfield_wall_color": Color("1a3d2a"), "wall_style": &"padded", "home_fan_share": 0.45, "away_fan_share": 0.3, "attendance": 0.9,

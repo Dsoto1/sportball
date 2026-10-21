@@ -2,11 +2,12 @@ class_name MatchHud
 extends Control
 ## Broadcast-style match HUD in priority order: score/inning/outs, bases,
 ## count, matchup, then context prompt and timing feedback. It only reads
-## state handed to it. Text is Rajdhani; scores, callouts and title cards
-## are Bungee (both SIL OFL). Prompts show the player's own key or button
+## state handed to it. Text and menus are M PLUS 1 Bold, a free stand-in
+## for the Rodin look of Wii-era menus; scores, callouts and title cards are
+## Bungee (both SIL OFL). Prompts show the player's own key or button
 ## icons (Kenney Input Prompts, CC0).
 
-const BODY_FONT := preload("res://assets/third_party/fonts/rajdhani/Rajdhani-SemiBold.ttf")
+const BODY_FONT := preload("res://ui/fonts/menu_font.tres")
 const DISPLAY_FONT := preload("res://assets/third_party/fonts/bungee/Bungee-Regular.ttf")
 
 var _score: Label
