@@ -10,6 +10,10 @@ extends Node3D
 enum Pose { IDLE, RUN, TURN, CHASE, TAG, THROW, DOWN, SLIDE, BAT_STANCE, SWING, CELEBRATE, BUNT, PITCH, SCOOP, CATCH_HIGH, DIVE, LEAD }
 
 const BODY := preload("res://assets/third_party/quaternius/universal-animation-library/UAL1_Standard.glb")
+## Fielder's glove (Artlist AI, see the asset manifest): fingers along +Y,
+## wrist at y = -0.95, about 1.9 units tall.
+const GLOVE := preload("res://assets/generated/artlist/glove/glove.glb")
+const GLOVE_SCALE := 0.15
 const BLEND := 0.12
 ## Arcade proportions: broader and a little bigger than the mannequin, so
 ## players read from the high field camera.
@@ -25,7 +29,7 @@ var _player: AnimationPlayer
 var _mesh: MeshInstance3D
 ## Glove hand (left for a righty).
 var _hand: BoneAttachment3D
-var _glove: MeshInstance3D
+var _glove: Node3D
 ## Throwing hand (right for a righty): holds the bat's handle and the ball.
 var _grip: BoneAttachment3D
 var _lefty := false
@@ -52,12 +56,10 @@ func setup(color: Color, tag: String) -> void:
 	var attach := BoneAttachment3D.new()
 	attach.bone_name = "hand_l"
 	skeleton.add_child(attach)
-	_glove = MeshInstance3D.new()
-	var mitt := SphereMesh.new()
-	mitt.radius = 0.13
-	mitt.height = 0.22
-	_glove.mesh = mitt
-	_glove.material_override = GrayboxField._mat(Color(0.45, 0.28, 0.14))
+	_glove = GLOVE.instantiate()
+	# Bone space: +Y runs from the wrist toward the fingers.
+	_glove.scale = Vector3.ONE * GLOVE_SCALE
+	_glove.position = Vector3(0.0, 0.95 * GLOVE_SCALE * 0.75, 0.0)
 	attach.add_child(_glove)
 	_hand = attach
 	var grip := BoneAttachment3D.new()
