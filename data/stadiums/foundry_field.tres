@@ -115,4 +115,7 @@ attendance = 0.75
 sponsors = PackedStringArray("RIVET & SONS HARDWARE", "RUSTWATER FERRY", "SPROCKET DINER", "LUGNUT BREWS", "FORGE & ANVIL", "BOILERMAKERS UNION")
 skyline_color = Color(0.2901961, 0.2509804, 0.2509804, 1)
 window_color = Color(1, 0.7019608, 0.36078432, 1)
+facade_color = Color(0.5411765, 0.2901961, 0.19607843, 1)
+facade_surface = &"brick"
+structure_surface = &"steel"
 pieces = Array[ExtResource("2_07v1h")]([SubResource("Resource_ml5p1"), SubResource("Resource_4aj37"), SubResource("Resource_0ohw5"), SubResource("Resource_s8cmx"), SubResource("Resource_05um3"), SubResource("Resource_sr515"), SubResource("Resource_rr4sb"), SubResource("Resource_rep1b"), SubResource("Resource_vvbo7"), SubResource("Resource_7a83r"), SubResource("Resource_tpvtf"), SubResource("Resource_a0pts")])

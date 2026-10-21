@@ -106,15 +106,10 @@ func _build_fence() -> void:
 			wall_mat = _surface(wall_color, GRASS_TEX, GRASS_NORMAL, 0.385, 1.2, 0.0)
 			wall_mat.set_shader_parameter("detail_strength", 1.3)
 			wall_mat.set_shader_parameter("vertical_uv", true)
-		&"brick":
-			wall_mat = _surface(wall_color, DIRT_TEX, DIRT_NORMAL, 0.556, 1.6, 0.0)
-			wall_mat.set_shader_parameter("detail_strength", 0.9)
-			wall_mat.set_shader_parameter("vertical_uv", true)
+		&"brick", &"stone":
+			wall_mat = StadiumSurfaces.material(style, wall_color, false, 0.6)
 		&"iron":
-			var iron := _mat(wall_color)
-			iron.metallic = 0.55
-			iron.roughness = 0.45
-			wall_mat = iron
+			wall_mat = StadiumSurfaces.material(&"steel", wall_color, false, 0.7)
 	for i in segments:
 		var a0 := lerpf(-angle, angle, float(i) / segments)
 		var a1 := lerpf(-angle, angle, float(i + 1) / segments)

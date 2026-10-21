@@ -125,4 +125,7 @@ attendance = 0.8
 sponsors = PackedStringArray("CASCADE COLA", "SPRINKLE & SONS PLUMBING", "BLUE PLAINS BBQ", "MISTY MEADOW DAIRY", "JUBILEE JEWELERS")
 skyline_color = Color(0.14901961, 0.1882353, 0.2901961, 1)
 window_color = Color(0.84705883, 0.9254902, 1, 1)
+facade_color = Color(0.8392157, 0.8117647, 0.73333335, 1)
+facade_surface = &"marble"
+structure_surface = &"stone"
 pieces = Array[ExtResource("2_wib25")]([SubResource("Resource_k8u6i"), SubResource("Resource_q8oj0"), SubResource("Resource_kaaf5"), SubResource("Resource_48ww4"), SubResource("Resource_1xj3a"), SubResource("Resource_taq0n"), SubResource("Resource_0ixp3"), SubResource("Resource_bdrrb"), SubResource("Resource_4ub2c"), SubResource("Resource_o7030"), SubResource("Resource_xncfn"), SubResource("Resource_vtwq7"), SubResource("Resource_2eyij")])

@@ -11,6 +11,7 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	root.position = Scenery.behind(stadium, piece.angle, r + 6.0)
 	var drum := Scenery.cylinder(root, r, r, r * 0.6, stadium.def.structure_color.lightened(0.2), 24)
 	drum.position.y = r * 0.3
+	drum.material_override = StadiumSurfaces.material(&"stone", stadium.def.structure_color.lightened(0.2))
 	var glass := Scenery.sphere(root, r * 0.95, Color(0.55, 0.85, 0.75), 1.0)
 	glass.position.y = r * 0.6
 	var mat := StandardMaterial3D.new()

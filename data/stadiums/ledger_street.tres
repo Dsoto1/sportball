@@ -115,4 +115,7 @@ attendance = 0.95
 sponsors = PackedStringArray("PEMBERTON PEANUTS", "COBBLESTONE COFFEE", "LANTERN LAUNDRY", "IRONCLAD INSURANCE", "LEDGER STREET LAGER")
 skyline_color = Color(0.3529412, 0.2901961, 0.28235295, 1)
 window_color = Color(1, 0.88235295, 0.65882355, 1)
+facade_color = Color(0.627451, 0.3137255, 0.23529412, 1)
+facade_surface = &"brick"
+structure_surface = &"stone"
 pieces = Array[ExtResource("2_mb518")]([SubResource("Resource_oeo3i"), SubResource("Resource_cq0mc"), SubResource("Resource_7xix8"), SubResource("Resource_up8hn"), SubResource("Resource_hcvew"), SubResource("Resource_qnulu"), SubResource("Resource_gnn5p"), SubResource("Resource_7qw1n"), SubResource("Resource_p8geh"), SubResource("Resource_rnwrq"), SubResource("Resource_52ddh"), SubResource("Resource_1hcmg")])

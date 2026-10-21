@@ -25,5 +25,5 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	var ring := Scenery.cylinder(root, tall * 0.075, tall * 0.075, tall * 0.02, home.accent_color, 16)
 	ring.position.y = tall * 0.1
 	ring.material_override = Stadium.glow(home.accent_color, 2.0)
-	var gantry := stadium.box(Vector3(2.0, tall * 0.85, 2.0), stadium.def.structure_color.darkened(0.3), root)
+	var gantry := stadium.box(Vector3(2.0, tall * 0.85, 2.0), stadium.def.structure_color.darkened(0.3), root, &"steel")
 	gantry.position = Vector3(tall * 0.14, tall * 0.425, 0.0)

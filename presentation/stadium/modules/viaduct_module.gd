@@ -22,10 +22,10 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 		var b := spots[i + 1]
 		var mid := (a + b) * 0.5
 		var length := a.distance_to(b)
-		var deck := stadium.box(Vector3(6.0, 1.6, length + 0.4), brick.darkened(0.15), root)
+		var deck := stadium.box(Vector3(6.0, 1.6, length + 0.4), brick.darkened(0.15), root, &"brick")
 		deck.position = mid + Vector3.UP * height
 		deck.look_at_from_position(deck.position, b + Vector3.UP * height, Vector3.UP)
-		var pier := stadium.box(Vector3(5.0, height, 2.4), brick, root)
+		var pier := stadium.box(Vector3(5.0, height, 2.4), brick, root, &"brick")
 		pier.position = a + Vector3.UP * height * 0.5
 		pier.look_at_from_position(pier.position, b + Vector3.UP * height * 0.5, Vector3.UP)
 		# The arch between piers: a half ring under the deck.
@@ -36,7 +36,7 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 		torus.rings = 16
 		torus.ring_segments = 6
 		arch.mesh = torus
-		arch.material_override = GrayboxField._mat(brick)
+		arch.material_override = StadiumSurfaces.material(&"brick", brick)
 		root.add_child(arch)
 		arch.position = mid + Vector3.UP * (height - length * 0.5)
 		arch.look_at_from_position(arch.position, arch.position + (b - a).cross(Vector3.UP), Vector3.UP)

@@ -158,6 +158,12 @@ func point(angle: float, radius: float, height: float) -> Vector3:
 func _build_bowl() -> void:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	# The facade and the ground outside are their own meshes, each in its
+	# own surface.
+	var facade := SurfaceTool.new()
+	facade.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var ground := SurfaceTool.new()
+	ground.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var riser := def.structure_color.darkened(0.35)
 	var eye := Color(0.06, 0.1, 0.09)
 	var a := -180.0
@@ -194,14 +200,14 @@ func _build_bowl() -> void:
 		var back_a := pa.x + rows * ROW_DEPTH
 		var back_b := pb.x + rows * ROW_DEPTH
 		_quad(st, point(a, back_a, top_a), point(b, back_b, top_b), point(b, back_b, top_b + 1.2), point(a, back_a, top_a + 1.2), def.accent_color.darkened(0.2))
-		_quad(st, point(b, back_b, 0.0), point(a, back_a, 0.0), point(a, back_a, top_a + 1.2), point(b, back_b, top_b + 1.2), def.structure_color)
+		_quad(facade, point(b, back_b, 0.0), point(a, back_a, 0.0), point(a, back_a, top_a + 1.2), point(b, back_b, top_b + 1.2), Color.WHITE)
 		# Outside the park: the bay on the water side, ground everywhere else.
 		var outside := def.skyline_color.darkened(0.45) if def.ground_color.a == 0.0 else def.ground_color
 		var edge := back_a + 1.0
 		if is_water(mid):
 			_quad(st, point(a, edge, 0.02), point(a, WATER_EDGE, 0.02), point(b, WATER_EDGE, 0.02), point(b, back_b + 1.0, 0.02), WATER)
 			edge = WATER_EDGE
-		_quad(st, point(a, edge, 0.0), point(a, 950.0, 0.0), point(b, 950.0, 0.0), point(b, edge if edge == WATER_EDGE else back_b + 1.0, 0.0), outside)
+		_quad(ground, point(a, edge, 0.0), point(a, 950.0, 0.0), point(b, 950.0, 0.0), point(b, edge if edge == WATER_EDGE else back_b + 1.0, 0.0), outside)
 		a = b
 	st.generate_normals()
 	var mi := MeshInstance3D.new()
@@ -213,6 +219,18 @@ func _build_bowl() -> void:
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 	mi.material_override = mat
 	add_child(mi)
+	if StadiumSurfaces.KINDS.has(def.stand_surface):
+		mi.material_override = StadiumSurfaces.material(def.stand_surface, Color.WHITE, true)
+	for part: Array in [[facade, "Facade", def.facade_surface, def.facade_tint()], [ground, "Ground", def.ground_surface, Color.WHITE]]:
+		var tool: SurfaceTool = part[0]
+		tool.generate_normals()
+		var piece := MeshInstance3D.new()
+		piece.name = part[1]
+		piece.mesh = tool.commit()
+		var surface_mat := StadiumSurfaces.material(part[2], part[3], part[1] == "Ground")
+		surface_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+		piece.material_override = surface_mat
+		add_child(piece)
 
 
 func _quad(st: SurfaceTool, p0: Vector3, p1: Vector3, p2: Vector3, p3: Vector3, color: Color) -> void:
@@ -298,7 +316,7 @@ func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
 		dugout.name = "Dugout_%s" % club.abbreviation
 		add_child(dugout)
 		dugout.look_at_from_position(center, Vector3.ZERO, Vector3.UP)
-		var back := box(Vector3(14.0, 2.4, 0.4), def.structure_color.darkened(0.5), dugout)
+		var back := box(Vector3(14.0, 2.4, 0.4), def.structure_color.darkened(0.3), dugout, &"facade")
 		back.position = Vector3(0, 1.0, 1.6)
 		var bench := box(Vector3(13.0, 0.5, 1.0), club.secondary_color, dugout)
 		bench.position = Vector3(0, 0.25, 1.0)
@@ -510,6 +528,22 @@ func _fill_card(card: Dictionary, p: PlayerDef, state: MatchState) -> void:
 
 # --- Kit for modules --------------------------------------------------------
 
+## A material for a surface name: a StadiumSurfaces kind, or &"structure",
+## &"facade", &"stand" or &"ground" for the park's own picks.
+func surface_mat(surface: StringName, color: Color) -> StandardMaterial3D:
+	match surface:
+		&"structure":
+			surface = def.structure_surface
+		&"facade":
+			surface = def.facade_surface
+			color = def.facade_tint() if color == def.structure_color else color
+		&"stand":
+			surface = def.stand_surface
+		&"ground":
+			surface = def.ground_surface
+	return StadiumSurfaces.material(surface, color)
+
+
 ## A node name not yet used in this park ("Warehouse", "Warehouse2", ...),
 ## so a park can hold more than one of a module.
 func unique_name(base: String) -> String:
@@ -534,12 +568,15 @@ func wall_inward(angle: float) -> Vector3:
 	return inward
 
 
-func box(size: Vector3, color: Color, parent: Node = null) -> MeshInstance3D:
+## A box in a flat color, or in one of the park's surfaces (a
+## StadiumSurfaces kind such as &"brick", or &"structure" / &"facade" for the
+## park's own choice) tinted to that color.
+func box(size: Vector3, color: Color, parent: Node = null, surface: StringName = &"") -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
 	var mesh := BoxMesh.new()
 	mesh.size = size
 	mi.mesh = mesh
-	mi.material_override = GrayboxField._mat(color)
+	mi.material_override = surface_mat(surface, color)
 	(parent if parent != null else self).add_child(mi)
 	return mi
 

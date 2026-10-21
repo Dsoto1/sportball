@@ -23,6 +23,7 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 				ring.position.y = tall * (0.3 + band * 0.12)
 				ring.material_override = Stadium.glow(def.accent_color, 0.6)
 		stack.position = base + Vector3.UP * tall * 0.5
+		stack.material_override = StadiumSurfaces.material(&"concrete" if cooling else &"brick", stack.material_override.albedo_color, false, 2.0 if cooling else 1.0)
 		var smoke := CPUParticles3D.new()
 		smoke.amount = 24
 		smoke.lifetime = 7.0

@@ -1,6 +1,8 @@
 extends StadiumModule
 ## A grove beyond the stands, from the piece's angle across "span" degrees:
-## palms, pines, cacti, round shade trees, cypresses or blossoming trees.
+## palms, pines, cacti, round shade trees, cypresses, blossoming trees or
+## tall rocks. Models from the Kenney Nature Kit (ModelKit); the primitive
+## shapes below are the fallback.
 
 
 func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef) -> void:
@@ -16,6 +18,11 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 		tree.position = Scenery.behind(stadium, angle + rng.randf_range(-1.0, 1.0), rng.randf_range(2.0, 14.0))
 		tree.rotation.y = rng.randf() * TAU
 		tree.scale = Vector3.ONE * piece.size * rng.randf_range(0.8, 1.2)
+		if ModelKit.has(kind):
+			# A modeled tree (Kenney Nature Kit), blossoms in pink.
+			var tall: float = {&"palm": 16.0, &"pine": 15.0, &"cactus": 11.0, &"round": 11.0, &"cypress": 14.0, &"blossom": 9.0, &"rock": 9.0}.get(kind, 12.0)
+			tree.add_child(ModelKit.spawn(kind, tall, rng, Color(0.97, 0.68, 0.82) if kind == &"blossom" else Color(0, 0, 0, 0)))
+			continue
 		match kind:
 			&"palm":
 				var trunk := Scenery.cylinder(tree, 0.5, 0.35, 16.0, Color(0.45, 0.33, 0.22), 8)

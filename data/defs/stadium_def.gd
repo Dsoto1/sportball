@@ -20,7 +20,7 @@ extends Resource
 ## Neon accent: the halo, lamp trim, scoreboard frame.
 @export var accent_color: Color = Color(1.0, 0.8, 0.3)
 @export var outfield_wall_color: Color = Color(0.16, 0.22, 0.38)
-## &"padded", &"iron", &"ivy" or &"brick": how the outfield wall is dressed.
+## &"padded", &"iron", &"ivy", &"brick" or &"stone": how the outfield wall is dressed.
 @export var wall_style: StringName = &"padded"
 ## Rows of seats in the foul-territory stands and the outfield bleachers.
 @export var foul_rows: int = 26
@@ -43,9 +43,22 @@ extends Resource
 ## default, a dark shade of the skyline color.
 @export var ground_color: Color = Color(0, 0, 0, 0)
 @export var window_color: Color = Color(1.0, 0.85, 0.5)
+## Surfaces (StadiumSurfaces kinds, tinted by the colors above): the
+## stands' steps, the back facade of the bowl, structural pieces (frames,
+## piers, towers) and the ground around the park. Empty for flat color.
+## The facade's own tint; transparent to use structure_color.
+@export var facade_color: Color = Color(0, 0, 0, 0)
+@export var stand_surface: StringName = &"concrete"
+@export var facade_surface: StringName = &"concrete"
+@export var structure_surface: StringName = &"concrete"
+@export var ground_surface: StringName = &""
 ## The placed modules, built in order (the first scoreboard is the main
 ## one the match updates first).
 @export var pieces: Array[StadiumPiece] = []
+
+
+func facade_tint() -> Color:
+	return structure_color if facade_color.a == 0.0 else facade_color
 
 
 func has_piece(kind: StringName) -> bool:

@@ -329,3 +329,19 @@ func test_angles_wrap_around_home() -> void:
 	for angle in range(0, 360, 10):
 		check(st.stand_top(angle).x > 40.0, "the stands never collapse onto the field at %d°" % angle)
 	st.free()
+
+
+func test_surfaces_and_models_load() -> void:
+	for kind: StringName in StadiumSurfaces.kinds():
+		var m := StadiumSurfaces.material(kind, Color(0.5, 0.4, 0.3))
+		check(m.albedo_texture != null and m.normal_texture != null, "%s has its detail and normal maps" % kind)
+		check(m.uv1_world_triplanar, "%s maps in world space (no UVs needed)" % kind)
+	check(StadiumSurfaces.material(&"nope", Color.RED).albedo_texture == null, "an unknown surface is a flat color")
+	var rng := RandomNumberGenerator.new()
+	for role: StringName in ModelKit.SETS:
+		var node := ModelKit.spawn(role, 10.0, rng)
+		check(node.find_children("*", "MeshInstance3D", true, false).size() > 0, "%s model loads" % role)
+		node.free()
+	for park in content().parks:
+		for kind in [park.facade_surface, park.structure_surface, park.stand_surface]:
+			check(kind == &"" or StadiumSurfaces.KINDS.has(kind), "%s uses known surfaces (%s)" % [park.id, kind])

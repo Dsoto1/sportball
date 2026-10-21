@@ -13,15 +13,17 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	stadium.add_child(root)
 	root.look_at_from_position(spot, spot + (spot - Vector3(0, spot.y, 0)), Vector3.UP)
 	var steel := def.structure_color.darkened(0.2)
-	var wall := stadium.box(Vector3(r * 2.8, r * 2.8, 3.0), def.structure_color.darkened(0.45), root)
+	var wall := stadium.box(Vector3(r * 2.8, r * 2.8, 3.0), def.structure_color.darkened(0.45), root, &"steel")
 	wall.position = Vector3(0, r * 1.4, -1.5)
 	var center := Vector3(0, top.y + r + 1.0, 0.3)
 	var ring := Scenery.cylinder(root, r, r, 1.6, steel, 40)
 	ring.rotation.x = PI * 0.5
 	ring.position = center
+	ring.material_override = StadiumSurfaces.material(&"steel", steel, false, 0.5)
 	var face := Scenery.cylinder(root, r * 0.82, r * 0.82, 1.9, steel.lightened(0.15), 40)
 	face.rotation.x = PI * 0.5
 	face.position = center
+	face.material_override = StadiumSurfaces.material(&"steel", steel.lightened(0.15), false, 0.5)
 	for b in 12:
 		var a := TAU * b / 12.0
 		var bolt := Scenery.cylinder(root, r * 0.05, r * 0.05, 2.4, home.highlight_color, 10)

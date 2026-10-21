@@ -18,12 +18,12 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 		crane.look_at_from_position(base, Vector3(0.0, 0.0, -45.0), Vector3.UP)
 		crane.rotate_y(deg_to_rad(25.0 * (1 if i % 2 == 0 else -1)))
 		for leg in 4:
-			var post := stadium.box(Vector3(0.5, tall, 0.5), steel, crane)
+			var post := stadium.box(Vector3(0.5, tall, 0.5), steel, crane, &"steel")
 			post.position = Vector3(-1.2 + 2.4 * (leg % 2), tall * 0.5, -1.2 + 2.4 * (leg / 2))
 		for rung in int(tall / 4.0):
 			var brace := stadium.box(Vector3(2.9, 0.25, 2.9), steel.darkened(0.2), crane)
 			brace.position.y = 2.0 + rung * 4.0
-		var boom := stadium.box(Vector3(1.6, 1.6, tall * 0.8), steel, crane)
+		var boom := stadium.box(Vector3(1.6, 1.6, tall * 0.8), steel, crane, &"steel")
 		boom.position = Vector3(0, tall + 0.8, -tall * 0.3)
 		var weight := stadium.box(Vector3(3.0, 2.4, 3.0), def.structure_color.darkened(0.4), crane)
 		weight.position = Vector3(0, tall + 0.4, tall * 0.12)

@@ -12,7 +12,7 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	var spot := stadium.point(piece.angle, top.x - 1.0, top.y + 0.6)
 	root.look_at_from_position(spot, Vector3(0, spot.y, -45.0), Vector3.UP)
 	root.scale = Vector3.ONE * piece.size
-	var pedestal := stadium.box(Vector3(5.0, 2.4, 3.0), stadium.def.structure_color.lightened(0.15), root)
+	var pedestal := stadium.box(Vector3(5.0, 2.4, 3.0), stadium.def.structure_color.lightened(0.15), root, &"marble")
 	pedestal.position.y = 1.2
 	if StringName(piece.param("figure")) == &"bull":
 		var body := Scenery.sphere(root, 1.6, bronze, 0.8)

@@ -9,7 +9,7 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	stadium.add_child(root)
 	root.position = Scenery.behind(stadium, piece.angle, 30.0)
 	var rock := Scenery.sphere(root, 9.0, Color(0.42, 0.4, 0.38), 0.4)
-	rock.position.y = 0.0
+	rock.material_override = StadiumSurfaces.material(&"rock", Color(0.5, 0.48, 0.45))
 	var bands := 6
 	for b in bands:
 		var t0 := float(b) / bands

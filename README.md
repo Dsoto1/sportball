@@ -258,6 +258,8 @@ The core is always built:
 - **Placing pieces:** `park.add_piece(&"warehouse", -45.0, {"text": "LOFTS"})`.
 - **Checking a design:** `park.validate()` lists problems: unknown modules, settings out of range, two of a one-per-park piece, a dome with light towers, a wall scoreboard on a low wall, no scoreboard.
 - **Adding a module:** one script under `presentation/stadium/modules/` and one catalog entry.
+- **Surfaces:** each park picks a surface for its facade, structure, stands and ground from `StadiumSurfaces`: brick, stone, concrete, steel, wood, rock, snow, marble or sand. These are CC0 ambientCG textures tinted by the park's palette and mapped in world space. Modules ask for `&"structure"` or `&"facade"`, or a surface by name.
+- **Models:** `ModelKit` hands out CC0 Kenney models by role (palm, pine, cactus, round, cypress, blossom, rock, tower, building, block), scaled to a height.
 
 ## Test
 

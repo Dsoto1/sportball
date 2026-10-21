@@ -16,7 +16,7 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	fall.name = stadium.unique_name("Waterfall")
 	stadium.add_child(fall)
 	fall.look_at_from_position(spot, spot + (spot - Vector3(0, spot.y, 0)), Vector3.UP)
-	var face := stadium.box(Vector3(width + 4.0, height, 5.0), def.structure_color.darkened(0.25), fall)
+	var face := stadium.box(Vector3(width + 4.0, height, 5.0), def.structure_color.darkened(0.25), fall, &"stone")
 	face.position = Vector3(0, height * 0.5, -2.5)
 	var lip := stadium.box(Vector3(width + 4.4, 0.8, 5.4), def.accent_color, fall)
 	lip.position = Vector3(0, height, -2.5)
@@ -32,7 +32,7 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	var sheet := stadium.box(Vector3(width, height, 0.3), Color.WHITE, fall)
 	sheet.position = Vector3(0, height * 0.5, 0.2)
 	sheet.material_override = water
-	var pool := stadium.box(Vector3(width + 6.0, 0.8, 7.0), def.structure_color, fall)
+	var pool := stadium.box(Vector3(width + 6.0, 0.8, 7.0), def.structure_color, fall, &"stone")
 	pool.position = Vector3(0, 0.4, 3.0)
 	var surface := stadium.box(Vector3(width + 5.0, 0.1, 6.0), Stadium.WATER, fall)
 	surface.position = Vector3(0, 0.82, 3.0)

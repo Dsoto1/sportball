@@ -1,0 +1,5 @@
+Ground054 by ambientCG (https://ambientcg.com/view?id=Ground054)
+License: CC0 1.0 Universal (public domain dedication)
+https://creativecommons.org/publicdomain/zero/1.0/
+Source page states: "All assets are released under the Creative Commons CC0 license, making them free to use without attribution - even in commercial circumstances."
+Downloaded 2026-10-21 as Ground054_1K-JPG.zip; Color converted to a normalized grayscale detail map and NormalGL kept, both downscaled to 512 px.

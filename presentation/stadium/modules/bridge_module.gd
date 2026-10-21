@@ -23,12 +23,12 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	var spans := 4
 	var arch_radius := length / spans * 0.46
 	var deck_height := arch_radius * 0.92
-	var deck := stadium.box(Vector3(8.0, 1.5, length), def.structure_color.darkened(0.3), root)
+	var deck := stadium.box(Vector3(8.0, 1.5, length), def.structure_color.darkened(0.3), root, &"steel")
 	deck.position.y = deck_height
 	for i in spans + 1:
 		var z := -length * 0.5 + length * i / spans
 		var tall := deck_height + arch_radius * 0.5
-		var tower := stadium.box(Vector3(9.0, tall, minf(3.0, arch_radius * 0.25)), def.structure_color.darkened(0.15), root)
+		var tower := stadium.box(Vector3(9.0, tall, minf(3.0, arch_radius * 0.25)), def.structure_color.darkened(0.15), root, &"stone")
 		tower.position = Vector3(0, tall * 0.5, z)
 	# Arches spring from the ground between the towers (half rings).
 	for i in spans:

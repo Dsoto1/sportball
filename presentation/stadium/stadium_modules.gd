@@ -99,7 +99,7 @@ const CATALOG := {
 		"about": "A grove behind the stands across span degrees: palms, pines, cacti, round shade trees, cypresses or blossoming trees.",
 		"angle": -45.0, "angle_range": [-180.0, 180.0],
 		"params": {"span": [30.0, -120.0, 120.0], "count": [8, 1, 30], "kind": [&"palm"]},
-		"choices": {"kind": [&"palm", &"pine", &"cactus", &"round", &"cypress", &"blossom"]},
+		"choices": {"kind": [&"palm", &"pine", &"cactus", &"round", &"cypress", &"blossom", &"rock"]},
 		"script": preload("res://presentation/stadium/modules/trees_module.gd"),
 	},
 	&"smokestacks": {

@@ -8,10 +8,11 @@ extends SceneTree
 ## after the standard set (centerpiece in the park's "frame", line-score
 ## board, slogan board, light towers, skyline at the park's skyline_height)
 ## unless a park lists its own "standard". "decks" tiers the foul stands.
+## Surfaces (facade, structure, ground) name StadiumSurfaces kinds.
 
 const PARKS := [
 	{
-		"id": &"halo_dome", "decks": 3, "frame": &"board", "display_name": "The Halo Dome",
+		"id": &"halo_dome", "facade_color": Color("6a5a8c"), "facade_surface": &"marble", "structure_surface": &"steel", "decks": 3, "frame": &"board", "display_name": "The Halo Dome",
 		"blurb": "Glitterati home · symmetrical, padded glass-and-gold wall",
 		"shape": [[-45, 96, 3.4], [-30, 104, 3.4], [-15, 112, 3.4], [0, 116, 4.2], [15, 112, 3.4], [30, 104, 3.4], [45, 96, 3.4]], "air": 1.0,
 		"seat_color": Color("3d2466"), "seat_color_alt": Color("2c1a4d"), "structure_color": Color("8f8aa3"), "accent_color": Color("ffc94a"),
@@ -21,7 +22,7 @@ const PARKS := [
 		"skyline_color": Color("2b2a52"), "window_color": Color("ffd27a"), "skyline_height": 1.0,
 	},
 	{
-		"id": &"foundry_field", "decks": 2, "frame": &"gate", "display_name": "Foundry Field",
+		"id": &"foundry_field", "facade_color": Color("8a4a32"), "facade_surface": &"brick", "structure_surface": &"steel", "decks": 2, "frame": &"gate", "display_name": "Foundry Field",
 		"blurb": "Gearheads home · The Boilerplate: a 34-foot iron wall in short right",
 		"shape": [[-45, 101, 2.6], [-25, 116, 2.6], [0, 121, 2.6], [13, 113, 2.6], [14.5, 111, 10.5], [30, 99, 10.5], [45, 90, 10.5]], "air": 1.0,
 		"seat_color": Color("6b3a22"), "seat_color_alt": Color("4f2b19"), "structure_color": Color("8a7d70"), "accent_color": Color("ff8a2a"),
@@ -32,7 +33,7 @@ const PARKS := [
 		"skyline_color": Color("4a4040"), "window_color": Color("ffb35c"), "skyline_height": 0.6,
 	},
 	{
-		"id": &"ledger_street", "decks": 2, "frame": &"arch", "display_name": "Ledger Street Park",
+		"id": &"ledger_street", "facade_color": Color("a0503c"), "facade_surface": &"brick", "structure_surface": &"stone", "decks": 2, "frame": &"arch", "display_name": "Ledger Street Park",
 		"blurb": "Bankers home · The Leviathan: a 37-foot green wall in short left, a deep triangle in right-center",
 		"shape": [[-45, 94.5, 11.3], [-30, 101, 11.3], [-14, 111, 11.3], [-12.5, 114, 4.0], [0, 119, 4.0], [12, 128, 4.0], [24, 116, 1.8], [33, 104, 1.8], [45, 92, 1.0]], "air": 1.0,
 		"seat_color": Color("1f4a33"), "seat_color_alt": Color("173828"), "structure_color": Color("8a4b3c"), "accent_color": Color("f2e6c8"),
@@ -43,7 +44,7 @@ const PARKS := [
 		"skyline_color": Color("5a4a48"), "window_color": Color("ffe1a8"), "skyline_height": 0.8,
 	},
 	{
-		"id": &"pier_nine", "decks": 2, "frame": &"board", "display_name": "Pier 9 Ballyard",
+		"id": &"pier_nine", "facade_color": Color("8a6a4a"), "facade_surface": &"wood", "structure_surface": &"stone", "decks": 2, "frame": &"board", "display_name": "Pier 9 Ballyard",
 		"blurb": "Gulls home · short porch in right, the bay beyond it, deep left-center",
 		"shape": [[-45, 101, 2.4], [-20, 115, 2.4], [0, 123, 2.4], [20, 110, 2.4], [32, 101, 2.4], [45, 94, 2.4]], "air": 1.03,
 		"seat_color": Color("1d3b5c"), "seat_color_alt": Color("152c45"), "structure_color": Color("c9c4b6"), "accent_color": Color("ff6b4a"),
@@ -54,7 +55,7 @@ const PARKS := [
 		"skyline_color": Color("37465e"), "window_color": Color("ffe9b0"), "skyline_height": 0.9,
 	},
 	{
-		"id": &"the_kiln", "ground_color": Color("8f4a2c"), "decks": 2, "frame": &"gate", "display_name": "The Kiln",
+		"id": &"the_kiln", "facade_color": Color("b25a3c"), "facade_surface": &"rock", "structure_surface": &"stone", "ground_surface": &"sand", "ground_color": Color("8f4a2c"), "decks": 2, "frame": &"gate", "display_name": "The Kiln",
 		"blurb": "Comets home · thin desert air carries the ball, so the outfield is a canyon; red mesas and a rocket beyond",
 		"shape": [[-45, 105, 4.3], [-25, 119, 4.3], [0, 127, 4.3], [25, 119, 4.3], [45, 106, 4.3]], "air": 0.82,
 		"seat_color": Color("a65a32"), "seat_color_alt": Color("8a4826"), "structure_color": Color("d9b98a"), "accent_color": Color("2ec4b6"),
@@ -65,7 +66,7 @@ const PARKS := [
 		"skyline_color": Color("b08a62"), "window_color": Color("fff0c0"), "skyline_height": 0.35,
 	},
 	{
-		"id": &"the_icebox", "ground_color": Color("e4ebf2"), "decks": 2, "frame": &"arch", "display_name": "The Icebox",
+		"id": &"the_icebox", "facade_color": Color("8494a6"), "facade_surface": &"stone", "structure_surface": &"wood", "ground_surface": &"snow", "ground_color": Color("e4ebf2"), "decks": 2, "frame": &"arch", "display_name": "The Icebox",
 		"blurb": "Yetis home · cold heavy air knocks fly balls down; ice falls and peaks beyond the wall",
 		"shape": [[-45, 99, 4.6], [-22, 112, 4.6], [0, 118, 4.6], [22, 112, 4.6], [45, 99, 4.6]], "air": 1.1,
 		"seat_color": Color("2d4a63"), "seat_color_alt": Color("223a4f"), "structure_color": Color("b8c4cc"), "accent_color": Color("9fe8ff"),
@@ -75,7 +76,7 @@ const PARKS := [
 		"skyline_color": Color("4a5866"), "window_color": Color("dff4ff"), "skyline_height": 0.4,
 	},
 	{
-		"id": &"reactor_park", "decks": 3, "frame": &"gate", "display_name": "Reactor Park",
+		"id": &"reactor_park", "facade_color": Color("6a6e70"), "facade_surface": &"concrete", "structure_surface": &"steel", "decks": 3, "frame": &"gate", "display_name": "Reactor Park",
 		"blurb": "Neutrons home · odd angles and a deep center-field notch behind a tall reactor wall",
 		"shape": [[-45, 98, 3.0], [-28, 108, 3.0], [-12, 121, 3.0], [-9, 130, 6.5], [-3, 130, 6.5], [0, 120, 3.0], [9, 121, 3.0], [18, 111, 3.0], [31, 102, 3.0], [45, 97, 3.0]], "air": 1.0,
 		"seat_color": Color("2a2e30"), "seat_color_alt": Color("202426"), "structure_color": Color("4b5154"), "accent_color": Color("39d353"),
@@ -85,7 +86,7 @@ const PARKS := [
 		"skyline_color": Color("3d3f2e"), "window_color": Color("c8ffd8"), "skyline_height": 0.9,
 	},
 	{
-		"id": &"the_horseshoe", "decks": 2, "frame": &"arch", "display_name": "The Horseshoe",
+		"id": &"the_horseshoe", "facade_color": Color("9a7a5e"), "facade_surface": &"stone", "structure_surface": &"brick", "decks": 2, "frame": &"arch", "display_name": "The Horseshoe",
 		"blurb": "Lamplighters home · night ball in a horseshoe: 279-foot lines, a 482-foot center field",
 		"shape": [[-45, 85, 4.9], [-36, 97, 4.9], [-26, 120, 3.0], [-12, 139, 3.0], [0, 147, 3.0], [12, 139, 3.0], [26, 119, 3.0], [36, 94, 3.4], [45, 81, 3.4]], "air": 1.0,
 		"seat_color": Color("16294a"), "seat_color_alt": Color("10203a"), "structure_color": Color("7a5a44"), "accent_color": Color("f0c04b"),
@@ -96,7 +97,7 @@ const PARKS := [
 		"skyline_color": Color("1a1f33"), "window_color": Color("ffe0a0"), "skyline_height": 1.2,
 	},
 	{
-		"id": &"warehouse_row", "decks": 2, "frame": &"gate", "clock": true, "display_name": "Warehouse Row",
+		"id": &"warehouse_row", "facade_color": Color("8a3e2e"), "facade_surface": &"brick", "structure_surface": &"steel", "decks": 2, "frame": &"gate", "clock": true, "display_name": "Warehouse Row",
 		"blurb": "Conductors home · a 25-foot brick wall in right and the old Roundhouse warehouse looming over it",
 		"shape": [[-45, 101, 2.4], [-25, 111, 2.4], [-8, 123, 2.4], [0, 122, 2.4], [14, 115, 2.4], [20, 112, 2.4], [21.5, 110, 7.6], [45, 97, 7.6]], "air": 1.0,
 		"seat_color": Color("8a2a2a"), "seat_color_alt": Color("6e2121"), "structure_color": Color("6e3a2c"), "accent_color": Color("d4a017"),
@@ -107,7 +108,7 @@ const PARKS := [
 		"skyline_color": Color("514848"), "window_color": Color("ffe1a8"), "skyline_height": 0.9,
 	},
 	{
-		"id": &"fountain_gardens", "decks": 2, "frame": &"board", "display_name": "Fountain Gardens",
+		"id": &"fountain_gardens", "facade_color": Color("d6cfbb"), "facade_surface": &"marble", "structure_surface": &"stone", "decks": 2, "frame": &"board", "display_name": "Fountain Gardens",
 		"blurb": "Swans home · big, symmetric and fair: garden terraces, fountains and blossoms beyond the wall",
 		"shape": [[-45, 101, 3.7], [-22, 118, 3.7], [0, 125, 3.7], [22, 118, 3.7], [45, 101, 3.7]], "air": 1.0,
 		"seat_color": Color("1d4a35"), "seat_color_alt": Color("163c2b"), "structure_color": Color("e8e2d0"), "accent_color": Color("d4af37"),
@@ -118,7 +119,7 @@ const PARKS := [
 		"skyline_color": Color("26304a"), "window_color": Color("d8ecff"), "skyline_height": 0.6,
 	},
 	{
-		"id": &"the_vault", "decks": 3, "frame": &"gate", "display_name": "The Vault",
+		"id": &"the_vault", "facade_color": Color("5a5e66"), "facade_surface": &"concrete", "structure_surface": &"steel", "decks": 3, "frame": &"gate", "display_name": "The Vault",
 		"blurb": "Safecrackers home · fast turf under searchlights: grounders scoot through the gaps, a giant vault door looms in left",
 		"shape": [[-45, 100, 3.0], [-22, 114, 3.0], [0, 122, 3.0], [22, 114, 3.0], [45, 100, 3.0]], "air": 0.97, "surface": 1.3,
 		"seat_color": Color("7a1a26"), "seat_color_alt": Color("5e141d"), "structure_color": Color("4a4f5a"), "accent_color": Color("ff2d2d"),

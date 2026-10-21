@@ -929,3 +929,34 @@ Affected systems: generate_teams, generate_parks, modules (centerpiece clock, tr
 Reason: Owner reference sheet for the Vault; owner instruction on new clubs.
 
 Affected systems: modules (vault_door, searchlights new; dome), catalog, generate_parks, generate_teams, tests, README, notes.
+
+## 2026-10-21 - Free Asset Kit for the Parks
+
+To bring the parks closer to the reference sheets, the stadiums now use free assets from the Tier 1 sources in `docs/14_ASSET_SOURCES.md`.
+
+- **Reachability:** ambientCG, Poly Haven, Kenney and Quaternius are reachable from the build environment. KayKit, OpenGameArt and Poly Pizza are blocked.
+- **Surfaces (`StadiumSurfaces`):** nine CC0 ambientCG materials: brick, stone, concrete, steel, wood, rock, snow, marble, sand.
+  - Each is stored as a 512 px normalized grayscale detail map plus a normal map (1.3 MB total).
+  - The park's palette tints them, so parks stay in their own colors.
+  - They map in world space (triplanar), because all stadium geometry is built in code without UVs.
+- **Per-park layers:** stands, facade (with its own `facade_color`), structure and ground. Examples:
+  - Ledger Street: brick and stone.
+  - The Kiln: red rock, sandstone and sand.
+  - The Icebox: stone, timber and snow.
+  - Pier 9: timber.
+  - The Halo Dome: marble and steel.
+- **Where the surfaces show:** the bowl's outer facade, the ground, the stands' steps, and the main structures:
+  - centerpiece gates and piers, scoreboard frames, light towers;
+  - viaduct, bridge, cranes, rocket gantry, stacks;
+  - mountains and mesas, waterfalls' rock faces, the vault door;
+  - pedestals, the conservatory;
+  - dugout walls;
+  - brick, stone and iron outfield walls.
+- **Models (`ModelKit`):** CC0 Kenney Nature Kit (18 models, trees and rocks) and City Kit Commercial (18 buildings).
+  - The trees module uses them instead of primitive shapes, with pink-tinted leaves for blossoms.
+  - The skyline adds a nearer ring of modeled buildings and skyscrapers in front of the lit-window towers.
+- **Logged:** ACG-003, KEN-004 and KEN-005 in the asset manifest.
+
+Reason: Owner request to use free assets to bring the parks closer to the reference sheets.
+
+Affected systems: StadiumSurfaces, ModelKit (new), StadiumDef (surfaces, facade_color), Stadium (bowl facade and ground meshes, box surfaces), GrayboxField (walls), many modules, generate_parks, data, tests, manifest, README.

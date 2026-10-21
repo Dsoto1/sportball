@@ -24,6 +24,7 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 			var butte := Scenery.cylinder(root, w * 0.55, w * 0.42, h, rock.darkened(rng.randf_range(0.0, 0.2)), 7)
 			butte.position = spot + Vector3.UP * h * 0.5
 			butte.rotation.y = rng.randf() * TAU
+			butte.material_override = StadiumSurfaces.material(&"rock", butte.material_override.albedo_color, false, 1.0 + h / 60.0)
 			# Strata: a paler band and a dark cap.
 			var band := Scenery.cylinder(butte, w * 0.5, w * 0.48, h * 0.12, rock.lightened(0.25), 7)
 			band.position.y = h * 0.1
@@ -33,8 +34,10 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 			var peak := Scenery.cylinder(root, h * 0.75, 0.0, h, rock.darkened(rng.randf_range(0.0, 0.2)), 7)
 			peak.position = spot + Vector3.UP * h * 0.5
 			peak.rotation.y = rng.randf() * TAU
+			peak.material_override = StadiumSurfaces.material(&"rock", peak.material_override.albedo_color, false, 1.0 + h / 60.0)
 			var snow := Scenery.cylinder(peak, h * 0.75 * 0.36, 0.0, h * 0.36, Color(0.95, 0.97, 1.0), 7)
 			snow.position.y = h * 0.32
+			snow.material_override = StadiumSurfaces.material(&"snow", Color(0.97, 0.98, 1.0), false, 3.0)
 	if mesa and bool(piece.param("arch")):
 		# A natural stone arch standing over the outfield horizon.
 		var arch_angle := piece.angle + float(piece.param("span")) * 0.5
@@ -46,7 +49,7 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 		torus.rings = 24
 		torus.ring_segments = 8
 		arch.mesh = torus
-		arch.material_override = GrayboxField._mat(rock)
+		arch.material_override = StadiumSurfaces.material(&"rock", rock, false, 2.0)
 		root.add_child(arch)
 		arch.look_at_from_position(spot, Vector3(0, 0, 0), Vector3.UP)
 		arch.rotate_object_local(Vector3.RIGHT, PI * 0.5)

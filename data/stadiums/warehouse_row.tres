@@ -128,4 +128,7 @@ attendance = 0.92
 sponsors = PackedStringArray("ROUNDHOUSE STORAGE CO.", "HARBORLIGHT CRAB SHACK", "BRASS RAIL BITTERS", "OLD LINE LOCKSMITHS", "CANAL STREET CANDY")
 skyline_color = Color(0.31764707, 0.28235295, 0.28235295, 1)
 window_color = Color(1, 0.88235295, 0.65882355, 1)
+facade_color = Color(0.5411765, 0.24313726, 0.18039216, 1)
+facade_surface = &"brick"
+structure_surface = &"steel"
 pieces = Array[ExtResource("2_3mioo")]([SubResource("Resource_llfex"), SubResource("Resource_dhncx"), SubResource("Resource_50gy8"), SubResource("Resource_3ko6v"), SubResource("Resource_5iq4d"), SubResource("Resource_di3l1"), SubResource("Resource_8s8n4"), SubResource("Resource_nehh2"), SubResource("Resource_eebaf"), SubResource("Resource_t0e0d"), SubResource("Resource_1sk07"), SubResource("Resource_fx584"), SubResource("Resource_i7bf1")])

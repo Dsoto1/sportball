@@ -1,6 +1,7 @@
 extends StadiumModule
-## A city ringing the park: towers taller toward the far side so they peek
-## over the outfield, windows lit (more of them, brighter, at night).
+## A city ringing the park: modeled buildings and towers (Kenney City Kit)
+## in a nearer ring, and lit-window towers behind them, taller toward the
+## far side so they peek over the outfield (more windows lit at night).
 
 
 func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef) -> void:
@@ -27,3 +28,15 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 		tower.position = Stadium.FIELD_CENTER + Vector3(cos(a) * radius, size.y * 0.5, sin(a) * radius)
 		tower.rotation.y = rng.randf_range(0.0, PI)
 		tower.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# The nearer ring: modeled city blocks, offices and skyscrapers.
+	var near := int(count * 0.9)
+	for i in near:
+		var a := TAU * (i + rng.randf_range(-0.35, 0.35)) / near
+		var behind_center := maxf(-sin(a), 0.0)
+		var role: StringName = &"tower" if rng.randf() < 0.3 + 0.4 * behind_center else (&"building" if rng.randf() < 0.6 else &"block")
+		var height := (rng.randf_range(45.0, 85.0) if role == &"tower" else rng.randf_range(22.0, 40.0)) * tall
+		var b := ModelKit.spawn(role, height, rng)
+		root.add_child(b)
+		var radius := rng.randf_range(330.0, 470.0)
+		b.position = Stadium.FIELD_CENTER + Vector3(cos(a) * radius, 0.0, sin(a) * radius)
+		b.rotation.y = rng.randf() * TAU

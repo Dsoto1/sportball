@@ -21,17 +21,17 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 		&"gate":
 			# Iron posts and a lintel, rivet bands, the board hung inside.
 			for side: float in [-1.0, 1.0]:
-				var post := stadium.box(Vector3(4.0, 34.0, 3.0), frame_color, board)
+				var post := stadium.box(Vector3(4.0, 34.0, 3.0), frame_color, board, &"steel")
 				post.position = Vector3(side * 19.0, -3.0, -1.5)
 				for band in 4:
 					var rivets := stadium.box(Vector3(4.3, 0.5, 3.2), def.accent_color.darkened(0.2), post)
 					rivets.position.y = -12.0 + band * 7.0
-			var lintel := stadium.box(Vector3(42.0, 4.0, 3.0), frame_color, board)
+			var lintel := stadium.box(Vector3(42.0, 4.0, 3.0), frame_color, board, &"steel")
 			lintel.position = Vector3(0, 13.5, -1.5)
 		&"arch":
 			# Masonry piers and a round-topped crown.
 			for side: float in [-1.0, 1.0]:
-				var pier := stadium.box(Vector3(5.0, 32.0, 3.0), def.structure_color, board)
+				var pier := stadium.box(Vector3(5.0, 32.0, 3.0), def.structure_color, board, &"facade")
 				pier.position = Vector3(side * 19.5, -4.0, -1.5)
 				var cap := stadium.box(Vector3(6.0, 1.2, 3.6), def.accent_color, pier)
 				cap.position.y = 16.5
@@ -43,12 +43,12 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 			crown.mesh = disc
 			crown.rotation_degrees.x = 90.0
 			crown.position = Vector3(0, 11.0, -1.6)
-			crown.material_override = GrayboxField._mat(def.structure_color)
+			crown.material_override = stadium.surface_mat(&"facade", def.structure_color)
 			board.add_child(crown)
 		_:
-			var legs := stadium.box(Vector3(30.0, 14.0, 1.0), frame_color, board)
+			var legs := stadium.box(Vector3(30.0, 14.0, 1.0), frame_color, board, &"structure")
 			legs.position = Vector3(0, -15.0, -0.8)
-	var back := stadium.box(Vector3(36.0, 22.0, 1.4), frame_color, board)
+	var back := stadium.box(Vector3(36.0, 22.0, 1.4), frame_color, board, &"structure")
 	back.position = Vector3(0, 0, -0.8)
 	var trim := stadium.box(Vector3(36.6, 0.6, 1.6), def.accent_color, board)
 	trim.position = Vector3(0, 11.2, -0.6)

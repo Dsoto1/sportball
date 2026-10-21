@@ -19,7 +19,7 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	for angle: float in angles:
 		var p := stadium.profile(angle)
 		var base := stadium.point(angle, p.x + p.z * Stadium.ROW_DEPTH + 4.0, 0.0)
-		var pole := stadium.box(Vector3(1.4, height, 1.4), def.structure_color.darkened(0.2), root)
+		var pole := stadium.box(Vector3(1.4, height, 1.4), def.structure_color.darkened(0.2), root, &"steel")
 		pole.position = base + Vector3.UP * height * 0.5
 		var bank := Node3D.new()
 		root.add_child(bank)
