@@ -279,3 +279,23 @@ Decision:
 Reason: Owner approved steals and bunts as the next step. They give the Gearheads' small-ball identity real tools, and both are core verbs in the brief.
 
 Affected systems: SwingIntent, ContactResult, ContactResolver, MatchState (FOUL_BUNT, apply_steal, steal events), LivePlay (bunt jump, steal mode, running start, sacrifice), BallInPlay (create_steal), AiManager, AiBatter, TeamDef and team data, AutoMatch, MatchDirector, MatchView (bunt pose, runner off base), ContactFeedback, input map, bot, sim report, tests.
+
+## 2026-10-21 - Pickoffs
+
+Decision:
+- **The play:** a pitcher may throw over before his windup starts (once the windup begins he is committed). The pickoff is a live play: the pitcher spins and throws, the runner dives back after his reaction time, and the cover tags.
+- **Outcomes:**
+  - A normal lead (4 m, 0.2 s reaction) is safe.
+  - A runner leaning to steal (+1.8 m, 0.35 s reaction) is picked off about 60–70% of the time.
+  - Wild pickoff throws can happen, and runners advance on them.
+- **Holding runners:** each attempt shrinks that runner's lead by 0.6 m (minimum 2.5 m) for the rest of the plate appearance, which shrinks his steal head start.
+- **Arcade rule:** two pickoff attempts per batter (`MatchRules.pickoff_limit`).
+- **AI:**
+  - The AI offense now decides its steals before the pitch, so its runners lean and the human pitcher can see it.
+  - The AI pitcher reads a lean 12% of the time and throws over to fast runners with an open base 2.5% of the time (scaled by speed).
+- **Human controls:** F / LT, with an optional direction, throws over. With no direction, the throw goes to the runner most likely to run.
+- **Balance (400 matches):** 2.7 throws over and 0.36 pickoffs per game. Steals go 1.3 per game at 81%, and the Gearheads win 44.75%.
+
+Reason: Owner request. Pickoffs are the pitcher's answer to the running game.
+
+Affected systems: MatchRules, MatchState (pickoff count, lead cuts, apply_pickoff, events), LivePlay (pickoff mode, steal lead), BallInPlay (create_pickoff, lead_for), AiManager, AutoMatch, MatchDirector, MatchView (leads), input map, bot, sim report, tests.

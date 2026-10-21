@@ -35,6 +35,7 @@ fast runners beat out grounders, good gloves bobble less.
 | Bunt (hold ← / → to push it toward third / first) | B | B |
 | Before the pitch: steal (every runner with an open base) / call it off | E / Q | RB / LB |
 | ...hold 1 / 2 + steal: send just that runner | 1-2 + E | B / Y + RB |
+| Pitching, before the pitch: pickoff throw (point → 1st, ↑ 2nd, ← 3rd; none = the likeliest runner) | F (+ WASD) | LT (+ stick) |
 | While swinging: steer left/right field, lift (up) or chop (down) | WASD or arrows | Left stick |
 | Aim pitch target | WASD or arrows | Left stick / D-pad |
 | Pick pitch | Q / E | LB / RB |
@@ -79,6 +80,14 @@ jump; late costs ground. Your runner breaks on the pitch, and the catcher
 has to throw him out, with speed and arm deciding the race. If the ball is
 put in play he already has a running start (hit-and-run). When you are on
 defense, a runner going calls out RUNNER GOING!: throw to his base.
+
+**Pickoffs.** Before the windup the pitcher can throw over (F / LT, aim
+with WASD). A runner with a normal lead dives back safely. One leaning to
+steal (watch for a runner with a bigger lead) is picked off about two times
+in three. Every throw over shrinks that runner's lead for the rest of the
+at-bat, which costs him jump on a steal. You get two per batter. The AI
+pitcher throws over on you too, and may read your steal if you call it
+early, so time it.
 
 Read the pitch by its trail: a **long blue** streak is a fastball, a
 **short orange** one a breaking ball (it moves late), a **stub of green** a

@@ -168,8 +168,9 @@ func bunt_bat() -> void:
 	_bat_swing_start = -1.0
 
 
-## A runner off his bag toward the next one (stealing, during the pitch).
-func set_runner_off_base(id: StringName, base: int, meters: float) -> void:
+## A runner off his bag toward the next one: his lead before the pitch
+## (standing), or stealing during it (running).
+func set_runner_off_base(id: StringName, base: int, meters: float, running: bool = true) -> void:
 	var actor: ActorView = _runners.get(id)
 	if actor == null:
 		return
@@ -177,7 +178,10 @@ func set_runner_off_base(id: StringName, base: int, meters: float) -> void:
 	var to := FieldLayout.base_position(base + 1)
 	actor.position = from.move_toward(to, meters)
 	actor.face(to)
-	actor.animate(ActorView.Pose.RUN, get_process_delta_time(), tuning.runner_speed)
+	if running:
+		actor.animate(ActorView.Pose.RUN, get_process_delta_time(), tuning.runner_speed)
+	else:
+		actor.animate(ActorView.Pose.IDLE, get_process_delta_time())
 
 
 ## Aim preview while batting: an arrow from home plate in the direction the

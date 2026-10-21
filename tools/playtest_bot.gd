@@ -103,6 +103,9 @@ func _drive() -> void:
 					return
 			if batting and entered and (_director.state.runner_on(1) != &"" or _director.state.runner_on(2) != &"") and _rng.randf() < 0.3:
 				_press(&"runner_advance")  # steal on this pitch
+			if not batting and entered and _director.state.can_pickoff() and _rng.randf() < 0.15:
+				_press(&"pickoff")  # throw over first
+				return
 			if not batting and _director.phase_time() > 0.3:
 				_director.debug_set_cursor(Vector2(_rng.randf_range(-0.3, 0.3), _rng.randf_range(0.5, 1.1)))
 				_press(&"pitch_primary")

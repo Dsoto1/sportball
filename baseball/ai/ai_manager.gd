@@ -56,6 +56,26 @@ static func steal_attempts(state: MatchState, roster: MatchRoster, tuning: Baseb
 	return sends
 
 
+## Base the AI pitcher throws over to before this pitch, or 0. He reads a
+## runner who is leaning to steal (leaning: start base -> anything) some of
+## the time, and otherwise keeps fast runners with an open base honest.
+static func pickoff_choice(state: MatchState, roster: MatchRoster, tuning: BaseballTuning, rng: MatchRng, leaning: Dictionary = {}) -> int:
+	if not state.can_pickoff():
+		return 0
+	for base: int in leaning:
+		if state.runner_on(base) != &"" and rng.chance(tuning.ai_pickoff_read):
+			return base
+	for base in [1, 2]:
+		var id := state.runner_on(base)
+		if id == &"" or state.runner_on(base + 1) != &"":
+			continue
+		var p := roster.player(id) if roster != null else null
+		var threat := 1.0 + (Ratings.norm(p.speed) if p != null else 0.0)
+		if rng.chance(tuning.ai_pickoff_rate * threat):
+			return base
+	return 0
+
+
 ## Rough chance a runner steals the next base against a catcher's arm,
 ## from the same race the live play runs (average jump, average pitch).
 static func success_chance(base: int, speed: float, arm: float, tuning: BaseballTuning) -> float:

@@ -21,10 +21,54 @@ var runner_speeds: Dictionary = {}
 var runner_aggression: float = 0.0
 ## A steal: start base -> meters off the bag when the catcher has the ball.
 var steal_heads: Dictionary = {}
+## A pickoff: the base thrown to (0 = not a pickoff), the runner's lead and
+## how fast he gets back.
+var pickoff_base: int = 0
+var pickoff_lead: float = 0.0
+var pickoff_reaction: float = 0.0
 
 
 func is_steal() -> bool:
 	return not steal_heads.is_empty()
+
+
+func is_pickoff() -> bool:
+	return pickoff_base > 0
+
+
+## Between pitches: a steal or a pickoff, not a batted ball.
+func is_runner_play() -> bool:
+	return is_steal() or is_pickoff()
+
+
+## A runner's lead off his bag: the normal lead, less what pickoff throws
+## have taken off it this plate appearance.
+static func lead_for(state: MatchState, runner_id: StringName, p_tuning: BaseballTuning) -> float:
+	return maxf(p_tuning.runner_lead_distance - state.lead_cut.get(runner_id, 0.0), p_tuning.min_lead)
+
+
+## A pickoff throw to `base`. leaning: the runner there was about to steal.
+## rng varies how quickly he reads the move.
+static func create_pickoff(state: MatchState, p_tuning: BaseballTuning, roster: MatchRoster, base: int, leaning: bool, rng: MatchRng = null) -> BallInPlay:
+	var id := state.runner_on(base) if base >= 1 and base <= 3 else &""
+	if id == &"" or state.game_over:
+		return null
+	var bip := BallInPlay.new()
+	bip.tuning = p_tuning
+	bip.batter_id = state.current_batter()
+	bip.outs_before = state.outs
+	bip.bases_before = state.bases.duplicate()
+	bip._read_roster(state, roster)
+	bip.contact = ContactResult.new()
+	bip.pickoff_base = base
+	bip.pickoff_lead = lead_for(state, id, p_tuning) + (p_tuning.lean_distance if leaning else 0.0)
+	bip.pickoff_reaction = p_tuning.lean_reaction if leaning else p_tuning.pickoff_runner_reaction
+	if rng != null:
+		bip.pickoff_reaction = maxf(bip.pickoff_reaction + rng.randfn(0.0, p_tuning.pickoff_reaction_sigma), 0.05)
+	var play := bip.start_live(false)
+	bip.trajectory = play.trajectory
+	bip.fielding = play.projection
+	return bip
 
 
 ## roster: who the MatchState ids are (ratings, personalities); null plays
@@ -64,7 +108,7 @@ static func create_steal(state: MatchState, p_tuning: BaseballTuning, roster: Ma
 		var open := base == 3 or state.bases[base] == &"" or stealers.has(base + 1)
 		if id != &"" and open:
 			var speed: float = bip.runner_speeds.get(id, p_tuning.runner_speed)
-			bip.steal_heads[base] = LivePlay.steal_head_start(speed, travel, stealers[base], p_tuning)
+			bip.steal_heads[base] = LivePlay.steal_head_start(speed, travel, stealers[base], p_tuning, lead_for(state, id, p_tuning))
 	if bip.steal_heads.is_empty():
 		return null
 	bip.contact = ContactResult.new()
@@ -98,6 +142,8 @@ func is_home_run() -> bool:
 
 ## rng enables fielding errors; without one the play is error-free.
 func start_live(auto_secure: bool = true, rng: MatchRng = null) -> LivePlay:
+	if is_pickoff():
+		return LivePlay.pickoff_play(bases_before, pickoff_base, pickoff_lead, pickoff_reaction, outs_before, tuning, fielders, runner_speeds, runner_aggression, rng)
 	if is_steal():
 		var steal := LivePlay.steal_play(bases_before, steal_heads, outs_before, tuning, fielders, runner_speeds, runner_aggression)
 		steal.rng = rng
@@ -112,7 +158,7 @@ func start_live(auto_secure: bool = true, rng: MatchRng = null) -> LivePlay:
 
 ## Resolves the whole play with the AI on both sides.
 func resolve_ai(rng: MatchRng = null) -> PlayOutcome:
-	if not is_steal() and is_home_run():
+	if not is_runner_play() and is_home_run():
 		return RunnerResolver.home_run(bases_before, batter_id)
 	return start_live(true, rng).run_ai(tuning.sim_play_step)
 

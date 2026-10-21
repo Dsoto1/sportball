@@ -19,6 +19,8 @@ extends Resource
 ## Seconds a human pitcher has to start the pitch before an automatic
 ## ball (0 = no clock).
 @export var pitch_clock: float = 15.0
+## Pickoff throws a pitcher may make per batter.
+@export var pickoff_limit: int = 2
 ## Removed players cannot come back into the game.
 @export var no_reentry: bool = true
 

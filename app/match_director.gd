@@ -68,6 +68,12 @@ var _who_on_first := false
 var _steal_orders := {}
 ## Runners going on this pitch: start base -> jump delay (s).
 var _steals := {}
+## When the human fields: the AI offense's steal plan, made before the pitch
+## so its runners lean (a cue for a pickoff). When the human bats: the phase
+## time the AI pitcher throws over (or -1) and to which base.
+var _ai_steal_plan := {}
+var _ai_pickoff_at := -1.0
+var _ai_pickoff_base := 0
 
 
 func setup(p_content: ContentLibrary, view: MatchView, hud: MatchHud, debug: DebugOverlay) -> void:
@@ -238,6 +244,8 @@ func _handle_global_input() -> void:
 func _enter_pre_pitch() -> void:
 	_hud.set_clock(-1.0)
 	_steal_orders.clear()
+	_ai_steal_plan.clear()
+	_ai_pickoff_at = -1.0
 	if state.game_over:
 		_enter_game_over()
 		return
@@ -245,6 +253,13 @@ func _enter_pre_pitch() -> void:
 	_ai_pitching_change()
 	_announce_whos_on_first()
 	_view.reset_for_pitch(state)
+	if user_is_batting():
+		# The AI pitcher may throw over to keep a runner honest.
+		_ai_pickoff_base = AiManager.pickoff_choice(state, roster, tuning, rng)
+		if _ai_pickoff_base > 0:
+			_ai_pickoff_at = rng.randf_range(0.4, AI_PRE_PITCH_DELAY - WINDUP_TIME - 0.1)
+	else:
+		_ai_steal_plan = AiManager.steal_attempts(state, roster, tuning, rng)
 	_bip = null
 	_outcome = null
 	_meter = 0.0
@@ -261,7 +276,11 @@ func _enter_pre_pitch() -> void:
 
 
 func _process_pre_pitch(delta: float) -> void:
+	_show_leads()
 	if user_is_batting():
+		if _ai_pickoff_at >= 0.0 and _phase_time >= _ai_pickoff_at:
+			_start_pickoff(_ai_pickoff_base)
+			return
 		_show_stick_marker()
 		if Input.is_action_just_pressed(&"runner_advance"):
 			_order_steal(_held_base())
@@ -282,6 +301,9 @@ func _process_pre_pitch(delta: float) -> void:
 		return
 	if Input.is_action_just_pressed(&"open_subs"):
 		_open_sub_menu()
+		return
+	if Input.is_action_just_pressed(&"pickoff"):
+		_human_pickoff()
 		return
 	# Pitch clock: a human pitcher who never starts the pitch is charged a ball.
 	var clock := content.rules.pitch_clock
@@ -476,7 +498,9 @@ func _process_ball_in_play() -> void:
 		return
 	var skip := Input.is_action_just_pressed(&"swing_contact") or Input.is_action_just_pressed(&"pitch_primary")
 	if t >= _play_done_at + PLAY_SETTLE_PAUSE or (skip and t > _play_done_at):
-		if _bip.is_steal():
+		if _bip.is_pickoff():
+			state.apply_pickoff(_outcome)
+		elif _bip.is_steal():
 			state.apply_steal(_outcome)
 		else:
 			state.apply_play(_outcome)
@@ -566,7 +590,10 @@ func _finish_play(outcome: PlayOutcome) -> void:
 	_log({"outcome": _outcome.kind, "throws": _outcome.throws.map(func(leg: Dictionary) -> int: return leg["base"]), "runs": _outcome.runs.size(), "outs": _outcome.outs.size()})
 	var detail := "%.1f m/s  %d°  %.0f m" % [_contact.exit_velocity, roundi(_contact.launch_angle), _bip.trajectory.distance()]
 	var text := String(_outcome.kind).replace("_", " ").to_upper()
-	if _bip.is_steal():
+	if _bip.is_pickoff():
+		text = "PICKED OFF!" if not _outcome.outs.is_empty() else "SAFE"
+		detail = "%s %s" % [_name(_bip.bases_before[_bip.pickoff_base - 1]), "was leaning" if not _outcome.outs.is_empty() else "dives back in time"]
+	elif _bip.is_steal():
 		var names := PackedStringArray()
 		for base: int in _bip.steal_heads:
 			names.append(_name(_bip.bases_before[base - 1]))
@@ -663,7 +690,7 @@ func _hud_prompt_suffix() -> String:
 			if user_is_batting():
 				base = "Watch the pitcher. SWING as the ring closes: J or click (contact) / K or right-click (power) / B (bunt, ←→ places it)\nHold WASD / L-stick while swinging: ←→ aim field  ↑ lift  ↓ chop    Steal: E / RB before the pitch (hold 1-3 for one runner), Q / LB cancel    Pinch hit: P / Y"
 			else:
-				base = "Aim: WASD / L-stick    Pitch: Q E / LB RB    Start meter: Space / A    Pitching change: P / Y"
+				base = "Aim: WASD / L-stick    Pitch: Q E / LB RB    Start meter: Space / A    Pickoff: F / LT (+ → ↑ ←)    Pitching change: P / Y"
 		Phase.BALL_IN_PLAY:
 			if _outcome != null:
 				base = "Skip: J / A"
@@ -704,6 +731,11 @@ func _order_steal(base: int) -> void:
 			continue
 		if not _steal_orders.has(b):
 			_steal_orders[b] = _phase_time
+			# The pitcher may read the lean and throw over.
+			var windup_start := AI_PRE_PITCH_DELAY - WINDUP_TIME
+			if _ai_pickoff_at < 0.0 and state.can_pickoff() and _phase_time + 0.3 < windup_start and rng.chance(tuning.ai_pickoff_read):
+				_ai_pickoff_at = _phase_time + 0.3
+				_ai_pickoff_base = b
 		picked.append(_name(state.runner_on(b)))
 	if picked.is_empty():
 		_hud.show_callout("NO BASE TO STEAL", "", 0.8)
@@ -720,7 +752,7 @@ func _decide_steals() -> void:
 			var late := maxf(_steal_orders[base] - windup_start, 0.0)
 			_steals[base] = tuning.steal_jump_delay + late + rng.randfn(0.0, tuning.steal_jump_sigma * 0.6)
 	else:
-		_steals = AiManager.steal_attempts(state, roster, tuning, rng)
+		_steals = _ai_steal_plan.duplicate()
 		if not _steals.is_empty():
 			_hud.show_callout("RUNNER GOING!", "throw to the base he is stealing", 1.0)
 	_steal_orders.clear()
@@ -753,6 +785,70 @@ func _start_steal_play(bases_before: Array[StringName]) -> void:
 	_play_done_at = -1.0
 	_view.set_camera_mode(MatchView.CameraMode.FIELD)
 	_view.set_cursor(Vector2.ZERO, 0.0, 0.0, Color.WHITE)
+	_set_phase(Phase.BALL_IN_PLAY)
+	_hud.show_prompt(_hud_prompt_suffix())
+
+
+# --- Pickoffs and leads -----------------------------------------------------
+
+## Everyone on base takes his lead; a runner about to steal leans farther.
+func _show_leads() -> void:
+	for base in [1, 2, 3]:
+		var id := state.runner_on(base)
+		if id == &"":
+			continue
+		var lean := _steal_orders.has(base) or _ai_steal_plan.has(base)
+		_view.set_runner_off_base(id, base, BallInPlay.lead_for(state, id, tuning) + (tuning.lean_distance if lean else 0.0), false)
+
+
+## The human pitcher throws over: to the base the stick points at, or the
+## runner most likely to run.
+func _human_pickoff() -> void:
+	if not state.can_pickoff():
+		_hud.show_callout("NO MORE PICKOFFS", "%d per batter" % content.rules.pickoff_limit, 1.0)
+		return
+	var base := ThrowAim.base_for(Input.get_vector(&"aim_left", &"aim_right", &"aim_down", &"aim_up"))
+	if base < 1 or base > 3 or state.runner_on(base) == &"":
+		base = _likely_stealer()
+	if base == 0:
+		return
+	_start_pickoff(base)
+
+
+## Lead runner with an open base ahead, else whoever is on base.
+func _likely_stealer() -> int:
+	for b in [2, 1]:
+		if state.runner_on(b) != &"" and state.runner_on(b + 1) == &"":
+			return b
+	for b in [1, 2, 3]:
+		if state.runner_on(b) != &"":
+			return b
+	return 0
+
+
+func _start_pickoff(base: int) -> void:
+	var leaning := _steal_orders.has(base) or _ai_steal_plan.has(base)
+	var bip := BallInPlay.create_pickoff(state, tuning, roster, base, leaning, rng)
+	if bip == null:
+		_ai_pickoff_at = -1.0
+		return
+	state.record_pickoff_attempt(state.runner_on(base), tuning.pickoff_lead_shrink)
+	_log({"pickoff": base, "leaning": leaning})
+	_steal_orders.clear()
+	_ai_steal_plan.clear()
+	_ai_pickoff_at = -1.0
+	_bip = bip
+	_play = bip.start_live(false, rng)
+	_play.human_defense = not user_is_batting()
+	_live = null
+	_outcome = null
+	_play_event_cursor = 0
+	_play_done_at = -1.0
+	_hud.set_clock(-1.0)
+	_hud.show_pitching(false)
+	_view.set_camera_mode(MatchView.CameraMode.FIELD)
+	_view.set_cursor(Vector2.ZERO, 0.0, 0.0, Color.WHITE)
+	_hud.show_callout("PICKOFF THROW", "to %s" % FieldLayout.base_name(base), 0.8)
 	_set_phase(Phase.BALL_IN_PLAY)
 	_hud.show_prompt(_hud_prompt_suffix())
 

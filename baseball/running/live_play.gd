@@ -98,6 +98,8 @@ var runner_aggression := 0.0
 var is_bunt := false
 ## A steal between pitches: the catcher has the ball, nobody is batting.
 var is_steal := false
+## A pickoff between pitches: the pitcher throws over, the runner dives back.
+var is_pickoff := false
 
 var _went := false
 var _ground_targets := {}
@@ -197,9 +199,47 @@ func _setup_steal(stealers: Dictionary) -> void:
 	windup = tuning.catcher_release_time
 
 
+## A pickoff: the pitcher spins and throws to `base` at once; the runner
+## there is `lead` meters off and dives back after `reaction` seconds.
+static func pickoff_play(bases: Array[StringName], base: int, lead: float, reaction: float, outs_before: int, p_tuning: BaseballTuning,
+		p_fielders: Array[FielderState] = [], speeds: Dictionary = {}, p_aggression: float = 0.0, p_rng: MatchRng = null) -> LivePlay:
+	var f := FieldingResult.new()
+	f.fielder_index = p_tuning.fielder_ids.find(&"p")
+	f.fielder_id = &"p"
+	f.secure_point = p_tuning.fielder_spots[f.fielder_index]
+	f.secure_time = 0.0
+	f.ready_time = 0.0
+	var traj := BallTrajectory.simulate(1.0, -60.0, 0.0, p_tuning)  # unused: the ball starts in the pitcher's hand
+	var play := LivePlay.new(bases, &"", outs_before, 0.0, traj, f, p_tuning, false, p_fielders, speeds, p_aggression)
+	play._setup_between_pitches()
+	play.is_pickoff = true
+	for r in play.runners:
+		if r.start_base == base:
+			r.s = base * BASE + lead
+			r.target = base
+			r.state = State.RUNNING
+			r.go_time = reaction
+	play.secure(f)
+	play.rng = p_rng  # after the catch-in-hand: the throw itself can sail
+	play.windup = p_tuning.pickoff_release_time
+	play._throw(base)
+	return play
+
+
+func _setup_between_pitches() -> void:
+	_went = true
+	runners = runners.filter(func(r: Runner) -> bool: return not r.is_batter)
+	for r in runners:
+		r.forced = false
+		r.s = r.start_base * BASE
+		r.target = r.start_base
+		r.state = State.ON_BASE
+
+
 ## Meters a stealing runner is off his bag when the pitch reaches the plate.
-static func steal_head_start(speed: float, travel_time: float, jump_delay: float, p_tuning: BaseballTuning) -> float:
-	return p_tuning.runner_lead_distance + speed * maxf(p_tuning.steal_delivery_time + travel_time - jump_delay - p_tuning.steal_start_penalty, 0.0)
+## lead: his lead off the bag (< 0 = the normal lead).
+static func steal_head_start(speed: float, travel_time: float, jump_delay: float, p_tuning: BaseballTuning, lead: float = -1.0) -> float:
+	return (lead if lead >= 0.0 else p_tuning.runner_lead_distance) + speed * maxf(p_tuning.steal_delivery_time + travel_time - jump_delay - p_tuning.steal_start_penalty, 0.0)
 
 
 ## A runner who was stealing when the ball was put in play is already on his way.
@@ -629,9 +669,9 @@ func ai_defense_action() -> Dictionary:
 	if chase != null:
 		return {"kind": "chase", "point": runner_position(chase)}
 	# Otherwise get the ball back in: throw ahead of the lead runner so
-	# nobody keeps running on a fielder who is just holding it. On a steal
-	# with no play the catcher just holds it.
-	if holder_cover == -1 and not is_steal:
+	# nobody keeps running on a fielder who is just holding it. Between
+	# pitches with no play the fielder just holds it.
+	if holder_cover == -1 and not is_steal and not is_pickoff:
 		return {"kind": "throw", "base": _hold_base()}
 	return {}
 
@@ -932,6 +972,8 @@ func outcome() -> PlayOutcome:
 func _classify(result: PlayOutcome) -> StringName:
 	if is_steal:
 		return PlayOutcome.KIND_STEAL
+	if is_pickoff:
+		return PlayOutcome.KIND_PICKOFF
 	if result.outs.size() >= 3:
 		return PlayOutcome.KIND_TRIPLE_PLAY
 	if result.outs.size() == 2:

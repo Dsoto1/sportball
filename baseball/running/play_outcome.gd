@@ -18,6 +18,8 @@ const KIND_TRIPLE_PLAY := &"triple_play"
 const KIND_SACRIFICE := &"sacrifice"
 ## A stolen-base play between pitches (no batter involved).
 const KIND_STEAL := &"steal"
+## A pickoff throw between pitches.
+const KIND_PICKOFF := &"pickoff"
 ## Batter safe only because of a bobble or a wild throw to first: not a hit.
 const KIND_REACHED_ON_ERROR := &"reached_on_error"
 

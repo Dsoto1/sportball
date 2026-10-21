@@ -40,6 +40,10 @@ var removed: Dictionary = {}
 var hits: Array[int] = [0, 0]
 ## Errors charged to each team's defense.
 var errors: Array[int] = [0, 0]
+## Pickoff throws this plate appearance, and meters each runner's lead has
+## shrunk from them (both reset when the plate appearance ends).
+var pickoffs_this_pa: int = 0
+var lead_cut: Dictionary = {}
 
 var _next_sequence: int = 0
 var _half_runs: int = 0
@@ -211,8 +215,29 @@ func apply_play(outcome: PlayOutcome) -> void:
 			break  # the half inning ended
 
 
-## Applies a stolen-base play between pitches: the count and batter stay.
+## A stolen-base play between pitches: the count and batter stay.
 func apply_steal(outcome: PlayOutcome) -> void:
+	apply_runner_play(outcome, &"caught_stealing")
+
+
+func can_pickoff() -> bool:
+	return not game_over and pickoffs_this_pa < rules.pickoff_limit and bases.any(func(b: StringName) -> bool: return b != &"")
+
+
+## A pickoff throw at `runner_id`: counts against the limit and shrinks
+## his lead. The play itself is applied with apply_pickoff.
+func record_pickoff_attempt(runner_id: StringName, shrink: float) -> void:
+	pickoffs_this_pa += 1
+	lead_cut[runner_id] = lead_cut.get(runner_id, 0.0) + shrink
+	emit(DomainEvent.PICKOFF_ATTEMPT, {"runner": runner_id})
+
+
+func apply_pickoff(outcome: PlayOutcome) -> void:
+	apply_runner_play(outcome, &"picked_off")
+
+
+## Any runner play between pitches (steal, pickoff): count and batter stay.
+func apply_runner_play(outcome: PlayOutcome, out_kind: StringName) -> void:
 	if game_over:
 		return
 	for advance in outcome.advances:
@@ -224,8 +249,11 @@ func apply_steal(outcome: PlayOutcome) -> void:
 			return
 	bases = outcome.final_bases.duplicate()
 	for out in outcome.outs:
-		emit(DomainEvent.CAUGHT_STEALING, {"runner": out["runner_id"], "base": out["base"]})
-		_record_out(out["runner_id"], out["base"], &"caught_stealing")
+		if out_kind == &"caught_stealing":
+			emit(DomainEvent.CAUGHT_STEALING, {"runner": out["runner_id"], "base": out["base"]})
+		else:
+			emit(DomainEvent.PICKED_OFF, {"runner": out["runner_id"], "base": out["base"]})
+		_record_out(out["runner_id"], out["base"], out_kind)
 		if outs == 0:
 			break
 
@@ -283,6 +311,8 @@ func _end_plate_appearance(result: StringName) -> void:
 	emit(DomainEvent.PLATE_APPEARANCE_ENDED, {"batter": current_batter(), "result": result})
 	balls = 0
 	strikes = 0
+	pickoffs_this_pa = 0
+	lead_cut.clear()
 	lineup_index[team] = (lineup_index[team] + 1) % lineups[team].size()
 
 

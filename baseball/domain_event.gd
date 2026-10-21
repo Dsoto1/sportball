@@ -19,6 +19,8 @@ const SUBSTITUTION := &"substitution"
 const RUNNER_PLACED := &"runner_placed"
 const STOLEN_BASE := &"stolen_base"
 const CAUGHT_STEALING := &"caught_stealing"
+const PICKOFF_ATTEMPT := &"pickoff_attempt"
+const PICKED_OFF := &"picked_off"
 
 var sequence: int
 var type: StringName

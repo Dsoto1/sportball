@@ -11,7 +11,7 @@ var roster: MatchRoster
 var stats := {
 	"pitches": 0, "in_zone": 0, "swings": 0, "whiffs": 0, "fouls": 0, "balls_in_play": 0,
 	"hits": 0, "home_runs": 0, "strikeouts": 0, "walks": 0, "dives": 0, "air_outs": 0,
-	"ground_outs": 0, "double_plays": 0, "errors": 0, "dive_misses": 0, "pitching_changes": 0, "steals": 0, "caught_stealing": 0, "sacrifices": 0, "bunts": 0, "plate_appearances": 0, "exit_velocity_sum": 0.0,
+	"ground_outs": 0, "double_plays": 0, "errors": 0, "dive_misses": 0, "pitching_changes": 0, "steals": 0, "caught_stealing": 0, "sacrifices": 0, "bunts": 0, "pickoffs": 0, "picked_off": 0, "plate_appearances": 0, "exit_velocity_sum": 0.0,
 }
 var outcome_counts := {}
 
@@ -57,6 +57,10 @@ func play_pitch() -> void:
 	var family := content.pitch(intent.family_id)
 	var mods := Ratings.pitcher_mods(pitcher, state.pitches_thrown(state.pitcher(state.fielding_team())), tuning)
 	var steals := AiManager.steal_attempts(state, roster, tuning, rng)
+	var pick := AiManager.pickoff_choice(state, roster, tuning, rng, steals)
+	if pick > 0:
+		_run_pickoff(pick, steals.has(pick))
+		return  # no pitch this time
 	var pitch := PitchResolver.resolve(intent, family, tuning, rng, mods)
 	state.record_pitch(pitch.to_dict())
 	stats["pitches"] += 1
@@ -108,6 +112,18 @@ func _run_steal(steals: Dictionary, bases_before: Array[StringName], travel: flo
 	stats["steals"] += outcome.advances.filter(func(a: Dictionary) -> bool: return bip.steal_heads.has(a["from"]) and a["safe"] and a["to"] > a["from"]).size()
 	stats["caught_stealing"] += outcome.outs.size()
 	state.apply_steal(outcome)
+
+
+func _run_pickoff(base: int, leaning: bool) -> void:
+	var tuning := content.tuning
+	var bip := BallInPlay.create_pickoff(state, tuning, roster, base, leaning, rng)
+	if bip == null:
+		return
+	state.record_pickoff_attempt(state.runner_on(base), tuning.pickoff_lead_shrink)
+	var outcome := bip.resolve_ai(rng)
+	stats["pickoffs"] += 1
+	stats["picked_off"] += outcome.outs.size()
+	state.apply_pickoff(outcome)
 
 
 func steal_head(runner_id: StringName, travel: float, jump: float) -> float:

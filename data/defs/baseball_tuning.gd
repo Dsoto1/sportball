@@ -274,6 +274,24 @@ extends Resource
 @export var catcher_transfer_time: float = 0.3
 @export var catcher_release_time: float = 0.35
 
+@export_group("Pickoffs")
+## Pitcher's step-off-and-throw time to a base.
+@export var pickoff_release_time: float = 0.3
+## A runner with a normal lead reacts this fast and dives back.
+@export var pickoff_runner_reaction: float = 0.2
+## A runner leaning to steal is this much farther off and slower to react.
+@export var lean_distance: float = 1.8
+@export var lean_reaction: float = 0.35
+## Spread of a runner's reaction to the pickoff move.
+@export var pickoff_reaction_sigma: float = 0.12
+## Each throw over shrinks that runner's lead (for the rest of the at-bat).
+@export var pickoff_lead_shrink: float = 0.6
+@export var min_lead: float = 2.5
+## AI pitcher: chance per pitch of a throw over to a dangerous runner, and
+## of reading a runner who is leaning to steal.
+@export var ai_pickoff_rate: float = 0.025
+@export var ai_pickoff_read: float = 0.12
+
 @export_group("AI")
 @export var ai_pitcher_meter_sigma: float = 0.22
 @export var ai_pitcher_edge_bias: float = 1.7
