@@ -13,6 +13,9 @@ static func decide(pitch: PitchResult, family: PitchFamilyDef, state: MatchState
 		rng.randfn(0.0, tuning.ai_batter_read_sigma * fooled * eye),
 		rng.randfn(0.0, tuning.ai_batter_read_sigma * fooled * eye))
 	var looks_strike := PitchResolver.in_zone(read, tuning)
+	var bunt := _bunt(state, tuning, rng, profile, batter, looks_strike)
+	if bunt != null:
+		return bunt
 	var chase := tuning.ai_swing_chase * eye * (profile.chase_scale if profile != null else 1.0)
 	var swing_chance := tuning.ai_swing_in_zone if looks_strike else chase
 	if profile != null:
@@ -36,5 +39,31 @@ static func decide(pitch: PitchResult, family: PitchFamilyDef, state: MatchState
 	if state.runner_on(3) != &"" and state.outs < 2:
 		stick.y += 0.5
 	var swing := SwingIntent.swing(type, timing, stick)
+	Ratings.apply_batter(swing, batter, tuning)
+	return swing
+
+
+## Sacrifice with a runner on first or second and fewer than two outs (weak
+## hitters more), or bunt for a hit with a fast batter. Only on pitches that
+## look like strikes; the stick places it.
+static func _bunt(state: MatchState, tuning: BaseballTuning, rng: MatchRng, profile: TeamDef, batter: PlayerDef, looks_strike: bool) -> SwingIntent:
+	if not looks_strike or state.strikes >= 2:
+		return null
+	var rate := profile.bunt_rate if profile != null else 1.0
+	var power := Ratings.norm(batter.power) if batter != null else 0.0
+	var on_first := state.runner_on(1) != &""
+	var on_second := state.runner_on(2) != &""
+	var aim := 0.0
+	var chance := 0.0
+	if state.outs < 2 and (on_first or on_second) and state.runner_on(3) == &"":
+		chance = tuning.ai_sac_bunt_rate * rate * clampf(1.0 - power, 0.2, 1.5)
+		aim = 0.6 if on_first and not on_second else -0.6  # make the corner man field it
+	elif batter != null and batter.speed >= 75 and state.outs < 2:
+		chance = tuning.ai_bunt_hit_rate * rate
+		aim = -0.9  # down the third-base line
+	if chance <= 0.0 or not rng.chance(chance):
+		return null
+	var timing := rng.randfn(0.0, tuning.ai_batter_timing_sigma * 0.6)
+	var swing := SwingIntent.swing(SwingIntent.Type.BUNT, timing, Vector2(aim + rng.randfn(0.0, 0.2), 0.0))
 	Ratings.apply_batter(swing, batter, tuning)
 	return swing

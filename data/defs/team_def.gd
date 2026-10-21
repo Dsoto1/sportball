@@ -37,6 +37,9 @@ extends Resource
 @export var edge_bias_scale: float = 1.0
 ## Fatigue (0..1) at which the AI goes to the bullpen.
 @export var bullpen_hook: float = 0.6
+## Multipliers on how often the AI runs and bunts (1 = league average).
+@export var steal_rate: float = 1.0
+@export var bunt_rate: float = 1.0
 
 
 func player(player_id: StringName) -> PlayerDef:

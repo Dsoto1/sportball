@@ -16,6 +16,8 @@ var quality: float = 0.0
 var exit_velocity: float = 0.0
 var launch_angle: float = 0.0
 var spray_angle: float = 0.0
+## A bunt: fouls count as strikes even with two strikes.
+var is_bunt: bool = false
 
 
 func to_dict() -> Dictionary:

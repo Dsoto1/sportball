@@ -6,7 +6,8 @@ extends RefCounted
 ## never own it. The rules package (MatchRules) sets counts, innings, the
 ## mercy rule and the extra-innings runner.
 
-enum PitchCall { BALL, CALLED_STRIKE, SWINGING_STRIKE, FOUL }
+## FOUL_BUNT is a strike even with two strikes (a strikeout).
+enum PitchCall { BALL, CALLED_STRIKE, SWINGING_STRIKE, FOUL, FOUL_BUNT }
 
 const AWAY := 0
 const HOME := 1
@@ -172,7 +173,7 @@ func apply_pitch_call(call: PitchCall) -> void:
 			balls += 1
 			if balls >= rules.balls_for_walk:
 				_walk()
-		PitchCall.CALLED_STRIKE, PitchCall.SWINGING_STRIKE:
+		PitchCall.CALLED_STRIKE, PitchCall.SWINGING_STRIKE, PitchCall.FOUL_BUNT:
 			strikes += 1
 			if strikes >= rules.strikes_for_out:
 				var batter := current_batter()
@@ -208,6 +209,25 @@ func apply_play(outcome: PlayOutcome) -> void:
 		_record_out(out["runner_id"], out["base"], out["kind"])
 		if outs == 0:
 			break  # the half inning ended
+
+
+## Applies a stolen-base play between pitches: the count and batter stay.
+func apply_steal(outcome: PlayOutcome) -> void:
+	if game_over:
+		return
+	for advance in outcome.advances:
+		if advance["safe"] and advance["to"] > advance["from"]:
+			emit(DomainEvent.STOLEN_BASE, advance)
+	for runner in outcome.runs:
+		_score_run(runner)
+		if game_over:
+			return
+	bases = outcome.final_bases.duplicate()
+	for out in outcome.outs:
+		emit(DomainEvent.CAUGHT_STEALING, {"runner": out["runner_id"], "base": out["base"]})
+		_record_out(out["runner_id"], out["base"], &"caught_stealing")
+		if outs == 0:
+			break
 
 
 func snapshot() -> Dictionary:

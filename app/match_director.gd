@@ -64,6 +64,10 @@ var _sub_options: Array[Dictionary] = []
 var _sub_selected := 0
 ## Who's on first: announced once each time he gets there.
 var _who_on_first := false
+## Human steal orders before the pitch: start base -> phase time pressed.
+var _steal_orders := {}
+## Runners going on this pitch: start base -> jump delay (s).
+var _steals := {}
 
 
 func setup(p_content: ContentLibrary, view: MatchView, hud: MatchHud, debug: DebugOverlay) -> void:
@@ -170,6 +174,8 @@ func _input(event: InputEvent) -> void:
 		type = SwingIntent.Type.CONTACT
 	elif event.is_action_pressed(&"swing_power"):
 		type = SwingIntent.Type.POWER
+	elif event.is_action_pressed(&"swing_bunt"):
+		type = SwingIntent.Type.BUNT
 	if type == SwingIntent.Type.NONE:
 		return
 	_pending_swing = type
@@ -231,6 +237,7 @@ func _handle_global_input() -> void:
 
 func _enter_pre_pitch() -> void:
 	_hud.set_clock(-1.0)
+	_steal_orders.clear()
 	if state.game_over:
 		_enter_game_over()
 		return
@@ -256,6 +263,11 @@ func _enter_pre_pitch() -> void:
 func _process_pre_pitch(delta: float) -> void:
 	if user_is_batting():
 		_show_stick_marker()
+		if Input.is_action_just_pressed(&"runner_advance"):
+			_order_steal(_held_base())
+		if Input.is_action_just_pressed(&"runner_retreat") and not _steal_orders.is_empty():
+			_steal_orders.clear()
+			_hud.show_callout("STEAL OFF", "", 0.8)
 		var windup_start := AI_PRE_PITCH_DELAY - WINDUP_TIME
 		if _phase_time >= windup_start:
 			_view.show_windup((_phase_time - windup_start) / WINDUP_TIME)
@@ -316,6 +328,7 @@ func _throw_pitch(intent: PitchIntent) -> void:
 	_log({"pitch": state.pitch_count, "family": intent.family_id, "aim": intent.aim, "meter_error": snappedf(intent.meter_error, 0.001)})
 	_ai_swing = null
 	_contact = null
+	_decide_steals()
 	if not user_is_batting():
 		_ai_swing = AiBatter.decide(_pitch, family, state, tuning, rng, _club(state.batting_team()), _player(state.current_batter()))
 		_hud.show_pitching(false)
@@ -335,6 +348,8 @@ func _process_pitch_flight(_delta: float) -> void:
 	var flight := float(_now_usec() - _pitch_release_usec) / 1000000.0
 	var family := content.pitch(_pitch.family_id)
 	_view.show_pitch(_pitch, minf(flight, travel), family.tell_color, family.tell_trail)
+	for base: int in _steals:
+		_view.set_runner_off_base(state.runner_on(base), base, _steal_head(base, minf(flight, travel)))
 	var timing := flight - travel
 	if user_is_batting():
 		_view.show_timing_ring(flight / travel if _contact == null or flight < travel else -1.0)
@@ -358,6 +373,7 @@ func _process_pitch_flight(_delta: float) -> void:
 		_view.show_pitch_marker(_pitch)
 		_view.set_aim_preview(false)
 		var call_text := ""
+		var bases_before := state.bases.duplicate()
 		if _contact.outcome == ContactResult.Outcome.IN_PLAY:
 			_start_ball_in_play()
 			if _outcome != null:
@@ -366,6 +382,9 @@ func _process_pitch_flight(_delta: float) -> void:
 			call_text = _apply_call()
 		if _contact.swing_type != SwingIntent.Type.NONE:
 			_show_contact_feedback(call_text)
+		if _contact.outcome != ContactResult.Outcome.IN_PLAY and _contact.outcome != ContactResult.Outcome.FOUL:
+			_start_steal_play(bases_before)
+		_steals.clear()
 
 
 ## The moment the ball meets the bat (or doesn't): what kind of contact it
@@ -386,7 +405,9 @@ func _show_contact_feedback(call_text: String) -> void:
 func _resolve_swing(swing: SwingIntent) -> void:
 	_contact = ContactResolver.resolve(_pitch, swing, tuning, rng)
 	_log({"swing": SwingIntent.Type.keys()[swing.type], "timing_ms": roundi(swing.timing_offset * 1000.0), "stick": swing.stick})
-	if swing.type != SwingIntent.Type.NONE:
+	if swing.type == SwingIntent.Type.BUNT:
+		_view.bunt_bat()
+	elif swing.type != SwingIntent.Type.NONE:
 		_view.swing_bat()
 
 
@@ -397,6 +418,7 @@ func _apply_call() -> String:
 		MatchState.PitchCall.CALLED_STRIKE: "STRIKE",
 		MatchState.PitchCall.SWINGING_STRIKE: "SWING & MISS",
 		MatchState.PitchCall.FOUL: "FOUL",
+		MatchState.PitchCall.FOUL_BUNT: "FOUL BUNT",
 	}[call]
 	_hud.show_callout(text, _timing_detail(), 1.0)
 	state.apply_pitch_call(call)
@@ -428,6 +450,8 @@ func _start_ball_in_play() -> void:
 			_live.assist = tuning.rookie_assist
 		_play = _bip.start_live(not human_fields, rng)
 		_play.human_defense = not user_is_batting()
+		for base: int in _steals:
+			_play.set_running_start(base, _steal_head(base, _pitch.travel_time))
 		if _play.human_defense and tuning.rookie_assist:
 			_play.error_scale = tuning.assist_error_scale
 	_set_phase(Phase.BALL_IN_PLAY)
@@ -452,7 +476,10 @@ func _process_ball_in_play() -> void:
 		return
 	var skip := Input.is_action_just_pressed(&"swing_contact") or Input.is_action_just_pressed(&"pitch_primary")
 	if t >= _play_done_at + PLAY_SETTLE_PAUSE or (skip and t > _play_done_at):
-		state.apply_play(_outcome)
+		if _bip.is_steal():
+			state.apply_steal(_outcome)
+		else:
+			state.apply_play(_outcome)
 		_enter_pre_pitch()
 
 
@@ -539,7 +566,13 @@ func _finish_play(outcome: PlayOutcome) -> void:
 	_log({"outcome": _outcome.kind, "throws": _outcome.throws.map(func(leg: Dictionary) -> int: return leg["base"]), "runs": _outcome.runs.size(), "outs": _outcome.outs.size()})
 	var detail := "%.1f m/s  %d°  %.0f m" % [_contact.exit_velocity, roundi(_contact.launch_angle), _bip.trajectory.distance()]
 	var text := String(_outcome.kind).replace("_", " ").to_upper()
-	if _outcome.kind == PlayOutcome.KIND_DOUBLE_PLAY or _outcome.kind == PlayOutcome.KIND_TRIPLE_PLAY:
+	if _bip.is_steal():
+		var names := PackedStringArray()
+		for base: int in _bip.steal_heads:
+			names.append(_name(_bip.bases_before[base - 1]))
+		text = "CAUGHT STEALING" if not _outcome.outs.is_empty() else "STOLEN BASE!"
+		detail = ", ".join(names)
+	elif _outcome.kind == PlayOutcome.KIND_DOUBLE_PLAY or _outcome.kind == PlayOutcome.KIND_TRIPLE_PLAY:
 		text += "!"
 	elif _play != null and _play.fielding != null and _play.fielding.is_dive and _play.fielding.caught_in_air:
 		text = "DIVING CATCH!"
@@ -628,7 +661,7 @@ func _hud_prompt_suffix() -> String:
 	match _phase:
 		Phase.PRE_PITCH, Phase.PITCH_FLIGHT:
 			if user_is_batting():
-				base = "Watch the pitcher. SWING as the ring closes: J or click (contact) / K or right-click (power)\nHold WASD / L-stick while swinging: ←→ aim field  ↑ lift  ↓ chop    Pinch hit: P / Y"
+				base = "Watch the pitcher. SWING as the ring closes: J or click (contact) / K or right-click (power) / B (bunt, ←→ places it)\nHold WASD / L-stick while swinging: ←→ aim field  ↑ lift  ↓ chop    Steal: E / RB before the pitch (hold 1-3 for one runner), Q / LB cancel    Pinch hit: P / Y"
 			else:
 				base = "Aim: WASD / L-stick    Pitch: Q E / LB RB    Start meter: Space / A    Pitching change: P / Y"
 		Phase.BALL_IN_PLAY:
@@ -656,6 +689,72 @@ func _move_cursor(delta: float) -> void:
 	var dir := Input.get_vector(&"aim_left", &"aim_right", &"aim_down", &"aim_up")
 	_cursor += dir * CURSOR_SPEED * delta
 	_cursor = _cursor.clamp(tuning.cursor_min, tuning.cursor_max)
+
+
+# --- Steals ----------------------------------------------------------------
+
+## The human orders a steal before the pitch: the runner on `base`, or with
+## no base held every runner who has an open base ahead (lead runner first).
+func _order_steal(base: int) -> void:
+	var picked := PackedStringArray()
+	for b in [2, 1]:
+		if (base > 0 and b != base) or state.runner_on(b) == &"":
+			continue
+		if state.runner_on(b + 1) != &"" and not _steal_orders.has(b + 1):
+			continue
+		if not _steal_orders.has(b):
+			_steal_orders[b] = _phase_time
+		picked.append(_name(state.runner_on(b)))
+	if picked.is_empty():
+		_hud.show_callout("NO BASE TO STEAL", "", 0.8)
+	else:
+		_hud.show_callout("RUNNER GOING", "%s on the pitch · Q / LB to call it off" % " & ".join(picked), 1.4)
+
+
+## At the release: the human's orders (a late order costs jump) or the AI's.
+func _decide_steals() -> void:
+	_steals.clear()
+	if user_is_batting():
+		var windup_start := AI_PRE_PITCH_DELAY - WINDUP_TIME
+		for base: int in _steal_orders:
+			var late := maxf(_steal_orders[base] - windup_start, 0.0)
+			_steals[base] = tuning.steal_jump_delay + late + rng.randfn(0.0, tuning.steal_jump_sigma * 0.6)
+	else:
+		_steals = AiManager.steal_attempts(state, roster, tuning, rng)
+		if not _steals.is_empty():
+			_hud.show_callout("RUNNER GOING!", "throw to the base he is stealing", 1.0)
+	_steal_orders.clear()
+	if not _steals.is_empty():
+		_log({"steal": _steals.keys()})
+
+
+func _steal_head(base: int, flight: float) -> float:
+	var speed := Ratings.runner_speed(_player(state.runner_on(base)), tuning)
+	return LivePlay.steal_head_start(speed, flight, _steals[base], tuning)
+
+
+## Runners who were going still go after a pitch not put in play.
+func _start_steal_play(bases_before: Array[StringName]) -> void:
+	var still := {}
+	for base: int in _steals:
+		if bases_before[base - 1] != &"" and state.bases[base - 1] == bases_before[base - 1]:
+			still[base] = _steals[base]
+	if still.is_empty():
+		return
+	var bip := BallInPlay.create_steal(state, tuning, roster, still, _pitch.travel_time)
+	if bip == null:
+		return
+	_bip = bip
+	_play = bip.start_live(false, rng)
+	_play.human_defense = not user_is_batting()
+	_live = null
+	_outcome = null
+	_play_event_cursor = 0
+	_play_done_at = -1.0
+	_view.set_camera_mode(MatchView.CameraMode.FIELD)
+	_view.set_cursor(Vector2.ZERO, 0.0, 0.0, Color.WHITE)
+	_set_phase(Phase.BALL_IN_PLAY)
+	_hud.show_prompt(_hud_prompt_suffix())
 
 
 # --- Roster helpers ------------------------------------------------------

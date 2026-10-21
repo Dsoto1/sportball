@@ -53,6 +53,8 @@ func _initialize() -> void:
 	for t in 2:
 		print("%-12s W %3d   R/G %.2f   H/G %.2f   HR/G %.2f   E/G %.2f" % [names[t], team[t]["wins"], team[t]["runs"] / float(matches),
 			team[t]["hits"] / float(matches), team[t]["hr"] / float(matches), team[t]["errors"] / float(matches)])
+	print("steals/game: %.2f  caught: %.2f (SB%% %.0f)   bunts/game: %.2f  sacrifices/game: %.2f" % [totals["steals"] / float(matches), totals["caught_stealing"] / float(matches),
+		100.0 * totals["steals"] / maxf(totals["steals"] + totals["caught_stealing"], 1.0), totals["bunts"] / float(matches), totals["sacrifices"] / float(matches)])
 	print("mercy-rule games: %d   pitching changes/game: %.2f" % [mercy, totals["pitching_changes"] / float(matches)])
 	print("errors: %d (%.2f/team/game)   missed dives: %d" % [totals["errors"], totals["errors"] / (2.0 * matches), totals["dive_misses"]])
 	var keys := outcomes.keys()

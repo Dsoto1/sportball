@@ -30,5 +30,42 @@ static func pitching_change(state: MatchState, roster: MatchRoster, tuning: Base
 	return closer if _available(state, team, closer) else &""
 
 
+## Runners the offense sends on this pitch: start base -> jump delay (s).
+## The AI runs when its estimate of success clears the bar, more often for
+## clubs with a high steal rate; never steals home or third with two outs.
+static func steal_attempts(state: MatchState, roster: MatchRoster, tuning: BaseballTuning, rng: MatchRng) -> Dictionary:
+	var sends := {}
+	if state.game_over or state.balls == 3 and state.runner_on(1) != &"":
+		return sends  # ball four moves him anyway
+	var club := roster.teams[state.batting_team()] if roster != null else null
+	var rate := club.steal_rate if club != null else 1.0
+	var bar := tuning.ai_steal_min_success - 0.06 * (rate - 1.0)
+	var catcher := roster.player(state.defense[state.fielding_team()].get(&"c", &"")) if roster != null else null
+	var arm := 1.0 + tuning.rating_arm_spread * Ratings.norm(catcher.arm) if catcher != null else 1.0
+	for base in [2, 1]:
+		var id := state.runner_on(base)
+		if id == &"" or (state.runner_on(base + 1) != &"" and not sends.has(base + 1)):
+			continue
+		if base == 2 and state.outs == 2:
+			continue
+		var speed := Ratings.runner_speed(roster.player(id) if roster != null else null, tuning)
+		if success_chance(base, speed, arm, tuning) < bar:
+			continue
+		if sends.has(base + 1) or rng.chance(tuning.ai_steal_attempt_rate * rate):
+			sends[base] = maxf(tuning.steal_jump_delay + rng.randfn(0.0, tuning.steal_jump_sigma), -0.2)
+	return sends
+
+
+## Rough chance a runner steals the next base against a catcher's arm,
+## from the same race the live play runs (average jump, average pitch).
+static func success_chance(base: int, speed: float, arm: float, tuning: BaseballTuning) -> float:
+	var head := LivePlay.steal_head_start(speed, 0.48, tuning.steal_jump_delay, tuning)
+	var runner := (FieldLayout.BASE_DISTANCE - head) / speed
+	var throw := tuning.catcher_transfer_time + tuning.catcher_release_time \
+		+ ThrowModel.flight_time(Vector3(0, 0, 0.9), FieldLayout.base_position(base + 1), tuning, arm) + tuning.tag_reach / speed
+	var margin := throw - runner
+	return 1.0 / (1.0 + exp(-1.7 * margin / tuning.steal_jump_sigma))
+
+
 static func _available(state: MatchState, team: int, id: StringName) -> bool:
 	return id != &"" and not state.removed.has(id) and state.pitcher(team) != id

@@ -32,6 +32,9 @@ fast runners beat out grounders, good gloves bobble less.
 |---|---|---|
 | Contact swing | J or left click | A |
 | Power swing (harder, smaller window) | K or right click | X |
+| Bunt (hold ← / → to push it toward third / first) | B | B |
+| Before the pitch: steal (every runner with an open base) / call it off | E / Q | RB / LB |
+| ...hold 1 / 2 + steal: send just that runner | 1-2 + E | B / Y + RB |
 | While swinging: steer left/right field, lift (up) or chop (down) | WASD or arrows | Left stick |
 | Aim pitch target | WASD or arrows | Left stick / D-pad |
 | Pick pitch | Q / E | LB / RB |
@@ -66,6 +69,16 @@ reached. The small yellow marker on the zone shows what your stick is
 adding, and the arrow on the field shows where it sends an on-time swing
 (blue and long = in the air, brown and short = on the ground). Swinging
 early pulls the ball left of the arrow, late pushes it right.
+
+**Small ball.** Bunt with B: the timing window is wide, but the ball comes
+off soft and on the ground, so runners move up (a sacrifice) or a fast
+batter beats it out. Steer it with ← / → and bunt strikes, not high pitches
+(they pop up). A foul bunt with two strikes is a strikeout. To steal, press
+E / RB before the pitch. Press it before the pitcher's windup for a good
+jump; late costs ground. Your runner breaks on the pitch, and the catcher
+has to throw him out, with speed and arm deciding the race. If the ball is
+put in play he already has a running start (hit-and-run). When you are on
+defense, a runner going calls out RUNNER GOING!: throw to his base.
 
 Read the pitch by its trail: a **long blue** streak is a fastball, a
 **short orange** one a breaking ball (it moves late), a **stub of green** a

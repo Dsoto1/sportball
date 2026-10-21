@@ -94,6 +94,10 @@ var errors: Array[Dictionary] = []
 var fielders: Array[FielderState] = []
 ## Seconds the batting team's runners shave off their safety margins.
 var runner_aggression := 0.0
+## A bunt: runners had their secondary lead and break as soon as it is down.
+var is_bunt := false
+## A steal between pitches: the catcher has the ball, nobody is batting.
+var is_steal := false
 
 var _went := false
 var _ground_targets := {}
@@ -154,6 +158,66 @@ func _init(bases: Array[StringName], p_batter_id: StringName, p_outs_before: int
 	batter.go_time = tuning.batter_start_delay
 	batter.speed = speeds.get(batter_id, tuning.runner_speed)
 	runners.append(batter)
+
+
+## A stolen-base play: the moment the catcher gloves the pitch. stealers:
+## start base -> meters the runner is off the bag already (lead + jump).
+static func steal_play(bases: Array[StringName], stealers: Dictionary, outs_before: int, p_tuning: BaseballTuning,
+		p_fielders: Array[FielderState] = [], speeds: Dictionary = {}, p_aggression: float = 0.0) -> LivePlay:
+	var f := FieldingResult.new()
+	f.fielder_index = p_tuning.fielder_ids.find(&"c")
+	f.fielder_id = &"c"
+	f.secure_point = Vector3(0.0, 0.0, 0.9)
+	f.secure_time = 0.0
+	f.ready_time = p_tuning.catcher_transfer_time
+	var traj := BallTrajectory.simulate(1.0, -60.0, 0.0, p_tuning)  # unused: the ball starts in the mitt
+	var play := LivePlay.new(bases, &"", outs_before, 0.0, traj, f, p_tuning, false, p_fielders, speeds, p_aggression)
+	play._setup_steal(stealers)
+	return play
+
+
+func _setup_steal(stealers: Dictionary) -> void:
+	is_steal = true
+	_went = true
+	runners = runners.filter(func(r: Runner) -> bool: return not r.is_batter)
+	for r in runners:
+		r.forced = false
+		if stealers.has(r.start_base):
+			r.s = r.start_base * BASE + stealers[r.start_base]
+			r.target = r.start_base + 1
+			r.state = State.RUNNING
+			r.go_time = 0.0
+			r.lock_until = INF  # committed: a stealer does not turn back
+			events.append({"type": "steal", "runner": r.id, "base": r.target})
+		else:
+			r.s = r.start_base * BASE
+			r.target = r.start_base
+			r.state = State.ON_BASE
+	secure(projection)
+	windup = tuning.catcher_release_time
+
+
+## Meters a stealing runner is off his bag when the pitch reaches the plate.
+static func steal_head_start(speed: float, travel_time: float, jump_delay: float, p_tuning: BaseballTuning) -> float:
+	return p_tuning.runner_lead_distance + speed * maxf(p_tuning.steal_delivery_time + travel_time - jump_delay - p_tuning.steal_start_penalty, 0.0)
+
+
+## A runner who was stealing when the ball was put in play is already on his way.
+func set_running_start(base: int, head: float) -> void:
+	for r in runners:
+		if not r.is_batter and r.start_base == base:
+			r.s = base * BASE + head
+			r.target = base + 1
+			r.state = State.RUNNING
+			r.go_time = 0.0
+
+
+## Call right after construction on a bunt.
+func start_bunt() -> void:
+	is_bunt = true
+	for r in runners:
+		if not r.is_batter:
+			r.s += tuning.bunt_runner_jump
 
 
 # --- Queries ----------------------------------------------------------------
@@ -321,7 +385,7 @@ func _go_ground() -> void:
 		r.target = _ground_targets.get(r.id, r.target)
 		r.state = State.RUNNING
 		if not r.is_batter:
-			r.go_time = maxf(r.go_time, time + tuning.runner_read_delay)
+			r.go_time = maxf(r.go_time, time + (0.0 if is_bunt else tuning.runner_read_delay))
 
 
 ## offense: {advance, retreat, base}. base 0 (or absent) orders every
@@ -565,8 +629,9 @@ func ai_defense_action() -> Dictionary:
 	if chase != null:
 		return {"kind": "chase", "point": runner_position(chase)}
 	# Otherwise get the ball back in: throw ahead of the lead runner so
-	# nobody keeps running on a fielder who is just holding it.
-	if holder_cover == -1:
+	# nobody keeps running on a fielder who is just holding it. On a steal
+	# with no play the catcher just holds it.
+	if holder_cover == -1 and not is_steal:
 		return {"kind": "throw", "base": _hold_base()}
 	return {}
 
@@ -643,7 +708,8 @@ func _catch_throw() -> void:
 		busy_until = time + tuning.wild_throw_pickup + tuning.wild_throw_run_share * flight["missed_by"] / tuning.fielder_speed
 		_scramble_until = busy_until + tuning.runner_take_base_margin
 		var batter := runner(batter_id)
-		errors.append({"type": "wild_throw", "base": base, "on_batter": base == FieldLayout.FIRST and batter.state == State.RUNNING and batter.target == FieldLayout.FIRST})
+		var on_batter := batter != null and base == FieldLayout.FIRST and batter.state == State.RUNNING and batter.target == FieldLayout.FIRST
+		errors.append({"type": "wild_throw", "base": base, "on_batter": on_batter})
 		events.append({"type": "error", "kind": "wild_throw", "base": base})
 	if base == CUTOFF:
 		windup = tuning.cutoff_release_time
@@ -864,6 +930,8 @@ func outcome() -> PlayOutcome:
 
 
 func _classify(result: PlayOutcome) -> StringName:
+	if is_steal:
+		return PlayOutcome.KIND_STEAL
 	if result.outs.size() >= 3:
 		return PlayOutcome.KIND_TRIPLE_PLAY
 	if result.outs.size() == 2:
@@ -877,6 +945,9 @@ func _classify(result: PlayOutcome) -> StringName:
 	var batter := runner(batter_id)
 	var hit_base := result.batter_base if result.batter_base > 0 else batter.reached
 	if hit_base == 0:
+		var moved_up := result.advances.any(func(a: Dictionary) -> bool: return a["runner_id"] != batter_id and a["safe"] and a["to"] > a["from"])
+		if is_bunt and result.outs.size() == 1 and moved_up:
+			return PlayOutcome.KIND_SACRIFICE
 		return PlayOutcome.KIND_GROUND_OUT
 	if result.batter_base > 0 and errors.any(func(e: Dictionary) -> bool: return e["on_batter"]):
 		return PlayOutcome.KIND_REACHED_ON_ERROR

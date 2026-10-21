@@ -37,7 +37,7 @@ const TEAMS := [
 		],
 		"order": [&"rwg_calloway", &"rwg_brightwater", &"rwg_paskett", &"rwg_mahoney", &"rwg_inkwell", &"rwg_corrigan", &"rwg_varga", &"rwg_mott", &"rwg_ferrow"],
 		"lineup_positions": [&"cf", &"ss", &"2b", &"1b", &"3b", &"dh", &"lf", &"rf", &"c"],
-		"ai": {"swing_aggression": 0.95, "chase_scale": 0.75, "power_swing_rate": 0.36, "runner_aggression": 0.2, "edge_bias_scale": 1.1, "bullpen_hook": 0.55},
+		"ai": {"swing_aggression": 0.95, "chase_scale": 0.75, "power_swing_rate": 0.36, "runner_aggression": 0.2, "edge_bias_scale": 1.1, "bullpen_hook": 0.55, "steal_rate": 2.5, "bunt_rate": 0.7},
 	},
 	{
 		"id": &"glitterati", "city": "Neon Heights", "name": "Glitterati", "abbr": "NHG",
@@ -69,7 +69,7 @@ const TEAMS := [
 		],
 		"order": [&"nhg_i_dont_care", &"nhg_because", &"nhg_who", &"nhg_vandermeer", &"nhg_lux", &"nhg_i_dont_know", &"nhg_why", &"nhg_what", &"nhg_today"],
 		"lineup_positions": [&"ss", &"cf", &"1b", &"rf", &"dh", &"3b", &"lf", &"2b", &"c"],
-		"ai": {"swing_aggression": 1.1, "chase_scale": 1.5, "power_swing_rate": 0.45, "runner_aggression": -0.1, "edge_bias_scale": 0.9, "bullpen_hook": 0.8},
+		"ai": {"swing_aggression": 1.1, "chase_scale": 1.5, "power_swing_rate": 0.42, "runner_aggression": -0.1, "edge_bias_scale": 0.9, "bullpen_hook": 0.8, "steal_rate": 0.5, "bunt_rate": 0.25},
 	},
 ]
 

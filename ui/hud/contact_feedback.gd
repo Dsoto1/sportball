@@ -46,6 +46,13 @@ static func describe(contact: ContactResult, tuning: BaseballTuning) -> Dictiona
 		spot = "chased it outside the zone"
 	elif contact.location_norm > tuning.sweet_zone:
 		spot = "on the edge of the zone"
+	if contact.is_bunt:
+		var bunt := "BUNT DOWN" if contact.outcome == ContactResult.Outcome.IN_PLAY else ("FOUL BUNT" if contact.outcome == ContactResult.Outcome.FOUL else "MISSED THE BUNT")
+		var where := "toward third" if contact.spray_angle < -8.0 else ("toward first" if contact.spray_angle > 8.0 else "back to the pitcher")
+		var bunt_detail := "%s · %s" % [bunt, timing]
+		if contact.outcome == ContactResult.Outcome.IN_PLAY:
+			bunt_detail += " · %s, %.0f m/s" % [where, contact.exit_velocity]
+		return {"headline": "", "detail": bunt_detail, "tier": Tier.MISS if contact.outcome != ContactResult.Outcome.IN_PLAY else Tier.OK}
 	var label: String = {
 		Tier.MISS: "MISSED",
 		Tier.WEAK: "WEAK contact",

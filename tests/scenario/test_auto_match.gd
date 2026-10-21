@@ -81,3 +81,18 @@ func test_team_styles_show_up_in_the_numbers() -> void:
 				if e.data["kind"] == PlayOutcome.KIND_HOME_RUN:
 					hr[team] += 1
 	check(hr[1] > hr[0], "Glitterati out-homer the Gearheads (%d vs %d)" % [hr[1], hr[0]])
+
+
+func test_small_ball_shows_up() -> void:
+	var steals := 0
+	var caught := 0
+	var bunts := 0
+	for seed_value in 20:
+		var sim := AutoMatch.play(400 + seed_value, content())
+		steals += sim.stats["steals"]
+		caught += sim.stats["caught_stealing"]
+		bunts += sim.stats["bunts"]
+		check(sim.state.game_over, "seed %d finished" % seed_value)
+	check(steals >= 10, "bases get stolen (%d in 20 games)" % steals)
+	check(caught >= 1, "and runners get caught (%d)" % caught)
+	check(bunts >= 10, "and people bunt (%d)" % bunts)

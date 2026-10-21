@@ -17,6 +17,8 @@ const GAME_ENDED := &"game_ended"
 const SUBSTITUTION := &"substitution"
 ## A runner put on base by rule (the extra-innings runner).
 const RUNNER_PLACED := &"runner_placed"
+const STOLEN_BASE := &"stolen_base"
+const CAUGHT_STEALING := &"caught_stealing"
 
 var sequence: int
 var type: StringName

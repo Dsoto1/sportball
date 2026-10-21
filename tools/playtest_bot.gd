@@ -26,6 +26,7 @@ var _did_pitching_change := false
 var _did_pinch_hit := false
 var _did_clock := false
 var _waiting_clock := false
+var _bunt_shot := 0
 
 
 func _initialize() -> void:
@@ -66,6 +67,10 @@ func _process(delta: float) -> bool:
 
 
 func _drive() -> void:
+	if _bunt_shot > 0:
+		_bunt_shot -= 1
+		if _bunt_shot == 0:
+			_screenshot("bunt")
 	var phase := _director.current_phase()
 	var entered := phase != _last_phase
 	_last_phase = phase
@@ -96,6 +101,8 @@ func _drive() -> void:
 					_did_pinch_hit = true
 					_press(&"open_subs")
 					return
+			if batting and entered and (_director.state.runner_on(1) != &"" or _director.state.runner_on(2) != &"") and _rng.randf() < 0.3:
+				_press(&"runner_advance")  # steal on this pitch
 			if not batting and _director.phase_time() > 0.3:
 				_director.debug_set_cursor(Vector2(_rng.randf_range(-0.3, 0.3), _rng.randf_range(0.5, 1.1)))
 				_press(&"pitch_primary")
@@ -114,12 +121,19 @@ func _drive() -> void:
 					_press(&"aim_up" if _rng.randf() < 0.5 else &"aim_down", _rng.randf())
 				# The event is seen next frame, so press one frame ahead.
 				if _director.phase_time() + FRAME >= pitch.travel_time + _swing_offset and PitchResolver.in_zone(pitch.location, _director.tuning):
-					var swing := &"swing_power" if _rng.randf() < 0.3 else &"swing_contact"
+					var roll := _rng.randf()
+					var bunt_chance := 0.4 if _director.state.runner_on(1) != &"" else 0.08
+					var swing := &"swing_bunt" if roll < bunt_chance else (&"swing_power" if roll < bunt_chance + 0.25 else &"swing_contact")
 					_send(swing, true)
+					if swing == &"swing_bunt":
+						_bunt_shot = 3
 					_events_down.append(swing)
 		MatchDirector.Phase.BALL_IN_PLAY:
 			if entered:
 				_plays += 1
+			var bip := _director.ball_in_play()
+			if bip != null and bip.is_steal() and _director.phase_time() > 0.9 and _director.phase_time() < 0.95:
+				_screenshot("steal")
 			var live := _director.live_fielding()
 			if live != null and not live.is_secured():
 				_steer(live)

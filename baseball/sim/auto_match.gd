@@ -11,7 +11,7 @@ var roster: MatchRoster
 var stats := {
 	"pitches": 0, "in_zone": 0, "swings": 0, "whiffs": 0, "fouls": 0, "balls_in_play": 0,
 	"hits": 0, "home_runs": 0, "strikeouts": 0, "walks": 0, "dives": 0, "air_outs": 0,
-	"ground_outs": 0, "double_plays": 0, "errors": 0, "dive_misses": 0, "pitching_changes": 0, "plate_appearances": 0, "exit_velocity_sum": 0.0,
+	"ground_outs": 0, "double_plays": 0, "errors": 0, "dive_misses": 0, "pitching_changes": 0, "steals": 0, "caught_stealing": 0, "sacrifices": 0, "bunts": 0, "plate_appearances": 0, "exit_velocity_sum": 0.0,
 }
 var outcome_counts := {}
 
@@ -56,6 +56,7 @@ func play_pitch() -> void:
 	var intent := AiPitcher.choose(state, content.pitches, tuning, rng, defense_club, pitcher)
 	var family := content.pitch(intent.family_id)
 	var mods := Ratings.pitcher_mods(pitcher, state.pitches_thrown(state.pitcher(state.fielding_team())), tuning)
+	var steals := AiManager.steal_attempts(state, roster, tuning, rng)
 	var pitch := PitchResolver.resolve(intent, family, tuning, rng, mods)
 	state.record_pitch(pitch.to_dict())
 	stats["pitches"] += 1
@@ -70,13 +71,48 @@ func play_pitch() -> void:
 			stats["whiffs"] += 1
 		ContactResult.Outcome.FOUL:
 			stats["fouls"] += 1
+	if swing.type == SwingIntent.Type.BUNT:
+		stats["bunts"] += 1
 	if contact.outcome != ContactResult.Outcome.IN_PLAY:
+		var bases_before := state.bases.duplicate()
 		state.apply_pitch_call(ContactResolver.call_for(pitch, contact))
+		if contact.outcome != ContactResult.Outcome.FOUL:
+			_run_steal(steals, bases_before, pitch.travel_time)
 		return
 	var bip := BallInPlay.create(contact, state, tuning, roster)
-	var outcome := bip.resolve_ai(rng)
+	var outcome: PlayOutcome
+	if bip.is_home_run():
+		outcome = bip.resolve_ai(rng)
+	else:
+		var live := bip.start_live(true, rng)
+		for base: int in steals:
+			live.set_running_start(base, steal_head(state.bases[base - 1], pitch.travel_time, steals[base]))
+		outcome = live.run_ai(tuning.sim_play_step)
 	_count_outcome(bip, outcome)
 	state.apply_play(outcome)
+
+
+## Runners who were going keep going after a pitch not put in play, if the
+## pitch left them where they were (no walk, no third out).
+func _run_steal(steals: Dictionary, bases_before: Array[StringName], travel: float) -> void:
+	var still := {}
+	for base: int in steals:
+		if bases_before[base - 1] != &"" and state.bases[base - 1] == bases_before[base - 1]:
+			still[base] = steals[base]
+	if still.is_empty():
+		return
+	var bip := BallInPlay.create_steal(state, content.tuning, roster, still, travel)
+	if bip == null:
+		return
+	var outcome := bip.resolve_ai(rng)
+	stats["steals"] += outcome.advances.filter(func(a: Dictionary) -> bool: return bip.steal_heads.has(a["from"]) and a["safe"] and a["to"] > a["from"]).size()
+	stats["caught_stealing"] += outcome.outs.size()
+	state.apply_steal(outcome)
+
+
+func steal_head(runner_id: StringName, travel: float, jump: float) -> float:
+	var p := roster.player(runner_id) if roster != null else null
+	return LivePlay.steal_head_start(Ratings.runner_speed(p, content.tuning), travel, jump, content.tuning)
 
 
 func _tally_plate_appearances() -> void:
@@ -107,5 +143,7 @@ func _count_outcome(bip: BallInPlay, outcome: PlayOutcome) -> void:
 		stats["ground_outs"] += 1
 	if outcome.outs.size() >= 2:
 		stats["double_plays"] += 1
+	if outcome.kind == PlayOutcome.KIND_SACRIFICE:
+		stats["sacrifices"] += 1
 	for e in outcome.errors:
 		stats["dive_misses" if e["type"] == "dive_miss" else "errors"] += 1

@@ -81,6 +81,29 @@ extends Resource
 ## Seconds after the batter is allowed to swing before a no-swing is a take.
 @export var swing_late_cutoff: float = 0.22
 
+@export_group("Bunting")
+## Bunts square early: a wide timing window, but they reach less of the plate.
+@export var bunt_timing_window: float = 0.075
+@export var bunt_reach_limit: float = 1.7
+@export var bunt_min_fair_quality: float = 0.5
+## Exit velocity of a good bunt, plus more for a poor one (it gets on a fielder).
+@export var bunt_exit_velocity: float = 9.5
+@export var bunt_mishit_velocity: float = 13.0
+@export var bunt_velocity_noise: float = 1.2
+@export var bunt_launch: float = -14.0
+## Degrees of loft per zone half-height above center: high pitches pop up.
+@export var bunt_launch_per_height: float = 22.0
+@export var bunt_launch_noise: float = 5.0
+@export var bunt_mishit_launch: float = 22.0
+## Degrees of spray from a full stick left/right (placing the bunt).
+@export var bunt_placement: float = 32.0
+@export var bunt_spray_per_timing: float = 10.0
+@export var bunt_spray_noise: float = 5.0
+## On a bunt the runners have their secondary lead and break at once.
+@export var bunt_runner_jump: float = 2.5
+## Catcher's first step on a bunt in front of the plate (he has to get up).
+@export var bunt_catcher_reaction: float = 0.85
+
 @export_group("Assists")
 ## Rookie assist for a human batter (toggle in game with T).
 @export var rookie_assist: bool = true
@@ -238,6 +261,19 @@ extends Resource
 @export var fatigue_scatter_gain: float = 0.9
 @export var fatigue_break_loss: float = 0.3
 
+@export_group("Stealing")
+## Seconds from a stealing runner's first move to the pitch's release.
+@export var steal_delivery_time: float = 0.95
+## Spread of the runner's jump (seconds lost reading the pitcher).
+@export var steal_jump_sigma: float = 0.25
+## Average jump delay for the AI (a human pays for pressing late instead).
+@export var steal_jump_delay: float = 0.15
+## Ground lost getting up to speed from a standing lead (in seconds of running).
+@export var steal_start_penalty: float = 0.55
+## Catcher: catch-to-throw transfer, then a quick release.
+@export var catcher_transfer_time: float = 0.3
+@export var catcher_release_time: float = 0.35
+
 @export_group("AI")
 @export var ai_pitcher_meter_sigma: float = 0.22
 @export var ai_pitcher_edge_bias: float = 1.7
@@ -251,6 +287,14 @@ extends Resource
 ## Swing chance multiplier on the first pitch of a plate appearance.
 @export var ai_first_pitch_patience: float = 0.75
 @export var ai_power_swing_rate: float = 0.35
+## Chance per pitch an AI runner with a good read goes (times the team's steal rate).
+@export var ai_steal_attempt_rate: float = 0.14
+## Estimated success the AI needs before it runs (lower for aggressive clubs).
+@export var ai_steal_min_success: float = 0.68
+## Chance per pitch of a sacrifice bunt in a bunting spot (times the team's rate).
+@export var ai_sac_bunt_rate: float = 0.22
+## Chance a fast batter (speed 75+) bunts for a hit on a given pitch.
+@export var ai_bunt_hit_rate: float = 0.06
 @export var ai_throw_min_margin: float = 0.05
 @export var ai_throw_lead_runner_bias: float = 0.35
 @export var ai_throw_run_prevention_bias: float = 0.6

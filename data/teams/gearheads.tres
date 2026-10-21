@@ -286,3 +286,5 @@ power_swing_rate = 0.36
 runner_aggression = 0.2
 edge_bias_scale = 1.1
 bullpen_hook = 0.55
+steal_rate = 2.5
+bunt_rate = 0.7

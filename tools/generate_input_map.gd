@@ -14,6 +14,7 @@ const BINDINGS := {
 	&"aim_down": [["key", KEY_S], ["key", KEY_DOWN], ["axis", JOY_AXIS_LEFT_Y, 1.0], ["button", JOY_BUTTON_DPAD_DOWN]],
 	&"swing_contact": [["key", KEY_J], ["mouse", MOUSE_BUTTON_LEFT], ["button", JOY_BUTTON_A]],
 	&"swing_power": [["key", KEY_K], ["mouse", MOUSE_BUTTON_RIGHT], ["button", JOY_BUTTON_X]],
+	&"swing_bunt": [["key", KEY_B], ["button", JOY_BUTTON_B]],
 	&"pitch_primary": [["key", KEY_SPACE], ["key", KEY_J], ["mouse", MOUSE_BUTTON_LEFT], ["button", JOY_BUTTON_A]],
 	&"pitch_next": [["key", KEY_E], ["button", JOY_BUTTON_RIGHT_SHOULDER]],
 	&"pitch_prev": [["key", KEY_Q], ["button", JOY_BUTTON_LEFT_SHOULDER]],

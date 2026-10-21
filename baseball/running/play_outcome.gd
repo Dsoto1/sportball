@@ -14,6 +14,10 @@ const KIND_GROUND_OUT := &"ground_out"
 const KIND_FIELDERS_CHOICE := &"fielders_choice"
 const KIND_DOUBLE_PLAY := &"double_play"
 const KIND_TRIPLE_PLAY := &"triple_play"
+## Batter bunted out on purpose and a runner moved up (not an at-bat).
+const KIND_SACRIFICE := &"sacrifice"
+## A stolen-base play between pitches (no batter involved).
+const KIND_STEAL := &"steal"
 ## Batter safe only because of a bobble or a wild throw to first: not a hit.
 const KIND_REACHED_ON_ERROR := &"reached_on_error"
 

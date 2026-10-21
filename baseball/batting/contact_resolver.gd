@@ -14,6 +14,8 @@ static func resolve(pitch: PitchResult, swing: SwingIntent, tuning: BaseballTuni
 		result.outcome = ContactResult.Outcome.TAKE
 		return result
 
+	if swing.type == SwingIntent.Type.BUNT:
+		return _bunt(pitch, swing, tuning, rng, result)
 	var power := swing.type == SwingIntent.Type.POWER
 	var window := (tuning.power_timing_window if power else tuning.contact_timing_window) * swing.window_scale
 	result.timing_offset = swing.timing_offset
@@ -57,6 +59,42 @@ static func resolve(pitch: PitchResult, swing: SwingIntent, tuning: BaseballTuni
 	return result
 
 
+## A bunt: a big timing window (the bat is held out), but the ball comes
+## off soft and on the ground. The stick places it: left pushes it down the
+## third-base line, right toward first. High pitches pop up; poor bunts come
+## off harder and straighter, right at a fielder.
+static func _bunt(pitch: PitchResult, swing: SwingIntent, tuning: BaseballTuning, rng: MatchRng, result: ContactResult) -> ContactResult:
+	result.is_bunt = true
+	var window := tuning.bunt_timing_window * swing.window_scale
+	result.timing_offset = swing.timing_offset
+	result.timing_norm = swing.timing_offset / window
+	result.location_norm = location_norm(pitch.location, tuning)
+	var t_abs := absf(result.timing_norm)
+	if result.location_norm > tuning.bunt_reach_limit:
+		result.outcome = ContactResult.Outcome.WHIFF
+		return result
+	if t_abs > 1.0:
+		result.outcome = ContactResult.Outcome.FOUL
+		return result
+	var coverage := maxf(result.location_norm - tuning.sweet_zone, 0.0) * tuning.location_penalty
+	result.quality = clampf(1.0 - sqrt(t_abs * t_abs * tuning.timing_weight + coverage * coverage), 0.0, 1.0)
+	var miss := 1.0 - result.quality
+	result.exit_velocity = maxf(tuning.bunt_exit_velocity + miss * tuning.bunt_mishit_velocity + rng.randfn(0.0, tuning.bunt_velocity_noise), 4.0)
+	var center := PitchResolver.zone_center(tuning)
+	var height := (pitch.location.y - center.y) / ((tuning.zone_top - tuning.zone_bottom) * 0.5)
+	var launch := tuning.bunt_launch + maxf(height, 0.0) * tuning.bunt_launch_per_height + rng.randfn(0.0, tuning.bunt_launch_noise + miss * tuning.bunt_mishit_launch)
+	result.launch_angle = clampf(launch, -30.0, 75.0)
+	var hand := -1.0 if swing.bats_left else 1.0
+	var spray := swing.stick.x * tuning.bunt_placement * (1.0 - miss * 0.5) + result.timing_norm * tuning.bunt_spray_per_timing * hand
+	spray += rng.randfn(0.0, tuning.bunt_spray_noise + miss * tuning.mishit_spray_spread)
+	result.spray_angle = spray
+	if result.quality < tuning.bunt_min_fair_quality or not FieldLayout.is_fair_angle(spray, tuning):
+		result.outcome = ContactResult.Outcome.FOUL
+	else:
+		result.outcome = ContactResult.Outcome.IN_PLAY
+	return result
+
+
 ## Distance of a pitch from the zone center in zone half-sizes:
 ## 0 = middle-middle, 1 = on an edge, sqrt(2) = a corner.
 static func location_norm(location: Vector2, tuning: BaseballTuning) -> float:
@@ -73,5 +111,5 @@ static func call_for(pitch: PitchResult, contact: ContactResult) -> int:
 		ContactResult.Outcome.WHIFF:
 			return MatchState.PitchCall.SWINGING_STRIKE
 		ContactResult.Outcome.FOUL:
-			return MatchState.PitchCall.FOUL
+			return MatchState.PitchCall.FOUL_BUNT if contact.is_bunt else MatchState.PitchCall.FOUL
 	return -1

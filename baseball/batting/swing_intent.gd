@@ -2,7 +2,8 @@ class_name SwingIntent
 extends RefCounted
 ## What the batter (human or AI) did on one pitch.
 
-enum Type { NONE, CONTACT, POWER }
+## BUNT: square around and push the ball soft along the ground.
+enum Type { NONE, CONTACT, POWER, BUNT }
 
 var type: Type = Type.NONE
 ## Seconds relative to the pitch reaching the plate. Negative = early.

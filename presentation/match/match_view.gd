@@ -47,6 +47,7 @@ var _field_focus := Vector3(0.0, 0.0, -42.0)
 const SWING_TIME := 0.28
 var _bat_pivot: Node3D
 var _bat_swing_start := -1.0
+var _bat_bunt := false
 var _view_clock := 0.0
 var _timing_ring: MeshInstance3D
 var _windup := -1.0
@@ -158,6 +159,25 @@ func reset_for_pitch(state: MatchState) -> void:
 func set_bat(visible_now: bool) -> void:
 	_bat_pivot.visible = visible_now
 	_bat_swing_start = -1.0
+	_bat_bunt = false
+
+
+## Squares around: the bat held flat out over the plate.
+func bunt_bat() -> void:
+	_bat_bunt = true
+	_bat_swing_start = -1.0
+
+
+## A runner off his bag toward the next one (stealing, during the pitch).
+func set_runner_off_base(id: StringName, base: int, meters: float) -> void:
+	var actor: ActorView = _runners.get(id)
+	if actor == null:
+		return
+	var from := FieldLayout.base_position(base)
+	var to := FieldLayout.base_position(base + 1)
+	actor.position = from.move_toward(to, meters)
+	actor.face(to)
+	actor.animate(ActorView.Pose.RUN, get_process_delta_time(), tuning.runner_speed)
 
 
 ## Aim preview while batting: an arrow from home plate in the direction the
@@ -467,7 +487,11 @@ func _update_bat() -> void:
 	# toward the pitcher. Elevation in degrees above level.
 	var yaw := 100.0 + sin(_view_clock * 3.0) * 6.0  # stance with a waggle
 	var lift := 50.0
-	if _bat_swing_start >= 0.0:
+	if _bat_bunt:
+		yaw = 0.0  # held flat across the front of the plate
+		lift = 6.0
+		_bat_pivot.position += Vector3(0.0, -0.1, -0.35)
+	elif _bat_swing_start >= 0.0:
 		var p := clampf((_view_clock - _bat_swing_start) / SWING_TIME, 0.0, 1.0)
 		var eased := p * p * (3.0 - 2.0 * p)
 		yaw = lerpf(100.0, -170.0, eased)

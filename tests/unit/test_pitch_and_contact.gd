@@ -144,3 +144,75 @@ func test_rookie_assist_slows_pitch_and_widens_window() -> void:
 	helped.window_scale = tuning().assist_timing_window_scale
 	check(ContactResolver.resolve(normal, plain, tuning(), MatchRng.new(1)).outcome != ContactResult.Outcome.IN_PLAY, "just late misses without help")
 	check_eq(ContactResolver.resolve(normal, helped, tuning(), MatchRng.new(1)).outcome, ContactResult.Outcome.IN_PLAY, "assist puts it in play")
+
+
+# --- Bunts ------------------------------------------------------------------
+
+func _bunt(timing: float, location: Vector2, stick: Vector2 = Vector2.ZERO, seed_value: int = 1) -> ContactResult:
+	var pitch := PitchResult.new()
+	pitch.location = location
+	pitch.in_zone = PitchResolver.in_zone(location, tuning())
+	var swing := SwingIntent.swing(SwingIntent.Type.BUNT, timing, stick)
+	return ContactResolver.resolve(pitch, swing, tuning(), MatchRng.new(seed_value))
+
+
+func test_good_bunt_is_soft_and_on_the_ground() -> void:
+	var c := _bunt(0.02, Vector2(0.0, 0.7))
+	check_eq(c.outcome, ContactResult.Outcome.IN_PLAY)
+	check(c.is_bunt, "flagged as a bunt")
+	check(c.exit_velocity < 15.0, "soft (%.1f m/s)" % c.exit_velocity)
+	check(c.launch_angle < 5.0, "on the ground (%.1f°)" % c.launch_angle)
+
+
+func test_bunt_window_is_wide() -> void:
+	var late := 0.11
+	check_eq(_bunt(late, Vector2(0.0, 0.8)).outcome != ContactResult.Outcome.WHIFF, true, "still on the ball 110 ms late")
+	var pitch := PitchResult.new()
+	pitch.location = Vector2(0.0, 0.8)
+	var swing := ContactResolver.resolve(pitch, SwingIntent.swing(SwingIntent.Type.CONTACT, late), tuning(), MatchRng.new(1))
+	check(swing.outcome != ContactResult.Outcome.IN_PLAY, "a full swing that late is not")
+
+
+func test_stick_places_the_bunt() -> void:
+	var third := 0.0
+	var first := 0.0
+	for i in 20:
+		third += _bunt(0.0, Vector2(0.0, 0.7), Vector2(-1, 0), i).spray_angle
+		first += _bunt(0.0, Vector2(0.0, 0.7), Vector2(1, 0), i).spray_angle
+	check(third / 20.0 < -15.0, "down the third-base line")
+	check(first / 20.0 > 15.0, "toward first")
+
+
+func test_high_pitch_bunt_pops_up() -> void:
+	var total := 0.0
+	for i in 20:
+		total += _bunt(0.0, Vector2(0.0, 1.1), Vector2.ZERO, i).launch_angle
+	check(total / 20.0 > 5.0, "high pitches pop up (avg %.1f°)" % (total / 20.0))
+
+
+func test_foul_bunt_with_two_strikes_is_a_strikeout() -> void:
+	var s := new_match()
+	s.apply_pitch_call(MatchState.PitchCall.CALLED_STRIKE)
+	s.apply_pitch_call(MatchState.PitchCall.CALLED_STRIKE)
+	var c := _bunt(0.5, Vector2(0.0, 0.8))
+	check_eq(c.outcome, ContactResult.Outcome.FOUL, "mistimed bunt fouls")
+	var pitch := PitchResult.new()
+	s.apply_pitch_call(ContactResolver.call_for(pitch, c) as MatchState.PitchCall)
+	check_eq(s.outs, 1, "struck out on the foul bunt")
+
+
+func test_sacrifice_bunt_moves_the_runner_up() -> void:
+	var sacs := 0
+	var tries := 0
+	for i in 40:
+		var s := new_match()
+		s.bases = [&"away_09", &"", &""]
+		var c := _bunt(0.0, Vector2(0.0, 0.65), Vector2(-0.6, 0), 100 + i)
+		if c.outcome != ContactResult.Outcome.IN_PLAY:
+			continue
+		tries += 1
+		var outcome := BallInPlay.create(c, s, tuning()).resolve_ai()
+		if outcome.kind == PlayOutcome.KIND_SACRIFICE or (outcome.is_hit() and outcome.final_bases[1] != &""):
+			sacs += 1
+	check(tries >= 30, "bunts get down (%d/40)" % tries)
+	check(sacs >= tries * 0.5, "runner moves up on most bunts (%d of %d)" % [sacs, tries])

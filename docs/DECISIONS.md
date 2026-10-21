@@ -251,3 +251,31 @@ Decision: A fielder throws by holding a direction and pressing throw (Space / J 
 Reason: Owner request: throw with WASD and the normal movement controls. Pointing and pressing is the standard arcade scheme, and it works the same on keyboard and gamepad.
 
 Affected systems: ThrowAim (new), LivePlay (auto throw, buffering), MatchDirector, MatchView, input map, README, bot, tests.
+
+## 2026-10-21 - Stolen Bases and Bunts
+
+Decision:
+- **Bunts are a swing type (`BUNT`).**
+  - A wide timing window (75 ms) with less plate coverage.
+  - The ball comes off soft (about 9.5 m/s, harder when mishit) and on the ground.
+  - The stick places it up to ±32°, and high pitches pop up.
+  - A foul bunt is a strike even with two strikes (`PitchCall.FOUL_BUNT`).
+  - On a bunt, runners have a 2.5 m secondary lead and no read delay, and the catcher needs 0.85 s to come out of his crouch.
+  - A bunt where the batter is out and a runner moves up is scored as a `sacrifice`.
+- **Steals are live plays, not dice.**
+  - The runner's head start comes from his lead, his speed and his jump against the pitcher's delivery and the pitch's flight.
+  - On a pitch not put in play, a `LivePlay` steal mode starts with the ball in the catcher's mitt. The catcher throws (an AI throw, or a human's directional throw), the cover tags, and wild throws and rundowns can happen.
+  - A stealer is committed and does not turn back on his own.
+  - On a ball put in play, the stealer keeps his running start (hit-and-run).
+  - A walk, a foul or a third out cancels the attempt.
+  - Results from the race: an average runner against an average arm makes it about 68% of the time, a slow one 17% and a fast one 96%.
+- **AI:**
+  - `AiManager.steal_attempts` runs when its own estimate of the race clears a bar.
+  - `AiBatter` sacrifices with a runner on first or second and fewer than two outs, and fast batters bunt for hits.
+  - New `TeamDef.steal_rate` and `bunt_rate` values: the Gearheads run (2.5×) and bunt sometimes (0.7×), and the Glitterati rarely do either.
+- **Human controls:** B bunts. E / RB before the pitch sends the runners (hold 1 or 2 for just one runner), and Q / LB calls it off. Ordering during the windup costs jump.
+- **Balance (400 matches):** the Gearheads now win 45.5%, up from 38%. They average 1.5 steals per game at an 81% success rate. The Glitterati still out-homer them 1.10 to 0.70 per game.
+
+Reason: Owner approved steals and bunts as the next step. They give the Gearheads' small-ball identity real tools, and both are core verbs in the brief.
+
+Affected systems: SwingIntent, ContactResult, ContactResolver, MatchState (FOUL_BUNT, apply_steal, steal events), LivePlay (bunt jump, steal mode, running start, sacrifice), BallInPlay (create_steal), AiManager, AiBatter, TeamDef and team data, AutoMatch, MatchDirector, MatchView (bunt pose, runner off base), ContactFeedback, input map, bot, sim report, tests.
