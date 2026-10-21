@@ -467,3 +467,15 @@ Decision:
 Reason: Owner request for custom baseball animations. The library's generic clips (punches, pistol grip, rolls) did not read as baseball.
 
 Affected systems: PoseBaker, BaseballMoves, ActorView (new poses, lefty), MatchView (swing, bunt, windup, follow-through, leads, catch poses), PlayAnimator, tests, pose_gallery.
+
+## 2026-10-21 - Ball and Bat Built in Code, AI Models for Organic Props
+
+Decision:
+- **Ball:** a sphere with a shader that draws the real figure-eight seam (the tennis-ball curve, which lies exactly on a sphere) and red stitching. It tumbles about the axis across its travel. It is a few pixels on screen and must be perfectly round, so a generated model would only be worse.
+- **Bat:** turned on a lathe from a knob / handle / taper / barrel profile (`BatMesh`), with a procedural wood-grain shader and spiral grip tape on the handle. Arcade-thick so it reads from the batting camera.
+- **AI 3D (Artlist):** spent only on organic or sculptural pieces that are hard to build by hand, such as the glove, helmets, catcher's mask and park landmarks. References are photos the owner finds (no generated reference images); spend is tracked in `docs/ARTLIST_CREDITS.md`.
+- **Stadiums stay procedural:** their geometry is the ball physics (wall distances and heights), so they are built from data. Generated models would be one fixed mesh that cannot match it.
+
+Reason: Owner direction to prioritize gloves, balls and bats and to save credits.
+
+Affected systems: MatchView (ball material and spin, bat), BatMesh, ball and bat shaders, tests.

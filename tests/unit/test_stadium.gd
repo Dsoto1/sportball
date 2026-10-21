@@ -108,3 +108,11 @@ func test_turf_runs_grounders_faster() -> void:
 	var turf := content().tuning_for(content().park(&"the_vault"))
 	check(FieldLayout.roll_deceleration(turf) < FieldLayout.roll_deceleration(grass), "less roll friction on turf")
 	check(FieldLayout.bounce_friction(turf) > FieldLayout.bounce_friction(grass), "grounders skip off turf")
+
+
+func test_bat_is_turned_from_knob_to_barrel() -> void:
+	var mesh := BatMesh.build()
+	var aabb := mesh.get_aabb()
+	check_near(aabb.size.z, BatMesh.LENGTH, 0.01, "bat is full length")
+	check(aabb.position.z + aabb.size.z <= 0.001, "knob at the grip end (z = 0), barrel toward -Z")
+	check(aabb.size.x > 0.1 and aabb.size.x < 0.13, "barrel about 11 cm across (%.3f)" % aabb.size.x)

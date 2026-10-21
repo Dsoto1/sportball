@@ -48,6 +48,9 @@ var _landing_hint: MeshInstance3D
 var _field_focus := Vector3(0.0, 0.0, -42.0)
 ## Seconds a swing takes to come through the zone and follow through.
 const SWING_TIME := 0.28
+const BALL_SHADER := preload("res://presentation/props/baseball.gdshader")
+## How fast the ball tumbles (radians per meter travelled), so its seams spin.
+const BALL_SPIN := 9.0
 ## Pitcher's follow-through after release (s), and the windup progress
 ## where his hands break and the ball leaves the glove.
 const FOLLOW_TIME := 0.45
@@ -60,6 +63,7 @@ var _timing_ring: MeshInstance3D
 var _windup := -1.0
 ## View clock when the pitcher let go (his follow-through), or -1.
 var _follow_start := -1.0
+var _last_ball_position := Vector3.ZERO
 var _aim: Node3D
 var _aim_shaft: MeshInstance3D
 var _aim_head: MeshInstance3D
@@ -91,6 +95,9 @@ func setup(p_tuning: BaseballTuning) -> void:
 	_camera.current = true
 	_snap_camera()
 	_ball = _sphere(0.11, Color(1, 1, 1), true)
+	var ball_mat := ShaderMaterial.new()
+	ball_mat.shader = BALL_SHADER
+	_ball.material_override = ball_mat
 	_ball_shadow = _disc(0.18, Color(0, 0, 0, 0.45))
 	for id in tuning.fielder_ids:
 		var actor := ActorView.new()
@@ -493,6 +500,7 @@ func _process(delta: float) -> void:
 		_camera.fov = CAMERA_FOV[_camera_mode] - 5.0 * kick
 	_update_bat()
 	_update_windup(delta)
+	_spin_ball()
 	var spot: Array = CAMERA_SPOTS[_camera_mode]
 	var weight := 1.0 - exp(-delta * 6.0)
 	var goal: Vector3 = spot[0]
@@ -517,6 +525,20 @@ func _process(delta: float) -> void:
 	var wanted := (target - _camera.position).normalized()
 	var look := forward.slerp(wanted, weight)
 	_camera.look_at(_camera.position + look, Vector3.UP)
+
+
+## Tumbles the ball about the axis across its travel, so its seams spin in
+## flight and roll on the ground.
+func _spin_ball() -> void:
+	var moved := _ball.position - _last_ball_position
+	_last_ball_position = _ball.position
+	var distance := moved.length()
+	if distance < 0.001 or distance > 5.0:
+		return
+	var axis := moved.cross(Vector3.UP)
+	if axis.length() < 0.0001:
+		axis = Vector3.RIGHT
+	_ball.rotate(axis.normalized(), -distance * BALL_SPIN)
 
 
 func _update_bat() -> void:
@@ -616,14 +638,11 @@ func _build_bat() -> void:
 	_bat_pivot.name = "Bat"
 	add_child(_bat_pivot)
 	var bat := MeshInstance3D.new()
-	var cyl := CylinderMesh.new()
-	cyl.top_radius = 0.06  # barrel
-	cyl.bottom_radius = 0.025  # handle
-	cyl.height = 0.95
-	bat.mesh = cyl
-	bat.rotation_degrees.x = -90.0  # lie along -Z, the pivot's facing
-	bat.position = Vector3(0.0, 0.0, -0.475)  # handle at the pivot (the hands)
-	bat.material_override = GrayboxField._mat(Color(0.82, 0.62, 0.36))
+	bat.name = "BatMesh"
+	bat.mesh = BatMesh.build()  # along -Z, the pivot's facing
+	# The hands grip a little above the knob.
+	bat.position = Vector3(0.0, 0.0, 0.06)
+	bat.material_override = BatMesh.material()
 	_bat_pivot.add_child(bat)
 	_timing_ring = _ring(Color(1, 1, 1, 0.8))
 	_timing_ring.position = Vector3(0.0, (tuning.zone_top + tuning.zone_bottom) * 0.5, 0.04)
