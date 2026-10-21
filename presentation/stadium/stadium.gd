@@ -243,9 +243,9 @@ func _build_batters_eye() -> void:
 
 
 func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
-	# Home team on the third-base side, visitors on first.
+	# Home team on the first-base side, visitors on third (the reference sheets).
 	for side: float in [-1.0, 1.0]:
-		var club := home if side < 0.0 else away
+		var club := away if side < 0.0 else home
 		var angle := 82.0 * side
 		var radius := profile(angle).x - 4.5
 		var center := point(angle, radius, 0.0)
