@@ -59,6 +59,8 @@ var _flash: MeshInstance3D
 var _flash_start := -10.0
 var _flash_size := 0.0
 var _contact_sound: ContactSound
+## Sound effects and the crowd.
+var sfx: Sfx
 var _trail: Array[MeshInstance3D] = []
 var _punch_start := -10.0
 var _punch_strength := 0.0
@@ -102,6 +104,9 @@ func set_camera_mode(mode: CameraMode) -> void:
 	var batter: ActorView = _runners.get(_batter_id)
 	if batter != null:
 		batter.set_tag_visible(mode != CameraMode.BAT)
+	var catcher := tuning.fielder_ids.find(&"c")
+	if catcher >= 0 and catcher < _fielders.size():
+		_fielders[catcher].set_tag_visible(mode != CameraMode.BAT)
 
 
 ## Point the ball-in-play camera tracks.
@@ -218,6 +223,9 @@ func set_aim_preview(show: bool, spray_deg: float = 0.0, lift: float = 0.0) -> v
 ## the crack of the bat. tier: ContactFeedback.Tier.
 func contact_feedback(location: Vector2, tier: int) -> void:
 	_contact_sound.play_tier(tier)
+	if tier != ContactFeedback.Tier.MISS:
+		# Wood under the synthesized crack: fuller the better the contact.
+		sfx.play(&"bat", -8.0 + 2.0 * tier, lerpf(0.85, 1.05, tier / 4.0))
 	if tier < ContactFeedback.Tier.SOLID:
 		return
 	# Camera punch: a quick zoom-in kick and shake, bigger on the barrel.
@@ -556,6 +564,9 @@ func _build_aim_and_flash() -> void:
 	_contact_sound = ContactSound.new()
 	_contact_sound.name = "ContactSound"
 	add_child(_contact_sound)
+	sfx = Sfx.new()
+	sfx.name = "Sfx"
+	add_child(sfx)
 
 
 func _build_bat() -> void:

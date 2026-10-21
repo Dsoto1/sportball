@@ -14,6 +14,9 @@ const WINDUP_TIME := 0.7
 ## Hit pause by contact tier (seconds the play clock holds after contact).
 const HIT_STOP := {ContactFeedback.Tier.SOLID: 0.05, ContactFeedback.Tier.SWEET: 0.11}
 const CALL_PAUSE := 0.8
+## Crowd reaction (0..1) to how a plate appearance ended.
+const CROWD := {&"strikeout": 0.3, &"single": 0.45, &"double": 0.65, &"triple": 0.8, &"home_run": 1.0,
+	&"inside_the_park_home_run": 1.0, &"double_play": 0.6, &"triple_play": 0.9}
 const PLAY_SETTLE_PAUSE := 0.9
 # How long a human fielder can hold the ball before the AI throw is used.
 const THROW_DECISION_WINDOW := 0.6
@@ -118,7 +121,7 @@ func start_match(seed_value: int) -> void:
 		["%s · Exhibition · %d innings · %s rules" % [home.stadium, content.rules.innings, content.rules.display_name], Color.WHITE, 22],
 		["Mercy rule at %d runs after %d · runner on second in extras · %ds pitch clock" % [content.rules.mercy_runs, content.rules.mercy_after_inning, roundi(content.rules.pitch_clock)], Color(0.85, 0.85, 0.85), 16],
 	])
-	_hud.show_prompt("Play as the %s (bat first): J / click / A      Play as the %s (field first): K / right-click / X" % [away.team_name.to_upper(), home.team_name.to_upper()])
+	_hud.show_prompt("Play as the %s (bat first) {swing_contact}        Play as the %s (field first) {swing_power}" % [away.team_name.to_upper(), home.team_name.to_upper()])
 
 
 func _process_pregame() -> void:
@@ -131,6 +134,8 @@ func _process_pregame() -> void:
 		return
 	user_team = pick
 	_hud.show_card([])
+	_view.sfx.play(&"ui_confirm")
+	_view.sfx.cheer(0.5)
 	var hint := "You bat first: swing as the white ring closes on the plate" if pick == MatchState.AWAY else "You pitch first: aim, then stop the meter in the white band"
 	_hud.show_callout("PLAY BALL", "You are the %s. %s" % [roster.teams[pick].full_name(), hint], 3.0)
 	_enter_pre_pitch()
@@ -176,6 +181,11 @@ func debug_set_cursor(at: Vector2) -> void:
 
 ## Swings are stamped here, as the event arrives, not when _process polls.
 func _input(event: InputEvent) -> void:
+	# Prompts follow whichever device the player is using.
+	if event is InputEventJoypadButton or (event is InputEventJoypadMotion and absf(event.axis_value) > 0.5):
+		_hud.set_gamepad(true)
+	elif event is InputEventKey or event is InputEventMouseButton:
+		_hud.set_gamepad(false)
 	if state == null or _phase != Phase.PITCH_FLIGHT or not user_is_batting():
 		return
 	if _contact != null or _pending_swing != SwingIntent.Type.NONE:
@@ -335,15 +345,18 @@ func _process_pre_pitch(delta: float) -> void:
 	var count := repertoire.size()
 	if Input.is_action_just_pressed(&"pitch_next"):
 		_selected_pitch = (_selected_pitch + 1) % count
+		_view.sfx.play(&"ui_tick")
 	if Input.is_action_just_pressed(&"pitch_prev"):
 		_selected_pitch = (_selected_pitch + count - 1) % count
+		_view.sfx.play(&"ui_tick")
 	if Input.is_action_just_pressed(&"slide_step"):
 		_slide_step = not _slide_step
+		_view.sfx.play(&"ui_toggle")
 	_hud.show_pitching(true, repertoire, _selected_pitch, _slide_step)
 	if Input.is_action_just_pressed(&"pitch_primary"):
 		_hud.set_clock(-1.0)
 		_set_phase(Phase.METER)
-		_hud.show_prompt("Release in the white band: Space / A")
+		_hud.show_prompt("Release in the white band {pitch_primary}")
 
 
 func _process_meter(delta: float) -> void:
@@ -419,6 +432,8 @@ func _process_pitch_flight(_delta: float) -> void:
 				call_text = String(_outcome.kind).replace("_", " ").to_upper()
 		else:
 			call_text = _apply_call()
+			if _contact.outcome != ContactResult.Outcome.FOUL:
+				_view.sfx.play(&"glove", 2.0 if _pitch.speed > 38.0 else 0.0)
 		if _contact.swing_type != SwingIntent.Type.NONE:
 			_show_contact_feedback(call_text)
 		if _contact.outcome != ContactResult.Outcome.IN_PLAY and _contact.outcome != ContactResult.Outcome.FOUL:
@@ -499,8 +514,11 @@ func _start_ball_in_play() -> void:
 
 func _process_ball_in_play() -> void:
 	var t := _phase_time
+	var before := _play.time if _play != null else 0.0
 	if _play != null and _outcome == null:
 		_step_play(t)
+	if _play != null and not _bip.is_runner_play() and before < _bip.trajectory.first_bounce_time and _play.time >= _bip.trajectory.first_bounce_time and _play.ball == LivePlay.Ball.LOOSE:
+		_view.sfx.play(&"ball_land")
 	var selected: StringName = &""
 	if user_is_batting() and _play != null and _outcome == null and _held_base() > 0:
 		var r := _play.runner_for_base(_held_base())
@@ -578,6 +596,7 @@ func _drain_play_events() -> void:
 		_play_event_cursor += 1
 		match e["type"]:
 			"out":
+				_view.sfx.play(&"out")
 				var labels := {PlayOutcome.OUT_FORCE: "FORCE OUT", PlayOutcome.OUT_TAG: "TAGGED OUT", PlayOutcome.OUT_DOUBLED_OFF: "DOUBLED OFF", PlayOutcome.OUT_CATCH: "CAUGHT"}
 				_hud.show_callout(labels.get(e["kind"], "OUT"), "at %s" % FieldLayout.base_name(e["base"]), 1.2)
 				_log({"out": e["runner"], "kind": e["kind"], "base": e["base"], "time": snappedf(_play.time, 0.01)})
@@ -590,6 +609,12 @@ func _drain_play_events() -> void:
 				_log({"error": e["kind"], "base": e["base"], "time": snappedf(_play.time, 0.01)})
 			"throw":
 				_log({"throw": e["base"], "time": snappedf(_play.time, 0.01)})
+			"catch":
+				_view.sfx.play(&"glove_big")
+			"fielded", "throw_caught":
+				_view.sfx.play(&"glove")
+			"safe":
+				_view.sfx.play(&"bag")
 
 
 func _field_focus(t: float) -> Vector3:
@@ -640,7 +665,7 @@ func _enter_game_over() -> void:
 	for team in [MatchState.AWAY, MatchState.HOME]:
 		lines.append(["%s   %2d   %2d   %2d" % [roster.teams[team].abbreviation, state.score[team], state.hits[team], state.errors[team]], MatchHud.text_color(roster.teams[team]), 30])
 	_hud.show_card(lines)
-	_hud.show_prompt("New match: F5 / Start")
+	_hud.show_prompt("New match {restart_match}")
 	print("[match] final %s  line %s" % [state.score, state.line_score])
 
 
@@ -651,10 +676,17 @@ func _drain_events() -> void:
 		_debug.push_event(event)
 		match event.type:
 			DomainEvent.PLATE_APPEARANCE_ENDED:
+				_view.sfx.cheer(CROWD.get(event.data["result"], 0.0))
 				if event.data["result"] == &"strikeout":
 					_hud.show_callout("STRUCK OUT", _timing_detail())
 				elif event.data["result"] == &"walk":
 					_hud.show_callout("WALK")
+			DomainEvent.RUN_SCORED:
+				_view.sfx.cheer(0.75)
+			DomainEvent.STOLEN_BASE:
+				_view.sfx.cheer(0.4)
+			DomainEvent.PICKED_OFF, DomainEvent.CAUGHT_STEALING:
+				_view.sfx.cheer(0.5)
 			DomainEvent.HALF_INNING_ENDED:
 				_hud.show_callout("SIDE RETIRED", "%d run%s" % [event.data["runs"], "" if event.data["runs"] == 1 else "s"])
 			DomainEvent.SUBSTITUTION:
@@ -699,24 +731,26 @@ func _timing_detail() -> String:
 	return "timing %+d ms" % roundi(_contact.timing_offset * 1000.0)
 
 
+## Prompt text with {action} tokens; the HUD draws them as the player's own
+## key or button icons.
 func _hud_prompt_suffix() -> String:
 	var role := "BATTING" if user_is_batting() else "PITCHING / FIELDING"
 	var base := ""
 	match _phase:
 		Phase.PRE_PITCH, Phase.PITCH_FLIGHT:
 			if user_is_batting():
-				base = "Watch the pitcher. SWING as the ring closes: J or click (contact) / K or right-click (power) / B (bunt, ←→ places it)\nHold WASD / L-stick while swinging: ←→ aim field  ↑ lift  ↓ chop    Steal: E / RB before the pitch (hold 1-3 for one runner), Q / LB cancel    Pinch hit: P / Y"
+				base = "Swing as the ring closes: {swing_contact} contact   {swing_power} power   {swing_bunt} bunt      {move} while swinging: aim, lift, chop\nBefore the pitch: {runner_advance} steal   {runner_retreat} call it off   (hold 1-2 for one runner)      {open_subs} pinch hit"
 			else:
-				base = "Aim: WASD / L-stick    Pitch: Q E / LB RB    Start meter: Space / A    Pickoff: F / LT (+ → ↑ ←)    Slide step: Shift / RT    Pitching change: P / Y"
+				base = "{move} aim   {pitch_prev}{pitch_next} pitch   {pitch_primary} start the meter      {pickoff} pickoff   {slide_step} slide step   {open_subs} pitching change"
 		Phase.BALL_IN_PLAY:
 			if _outcome != null:
-				base = "Skip: J / A"
+				base = "Skip {skip}"
 			elif user_is_batting():
-				base = "Runners: advance E / RB   retreat Q / LB   (hold 1-4 / B Y X A for one runner)"
+				base = "Runners: {runner_advance} advance   {runner_retreat} retreat   (hold a base button for one runner)"
 			else:
-				base = "Run: WASD / L-stick   Dive: Shift / RT   Switch: F / LT\nThrow: hold a direction (→ 1st  ↑ 2nd  ← 3rd  ↓ home) + Space / J / click / RB  (no direction = best play)   or 1-4 / B Y X A"
-	var assist := "   Rookie assist: %s (T)" % ("ON" if tuning.rookie_assist else "OFF")
-	return "%s\n[%s]   Tab/Back: switch side   ` or F1: debug   R or F5: restart%s" % [base, role, assist]
+				base = "{move} run   {dive} dive   {switch_fielder} switch fielder\nThrow: point at the base + {throw_ball}  (no direction = best play)   or {throw_base_1}{throw_base_2}{throw_base_3}{throw_base_4}"
+	var assist := "Rookie assist %s {toggle_assist}" % ("ON" if tuning.rookie_assist else "OFF")
+	return "%s\n%s      {switch_side} switch side   {toggle_debug} debug   {restart_match} restart   %s" % [base, role, assist]
 
 
 ## Reads the batting stick and shows it as a small marker on the zone:
@@ -948,8 +982,10 @@ func _process_sub_menu() -> void:
 	var count := _sub_options.size()
 	if Input.is_action_just_pressed(&"aim_down"):
 		_sub_selected = (_sub_selected + 1) % count
+		_view.sfx.play(&"ui_tick")
 	if Input.is_action_just_pressed(&"aim_up"):
 		_sub_selected = (_sub_selected + count - 1) % count
+		_view.sfx.play(&"ui_tick")
 	var labels: Array = _sub_options.map(func(o: Dictionary) -> String: return o["label"])
 	_hud.update_menu(labels, _sub_selected)
 	if Input.is_action_just_pressed(&"open_subs"):
@@ -957,6 +993,7 @@ func _process_sub_menu() -> void:
 	elif Input.is_action_just_pressed(&"pitch_primary") or Input.is_action_just_pressed(&"swing_contact"):
 		var pick := _sub_options[_sub_selected]
 		state.substitute(user_team, pick["out"], pick["in"])
+		_view.sfx.play(&"ui_confirm")
 		_close_sub_menu()
 
 

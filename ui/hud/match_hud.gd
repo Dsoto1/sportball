@@ -2,7 +2,12 @@ class_name MatchHud
 extends Control
 ## Broadcast-style match HUD in priority order: score/inning/outs, bases,
 ## count, matchup, then context prompt and timing feedback. It only reads
-## state handed to it.
+## state handed to it. Text is Rajdhani; scores, callouts and title cards
+## are Bungee (both SIL OFL). Prompts show the player's own key or button
+## icons (Kenney Input Prompts, CC0).
+
+const BODY_FONT := preload("res://assets/third_party/fonts/rajdhani/Rajdhani-SemiBold.ttf")
+const DISPLAY_FONT := preload("res://assets/third_party/fonts/bungee/Bungee-Regular.ttf")
 
 var _score: Label
 var _away_score: Label
@@ -17,7 +22,10 @@ var _count: Label
 var _matchup: Label
 var _callout: Label
 var _detail: Label
-var _prompt: Label
+var _prompt: RichTextLabel
+var _prompt_text := ""
+## Show gamepad icons (true) or keyboard/mouse icons in prompts.
+var gamepad := false
 var _pitch_menu: Label
 var _meter: PitchMeter
 var _callout_timer := 0.0
@@ -26,6 +34,9 @@ var _callout_timer := 0.0
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var look := Theme.new()
+	look.default_font = BODY_FONT
+	theme = look
 	var panel := PanelContainer.new()
 	panel.position = Vector2(20, 20)
 	add_child(panel)
@@ -48,9 +59,19 @@ func _ready() -> void:
 
 	_callout = _wide_label(64, Control.PRESET_TOP_WIDE, 150.0)
 	_detail = _wide_label(24, Control.PRESET_TOP_WIDE, 235.0)
-	_prompt = _wide_label(20, Control.PRESET_BOTTOM_WIDE, -24.0)
+	_prompt = RichTextLabel.new()
+	_prompt.bbcode_enabled = true
+	_prompt.fit_content = true
+	_prompt.scroll_active = false
+	_prompt.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_prompt.add_theme_font_size_override("normal_font_size", 21)
+	_prompt.add_theme_color_override("font_outline_color", Color.BLACK)
+	_prompt.add_theme_constant_override("outline_size", 6)
+	add_child(_prompt)
+	_prompt.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	_prompt.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	_prompt.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	_prompt.offset_top = -90.0
+	_prompt.offset_bottom = -12.0
 
 	_pitch_menu = _label(self, 20)
 	_pitch_menu.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
@@ -74,6 +95,8 @@ func _ready() -> void:
 	_card.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_card)
+	for big in [_callout, _away_score, _home_score, _clock]:
+		big.add_theme_font_override("font", DISPLAY_FONT)
 	show_pitching(false)
 
 
@@ -126,6 +149,8 @@ func show_card(lines: Array) -> void:
 	for line in lines:
 		var label := _label(_card, line[2])
 		label.text = line[0]
+		if line[2] >= 26:
+			label.add_theme_font_override("font", DISPLAY_FONT)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.add_theme_color_override("font_color", line[1])
 	if _card.visible:
@@ -155,7 +180,7 @@ func update_menu(lines: Array, selected: int) -> void:
 	for i in lines.size():
 		text.append(("▶ %s" if i == selected else "   %s") % lines[i])
 	text.append("")
-	text.append("Up/Down: choose    J / A: confirm    P / Y: cancel")
+	text.append("Up/Down: choose    %s: confirm    %s: cancel" % ["A" if gamepad else "J", "Y" if gamepad else "P"])
 	_menu.text = "\n".join(text)
 
 
@@ -167,8 +192,18 @@ func show_callout(text: String, detail: String = "", seconds: float = 1.4) -> vo
 	_detail.modulate.a = 1.0
 
 
+## text may hold {action} tokens; they become key or button icons.
 func show_prompt(text: String) -> void:
-	_prompt.text = text
+	_prompt_text = text
+	_prompt.text = "[center]%s[/center]" % PromptIcons.render(text, gamepad)
+
+
+## The player switched between keyboard/mouse and a gamepad.
+func set_gamepad(value: bool) -> void:
+	if value == gamepad:
+		return
+	gamepad = value
+	show_prompt(_prompt_text)
 
 
 func show_pitching(visible_now: bool, families: Array[PitchFamilyDef] = [], selected: int = 0, slide_step: bool = false) -> void:

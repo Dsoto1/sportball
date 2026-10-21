@@ -1,0 +1,5 @@
+Grass004 by ambientCG (https://ambientcg.com/view?id=Grass004)
+License: CC0 1.0 Universal (public domain dedication)
+https://creativecommons.org/publicdomain/zero/1.0/
+Source page states: "All assets are released under the Creative Commons CC0 license, making them free to use without attribution - even in commercial circumstances."
+Downloaded 2026-10-21 as Grass004_1K-JPG.zip; Color and NormalGL maps downscaled to 512 px.

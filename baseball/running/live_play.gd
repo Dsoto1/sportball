@@ -361,6 +361,8 @@ func secure(f: FieldingResult) -> void:
 		_misplay("dive_miss", tuning.dive_miss_roll, tuning.dive_miss_delay)
 	elif not f.caught_in_air and _roll((tuning.bobble_chance + tuning.bobble_chance_per_speed * _ball_speed(f.secure_time)) * _holder_fielder_scale(false)):
 		_misplay("bobble", tuning.bobble_roll, tuning.bobble_time)
+	if not fielding.caught_in_air:
+		events.append({"type": "fielded"})
 	if fielding.caught_in_air:
 		var batter := runner(batter_id)
 		_record_out(batter, FieldLayout.HOME, PlayOutcome.OUT_CATCH)
@@ -575,6 +577,7 @@ func _resolve_arrivals() -> void:
 		if r.state != State.RUNNING or absf(r.s - r.target * BASE) > 0.001:
 			continue
 		r.reached = maxi(r.reached, r.target)
+		events.append({"type": "safe", "runner": r.id, "base": r.target})
 		if r.target == HOME_PLATE:
 			r.state = State.SCORED
 			r.score_time = time
@@ -740,6 +743,7 @@ func _route(base: int) -> Dictionary:
 func _catch_throw() -> void:
 	var base: int = flight["base"]
 	ball = Ball.HELD
+	events.append({"type": "throw_caught", "base": base})
 	holder_cover = base
 	holder_pos = flight["to"]
 	covers[base] = holder_pos
