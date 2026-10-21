@@ -15,6 +15,9 @@ surface_speed = 1.3
 [sub_resource type="Resource" id="Resource_iootr"]
 script = ExtResource("2_b78mq")
 kind = &"centerpiece"
+params = {
+"frame": &"gate"
+}
 
 [sub_resource type="Resource" id="Resource_4i8r7"]
 script = ExtResource("2_b78mq")
@@ -28,9 +31,56 @@ angle = 34.0
 
 [sub_resource type="Resource" id="Resource_pt7r0"]
 script = ExtResource("2_b78mq")
-kind = &"dome"
+kind = &"light_towers"
 
 [sub_resource type="Resource" id="Resource_ysqj7"]
+script = ExtResource("2_b78mq")
+kind = &"skyline"
+params = {
+"height": 1.3
+}
+
+[sub_resource type="Resource" id="Resource_mjxe6"]
+script = ExtResource("2_b78mq")
+kind = &"vault_door"
+angle = -34.0
+
+[sub_resource type="Resource" id="Resource_mtp5g"]
+script = ExtResource("2_b78mq")
+kind = &"searchlights"
+angle = -70.0
+params = {
+"count": 7,
+"span": 140.0
+}
+
+[sub_resource type="Resource" id="Resource_w3um4"]
+script = ExtResource("2_b78mq")
+kind = &"viaduct"
+angle = 18.0
+params = {
+"height": 20.0,
+"span": 32.0
+}
+
+[sub_resource type="Resource" id="Resource_ewyli"]
+script = ExtResource("2_b78mq")
+kind = &"bridge"
+angle = 40.0
+params = {
+"distance": 120.0,
+"length": 160.0
+}
+
+[sub_resource type="Resource" id="Resource_eijjg"]
+script = ExtResource("2_b78mq")
+kind = &"bunting"
+angle = 50.0
+params = {
+"span": 260.0
+}
+
+[sub_resource type="Resource" id="Resource_aq1kd"]
 script = ExtResource("2_b78mq")
 kind = &"flags"
 angle = -50.0
@@ -43,20 +93,21 @@ params = {
 script = ExtResource("3_c1uws")
 id = &"the_vault"
 display_name = "The Vault"
-blurb = "Safecrackers home · a sealed dome on fast turf: grounders scoot through the gaps"
+blurb = "Safecrackers home · fast turf under searchlights: grounders scoot through the gaps, a giant vault door looms in left"
 field_shape = SubResource("Resource_pwxlr")
-seat_color = Color(0.16470589, 0.18431373, 0.22745098, 1)
-seat_color_alt = Color(0.1254902, 0.14117648, 0.1764706, 1)
-structure_color = Color(0.6039216, 0.6392157, 0.70980394, 1)
-accent_color = Color(1, 0.3529412, 0.8156863, 1)
-outfield_wall_color = Color(0.10980392, 0.13333334, 0.21176471, 1)
+seat_color = Color(0.47843137, 0.101960786, 0.14901961, 1)
+seat_color_alt = Color(0.36862746, 0.078431375, 0.11372549, 1)
+structure_color = Color(0.2901961, 0.30980393, 0.3529412, 1)
+accent_color = Color(1, 0.1764706, 0.1764706, 1)
+outfield_wall_color = Color(0.101960786, 0.13333334, 0.1882353, 1)
 outfield_rows = 14
 decks = 3
 home_fan_share = 0.5
 away_fan_share = 0.25
 attendance = 0.7
+night = true
 turf = true
 sponsors = PackedStringArray("STRONGBOX SECURITY", "TITAN TURF", "DOMELIGHT DINER", "PRESSURE SEAL WINDOWS", "BIG TOP BURGERS")
-skyline_color = Color(0.14901961, 0.1882353, 0.2901961, 1)
-window_color = Color(0.84705883, 0.9254902, 1, 1)
-pieces = Array[ExtResource("2_b78mq")]([SubResource("Resource_iootr"), SubResource("Resource_4i8r7"), SubResource("Resource_t1ilx"), SubResource("Resource_pt7r0"), SubResource("Resource_ysqj7")])
+skyline_color = Color(0.11764706, 0.14117648, 0.2, 1)
+window_color = Color(1, 0.8352941, 0.6039216, 1)
+pieces = Array[ExtResource("2_b78mq")]([SubResource("Resource_iootr"), SubResource("Resource_4i8r7"), SubResource("Resource_t1ilx"), SubResource("Resource_pt7r0"), SubResource("Resource_ysqj7"), SubResource("Resource_mjxe6"), SubResource("Resource_mtp5g"), SubResource("Resource_w3um4"), SubResource("Resource_ewyli"), SubResource("Resource_eijjg"), SubResource("Resource_aq1kd")])

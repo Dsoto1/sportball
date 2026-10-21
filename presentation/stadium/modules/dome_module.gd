@@ -7,7 +7,9 @@ extends StadiumModule
 func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef) -> void:
 	var def := stadium.def
 	var radius := 215.0 * piece.size
-	var rim := 22.0
+	# The wall rises clear of everything in the park (the centerpiece stands
+	# on the outfield stands) before the shell curves over.
+	var rim := stadium.stand_top(0.0).y + 46.0
 	var rise := float(piece.param("rise"))
 	var center := Stadium.FIELD_CENTER + Vector3(0.0, 0.0, 10.0)
 	var shell := MeshInstance3D.new()
@@ -68,4 +70,5 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	crown.mesh = disc
 	crown.position = center + Vector3.UP * (rim + rise - 0.8)
 	crown.material_override = Stadium.glow(def.accent_color, 2.5)
+	crown.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	stadium.add_child(crown)

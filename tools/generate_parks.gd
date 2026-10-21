@@ -118,15 +118,15 @@ const PARKS := [
 		"skyline_color": Color("26304a"), "window_color": Color("d8ecff"), "skyline_height": 0.6,
 	},
 	{
-		"id": &"the_vault", "decks": 3, "frame": &"board", "display_name": "The Vault",
-		"blurb": "Safecrackers home · a sealed dome on fast turf: grounders scoot through the gaps",
+		"id": &"the_vault", "decks": 3, "frame": &"gate", "display_name": "The Vault",
+		"blurb": "Safecrackers home · fast turf under searchlights: grounders scoot through the gaps, a giant vault door looms in left",
 		"shape": [[-45, 100, 3.0], [-22, 114, 3.0], [0, 122, 3.0], [22, 114, 3.0], [45, 100, 3.0]], "air": 0.97, "surface": 1.3,
-		"seat_color": Color("2a2f3a"), "seat_color_alt": Color("20242d"), "structure_color": Color("9aa3b5"), "accent_color": Color("ff5ad0"),
-		"outfield_wall_color": Color("1c2236"), "wall_style": &"padded", "home_fan_share": 0.5, "away_fan_share": 0.25, "attendance": 0.7,
-		"foul_rows": 26, "outfield_rows": 14, "turf": true,
-		"pieces": [[&"dome"], [&"flags", -50.0, {"span": 100.0, "count": 10}]], "standard": [&"centerpiece", &"scoreboard", &"slogan_board"],
+		"seat_color": Color("7a1a26"), "seat_color_alt": Color("5e141d"), "structure_color": Color("4a4f5a"), "accent_color": Color("ff2d2d"),
+		"outfield_wall_color": Color("1a2230"), "wall_style": &"padded", "home_fan_share": 0.5, "away_fan_share": 0.25, "attendance": 0.7,
+		"foul_rows": 26, "outfield_rows": 14, "turf": true, "night": true,
+		"pieces": [[&"vault_door", -34.0], [&"searchlights", -70.0, {"span": 140.0, "count": 7}], [&"viaduct", 18.0, {"span": 32.0, "height": 20.0}], [&"bridge", 40.0, {"distance": 120.0, "length": 160.0}], [&"bunting", 50.0, {"span": 260.0}], [&"flags", -50.0, {"span": 100.0, "count": 10}]],
 		"sponsors": ["STRONGBOX SECURITY", "TITAN TURF", "DOMELIGHT DINER", "PRESSURE SEAL WINDOWS", "BIG TOP BURGERS"],
-		"skyline_color": Color("26304a"), "window_color": Color("d8ecff"),
+		"skyline_color": Color("1e2433"), "window_color": Color("ffd59a"), "skyline_height": 1.3,
 	},
 ]
 

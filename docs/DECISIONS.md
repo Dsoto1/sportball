@@ -910,3 +910,22 @@ Affected systems: generate_teams, generate_parks, Emblem (atom), modules (pipes,
 Reason: Owner reference sheets.
 
 Affected systems: generate_teams, generate_parks, modules (centerpiece clock, trees kinds, conservatory new), Stadium.profile, tests, README, notes.
+
+## 2026-10-21 - The Vault Sheet; New Clubs Wait
+
+- **Owner's rule:** only sheets for the eleven listed clubs get built. Sheets for new clubs are saved under `docs/stadium_refs/proposed/` and noted for later. So far: the Sailport Privateers, Redrock Rangers, Sandstone Legion and Tidal Reign.
+- **The Vault opens up:** its sheet shows an open-air night park, so the dome comes off.
+  - New `vault_door`: a giant bank-vault door in a tall wall behind the left-field stands.
+  - New `searchlights`: beams sweeping into the sky.
+  - An elevated train, an arched bridge, bunting, and a taller skyline.
+  - Burgundy, gunmetal and alarm red. The centerpiece is a gate.
+- **What stays:** the fast turf and the wall shape, since those are rules. The sheet's tall left-field wall would repeat Ledger Street's Leviathan anyway.
+- **Safecrackers' colors:** from the sheet. Alarm red is the accent (neon), silver the highlight, burgundy the support.
+- **The dome module still exists:**
+  - its wall now rises 46 m above the stands, so it clears the centerpiece;
+  - its crown no longer casts a shadow;
+  - a test keeps a domed design buildable.
+
+Reason: Owner reference sheet for the Vault; owner instruction on new clubs.
+
+Affected systems: modules (vault_door, searchlights new; dome), catalog, generate_parks, generate_teams, tests, README, notes.

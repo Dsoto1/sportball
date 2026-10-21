@@ -157,12 +157,30 @@ points. The Foundry sheet also has a six-color team set.
   - Dark: Evergreen #0B2E1F
   - Highlight: Royal Gold #D4AF37
 
+## 11 The Vault
+
+- A heist/noir night park, open to the sky (not a dome):
+  - a giant bank-vault door in a tall wall over left field;
+  - searchlights, catwalks, an elevated train and an arched bridge;
+  - a dense Art Deco skyline, bunting.
+- The sheet's very tall left-field wall stays out, by the rule that the sheets don't change field dimensions. The Vault keeps its walls and fast turf. The door stands behind the left-field stands instead.
+- Team colors:
+  - Primary: Gunmetal Gray #2B2F3A
+  - Secondary: Midnight Blue #0F2A44
+  - Accent: Burgundy Red #8B1E2D (support role)
+  - Accent 2: Silver #C0C6CF (highlight role)
+  - Support: Concrete Gray #7A7F87 (not used)
+  - Highlight: Alarm Red #FF2D2D (accent role, the neon)
+
 ## Proposed new clubs (`proposed/`, not in the league)
 
 - **Sailport Privateers, The Blackwater Park:** a pirate harbor fortress with ships, a lighthouse, waterfalls and caves.
 - **Redrock Rangers, Canyon Rim Park:** a canyon mining town with rock arches, a trestle and a train.
 
-Waiting on the owner's call. The Vault (the Safecrackers' dome) sheet hasn't come yet.
+- **Sandstone Legion:** a Roman colosseum park with sandstone arcades, flaming braziers, statues, red banners and twin waterfalls.
+- **Tidal Reign, Harbor Stadium:** a nautical harbor with cliffs, waterfalls, a lighthouse and tall ships, a trident emblem.
+
+Owner's rule: new clubs and parks are noted here for later; the eleven listed parks come first. The Vault (the Safecrackers' dome) sheet hasn't come yet.
 
 ## Built so far
 

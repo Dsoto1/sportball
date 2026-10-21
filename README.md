@@ -199,7 +199,7 @@ hitter's own swing (bat speed, attack angle, pull) in play:
 | The Horseshoe | night game; 279 / 266 ft lines, a 482 ft center field | 5.47 | 0.45 | 0.98 | 1.40 |
 | Warehouse Row | 25 ft brick wall in right, the Roundhouse warehouse beyond it | 5.47 | 1.10 | 2.05 | 0.85 |
 | Fountain Gardens | big and fair; garden terraces, fountains and blossoms beyond the wall | 4.85 | 0.85 | 1.18 | 1.32 |
-| The Vault | sealed dome on fast turf | 5.60 | 0.98 | 2.33 | 0.45 |
+| The Vault | fast turf under searchlights, a giant vault door in left | 5.60 | 0.98 | 2.33 | 0.45 |
 
 ### Building a park
 
@@ -232,6 +232,8 @@ The core is always built:
 | `warehouse` | long brick building along a line, its name on top | length, height, text |
 | `fountains` | pools with cascades and jets beyond the wall | span, basins |
 | `dome` | sealed roof; the park plays indoors | rise |
+| `vault_door` | giant round bank-vault door in a tall wall behind the stands | radius |
+| `searchlights` | beams sweeping into the night sky | span, count, length |
 | `waterfalls` | waterfall behind the outfield stands, into a pool (or a frozen ice fall) | height, width, frozen |
 | `trees` | grove across a span: palms, pines, cacti, round, cypress, blossom | span, count, kind |
 | `conservatory` | glass greenhouse dome on a stone drum | radius |

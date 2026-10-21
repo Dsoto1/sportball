@@ -111,7 +111,7 @@ const REPERTOIRES := {
 ## owner reference sheet (docs/stadium_refs) use its colors exactly; the
 ## rest are drafts until theirs arrive. Sheets so far: Glitterati,
 ## Gearheads, Bankers, Gulls, Comets, Yetis, Neutrons, Lamplighters,
-## Conductors, Swans.
+## Conductors, Swans, Safecrackers.
 const IDENTITY := {
 	&"glitterati": {"colors": ["4b2a7b", "d9a93a", "9b5cff", "a7a9b4", "141019", "f4f1fa"],
 		"slogan": "Bigger Brighter Together", "emblem": [&"halo", "*"]},
@@ -133,7 +133,7 @@ const IDENTITY := {
 		"slogan": "All Aboard", "emblem": [&"gear", "IC"]},
 	&"swans": {"colors": ["145a3b", "f4f1e8", "f3a7c4", "a7a7af", "0b2e1f", "d4af37"],
 		"slogan": "Grace Under Pressure", "emblem": [&"laurel", "S"]},
-	&"safecrackers": {"colors": ["5a6272", "ff5ad0", "151518", "9aa3b5", "0c0c10", "f3f0f7"],
+	&"safecrackers": {"colors": ["2b2f3a", "0f2a44", "ff2d2d", "8b1e2d", "15171c", "c0c6cf"],
 		"slogan": "Crack the Code", "emblem": [&"gear", "V"]},
 }
 

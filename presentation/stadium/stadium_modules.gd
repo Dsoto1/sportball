@@ -226,6 +226,21 @@ const CATALOG := {
 		"params": {"radius": [12.0, 6.0, 24.0]},
 		"script": preload("res://presentation/stadium/modules/conservatory_module.gd"),
 	},
+	&"vault_door": {
+		"name": "Vault Door", "category": &"landmark", "unique": false, "placed": true,
+		"about": "A giant round bank-vault door in a tall wall behind the stands, with bolts, a spoked wheel and red lights.",
+		"angle": -35.0, "angle_range": [-60.0, 60.0],
+		"params": {"radius": [14.0, 6.0, 24.0]},
+		"script": preload("res://presentation/stadium/modules/vault_door_module.gd"),
+	},
+	&"searchlights": {
+		"name": "Searchlights", "category": &"sky", "unique": false, "placed": true,
+		"about": "Searchlight beams sweeping up into the night sky from behind the stands, across span degrees.",
+		"angle": -60.0, "angle_range": [-180.0, 180.0],
+		"params": {"span": [120.0, -360.0, 360.0], "count": [6, 1, 16], "length": [160.0, 60.0, 300.0]},
+		"excludes": [&"dome"],
+		"script": preload("res://presentation/stadium/modules/searchlights_module.gd"),
+	},
 	&"dome": {
 		"name": "Dome", "category": &"structure", "unique": true, "placed": false,
 		"about": "A sealed roof over the whole park: catwalk rings, light banks, a glowing crown. Indoor light.",
