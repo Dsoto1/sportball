@@ -186,6 +186,11 @@ points. The Foundry sheet also has a six-color team set.
 
 - **Pinecrest Loggers, Timberfall Park:** a mountain lumber town with waterfalls, a sawmill wheel, a log crane, timber stacks and pines.
 
+- **Silver Blossom Kitsune, Sakura Gate Park:** a mountainside shrine park with pagodas, torii gates, cherry blossoms, waterfalls and a giant kitsune statue.
+- **Tidal Reign Krakens, Deepwater Park:** an underwater ruin with glass sea walls, aqueducts and a Neptune statue. This may be a second take on Tidal Reign (Harbor Stadium) above; same club name, different park.
+- **Skyward Aviators, Cloudreach Stadium:** a floating-island park with airships, skybridges and propeller towers.
+- **Crimson Dunes Scorpions, Amber Gate Park:** a desert canyon city with scorpion statues, an oasis and sandstone arches.
+
 Owner's rule: new clubs and parks are noted here for later; the eleven listed parks come first. The Vault (the Safecrackers' dome) sheet hasn't come yet.
 
 ## Built so far
