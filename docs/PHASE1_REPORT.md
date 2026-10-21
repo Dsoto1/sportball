@@ -69,7 +69,8 @@ home runs and make more errors, and the Gearheads make fewer errors.
    matches the Gearheads win 45.5% (it was 38%). They steal 1.5 bases per
    game at 81% and bunt about 1.7 times per game. The Glitterati remain the
    slight favorite with their power. With pickoffs (2.7 throws over and
-   0.36 pickoffs per game) the Gearheads win 44.75%. See DECISIONS.
+   0.36 pickoffs per game) and slide steps, the Gearheads win 44.5% (800
+   matches). See DECISIONS.
 2. **Pitch clock only for human pitchers.** The AI never runs it down, and
    there is no batter-side clock.
 3. **No in-game lineup card or defensive substitutions.** You can change
@@ -80,7 +81,5 @@ home runs and make more errors, and the Gearheads make fewer errors.
 
 ## Next
 
-- Slide steps (a quicker delivery that costs command), the last tool
-  against the running game.
 - With your approval: the first CC0 readability assets (HUD font,
   crowd/bat audio, a field texture), logged in the asset manifest.

@@ -9,6 +9,9 @@ var aim: Vector2
 var meter_error: float
 ## Assist: multiplies the family's speed (1 = normal).
 var speed_scale: float = 1.0
+## Quick delivery from the stretch: less time for a base stealer, at the
+## cost of command and a little velocity.
+var slide_step: bool = false
 
 
 func _init(p_family_id: StringName, p_aim: Vector2, p_meter_error: float) -> void:

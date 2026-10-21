@@ -48,11 +48,15 @@ static func steal_attempts(state: MatchState, roster: MatchRoster, tuning: Baseb
 			continue
 		if base == 2 and state.outs == 2:
 			continue
-		var speed := Ratings.runner_speed(roster.player(id) if roster != null else null, tuning)
-		if success_chance(base, speed, arm, tuning) < bar:
+		var runner := roster.player(id) if roster != null else null
+		var speed := Ratings.runner_speed(runner, tuning)
+		var jump := Ratings.steal_jump(runner, tuning)
+		# Runners know pitchers slide-step on threats about half the time.
+		var chance := 0.5 * (success_chance(base, speed, arm, tuning, false, jump) + success_chance(base, speed, arm, tuning, true, jump))
+		if chance < bar:
 			continue
 		if sends.has(base + 1) or rng.chance(tuning.ai_steal_attempt_rate * rate):
-			sends[base] = maxf(tuning.steal_jump_delay + rng.randfn(0.0, tuning.steal_jump_sigma), -0.2)
+			sends[base] = maxf(jump + rng.randfn(0.0, tuning.steal_jump_sigma), -0.2)
 	return sends
 
 
@@ -76,10 +80,27 @@ static func pickoff_choice(state: MatchState, roster: MatchRoster, tuning: Baseb
 	return 0
 
 
+## Does the AI pitcher use the slide step on this pitch? More often with a
+## fast runner who has an open base, and usually when he reads a lean.
+static func slide_step(state: MatchState, roster: MatchRoster, tuning: BaseballTuning, rng: MatchRng, leaning: Dictionary = {}) -> bool:
+	for base: int in leaning:
+		if state.runner_on(base) != &"" and rng.chance(tuning.ai_slide_step_read):
+			return true
+	for base in [1, 2]:
+		var id := state.runner_on(base)
+		if id == &"" or state.runner_on(base + 1) != &"":
+			continue
+		var p := roster.player(id) if roster != null else null
+		var threat := maxf(Ratings.norm(p.speed) if p != null else 0.0, 0.0)
+		if threat > 0.0 and rng.chance(tuning.ai_slide_step_rate * threat):
+			return true
+	return false
+
+
 ## Rough chance a runner steals the next base against a catcher's arm,
 ## from the same race the live play runs (average jump, average pitch).
-static func success_chance(base: int, speed: float, arm: float, tuning: BaseballTuning) -> float:
-	var head := LivePlay.steal_head_start(speed, 0.48, tuning.steal_jump_delay, tuning)
+static func success_chance(base: int, speed: float, arm: float, tuning: BaseballTuning, slide_step: bool = false, jump: float = -1.0) -> float:
+	var head := LivePlay.steal_head_start(speed, 0.48, jump if jump >= 0.0 else tuning.steal_jump_delay, tuning, -1.0, slide_step)
 	var runner := (FieldLayout.BASE_DISTANCE - head) / speed
 	var throw := tuning.catcher_transfer_time + tuning.catcher_release_time \
 		+ ThrowModel.flight_time(Vector3(0, 0, 0.9), FieldLayout.base_position(base + 1), tuning, arm) + tuning.tag_reach / speed

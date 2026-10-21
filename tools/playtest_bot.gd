@@ -103,6 +103,8 @@ func _drive() -> void:
 					return
 			if batting and entered and (_director.state.runner_on(1) != &"" or _director.state.runner_on(2) != &"") and _rng.randf() < 0.3:
 				_press(&"runner_advance")  # steal on this pitch
+			if not batting and entered and _director.state.runner_on(1) != &"" and _rng.randf() < 0.3:
+				_press(&"slide_step")  # toggle the quick delivery
 			if not batting and entered and _director.state.can_pickoff() and _rng.randf() < 0.15:
 				_press(&"pickoff")  # throw over first
 				return

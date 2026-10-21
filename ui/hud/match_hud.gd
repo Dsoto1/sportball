@@ -54,7 +54,7 @@ func _ready() -> void:
 
 	_pitch_menu = _label(self, 20)
 	_pitch_menu.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
-	_pitch_menu.position = Vector2(24, -170)
+	_pitch_menu.position = Vector2(24, -215)
 	_meter = PitchMeter.new()
 	_meter.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
 	_meter.position = Vector2(24, -60)
@@ -171,7 +171,7 @@ func show_prompt(text: String) -> void:
 	_prompt.text = text
 
 
-func show_pitching(visible_now: bool, families: Array[PitchFamilyDef] = [], selected: int = 0) -> void:
+func show_pitching(visible_now: bool, families: Array[PitchFamilyDef] = [], selected: int = 0, slide_step: bool = false) -> void:
 	_pitch_menu.visible = visible_now
 	_meter.visible = visible_now
 	if not visible_now:
@@ -179,6 +179,8 @@ func show_pitching(visible_now: bool, families: Array[PitchFamilyDef] = [], sele
 	var lines := PackedStringArray()
 	for i in families.size():
 		lines.append(("> %s <" if i == selected else "  %s") % families[i].display_name.to_upper())
+	lines.append("")
+	lines.append("SLIDE STEP: %s  (Shift / RT)" % ("ON — quicker, less control" if slide_step else "off"))
 	_pitch_menu.text = "\n".join(lines)
 
 

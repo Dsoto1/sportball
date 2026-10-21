@@ -299,3 +299,20 @@ Decision:
 Reason: Owner request. Pickoffs are the pitcher's answer to the running game.
 
 Affected systems: MatchRules, MatchState (pickoff count, lead cuts, apply_pickoff, events), LivePlay (pickoff mode, steal lead), BallInPlay (create_pickoff, lead_for), AiManager, AutoMatch, MatchDirector, MatchView (leads), input map, bot, sim report, tests.
+
+## 2026-10-21 - Slide Steps
+
+Decision:
+- **The rule:** a pitch can be thrown with a slide step (`PitchIntent.slide_step`).
+- **Its effect:** a stealing runner gets 0.18 s less delivery time (about 1.4 m less head start at average speed), and the pitch has 1.4× scatter and 97% velocity.
+- **AI pitcher:**
+  - He slide-steps against fast runners with an open base (0.15 × speed threat) and when he reads a lean (25%).
+  - He decides as his windup starts, and the windup is visibly shorter (55%), which changes the batter's timing cue.
+- **AI runners** value a steal as the average of their chances with and without a slide step.
+- **Fast runners get better jumps** (up to 0.12 s), which keeps speed decisive.
+- **Human controls:** Shift / RT toggles the slide step while pitching, and the pitch menu shows it.
+- **Balance (800 matches):** 3.5–3.9 slide steps per game, steals at 80–85% success, pickoffs about 0.33 per game. The Glitterati's power-swing rate was trimmed to 0.39, and the Gearheads win 44.5%.
+
+Reason: Owner request. The slide step completes the pitcher's answers to the running game: holding the runner (pickoffs) and being quick to the plate.
+
+Affected systems: PitchIntent, PitchResult, PitchResolver, LivePlay.steal_head_start, BallInPlay.create_steal, AiManager (slide_step, steal estimate), Ratings.steal_jump, AutoMatch, MatchDirector (AI windup, human toggle), MatchHud, input map, team data, bot, sim report, tests.

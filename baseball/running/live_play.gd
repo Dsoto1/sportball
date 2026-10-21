@@ -238,8 +238,10 @@ func _setup_between_pitches() -> void:
 
 ## Meters a stealing runner is off his bag when the pitch reaches the plate.
 ## lead: his lead off the bag (< 0 = the normal lead).
-static func steal_head_start(speed: float, travel_time: float, jump_delay: float, p_tuning: BaseballTuning, lead: float = -1.0) -> float:
-	return (lead if lead >= 0.0 else p_tuning.runner_lead_distance) + speed * maxf(p_tuning.steal_delivery_time + travel_time - jump_delay - p_tuning.steal_start_penalty, 0.0)
+## slide_step: the pitcher used the quick delivery.
+static func steal_head_start(speed: float, travel_time: float, jump_delay: float, p_tuning: BaseballTuning, lead: float = -1.0, slide_step: bool = false) -> float:
+	var delivery := p_tuning.steal_delivery_time - (p_tuning.slide_step_time_saved if slide_step else 0.0)
+	return (lead if lead >= 0.0 else p_tuning.runner_lead_distance) + speed * maxf(delivery + travel_time - jump_delay - p_tuning.steal_start_penalty, 0.0)
 
 
 ## A runner who was stealing when the ball was put in play is already on his way.

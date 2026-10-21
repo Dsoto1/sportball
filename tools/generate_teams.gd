@@ -69,7 +69,7 @@ const TEAMS := [
 		],
 		"order": [&"nhg_i_dont_care", &"nhg_because", &"nhg_who", &"nhg_vandermeer", &"nhg_lux", &"nhg_i_dont_know", &"nhg_why", &"nhg_what", &"nhg_today"],
 		"lineup_positions": [&"ss", &"cf", &"1b", &"rf", &"dh", &"3b", &"lf", &"2b", &"c"],
-		"ai": {"swing_aggression": 1.1, "chase_scale": 1.5, "power_swing_rate": 0.42, "runner_aggression": -0.1, "edge_bias_scale": 0.9, "bullpen_hook": 0.8, "steal_rate": 0.5, "bunt_rate": 0.25},
+		"ai": {"swing_aggression": 1.1, "chase_scale": 1.5, "power_swing_rate": 0.39, "runner_aggression": -0.1, "edge_bias_scale": 0.9, "bullpen_hook": 0.8, "steal_rate": 0.5, "bunt_rate": 0.25},
 	},
 ]
 

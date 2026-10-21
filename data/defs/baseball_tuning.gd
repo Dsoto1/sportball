@@ -252,6 +252,8 @@ extends Resource
 @export var rating_glove_reaction_spread: float = 0.06
 @export var rating_arm_spread: float = 0.1
 @export var rating_error_spread: float = 0.6
+## Seconds of steal jump a 100-speed runner gains reading the pitcher.
+@export var rating_jump_spread: float = 0.12
 ## Pitches thrown before fatigue sets in, for stamina 0 and 100.
 @export var stamina_pitches_min: float = 20.0
 @export var stamina_pitches_max: float = 90.0
@@ -273,6 +275,19 @@ extends Resource
 ## Catcher: catch-to-throw transfer, then a quick release.
 @export var catcher_transfer_time: float = 0.3
 @export var catcher_release_time: float = 0.35
+
+@export_group("Slide Step")
+## A slide step (quick delivery) gives a stealing runner this much less time.
+@export var slide_step_time_saved: float = 0.18
+## ...and costs command (scatter multiplier) and a little velocity.
+@export var slide_step_scatter: float = 1.4
+@export var slide_step_speed: float = 0.97
+## Share of the normal windup the quick delivery takes on screen.
+@export var slide_step_windup_share: float = 0.55
+## AI pitcher: chance of a slide step with a dangerous runner on (times his
+## speed threat), and when he reads a runner leaning to steal.
+@export var ai_slide_step_rate: float = 0.15
+@export var ai_slide_step_read: float = 0.25
 
 @export_group("Pickoffs")
 ## Pitcher's step-off-and-throw time to a base.

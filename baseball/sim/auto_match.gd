@@ -11,7 +11,7 @@ var roster: MatchRoster
 var stats := {
 	"pitches": 0, "in_zone": 0, "swings": 0, "whiffs": 0, "fouls": 0, "balls_in_play": 0,
 	"hits": 0, "home_runs": 0, "strikeouts": 0, "walks": 0, "dives": 0, "air_outs": 0,
-	"ground_outs": 0, "double_plays": 0, "errors": 0, "dive_misses": 0, "pitching_changes": 0, "steals": 0, "caught_stealing": 0, "sacrifices": 0, "bunts": 0, "pickoffs": 0, "picked_off": 0, "plate_appearances": 0, "exit_velocity_sum": 0.0,
+	"ground_outs": 0, "double_plays": 0, "errors": 0, "dive_misses": 0, "pitching_changes": 0, "steals": 0, "caught_stealing": 0, "sacrifices": 0, "bunts": 0, "pickoffs": 0, "picked_off": 0, "slide_steps": 0, "plate_appearances": 0, "exit_velocity_sum": 0.0,
 }
 var outcome_counts := {}
 
@@ -61,6 +61,9 @@ func play_pitch() -> void:
 	if pick > 0:
 		_run_pickoff(pick, steals.has(pick))
 		return  # no pitch this time
+	intent.slide_step = AiManager.slide_step(state, roster, tuning, rng, steals)
+	if intent.slide_step:
+		stats["slide_steps"] += 1
 	var pitch := PitchResolver.resolve(intent, family, tuning, rng, mods)
 	state.record_pitch(pitch.to_dict())
 	stats["pitches"] += 1
@@ -81,7 +84,7 @@ func play_pitch() -> void:
 		var bases_before := state.bases.duplicate()
 		state.apply_pitch_call(ContactResolver.call_for(pitch, contact))
 		if contact.outcome != ContactResult.Outcome.FOUL:
-			_run_steal(steals, bases_before, pitch.travel_time)
+			_run_steal(steals, bases_before, pitch.travel_time, pitch.slide_step)
 		return
 	var bip := BallInPlay.create(contact, state, tuning, roster)
 	var outcome: PlayOutcome
@@ -90,7 +93,7 @@ func play_pitch() -> void:
 	else:
 		var live := bip.start_live(true, rng)
 		for base: int in steals:
-			live.set_running_start(base, steal_head(state.bases[base - 1], pitch.travel_time, steals[base]))
+			live.set_running_start(base, steal_head(state.bases[base - 1], pitch.travel_time, steals[base], pitch.slide_step))
 		outcome = live.run_ai(tuning.sim_play_step)
 	_count_outcome(bip, outcome)
 	state.apply_play(outcome)
@@ -98,14 +101,14 @@ func play_pitch() -> void:
 
 ## Runners who were going keep going after a pitch not put in play, if the
 ## pitch left them where they were (no walk, no third out).
-func _run_steal(steals: Dictionary, bases_before: Array[StringName], travel: float) -> void:
+func _run_steal(steals: Dictionary, bases_before: Array[StringName], travel: float, slide_step: bool = false) -> void:
 	var still := {}
 	for base: int in steals:
 		if bases_before[base - 1] != &"" and state.bases[base - 1] == bases_before[base - 1]:
 			still[base] = steals[base]
 	if still.is_empty():
 		return
-	var bip := BallInPlay.create_steal(state, content.tuning, roster, still, travel)
+	var bip := BallInPlay.create_steal(state, content.tuning, roster, still, travel, slide_step)
 	if bip == null:
 		return
 	var outcome := bip.resolve_ai(rng)
@@ -126,9 +129,10 @@ func _run_pickoff(base: int, leaning: bool) -> void:
 	state.apply_pickoff(outcome)
 
 
-func steal_head(runner_id: StringName, travel: float, jump: float) -> float:
+func steal_head(runner_id: StringName, travel: float, jump: float, slide_step: bool = false) -> float:
 	var p := roster.player(runner_id) if roster != null else null
-	return LivePlay.steal_head_start(Ratings.runner_speed(p, content.tuning), travel, jump, content.tuning)
+	return LivePlay.steal_head_start(Ratings.runner_speed(p, content.tuning), travel, jump, content.tuning,
+		BallInPlay.lead_for(state, runner_id, content.tuning), slide_step)
 
 
 func _tally_plate_appearances() -> void:

@@ -35,6 +35,7 @@ fast runners beat out grounders, good gloves bobble less.
 | Bunt (hold ← / → to push it toward third / first) | B | B |
 | Before the pitch: steal (every runner with an open base) / call it off | E / Q | RB / LB |
 | ...hold 1 / 2 + steal: send just that runner | 1-2 + E | B / Y + RB |
+| Pitching: slide step on/off (quicker delivery, less control) | Shift | RT |
 | Pitching, before the pitch: pickoff throw (point → 1st, ↑ 2nd, ← 3rd; none = the likeliest runner) | F (+ WASD) | LT (+ stick) |
 | While swinging: steer left/right field, lift (up) or chop (down) | WASD or arrows | Left stick |
 | Aim pitch target | WASD or arrows | Left stick / D-pad |
@@ -88,6 +89,12 @@ in three. Every throw over shrinks that runner's lead for the rest of the
 at-bat, which costs him jump on a steal. You get two per batter. The AI
 pitcher throws over on you too, and may read your steal if you call it
 early, so time it.
+
+**Slide step.** Toggle it with Shift / RT while pitching (the pitch menu
+shows it). The quick delivery takes ground away from a base stealer, but
+the pitch is wilder and a little slower. The AI pitcher slide-steps against
+fast runners and when he reads a lean. You can spot it because his windup
+is visibly quicker, so be ready to swing a beat earlier.
 
 Read the pitch by its trail: a **long blue** streak is a fastball, a
 **short orange** one a breaking ball (it moves late), a **stub of green** a

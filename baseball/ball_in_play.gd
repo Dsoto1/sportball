@@ -94,7 +94,7 @@ static func create(p_contact: ContactResult, state: MatchState, p_tuning: Baseba
 ## A steal attempt after a pitch that was not put in play. stealers: start
 ## base -> jump delay (s), for runners who are still there to go; travel:
 ## the pitch's flight time. Returns null when nobody is left to steal.
-static func create_steal(state: MatchState, p_tuning: BaseballTuning, roster: MatchRoster, stealers: Dictionary, travel: float) -> BallInPlay:
+static func create_steal(state: MatchState, p_tuning: BaseballTuning, roster: MatchRoster, stealers: Dictionary, travel: float, slide_step: bool = false) -> BallInPlay:
 	if state.game_over:
 		return null
 	var bip := BallInPlay.new()
@@ -108,7 +108,7 @@ static func create_steal(state: MatchState, p_tuning: BaseballTuning, roster: Ma
 		var open := base == 3 or state.bases[base] == &"" or stealers.has(base + 1)
 		if id != &"" and open:
 			var speed: float = bip.runner_speeds.get(id, p_tuning.runner_speed)
-			bip.steal_heads[base] = LivePlay.steal_head_start(speed, travel, stealers[base], p_tuning, lead_for(state, id, p_tuning))
+			bip.steal_heads[base] = LivePlay.steal_head_start(speed, travel, stealers[base], p_tuning, lead_for(state, id, p_tuning), slide_step)
 	if bip.steal_heads.is_empty():
 		return null
 	bip.contact = ContactResult.new()

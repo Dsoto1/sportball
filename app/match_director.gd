@@ -74,6 +74,11 @@ var _steals := {}
 var _ai_steal_plan := {}
 var _ai_pickoff_at := -1.0
 var _ai_pickoff_base := 0
+## Slide step: the human pitcher's toggle; the AI pitcher's choice (decided
+## as his windup starts) and when he releases.
+var _slide_step := false
+var _ai_slide_step := false
+var _ai_windup_decided := false
 
 
 func setup(p_content: ContentLibrary, view: MatchView, hud: MatchHud, debug: DebugOverlay) -> void:
@@ -246,6 +251,8 @@ func _enter_pre_pitch() -> void:
 	_steal_orders.clear()
 	_ai_steal_plan.clear()
 	_ai_pickoff_at = -1.0
+	_ai_slide_step = false
+	_ai_windup_decided = false
 	if state.game_over:
 		_enter_game_over()
 		return
@@ -270,7 +277,7 @@ func _enter_pre_pitch() -> void:
 	else:
 		_view.set_camera_mode(MatchView.CameraMode.PITCH)
 		_selected_pitch = mini(_selected_pitch, _repertoire().size() - 1)
-		_hud.show_pitching(true, _repertoire(), _selected_pitch)
+		_hud.show_pitching(true, _repertoire(), _selected_pitch, _slide_step)
 		_hud.set_meter(0.0, tuning.pitch_meter_sweet_spot)
 	_hud.show_prompt(_hud_prompt_suffix())
 
@@ -288,13 +295,19 @@ func _process_pre_pitch(delta: float) -> void:
 			_steal_orders.clear()
 			_hud.show_callout("STEAL OFF", "", 0.8)
 		var windup_start := AI_PRE_PITCH_DELAY - WINDUP_TIME
+		if _phase_time >= windup_start and not _ai_windup_decided:
+			# From the stretch: a quick slide step against a runner he fears.
+			_ai_windup_decided = true
+			_ai_slide_step = AiManager.slide_step(state, roster, tuning, rng, _steal_orders)
+		var windup := WINDUP_TIME * (tuning.slide_step_windup_share if _ai_slide_step else 1.0)
 		if _phase_time >= windup_start:
-			_view.show_windup((_phase_time - windup_start) / WINDUP_TIME)
+			_view.show_windup((_phase_time - windup_start) / windup)
 		if Input.is_action_just_pressed(&"open_subs") and _phase_time < AI_PRE_PITCH_DELAY - WINDUP_TIME:
 			_open_sub_menu()
 			return
-		if _phase_time >= AI_PRE_PITCH_DELAY:
+		if _phase_time >= windup_start + windup:
 			var intent := AiPitcher.choose(state, content.pitches, tuning, rng, _club(state.fielding_team()), _player(state.pitcher(state.fielding_team())))
+			intent.slide_step = _ai_slide_step
 			if tuning.rookie_assist:
 				intent.speed_scale = tuning.assist_pitch_speed_scale
 			_throw_pitch(intent)
@@ -324,7 +337,9 @@ func _process_pre_pitch(delta: float) -> void:
 		_selected_pitch = (_selected_pitch + 1) % count
 	if Input.is_action_just_pressed(&"pitch_prev"):
 		_selected_pitch = (_selected_pitch + count - 1) % count
-	_hud.show_pitching(true, repertoire, _selected_pitch)
+	if Input.is_action_just_pressed(&"slide_step"):
+		_slide_step = not _slide_step
+	_hud.show_pitching(true, repertoire, _selected_pitch, _slide_step)
 	if Input.is_action_just_pressed(&"pitch_primary"):
 		_hud.set_clock(-1.0)
 		_set_phase(Phase.METER)
@@ -339,7 +354,9 @@ func _process_meter(delta: float) -> void:
 	if Input.is_action_just_pressed(&"pitch_primary") or _meter >= 1.0:
 		var family := _repertoire()[_selected_pitch]
 		var error := PitchResolver.meter_error(_meter, tuning)
-		_throw_pitch(PitchIntent.new(family.id, _cursor, error))
+		var intent := PitchIntent.new(family.id, _cursor, error)
+		intent.slide_step = _slide_step
+		_throw_pitch(intent)
 
 
 func _throw_pitch(intent: PitchIntent) -> void:
@@ -347,7 +364,7 @@ func _throw_pitch(intent: PitchIntent) -> void:
 	var pitcher := state.pitcher(state.fielding_team())
 	_pitch = PitchResolver.resolve(intent, family, tuning, rng, Ratings.pitcher_mods(_player(pitcher), state.pitches_thrown(pitcher), tuning))
 	state.record_pitch(_pitch.to_dict())
-	_log({"pitch": state.pitch_count, "family": intent.family_id, "aim": intent.aim, "meter_error": snappedf(intent.meter_error, 0.001)})
+	_log({"pitch": state.pitch_count, "family": intent.family_id, "aim": intent.aim, "meter_error": snappedf(intent.meter_error, 0.001), "slide_step": intent.slide_step})
 	_ai_swing = null
 	_contact = null
 	_decide_steals()
@@ -690,7 +707,7 @@ func _hud_prompt_suffix() -> String:
 			if user_is_batting():
 				base = "Watch the pitcher. SWING as the ring closes: J or click (contact) / K or right-click (power) / B (bunt, ←→ places it)\nHold WASD / L-stick while swinging: ←→ aim field  ↑ lift  ↓ chop    Steal: E / RB before the pitch (hold 1-3 for one runner), Q / LB cancel    Pinch hit: P / Y"
 			else:
-				base = "Aim: WASD / L-stick    Pitch: Q E / LB RB    Start meter: Space / A    Pickoff: F / LT (+ → ↑ ←)    Pitching change: P / Y"
+				base = "Aim: WASD / L-stick    Pitch: Q E / LB RB    Start meter: Space / A    Pickoff: F / LT (+ → ↑ ←)    Slide step: Shift / RT    Pitching change: P / Y"
 		Phase.BALL_IN_PLAY:
 			if _outcome != null:
 				base = "Skip: J / A"
@@ -750,7 +767,7 @@ func _decide_steals() -> void:
 		var windup_start := AI_PRE_PITCH_DELAY - WINDUP_TIME
 		for base: int in _steal_orders:
 			var late := maxf(_steal_orders[base] - windup_start, 0.0)
-			_steals[base] = tuning.steal_jump_delay + late + rng.randfn(0.0, tuning.steal_jump_sigma * 0.6)
+			_steals[base] = Ratings.steal_jump(_player(state.runner_on(base)), tuning) + late + rng.randfn(0.0, tuning.steal_jump_sigma * 0.6)
 	else:
 		_steals = _ai_steal_plan.duplicate()
 		if not _steals.is_empty():
@@ -761,8 +778,9 @@ func _decide_steals() -> void:
 
 
 func _steal_head(base: int, flight: float) -> float:
-	var speed := Ratings.runner_speed(_player(state.runner_on(base)), tuning)
-	return LivePlay.steal_head_start(speed, flight, _steals[base], tuning)
+	var id := state.runner_on(base)
+	var speed := Ratings.runner_speed(_player(id), tuning)
+	return LivePlay.steal_head_start(speed, flight, _steals[base], tuning, BallInPlay.lead_for(state, id, tuning), _pitch.slide_step)
 
 
 ## Runners who were going still go after a pitch not put in play.
@@ -773,7 +791,7 @@ func _start_steal_play(bases_before: Array[StringName]) -> void:
 			still[base] = _steals[base]
 	if still.is_empty():
 		return
-	var bip := BallInPlay.create_steal(state, tuning, roster, still, _pitch.travel_time)
+	var bip := BallInPlay.create_steal(state, tuning, roster, still, _pitch.travel_time, _pitch.slide_step)
 	if bip == null:
 		return
 	_bip = bip

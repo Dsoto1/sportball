@@ -101,3 +101,57 @@ func test_running_start_beats_the_force_on_a_grounder() -> void:
 	var hit_and_run := running.run_ai(tuning().sim_play_step)
 	check(plain.outs.any(func(o: Dictionary) -> bool: return o["runner_id"] == &"r1"), "without the jump he is forced")
 	check(not hit_and_run.outs.any(func(o: Dictionary) -> bool: return o["runner_id"] == &"r1"), "with it he is safe")
+
+
+# --- Slide step -------------------------------------------------------------
+
+func test_slide_step_cuts_the_head_start() -> void:
+	var normal := LivePlay.steal_head_start(8.0, 0.48, 0.15, tuning())
+	var quick := LivePlay.steal_head_start(8.0, 0.48, 0.15, tuning(), -1.0, true)
+	check_near(normal - quick, 8.0 * tuning().slide_step_time_saved, 0.001, "runner loses ground")
+
+
+func test_slide_step_costs_command_and_velocity() -> void:
+	var family := content().pitch(&"fastball")
+	var spread := [0.0, 0.0]
+	var speed := [0.0, 0.0]
+	for i in 200:
+		for slide in [0, 1]:
+			var intent := PitchIntent.new(&"fastball", Vector2(0.0, 0.8), 0.2)
+			intent.slide_step = slide == 1
+			var p := PitchResolver.resolve(intent, family, tuning(), MatchRng.new(i))
+			spread[slide] += p.location.distance_to(intent.aim)
+			speed[slide] = p.speed
+	check(spread[1] > spread[0] * 1.25, "wilder from the slide step")
+	check(speed[1] < speed[0], "a touch slower")
+
+
+func test_slide_step_throws_out_more_runners() -> void:
+	var rng := MatchRng.new(21)
+	var safe := [0, 0]
+	for i in 80:
+		var jump := tuning().steal_jump_delay + rng.randfn(0.0, tuning().steal_jump_sigma)
+		for slide in [0, 1]:
+			var s := new_match()
+			s.bases = _bases(&"r1")
+			var o := BallInPlay.create_steal(s, tuning(), null, {1: jump}, 0.48, slide == 1).resolve_ai()
+			if o.final_bases[1] != &"":
+				safe[slide] += 1
+	check(safe[1] < safe[0] - 8, "slide step catches more (%d vs %d of 80)" % [safe[1], safe[0]])
+
+
+func test_ai_slide_steps_on_fast_runners() -> void:
+	var s := new_match()
+	s.bases = _bases(&"r1")
+	var rng := MatchRng.new(4)
+	var with_lean := 0
+	var empty := 0
+	for i in 200:
+		if AiManager.slide_step(s, null, tuning(), rng, {1: 0.1}):
+			with_lean += 1
+	s.bases = _bases()
+	for i in 200:
+		if AiManager.slide_step(s, null, tuning(), rng):
+			empty += 1
+	check(with_lean > 20, "reads a lean (%d/200)" % with_lean)
+	check_eq(empty, 0, "never with nobody on")

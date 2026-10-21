@@ -45,6 +45,11 @@ static func eye_scale(p: PlayerDef, tuning: BaseballTuning) -> float:
 	return 1.0 if p == null else 1.0 - tuning.rating_eye_spread * norm(p.eye)
 
 
+## A runner's average steal jump delay (fast runners read pitchers better).
+static func steal_jump(p: PlayerDef, tuning: BaseballTuning) -> float:
+	return tuning.steal_jump_delay - (tuning.rating_jump_spread * norm(p.speed) if p != null else 0.0)
+
+
 static func runner_speed(p: PlayerDef, tuning: BaseballTuning) -> float:
 	return tuning.runner_speed * (1.0 if p == null else 1.0 + tuning.rating_speed_spread * norm(p.speed))
 
