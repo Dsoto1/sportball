@@ -34,13 +34,14 @@ static func simulate(exit_velocity: float, launch_angle: float, spray_angle: flo
 	var v := dir * exit_velocity * cos(la) + Vector3.UP * exit_velocity * sin(la)
 	var p := Vector3(0.0, tuning.contact_height, 0.0)
 	var airborne := true
+	var drag := FieldLayout.drag(tuning)
 	var t := 0.0
 	var max_time := tuning.max_flight_time if fair else 3.0
 	traj._append(t, p)
 	while t < max_time:
 		t += traj.step
 		if airborne:
-			var accel := Vector3(0.0, -tuning.gravity, 0.0) - v * (tuning.drag * v.length())
+			var accel := Vector3(0.0, -tuning.gravity, 0.0) - v * (drag * v.length())
 			v += accel * traj.step
 			p += v * traj.step
 			if p.y <= 0.0:
@@ -131,10 +132,11 @@ func _append(t: float, p: Vector3) -> void:
 func _check_fence(p: Vector3, v: Vector3, tuning: BaseballTuning) -> bool:
 	var flat := Vector2(p.x, p.z)
 	var r := flat.length()
-	var fence := FieldLayout.fence_distance(FieldLayout.spray_angle_of(p), tuning)
+	var spray := FieldLayout.spray_angle_of(p)
+	var fence := FieldLayout.fence_distance(spray, tuning)
 	if r < fence:
 		return false
-	if p.y > tuning.fence_height and first_bounce_time == INF:
+	if p.y > FieldLayout.fence_height(spray, tuning) and first_bounce_time == INF:
 		result = Result.HOME_RUN
 		landing_point = p
 		return true

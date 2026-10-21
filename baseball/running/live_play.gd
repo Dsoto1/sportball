@@ -206,7 +206,7 @@ static func pickoff_play(bases: Array[StringName], base: int, lead: float, react
 	var f := FieldingResult.new()
 	f.fielder_index = p_tuning.fielder_ids.find(&"p")
 	f.fielder_id = &"p"
-	f.secure_point = p_tuning.fielder_spots[f.fielder_index]
+	f.secure_point = FieldLayout.fielder_spot(f.fielder_index, p_tuning)
 	f.secure_time = 0.0
 	f.ready_time = 0.0
 	var traj := BallTrajectory.simulate(1.0, -60.0, 0.0, p_tuning)  # unused: the ball starts in the pitcher's hand

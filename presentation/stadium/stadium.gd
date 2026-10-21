@@ -21,15 +21,17 @@ const BATTERS_EYE := 6.0
 const AISLE_EVERY := 8.0
 const SEAT_SPACING := 0.62
 const FIELD_CENTER := Vector3(0.0, 0.0, -45.0)
+const WATER := Color(0.12, 0.4, 0.58)
+## How far out the bay reaches (meters from home).
+const WATER_EDGE := 420.0
 
 var _def: StadiumDef
 var _tuning: BaseballTuning
 var _crowd_mat: ShaderMaterial
 var _excitement := 0.0
 var _rng := RandomNumberGenerator.new()
-var _board_cells := {}
-var _board_lamps := {}
-var _board_batter: Label3D
+## Every scoreboard in the park: {cells, lamps, batter, first_column}.
+var _boards: Array[Dictionary] = []
 var _board_key := ""
 
 
@@ -47,6 +49,10 @@ func build(tuning: BaseballTuning, def: StadiumDef, home: TeamDef, away: TeamDef
 	_build_markers()
 	_build_towers()
 	_build_scoreboard(home, away)
+	if def.wall_scoreboard:
+		_build_wall_scoreboard(home, away, def.wall_scoreboard_angle)
+	if def.water_side != 0:
+		_build_water(def.water_side)
 	if def.halo:
 		_build_halo()
 	if def.skyline:
@@ -71,17 +77,26 @@ func _profile(angle: float) -> Vector3:
 	var a := absf(angle)
 	var inner := 0.0
 	if a <= 45.0:
-		inner = FieldLayout.fence_distance(a, _tuning) + 5.0
+		inner = FieldLayout.fence_distance(angle, _tuning) + 5.0
 	else:
+		# Start from this side's own corner, then close in behind home.
+		var corner := FieldLayout.fence_distance(signf(angle) * 45.0, _tuning) + 5.0
 		for i in range(1, FOUL_EDGE.size()):
 			if a <= FOUL_EDGE[i][0]:
 				var t: float = (a - FOUL_EDGE[i - 1][0]) / (FOUL_EDGE[i][0] - FOUL_EDGE[i - 1][0])
-				inner = lerpf(FOUL_EDGE[i - 1][1], FOUL_EDGE[i][1], t)
+				var start: float = corner if i == 1 else FOUL_EDGE[i - 1][1]
+				inner = lerpf(start, FOUL_EDGE[i][1], t)
 				break
 	var foul := smoothstep(40.0, 60.0, a)
-	var first := lerpf(_tuning.fence_height + 0.6, 1.3, foul)
-	var rows := roundf(lerpf(16.0, 26.0, foul))
+	var first := lerpf(FieldLayout.fence_height(clampf(angle, -45.0, 45.0), _tuning) + 0.6, 1.3, foul)
+	var rows := roundf(lerpf(float(_def.outfield_rows), float(_def.foul_rows), foul))
+	if _is_water(angle):
+		rows = minf(rows, 5.0)  # a low wall of seats along the water
 	return Vector3(inner, first, rows)
+
+
+func _is_water(angle: float) -> bool:
+	return _def.water_side != 0 and signf(angle) == signf(_def.water_side) and absf(angle) > 18.0 and absf(angle) < 62.0
 
 
 func _is_aisle(angle: float) -> bool:
@@ -126,6 +141,13 @@ func _build_bowl() -> void:
 		var back_b := pb.x + rows * ROW_DEPTH
 		_quad(st, _point(a, back_a, top_a), _point(b, back_b, top_b), _point(b, back_b, top_b + 1.2), _point(a, back_a, top_a + 1.2), _def.accent_color.darkened(0.2))
 		_quad(st, _point(b, back_b, 0.0), _point(a, back_a, 0.0), _point(a, back_a, top_a + 1.2), _point(b, back_b, top_b + 1.2), _def.structure_color)
+		# Outside the park: the bay on the water side, ground everywhere else.
+		var outside := _def.skyline_color.darkened(0.45)
+		var edge := back_a + 1.0
+		if _is_water(mid):
+			_quad(st, _point(a, edge, 0.02), _point(a, WATER_EDGE, 0.02), _point(b, WATER_EDGE, 0.02), _point(b, back_b + 1.0, 0.02), WATER)
+			edge = WATER_EDGE
+		_quad(st, _point(a, edge, 0.0), _point(a, 950.0, 0.0), _point(b, 950.0, 0.0), _point(b, edge if edge == WATER_EDGE else back_b + 1.0, 0.0), outside)
 		a = b
 	st.generate_normals()
 	var mi := MeshInstance3D.new()
@@ -137,14 +159,6 @@ func _build_bowl() -> void:
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 	mi.material_override = mat
 	add_child(mi)
-	# Ground outside the park.
-	var ground := MeshInstance3D.new()
-	var plane := PlaneMesh.new()
-	plane.size = Vector2(2400, 2400)
-	ground.mesh = plane
-	ground.position = Vector3(0, -0.12, 0)
-	ground.material_override = GrayboxField._mat(_def.skyline_color.darkened(0.45))
-	add_child(ground)
 
 
 func _quad(st: SurfaceTool, p0: Vector3, p1: Vector3, p2: Vector3, p3: Vector3, color: Color) -> void:
@@ -272,7 +286,7 @@ func _build_markers() -> void:
 		var inward := (after - before).cross(Vector3.UP).normalized()
 		if inward.dot(-FieldLayout.direction_for_spray(angle)) < 0.0:
 			inward = -inward
-		var spot := _point(angle, d, _tuning.fence_height * 0.55) + inward * 0.4
+		var spot := _point(angle, d, minf(FieldLayout.fence_height(angle, _tuning) * 0.55, 2.2)) + inward * 0.7
 		label.look_at_from_position(spot, spot - inward, Vector3.UP)
 
 
@@ -318,27 +332,57 @@ func _build_scoreboard(home: TeamDef, away: TeamDef) -> void:
 	legs.position = Vector3(0, -11.0, -0.6)
 	var title := _label(_def.display_name.to_upper(), 120, _def.accent_color, board)
 	title.position = Vector3(0, 6.6, 0.3)
-	var columns := 9 + 3
-	for c in columns:
+	_boards.append(_board_face(board, home, away, 1.0, Color(1.0, 0.92, 0.6), Color(0.75, 0.8, 0.95), true))
+
+
+## A hand-operated scoreboard set into a tall outfield wall: white numbers
+## on painted panels, slotted in by hand (no batter line).
+func _build_wall_scoreboard(home: TeamDef, away: TeamDef, angle: float) -> void:
+	var d := FieldLayout.fence_distance(angle, _tuning)
+	var h := FieldLayout.fence_height(angle, _tuning)
+	if h < 6.0:
+		return
+	var before := FieldLayout.direction_for_spray(angle - 1.0) * FieldLayout.fence_distance(angle - 1.0, _tuning)
+	var after := FieldLayout.direction_for_spray(angle + 1.0) * FieldLayout.fence_distance(angle + 1.0, _tuning)
+	var inward := (after - before).cross(Vector3.UP).normalized()
+	if inward.dot(-FieldLayout.direction_for_spray(angle)) < 0.0:
+		inward = -inward
+	var spot := _point(angle, d, h * 0.55) + inward * 0.3
+	var board := Node3D.new()
+	board.name = "WallScoreboard"
+	add_child(board)
+	board.look_at_from_position(spot, spot - inward, Vector3.UP)
+	board.scale = Vector3.ONE * 0.42
+	var panel := _box(Vector3(30.0, 11.0, 0.3), _def.outfield_wall_color.darkened(0.35), board)
+	panel.position = Vector3(0, 0, -0.2)
+	_boards.append(_board_face(board, home, away, 1.0, Color.WHITE, Color(0.85, 0.9, 0.85), false))
+
+
+## Line score grid (9 innings, R H E), team names and count lamps on a board
+## whose local +Z faces the field. Returns the board's updatable parts.
+func _board_face(board: Node3D, home: TeamDef, away: TeamDef, _size: float, number_color: Color, header_color: Color, with_batter: bool) -> Dictionary:
+	var cells := {}
+	for c in 12:
 		var x := -9.0 + c * 2.1
 		var header: String = "%d" % (c + 1) if c < 9 else ["R", "H", "E"][c - 9]
-		var h := _label(header, 72, Color(0.75, 0.8, 0.95), board)
+		var h := _label(header, 72, header_color, board)
 		h.position = Vector3(x, 3.6, 0.3)
 		for row in 2:
-			var cell := _label("", 88, Color(1.0, 0.92, 0.6), board)
+			var cell := _label("", 88, number_color, board)
 			cell.position = Vector3(x, 1.4 - row * 2.4, 0.3)
-			_board_cells[Vector2i(c, row)] = cell
+			cells[Vector2i(c, row)] = cell
 	for row in 2:
 		var club := away if row == 0 else home
 		var name := _label(club.abbreviation, 88, MatchHud.text_color(club), board)
 		name.position = Vector3(-13.0, 1.4 - row * 2.4, 0.3)
 	# Count lamps: balls, strikes, outs.
+	var lamps := {}
 	var groups := {"B": [3, Color(0.3, 1.0, 0.4)], "S": [2, Color(1.0, 0.3, 0.25)], "O": [2, Color(1.0, 0.75, 0.2)]}
 	var gx := -12.0
 	for key in ["B", "S", "O"]:
 		var tag := _label(key, 72, Color.WHITE, board)
 		tag.position = Vector3(gx, -3.6, 0.3)
-		var lamps: Array[MeshInstance3D] = []
+		var bulbs: Array[MeshInstance3D] = []
 		for i in groups[key][0]:
 			var lamp := MeshInstance3D.new()
 			var sphere := SphereMesh.new()
@@ -347,16 +391,19 @@ func _build_scoreboard(home: TeamDef, away: TeamDef) -> void:
 			lamp.mesh = sphere
 			lamp.position = Vector3(gx + 1.4 + i * 1.15, -3.6, 0.3)
 			board.add_child(lamp)
-			lamps.append(lamp)
-		_board_lamps[key] = [lamps, groups[key][1]]
+			bulbs.append(lamp)
+		lamps[key] = [bulbs, groups[key][1]]
 		gx += 7.5
-	_board_batter = _label("", 72, Color.WHITE, board)
-	_board_batter.position = Vector3(0, -5.8, 0.3)
+	var batter: Label3D = null
+	if with_batter:
+		batter = _label("", 72, Color.WHITE, board)
+		batter.position = Vector3(0, -5.8, 0.3)
+	return {"cells": cells, "lamps": lamps, "batter": batter}
 
 
 ## Updates the board from the match (cheap when nothing changed).
 func update_scoreboard(state: MatchState, roster: MatchRoster) -> void:
-	if _board_batter == null:
+	if _boards.is_empty():
 		return
 	var p := roster.player(state.current_batter()) if roster != null else null
 	var key := "%s|%s|%s|%s|%d%d%d|%s" % [state.line_score, state.score, state.hits, state.errors, state.balls, state.strikes, state.outs, state.current_batter()]
@@ -364,26 +411,30 @@ func update_scoreboard(state: MatchState, roster: MatchRoster) -> void:
 		return
 	_board_key = key
 	var first := maxi(state.inning - 8, 1)  # extra innings scroll the window
-	for row in 2:
-		var line: Array = state.line_score[row]
-		for c in 9:
-			var inning := first + c
-			var text := ""
-			if inning - 1 < line.size():
-				text = str(line[inning - 1])
-			elif inning == state.inning and (row == 0) == state.is_top and not state.game_over:
-				text = "-"
-			_board_cells[Vector2i(c, row)].text = text
-		_board_cells[Vector2i(9, row)].text = str(state.score[row])
-		_board_cells[Vector2i(10, row)].text = str(state.hits[row])
-		_board_cells[Vector2i(11, row)].text = str(state.errors[row])
 	var lit := {"B": state.balls, "S": state.strikes, "O": state.outs}
-	for k in _board_lamps:
-		var lamps: Array = _board_lamps[k][0]
-		for i in lamps.size():
-			var on: bool = i < lit[k]
-			(lamps[i] as MeshInstance3D).material_override = _glow(_board_lamps[k][1], 2.2) if on else GrayboxField._mat(Color(0.12, 0.12, 0.14))
-	_board_batter.text = "AT BAT  #%d %s" % [p.number, p.display_name.to_upper()] if p != null else ""
+	for board in _boards:
+		var cells: Dictionary = board["cells"]
+		for row in 2:
+			var line: Array = state.line_score[row]
+			for c in 9:
+				var inning := first + c
+				var text := ""
+				if inning - 1 < line.size():
+					text = str(line[inning - 1])
+				elif inning == state.inning and (row == 0) == state.is_top and not state.game_over:
+					text = "-"
+				cells[Vector2i(c, row)].text = text
+			cells[Vector2i(9, row)].text = str(state.score[row])
+			cells[Vector2i(10, row)].text = str(state.hits[row])
+			cells[Vector2i(11, row)].text = str(state.errors[row])
+		var lamps: Dictionary = board["lamps"]
+		for k in lamps:
+			var bulbs: Array = lamps[k][0]
+			for i in bulbs.size():
+				var on: bool = i < lit[k]
+				(bulbs[i] as MeshInstance3D).material_override = _glow(lamps[k][1], 2.2) if on else GrayboxField._mat(Color(0.12, 0.12, 0.14))
+		if board["batter"] != null:
+			board["batter"].text = "AT BAT  #%d %s" % [p.number, p.display_name.to_upper()] if p != null else ""
 
 
 # --- Halo and skyline ------------------------------------------------------
@@ -432,6 +483,15 @@ func _build_halo() -> void:
 		text.modulate = Color(1.0, 0.97, 0.9)
 
 
+## The bay beyond one side of the outfield (home runs splash down).
+func _build_water(side: int) -> void:
+	# The water itself is part of the ground ring (see _build_bowl); boats bob on it.
+	for i in 5:
+		var boat := _box(Vector3(6.0, 1.6, 2.4), Color.WHITE if i % 2 == 0 else _def.accent_color)
+		boat.position = FieldLayout.direction_for_spray(side * (22.0 + i * 7.0)) * (150.0 + i * 14.0) + Vector3(0, 0.6, 0)
+		boat.rotation.y = i * 0.7
+
+
 func _build_skyline() -> void:
 	var mat := ShaderMaterial.new()
 	mat.shader = SKYLINE_SHADER
@@ -445,7 +505,7 @@ func _build_skyline() -> void:
 		var radius := _rng.randf_range(520.0, 700.0)
 		# Taller toward the far side so the city peeks over the outfield.
 		var behind_center := maxf(-sin(a), 0.0)
-		var size := Vector3(_rng.randf_range(26.0, 55.0), _rng.randf_range(30.0, 70.0) + 90.0 * behind_center * _rng.randf(), _rng.randf_range(26.0, 55.0))
+		var size := Vector3(_rng.randf_range(26.0, 55.0), (_rng.randf_range(30.0, 70.0) + 90.0 * behind_center * _rng.randf()) * _def.skyline_height, _rng.randf_range(26.0, 55.0))
 		var tower := _box(size, _def.skyline_color)
 		tower.material_override = mat
 		tower.position = FIELD_CENTER + Vector3(cos(a) * radius, size.y * 0.5, sin(a) * radius)

@@ -138,7 +138,7 @@ func reset_for_pitch(state: MatchState) -> void:
 	for i in _fielders.size():
 		_fielders[i].reset_pose()
 		_fielders[i].set_look(fielding_color, _fielder_tag(state, tuning.fielder_ids[i]), fielding_trim)
-		_fielders[i].position = tuning.fielder_spots[i]
+		_fielders[i].position = FieldLayout.fielder_spot(i, tuning)
 		_fielders[i].face(Vector3.ZERO)
 		_fielders[i].set_crouch(tuning.fielder_ids[i] == &"c")
 	_clear_runners()
@@ -334,7 +334,7 @@ func show_play(bip: BallInPlay, t: float, play: LivePlay, outcome: PlayOutcome, 
 			_:
 				holder = covers.get(play.holder_cover, -1)
 	for i in _fielders.size():
-		var start := tuning.fielder_spots[i]
+		var start := FieldLayout.fielder_spot(i, tuning)
 		var actor := _fielders[i]
 		actor.set_crouch(false)
 		var since := maxf(t - tuning.fielder_reaction, 0.0)
@@ -640,15 +640,21 @@ func set_throw_target(base: int) -> void:
 
 func set_roster(roster: MatchRoster) -> void:
 	_roster = roster
-	var home := roster.teams[MatchState.HOME]
+
+
+## Rebuilds the field and the park around it for a venue. p_tuning carries
+## the park's walls (its field shape); the view draws from it from now on.
+func set_park(p_tuning: BaseballTuning, park: StadiumDef) -> void:
+	tuning = p_tuning
+	_field.build(tuning, park)
 	if _stadium != null:
 		_stadium.queue_free()
 		_stadium = null
-	if home.stadium_def != null:
+	if park != null and _roster != null:
 		_stadium = Stadium.new()
 		_stadium.name = "Stadium"
 		add_child(_stadium)
-		_stadium.build(tuning, home.stadium_def, home, roster.teams[MatchState.AWAY])
+		_stadium.build(tuning, park, _roster.teams[MatchState.HOME], _roster.teams[MatchState.AWAY])
 
 
 ## The crowd reacts to a moment (0..1): the roar and the fans jumping.

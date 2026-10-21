@@ -1,18 +1,33 @@
 [gd_resource type="Resource" script_class="StadiumDef" format=3]
 
-[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="1_db2jj"]
+[ext_resource type="Script" path="res://data/defs/field_shape.gd" id="1_4w26e"]
+[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="2_anrrk"]
 
-[resource]
-script = ExtResource("1_db2jj")
+[sub_resource type="Resource" id="Resource_07v1h"]
+script = ExtResource("1_4w26e")
 id = &"foundry_field"
 display_name = "Foundry Field"
+points = PackedVector3Array(-45, 101, 2.6, -25, 116, 2.6, 0, 121, 2.6, 13, 113, 2.6, 14.5, 111, 10.5, 30, 99, 10.5, 45, 90, 10.5)
+
+[resource]
+script = ExtResource("2_anrrk")
+id = &"foundry_field"
+display_name = "Foundry Field"
+blurb = "Gearheads home · The Boilerplate: a 34-foot iron wall in short right"
+field_shape = SubResource("Resource_07v1h")
 seat_color = Color(0.41960785, 0.22745098, 0.13333334, 1)
 seat_color_alt = Color(0.30980393, 0.16862746, 0.09803922, 1)
 structure_color = Color(0.5411765, 0.49019608, 0.4392157, 1)
 accent_color = Color(1, 0.5411765, 0.16470589, 1)
-outfield_wall_color = Color(0.11372549, 0.16470589, 0.2901961, 1)
+outfield_wall_color = Color(0.18039216, 0.16470589, 0.16470589, 1)
+wall_style = &"iron"
+foul_rows = 20
+outfield_rows = 12
+wall_scoreboard = true
+wall_scoreboard_angle = 26.0
+skyline_height = 0.6
 away_fan_share = 0.15
-attendance = 0.7
-sponsors = PackedStringArray("RIVET & SONS HARDWARE", "RUSTWATER FERRY", "SPROCKET DINER", "LUGNUT BREWS")
+attendance = 0.75
+sponsors = PackedStringArray("RIVET & SONS HARDWARE", "RUSTWATER FERRY", "SPROCKET DINER", "LUGNUT BREWS", "FORGE & ANVIL", "BOILERMAKERS UNION")
 skyline_color = Color(0.2901961, 0.2509804, 0.2509804, 1)
 window_color = Color(1, 0.7019608, 0.36078432, 1)

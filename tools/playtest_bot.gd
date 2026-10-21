@@ -81,6 +81,8 @@ func _drive() -> void:
 		_did_clock = true
 	match phase:
 		MatchDirector.Phase.PREGAME:
+			if entered:
+				_press(&"aim_right")  # try the next venue
 			if _director.phase_time() > 0.3 and _shots_taken == 0:
 				_screenshot("pregame")
 			if _director.phase_time() > 0.5:

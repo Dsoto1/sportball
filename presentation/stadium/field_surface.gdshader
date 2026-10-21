@@ -17,6 +17,8 @@ uniform float stripe_strength = 0.0;
 uniform float stripe_width = 7.0;
 uniform float normal_strength = 0.4;
 uniform float roughness_value = 0.92;
+// Walls: map the texture along the wall and up it instead of across the ground.
+uniform bool vertical_uv = false;
 
 varying vec3 world_pos;
 
@@ -25,7 +27,7 @@ void vertex() {
 }
 
 void fragment() {
-	vec2 uv = world_pos.xz / tile;
+	vec2 uv = (vertical_uv ? vec2(world_pos.x + world_pos.z, world_pos.y) : world_pos.xz) / tile;
 	float near = dot(texture(detail, uv).rgb, vec3(0.299, 0.587, 0.114)) - detail_mid;
 	// A second, larger sample breaks up visible tiling.
 	float far = dot(texture(detail, uv * 0.21 + vec2(0.37, 0.61)).rgb, vec3(0.299, 0.587, 0.114)) - detail_mid;

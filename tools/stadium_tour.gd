@@ -1,11 +1,12 @@
 extends SceneTree
 ## Flies the camera to stadium landmarks (left-field corner, scoreboard,
 ## aerial, center field) and saves a screenshot of each. Needs a display:
-##   godot --path . --resolution 1280x720 -s res://tools/stadium_tour.gd -- /tmp/shots
+##   godot --path . --resolution 1280x720 -s res://tools/stadium_tour.gd -- /tmp/shots [park_id]
 var _frames := 0
 var _out := ""
 var _view: MatchView
 var _i := 0
+var _park_id: StringName = &""
 const SHOTS := [
 	[Vector3(-20, 4, -60), Vector3(-60, 2, -78)],
 	[Vector3(10, 10, -40), Vector3(50, 20, -125)],
@@ -14,6 +15,8 @@ const SHOTS := [
 ]
 func _initialize() -> void:
 	_out = OS.get_cmdline_user_args()[0]
+	if OS.get_cmdline_user_args().size() > 1:
+		_park_id = StringName(OS.get_cmdline_user_args()[1])
 	root.add_child(load("res://app/main.tscn").instantiate())
 func _process(_d: float) -> bool:
 	_frames += 1
@@ -22,6 +25,10 @@ func _process(_d: float) -> bool:
 		var hud: MatchHud = root.get_node_or_null("Main/UI/MatchHud")
 		if hud != null:
 			hud.visible = false
+		if _view != null and _park_id != &"":
+			var content := ContentLibrary.load_default()
+			var park := content.park(_park_id)
+			_view.set_park(content.tuning_for(park), park)
 		return false
 	if _frames < 30:
 		return false
@@ -37,6 +44,6 @@ func _process(_d: float) -> bool:
 	cam.look_at(SHOTS[_i][1])
 	cam.fov = 55.0
 	if _frames % 8 == 0:
-		root.get_texture().get_image().save_png(_out.path_join("tour_%d.png" % _i))
+		root.get_texture().get_image().save_png(_out.path_join("%s_%d.png" % [_park_id if _park_id != &"" else &"tour", _i]))
 		_i += 1
 	return false

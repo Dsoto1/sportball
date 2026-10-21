@@ -22,7 +22,7 @@ static func default_defense(tuning: BaseballTuning, players: Dictionary = {}) ->
 	for i in tuning.fielder_ids.size():
 		var f := FielderState.new()
 		f.id = tuning.fielder_ids[i]
-		f.start = tuning.fielder_spots[i]
+		f.start = FieldLayout.fielder_spot(i, tuning)
 		f.speed = tuning.fielder_speed
 		f.reaction = tuning.fielder_reaction
 		f.reach = tuning.catch_reach

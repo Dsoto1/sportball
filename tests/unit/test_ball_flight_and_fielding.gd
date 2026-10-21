@@ -118,3 +118,43 @@ func test_ball_off_the_wall_costs_pickup_time() -> void:
 			check_near(f.ready_time - f.secure_time, tuning().wall_carom_delay, 0.001, "carom delay at la %d" % la)
 		break
 	check(found, "some ball comes off the wall")
+
+
+# --- Park shapes -------------------------------------------------------------
+
+func _park(points: PackedVector3Array, drag_scale: float = 1.0) -> BaseballTuning:
+	var t: BaseballTuning = tuning().duplicate()
+	var shape := FieldShape.new()
+	shape.points = points
+	shape.air_drag_scale = drag_scale
+	t.field_shape = shape
+	return t
+
+
+func test_field_shape_sets_wall_distance_and_height() -> void:
+	var t := _park(PackedVector3Array([Vector3(-45, 94, 11.3), Vector3(-20, 105, 11.3), Vector3(-18, 110, 2.5), Vector3(45, 92, 2.5)]))
+	check_near(FieldLayout.fence_distance(-45.0, t), 94.0, 0.01, "left corner")
+	check_near(FieldLayout.fence_height(-30.0, t), 11.3, 0.01, "tall wall in left")
+	check_near(FieldLayout.fence_height(10.0, t), 2.5, 0.01, "normal wall in right")
+	check(FieldLayout.fence_distance(-19.0, t) > 105.0 and FieldLayout.fence_distance(-19.0, t) < 110.0, "between points")
+
+
+func test_tall_wall_turns_homers_into_wall_balls() -> void:
+	var normal := _park(PackedVector3Array([Vector3(-45, 94, 3.2), Vector3(45, 94, 3.2)]))
+	var monster := _park(PackedVector3Array([Vector3(-45, 94, 11.3), Vector3(45, 94, 11.3)]))
+	var homers := [0, 0]
+	for la in range(14, 30, 2):
+		if BallTrajectory.simulate(42.0, float(la), -30.0, normal).result == BallTrajectory.Result.HOME_RUN:
+			homers[0] += 1
+		var tall := BallTrajectory.simulate(42.0, float(la), -30.0, monster)
+		if tall.result == BallTrajectory.Result.HOME_RUN:
+			homers[1] += 1
+	check(homers[0] > homers[1], "the tall wall stops some (%d vs %d)" % homers)
+
+
+func test_thin_air_carries() -> void:
+	var sea := _park(PackedVector3Array([Vector3(-45, 400, 3), Vector3(45, 400, 3)]))
+	var thin := _park(PackedVector3Array([Vector3(-45, 400, 3), Vector3(45, 400, 3)]), 0.8)
+	var d0 := BallTrajectory.simulate(42.0, 28.0, 0.0, sea).distance()
+	var d1 := BallTrajectory.simulate(42.0, 28.0, 0.0, thin).distance()
+	check(d1 > d0 + 4.0, "carries farther in thin air (%.1f vs %.1f)" % [d1, d0])

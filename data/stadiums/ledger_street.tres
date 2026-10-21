@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="StadiumDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/field_shape.gd" id="1_hdo1r"]
+[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="2_bvlah"]
+
+[sub_resource type="Resource" id="Resource_mb518"]
+script = ExtResource("1_hdo1r")
+id = &"ledger_street"
+display_name = "Ledger Street Park"
+points = PackedVector3Array(-45, 94.5, 11.3, -30, 101, 11.3, -14, 111, 11.3, -12.5, 114, 4, 0, 119, 4, 12, 128, 4, 24, 116, 1.8, 33, 104, 1.8, 45, 92, 1)
+
+[resource]
+script = ExtResource("2_bvlah")
+id = &"ledger_street"
+display_name = "Ledger Street Park"
+blurb = "Neutral · The Leviathan: a 37-foot green wall in short left, a deep triangle in right-center"
+field_shape = SubResource("Resource_mb518")
+seat_color = Color(0.12156863, 0.2901961, 0.2, 1)
+seat_color_alt = Color(0.09019608, 0.21960784, 0.15686275, 1)
+structure_color = Color(0.5411765, 0.29411766, 0.23529412, 1)
+accent_color = Color(0.9490196, 0.9019608, 0.78431374, 1)
+outfield_wall_color = Color(0.11372549, 0.32156864, 0.20784314, 1)
+foul_rows = 22
+outfield_rows = 10
+wall_scoreboard = true
+wall_scoreboard_angle = -28.0
+skyline_height = 0.8
+home_fan_share = 0.5
+away_fan_share = 0.3
+attendance = 0.95
+sponsors = PackedStringArray("PEMBERTON PEANUTS", "COBBLESTONE COFFEE", "LANTERN LAUNDRY", "IRONCLAD INSURANCE", "LEDGER STREET LAGER")
+skyline_color = Color(0.3529412, 0.2901961, 0.28235295, 1)
+window_color = Color(1, 0.88235295, 0.65882355, 1)

@@ -8,6 +8,9 @@ var rng: MatchRng
 var content: ContentLibrary
 ## Null for a placeholder match (league-average players, classic rules).
 var roster: MatchRoster
+## Tuning for this match, carrying the park's field shape.
+var tuning: BaseballTuning
+var park: StadiumDef
 var stats := {
 	"pitches": 0, "in_zone": 0, "swings": 0, "whiffs": 0, "fouls": 0, "balls_in_play": 0,
 	"hits": 0, "home_runs": 0, "strikeouts": 0, "walks": 0, "dives": 0, "air_outs": 0,
@@ -18,34 +21,37 @@ var outcome_counts := {}
 
 ## away/home: team ids from the content library, or &"" for a placeholder
 ## match with classic rules.
-func _init(p_seed: int, p_content: ContentLibrary, away: StringName = &"gearheads", home: StringName = &"glitterati") -> void:
+## park_id: where it is played (&"" = the home team's park).
+func _init(p_seed: int, p_content: ContentLibrary, away: StringName = &"gearheads", home: StringName = &"glitterati", park_id: StringName = &"") -> void:
 	content = p_content
 	rng = MatchRng.new(p_seed)
+	park = content.park(park_id)
+	if park == null and home != &"":
+		park = content.team(home).stadium_def
+	tuning = content.tuning_for(park)
 	if away == &"" or home == &"":
 		state = MatchState.new(
 			MatchState.placeholder_lineup("away"),
 			MatchState.placeholder_lineup("home"),
-			content.tuning.innings)
+			tuning.innings)
 	else:
 		roster = MatchRoster.new(content.team(away), content.team(home))
 		state = MatchState.from_teams(roster.teams[0], roster.teams[1], content.rules)
 
 
-static func play(p_seed: int, p_content: ContentLibrary, away: StringName = &"gearheads", home: StringName = &"glitterati") -> AutoMatch:
-	var sim := AutoMatch.new(p_seed, p_content, away, home)
+static func play(p_seed: int, p_content: ContentLibrary, away: StringName = &"gearheads", home: StringName = &"glitterati", park_id: StringName = &"") -> AutoMatch:
+	var sim := AutoMatch.new(p_seed, p_content, away, home, park_id)
 	sim.run()
 	return sim
 
 
 func run() -> void:
-	var tuning := content.tuning
 	while not state.game_over and stats["pitches"] < tuning.max_pitches_per_match:
 		play_pitch()
 	_tally_plate_appearances()
 
 
 func play_pitch() -> void:
-	var tuning := content.tuning
 	var reliever := AiManager.pitching_change(state, roster, tuning)
 	if reliever != &"" and state.substitute(state.fielding_team(), state.pitcher(state.fielding_team()), reliever):
 		stats["pitching_changes"] += 1
@@ -108,7 +114,7 @@ func _run_steal(steals: Dictionary, bases_before: Array[StringName], travel: flo
 			still[base] = steals[base]
 	if still.is_empty():
 		return
-	var bip := BallInPlay.create_steal(state, content.tuning, roster, still, travel, slide_step)
+	var bip := BallInPlay.create_steal(state, tuning, roster, still, travel, slide_step)
 	if bip == null:
 		return
 	var outcome := bip.resolve_ai(rng)
@@ -118,7 +124,6 @@ func _run_steal(steals: Dictionary, bases_before: Array[StringName], travel: flo
 
 
 func _run_pickoff(base: int, leaning: bool) -> void:
-	var tuning := content.tuning
 	var bip := BallInPlay.create_pickoff(state, tuning, roster, base, leaning, rng)
 	if bip == null:
 		return
@@ -131,8 +136,8 @@ func _run_pickoff(base: int, leaning: bool) -> void:
 
 func steal_head(runner_id: StringName, travel: float, jump: float, slide_step: bool = false) -> float:
 	var p := roster.player(runner_id) if roster != null else null
-	return LivePlay.steal_head_start(Ratings.runner_speed(p, content.tuning), travel, jump, content.tuning,
-		BallInPlay.lead_for(state, runner_id, content.tuning), slide_step)
+	return LivePlay.steal_head_start(Ratings.runner_speed(p, tuning), travel, jump, tuning,
+		BallInPlay.lead_for(state, runner_id, tuning), slide_step)
 
 
 func _tally_plate_appearances() -> void:

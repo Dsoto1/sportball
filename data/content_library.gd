@@ -16,6 +16,7 @@ const PITCH_PATHS: Array[String] = [
 	"res://data/pitches/showstopper.tres",
 ]
 const RULES_PATH := "res://data/rules/arcade.tres"
+const PARKS_DIR := "res://data/stadiums"
 const TEAM_PATHS: Array[String] = [
 	"res://data/teams/gearheads.tres",
 	"res://data/teams/glitterati.tres",
@@ -27,6 +28,7 @@ var tuning: BaseballTuning
 var pitches: Array[PitchFamilyDef] = []
 var rules: MatchRules
 var teams: Array[TeamDef] = []
+var parks: Array[StadiumDef] = []
 
 
 static func load_default() -> ContentLibrary:
@@ -43,7 +45,28 @@ static func load_default() -> ContentLibrary:
 		var team := load(path) as TeamDef
 		assert(team != null, "Missing team at %s" % path)
 		lib.teams.append(team)
+	for file in DirAccess.get_files_at(PARKS_DIR):
+		var path := PARKS_DIR.path_join(file.trim_suffix(".remap"))
+		if path.ends_with(".tres"):
+			var park := load(path) as StadiumDef
+			if park != null and not lib.parks.has(park):
+				lib.parks.append(park)
+	lib.parks.sort_custom(func(a: StadiumDef, b: StadiumDef) -> bool: return a.display_name < b.display_name)
 	return lib
+
+
+func park(id: StringName) -> StadiumDef:
+	for p in parks:
+		if p.id == id:
+			return p
+	return null
+
+
+## A copy of the tuning for one match in a park: its walls and air.
+func tuning_for(p: StadiumDef) -> BaseballTuning:
+	var t: BaseballTuning = tuning.duplicate()
+	t.field_shape = p.field_shape if p != null else null
+	return t
 
 
 func team(id: StringName) -> TeamDef:

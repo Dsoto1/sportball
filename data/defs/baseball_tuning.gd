@@ -132,6 +132,9 @@ extends Resource
 @export var fence_line: float = 92.0
 @export var fence_height: float = 3.2
 @export var fence_restitution: float = 0.3
+## The park being played in: wall distances and heights by angle, and the
+## air. Null uses fence_center / fence_line / fence_height above.
+@export var field_shape: FieldShape
 ## A ball played off the wall costs the fielder this long to pick up.
 @export var wall_carom_delay: float = 0.8
 

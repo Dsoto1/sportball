@@ -5,6 +5,10 @@ extends Resource
 
 @export var id: StringName
 @export var display_name: String
+## One line for the venue picker ("short porch in right, thin air").
+@export var blurb: String
+## Playing dimensions: wall distances and heights, air (rules of the park).
+@export var field_shape: FieldShape
 @export var seat_color: Color = Color(0.3, 0.3, 0.4)
 @export var seat_color_alt: Color = Color(0.25, 0.25, 0.32)
 ## Concrete, facades, dugouts and towers.
@@ -12,6 +16,18 @@ extends Resource
 ## Neon accent: the halo, lamp trim, scoreboard frame.
 @export var accent_color: Color = Color(1.0, 0.8, 0.3)
 @export var outfield_wall_color: Color = Color(0.16, 0.22, 0.38)
+## &"padded", &"iron", &"ivy" or &"brick": how the outfield wall is dressed.
+@export var wall_style: StringName = &"padded"
+## Rows of seats in the foul-territory stands and the outfield bleachers.
+@export var foul_rows: int = 26
+@export var outfield_rows: int = 16
+## A hand-operated scoreboard built into the outfield wall at this angle.
+@export var wall_scoreboard: bool = false
+@export var wall_scoreboard_angle: float = -30.0
+## Water beyond the stands on one side: 1 = right field, -1 = left, 0 = none.
+@export var water_side: int = 0
+## Skyline tower height multiplier (0.4 = low desert town).
+@export var skyline_height: float = 1.0
 ## Fans in home colors, away colors and anything else (shares sum to ~1).
 @export var home_fan_share: float = 0.6
 @export var away_fan_share: float = 0.12

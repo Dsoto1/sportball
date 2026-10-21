@@ -38,8 +38,34 @@ static func direction_for_spray(spray_deg: float) -> Vector3:
 
 
 static func fence_distance(spray_deg: float, tuning: BaseballTuning) -> float:
+	if tuning.field_shape != null:
+		return tuning.field_shape.distance_at(spray_deg)
 	var t := clampf(absf(spray_deg) / tuning.foul_line_angle, 0.0, 1.0)
 	return lerpf(tuning.fence_center, tuning.fence_line, t * t)
+
+
+## Where fielder `index` stands before the pitch. Outfielders play at the
+## same share of the wall distance as they do in the default park, so a
+## deep park pushes them back and a short porch pulls them in.
+static func fielder_spot(index: int, tuning: BaseballTuning) -> Vector3:
+	var spot := tuning.fielder_spots[index]
+	if tuning.field_shape == null or not tuning.fielder_ids[index] in [&"lf", &"cf", &"rf"]:
+		return spot
+	var angle := spray_angle_of(spot)
+	var t := clampf(absf(angle) / tuning.foul_line_angle, 0.0, 1.0)
+	var default_fence := lerpf(tuning.fence_center, tuning.fence_line, t * t)
+	var depth := Vector2(spot.x, spot.z).length() / default_fence
+	return direction_for_spray(angle) * fence_distance(angle, tuning) * depth
+
+
+## Wall height at a spray angle (a park's tall wall stops would-be homers).
+static func fence_height(spray_deg: float, tuning: BaseballTuning) -> float:
+	return tuning.field_shape.height_at(spray_deg) if tuning.field_shape != null else tuning.fence_height
+
+
+## Air drag in this park (thin air carries the ball).
+static func drag(tuning: BaseballTuning) -> float:
+	return tuning.drag * (tuning.field_shape.air_drag_scale if tuning.field_shape != null else 1.0)
 
 
 static func is_fair_angle(spray_deg: float, tuning: BaseballTuning) -> bool:

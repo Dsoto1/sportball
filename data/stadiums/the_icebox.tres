@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="StadiumDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/field_shape.gd" id="1_toylq"]
+[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="2_483po"]
+
+[sub_resource type="Resource" id="Resource_nkemg"]
+script = ExtResource("1_toylq")
+id = &"the_icebox"
+display_name = "The Icebox"
+points = PackedVector3Array(-45, 99, 4.6, -22, 112, 4.6, 0, 118, 4.6, 22, 112, 4.6, 45, 99, 4.6)
+air_drag_scale = 1.1
+
+[resource]
+script = ExtResource("2_483po")
+id = &"the_icebox"
+display_name = "The Icebox"
+blurb = "Neutral · cold heavy air knocks fly balls down, ivy on every wall"
+field_shape = SubResource("Resource_nkemg")
+seat_color = Color(0.1764706, 0.2901961, 0.3882353, 1)
+seat_color_alt = Color(0.13333334, 0.22745098, 0.30980393, 1)
+structure_color = Color(0.72156864, 0.76862746, 0.8, 1)
+accent_color = Color(0.62352943, 0.9098039, 1, 1)
+outfield_wall_color = Color(0.12156863, 0.2901961, 0.15686275, 1)
+wall_style = &"ivy"
+skyline_height = 0.7
+home_fan_share = 0.5
+away_fan_share = 0.25
+sponsors = PackedStringArray("FROSTGATE FURNACES", "SNOWLINE SKIS", "YETI COCOA", "GLACIER GLASS", "NORTHWIND WOOLENS")
+skyline_color = Color(0.2901961, 0.34509805, 0.4, 1)
+window_color = Color(0.8745098, 0.95686275, 1, 1)
