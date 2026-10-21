@@ -44,22 +44,33 @@ Prompts for one reference image per ballpark in `tools/generate_parks.gd`.
 
 ## Sheet layout (identical on every sheet)
 
-A 3:2 sheet with a title strip and ten labeled panels in this order. Every
-sheet uses the same camera position and lens for each panel, so panel 3
-of one park can be compared with panel 3 of another.
+Match `docs/stadium_refs/01_halo_dome.jpg` and `02_foundry_field.jpg`
+exactly. Each sheet has a title block with the club emblem, name and
+"<PARK> · STADIUM REFERENCE", and 11 labeled panels with the same camera for
+each panel at every park:
 
-1. **Establishing view:** high behind home plate, the whole field, stands and what is beyond the outfield (the large top-left panel).
-2. **Main scoreboard:** front-on: park name, both clubs' line scores (innings 1-9, R H E), the batter's portrait, number, name, position, AVG/HR/RBI, ball/strike/out dots and a base diamond.
-3. **From the pitcher's mound:** looking in at home plate, the backstop and the stands behind it.
-4. **Home plate close-up:** low, looking out to center field.
-5. **First-base view:** from first base, looking down the right-field line to the foul pole.
-6. **Third-base view:** from third base, looking down the left-field line to the foul pole.
-7. **Outfield wall and centerpiece:** front-on to center field: the wall, its distance plaques, the batter's eye and the centerpiece.
-8. **Home dugout:** front-on, in the home club's colors and emblem.
-9. **Away dugout:** front-on, the same structure in neutral colors with the visitors' emblem on a banner.
-10. **Press box:** the announcer's booth behind home, from outside.
+1. **Establishing view (behind home plate):** the large top panel; a game in progress, the whole field, the centerpiece scoreboard in center.
+2. **Home plate close-up:** the batter's view out to center.
+3. **Pitcher's view:** from the mound to home plate.
+4. **First base line (home dugout):** the home dugout in club colors and wordmark.
+5. **Third base line (visitor dugout):** the same dugout, neutral, marked "VISITORS".
+6. **Left field corner:** the foul pole at the corner, the wall running to it.
+7. **Left-center field.**
+8. **Center field:** the wall and the centerpiece scoreboard.
+9. **Right-center field.**
+10. **Right field corner.**
+11. **Aerial overview:** the stadium and its surroundings.
 
-Bottom strip: the club's emblem, name, a one-line identity, four color swatches (primary, secondary, accent, dark) and a one-line stadium theme.
+Below the panels:
+
+- **Outfield wall strip:** the wall from foul pole to foul pole, with left, left-center, center, right-center and right labeled, and emblem panels and distances.
+- **Team color set:** six swatches with names and hex values: primary, secondary, accent, support, dark, highlight.
+- **Key points:**
+  - foul poles at the corners;
+  - one continuous wall, no outfield dugouts or field-level seating;
+  - everything else behind the wall;
+  - home dugout at first, visitors at third;
+  - the park's theme in one line.
 
 ## Shared kit (every park is built from these)
 
@@ -69,11 +80,12 @@ Bottom strip: the club's emblem, name, a one-line identity, four color swatches 
 - **Stands:** tiered decks (1 to 3, by park) wrapping from foul pole to foul pole behind home, each deck with a glowing fascia band along its front carrying club wordmarks. Lower bleachers in the outfield.
 - **Outfield wall:** padded, iron, brick or ivy, with emblem and wordmark panels, distances on dark plaques, yellow foul poles.
 - **Batter's eye:** a dark, plain block in straightaway center (hedge, panels or glass).
-- **Main scoreboard:** the same layout and stat set everywhere, framed in the park's materials with the emblem on top.
-- **Video board:** a second, smaller screen near the centerpiece showing the batter.
-- **Dugouts:** the same shape at every park: bat rack, helmet shelves, a lit roof edge, the emblem on the back wall.
+- **Centerpiece scoreboard:** in straightaway center above the batter's eye, the same layout everywhere: club name, batter portrait, number, name, position, AVG/HR/RBI. It is framed in the park's materials and crowned with the emblem.
+- **Slogan boards:** over the right-field stands, with the park name and the club slogan.
+- **Dugouts:** two only, home on the first-base line and visitors on the third-base line, the same shape at every park.
 - **Press box:** a glass booth behind home with the emblem above.
-- **Light banks:** on towers (outdoor parks) or hung from the roof (the Vault).
+- **Light towers:** rising out of the upper stands, a pair flanking the centerpiece (outdoor parks); light banks hung from the roof at the Vault.
+- **Yellow foul poles** at the corners.
 
 **Optional kit pieces, each park picks a few:**
 
