@@ -10,3 +10,4 @@ Catalogue sound-effect downloads are not in the plan (use CC0 sources).
 | Date | Item | Model | Credits | Month total | Asset |
 |---|---|---|---|---|---|
 | 2026-10-21 | Test glove (text-to-3D) | Hyper3D Rodin v2.5 Fast | 300 | 300 / 4,125 | AI-001 |
+| 2026-10-21 | Glove v2 (image-to-3D from the owner's reference photo) | Hyper3D Rodin v2.5 Fast | 300 | 600 / 4,125 | AI-002 |
