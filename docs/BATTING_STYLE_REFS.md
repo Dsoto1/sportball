@@ -202,3 +202,56 @@ the catcher (bottom row). Paste as is.
 > Background: plain flat light gray, no field, no crowd. Soft even studio
 > light. Stylized 3D render look, like a character turnaround sheet. Not a
 > real player, no likeness of any real person.
+
+## Top-down foot placement diagram
+
+The game draws its own exact diagram from the poses
+(`docs/batting_feet_topdown.png`; redraw with `tools/foot_diagram_data.gd`
+and `tools/draw_foot_diagram.py`). Use this prompt for a hand-made or
+AI-drawn target to compare it with. Per the spec, the diagram wins over any
+artistic reference on foot placement.
+
+> Technical top-down diagram, flat vector style like a coaching manual, on a
+> white background, for six right-handed baseball batting styles in a 3 x 2
+> grid: 1 CLASSIC, 2 CROUCH, 3 OPEN, 4 LEG KICK, 5 BAT WRAP, 6 SLAP. Each
+> panel is the same view straight down from above, the same scale, the
+> pitcher at the top of the panel and the catcher at the bottom.
+>
+> In every panel: home plate drawn to scale (17 inches across, the point
+> toward the catcher) on the right; the right-handed batter's box to its left
+> (4 feet wide by 6 feet long, its inner line 6 inches from the plate's
+> edge), drawn as a thin gray outline; an arrow at the top labelled "to the
+> pitcher". Nothing else: no player, no bat, no field, no shadows.
+>
+> Show the batter's two feet as simple footprint shapes (heel and toe
+> clearly different), toes pointing toward the plate at the stance, in five
+> colors with a legend: STANCE gray, LOAD blue, FOOT PLANT orange, CONTACT
+> red, FINISH green. A dashed outline means the foot is off the ground or up
+> on its toe. Draw an arrow for the lead (left) foot's travel from STANCE to
+> FOOT PLANT, and a curved arrow for the rear (right) foot's pivot from
+> FOOT PLANT to FINISH.
+>
+> Rules for every style: both feet stay inside the batter's box; no foot
+> touches the plate; the rear foot stays put through LOAD, then pivots on
+> the ball of the foot (heel turning toward the catcher) through CONTACT and
+> FINISH; the lead foot strides toward the pitcher (straight up the panel),
+> lands about 30 degrees open toward the pitcher, and stays planted through
+> CONTACT and FINISH.
+>
+> Per style:
+> 1 CLASSIC: feet a little wider than the shoulders, parallel to the plate's
+> edge; a short stride (about 7 inches) straight toward the pitcher.
+> 2 CROUCH: a much wider stance; a short, low stride (about 7 inches) to a
+> very wide base.
+> 3 OPEN: the lead foot starts pulled back away from the plate with its toes
+> turned toward the pitcher; at LOAD a toe tap brings it back in, level with
+> the rear foot; then a short stride toward the pitcher.
+> 4 LEG KICK: stance like CLASSIC; at LOAD the lead foot is lifted high in
+> the air (dashed) and drawn back near the rear foot; then the longest
+> stride of the six (about 12 inches) toward the pitcher.
+> 5 BAT WRAP: feet like CLASSIC, a medium stride.
+> 6 SLAP: a narrow stance; the shortest stride (about 5 inches), already
+> leaning toward first base at FINISH.
+>
+> Label each panel with its style name in bold at the top left. Clean
+> lines, readable labels, no decorative elements.

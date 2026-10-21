@@ -557,3 +557,9 @@ Decision:
 Reason: Owner's revised batting spec and first reference sheet.
 
 Affected systems: BattingStyles, MatchView (one-hand release constant), tests, docs.
+
+- **Follow-up (same day), from the top-down foot diagram (`tools/draw_foot_diagram.py`, drawn from the poses):**
+  - The lead foot no longer spins with the hips: it lands 30° open at the plant and braces there through the finish, while the back foot pivots.
+  - Strides are longer but keep the spec's order: leg kick about 30 cm, classic, crouch and wrap about 18 cm, open about 16 cm, slap about 12 cm.
+  - Finishes sit a little lower so the planted foot stays on the ground.
+  - New tests: every placed foot is within the leg's reach, and the lead foot stays planted and braced.

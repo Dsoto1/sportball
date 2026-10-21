@@ -21,6 +21,8 @@ const ONE_HAND_RELEASE := 0.5
 ## Body space (m, forward = toward the plate): no foot may reach the plate.
 ## The batter stands 0.85 m from its middle; its near edge is 0.63 away.
 const PLATE_CLEAR := 0.45
+## How open the lead foot lands at the plant (degrees toward the pitcher).
+const LEAD_TOE := 30.0
 
 ## Style ids, in the order a roster's styles are handed out when a player
 ## sets none.
@@ -92,10 +94,10 @@ static func poses(style: StringName) -> Dictionary:
 				"hand_r": P(0.2, 1.22, 0.14), "hand_l": P(0.14, 1.15, 0.17),
 			})
 			load = _with(stance, {"drop": 0.24, "shift": P(0.04, 0, 0), "hips": Vector3(14, -14, 0), "chest": Vector3(26, -28, 0), "hand_r": P(0.25, 1.24, 0.1), "hand_l": P(0.19, 1.17, 0.13)})
-			stride = _with(stride, {"drop": 0.24, "foot_l": P(-0.52, 0.1, 0.07), "foot_r": P(0.42, 0.1, -0.02), "hips": Vector3(14, 8, 0), "chest": Vector3(26, -24, 0)})
-			contact = _with(contact, {"drop": 0.22, "foot_l": P(-0.52, 0.1, 0.07)})
-			extend = _with(extend, {"drop": 0.2, "foot_l": P(-0.52, 0.1, 0.07)})
-			finish = _with(finish, {"drop": 0.16, "foot_l": P(-0.52, 0.1, 0.07)})
+			stride = _with(stride, {"drop": 0.24, "foot_l": P(-0.6, 0.1, 0.07), "foot_r": P(0.42, 0.1, -0.02), "hips": Vector3(14, 8, 0), "chest": Vector3(26, -24, 0)})
+			contact = _with(contact, {"drop": 0.22, "foot_l": P(-0.6, 0.1, 0.07)})
+			extend = _with(extend, {"drop": 0.2, "foot_l": P(-0.6, 0.1, 0.07)})
+			finish = _with(finish, {"drop": 0.22, "foot_l": P(-0.6, 0.1, 0.07)})
 		&"open":
 			stance = _with(stance, {
 				"hips": Vector3(6, 18, 0), "chest": Vector3(10, -2, 0), "head": Vector3(-8, 70, 0),
@@ -103,10 +105,10 @@ static func poses(style: StringName) -> Dictionary:
 			})
 			# A toe tap closes him up, then a short stride from there.
 			load = _with(load, {"foot_l": P(-0.2, 0.17, -0.02), "toe_l": 0.0, "hips": Vector3(8, -12, 0), "chest": Vector3(12, -30, 0)})
-			stride = _with(stride, {"foot_l": P(-0.4, 0.1, 0.06)})
-			contact = _with(contact, {"foot_l": P(-0.4, 0.1, 0.06)})
-			extend = _with(extend, {"foot_l": P(-0.4, 0.1, 0.06)})
-			finish = _with(finish, {"foot_l": P(-0.4, 0.1, 0.06)})
+			stride = _with(stride, {"foot_l": P(-0.46, 0.1, 0.06)})
+			contact = _with(contact, {"foot_l": P(-0.46, 0.1, 0.06)})
+			extend = _with(extend, {"foot_l": P(-0.46, 0.1, 0.06)})
+			finish = _with(finish, {"foot_l": P(-0.46, 0.1, 0.06)})
 		&"leg_kick":
 			stance = _with(stance, {"drop": 0.06, "chest": Vector3(8, -18, 0)})
 			load = _with(load, {
@@ -114,10 +116,10 @@ static func poses(style: StringName) -> Dictionary:
 				"foot_l": P(-0.1, 0.52, 0.14), "knee_l": P(0, 0.6, 1),
 				"hand_r": P(0.28, 1.5, 0.0), "hand_l": P(0.22, 1.44, 0.04),
 			})
-			stride = _with(stride, {"drop": 0.18, "foot_l": P(-0.58, 0.1, 0.06)})
-			contact = _with(contact, {"drop": 0.18, "foot_l": P(-0.58, 0.1, 0.06), "hips": Vector3(8, 58, 0)})
-			extend = _with(extend, {"drop": 0.16, "foot_l": P(-0.58, 0.1, 0.06)})
-			finish = _with(finish, {"drop": 0.12, "foot_l": P(-0.58, 0.1, 0.06), "hips": Vector3(4, 95, 0)})
+			stride = _with(stride, {"drop": 0.22, "foot_l": P(-0.64, 0.1, 0.06)})
+			contact = _with(contact, {"drop": 0.22, "foot_l": P(-0.64, 0.1, 0.06), "hips": Vector3(8, 58, 0)})
+			extend = _with(extend, {"drop": 0.24, "foot_l": P(-0.64, 0.1, 0.06)})
+			finish = _with(finish, {"drop": 0.26, "foot_l": P(-0.64, 0.1, 0.06), "hips": Vector3(4, 90, 0)})
 		&"wrap":
 			stance = _with(stance, {
 				"chest": Vector3(12, -24, 0),
@@ -135,14 +137,23 @@ static func poses(style: StringName) -> Dictionary:
 				"elbow_r": P(1, -1, 0), "elbow_l": P(-0.2, -1, 0.3),
 			})
 			load = _with(stance, {"hips": Vector3(10, -8, 0), "chest": Vector3(16, -20, 0), "hand_r": P(0.18, 1.2, 0.22), "hand_l": P(0.12, 1.15, 0.25)})
-			stride = _with(stride, {"drop": 0.15, "foot_l": P(-0.36, 0.1, 0.08), "foot_r": P(0.3, 0.1, -0.02), "hand_r": P(0.16, 1.18, 0.2), "hand_l": P(0.1, 1.13, 0.23)})
-			contact = _with(contact, {"foot_l": P(-0.36, 0.1, 0.08), "hips": Vector3(8, 40, 0), "chest": Vector3(16, 22, 0)})
-			extend = _with(extend, {"foot_l": P(-0.36, 0.1, 0.08), "hips": Vector3(6, 55, 0), "chest": Vector3(12, 30, 0)})
+			stride = _with(stride, {"drop": 0.15, "foot_l": P(-0.4, 0.1, 0.08), "foot_r": P(0.3, 0.1, -0.02), "hand_r": P(0.16, 1.18, 0.2), "hand_l": P(0.1, 1.13, 0.23)})
+			contact = _with(contact, {"foot_l": P(-0.4, 0.1, 0.08), "hips": Vector3(8, 40, 0), "chest": Vector3(16, 22, 0)})
+			extend = _with(extend, {"foot_l": P(-0.4, 0.1, 0.08), "hips": Vector3(6, 55, 0), "chest": Vector3(12, 30, 0)})
 			# Compact: hands stay level and out front, he's already leaving the box.
 			finish = _with(contact, {
-				"foot_l": P(-0.36, 0.1, 0.08), "hips": Vector3(6, 62, 0), "chest": Vector3(10, 30, 0), "head": Vector3(-5, -10, 0),
+				"foot_l": P(-0.4, 0.1, 0.08), "hips": Vector3(6, 62, 0), "chest": Vector3(10, 30, 0), "head": Vector3(-5, -10, 0),
 				"hand_r": P(-0.32, 1.25, 0.22), "hand_l": P(-0.36, 1.2, 0.18),
 			})
+	# Feet: square to the plate while he waits and loads; from the plant on,
+	# the lead foot lands a third open and braces there (it must not spin
+	# with the hips), while the back foot pivots (its own toe_r per pose).
+	for pose: Dictionary in [stance, load]:
+		pose.get_or_add("toe_l", 0.0)
+		pose.get_or_add("toe_r", 0.0)
+	for pose: Dictionary in [stride, contact, extend, finish]:
+		pose.get_or_add("toe_l", LEAD_TOE)
+	stride.get_or_add("toe_r", 0.0)
 	var bob := _with(stance, {"drop": float(stance.get("drop", 0.0)) + 0.02})
 	return {"stance": stance, "bob": bob, "load": load, "stride": stride, "contact": contact, "extend": extend, "finish": finish}
 

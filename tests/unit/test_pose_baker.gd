@@ -145,3 +145,25 @@ func test_styles_obey_the_batters_box() -> void:
 	check(float(crouch["stance"]["drop"]) > float(classic["stance"]["drop"]), "the crouch sits lowest")
 	check(float(crouch["finish"]["drop"]) > float(classic["finish"]["drop"]), "and finishes lower")
 	check(BattingStyles.ONE_HAND_RELEASE > BattingStyles.CONTACT_AT, "a one-hand release only comes after contact")
+	# The front side braces: the planted lead foot does not spin with the hips.
+	for style: StringName in BattingStyles.ORDER:
+		var p := BattingStyles.poses(style)
+		for key in ["stride", "contact", "finish"]:
+			var toe := float(p[key].get("toe_l", 999.0))
+			check(toe >= 0.0 and toe <= 60.0, "%s %s: lead foot planted and braced (%.0f°)" % [style, key, toe])
+
+
+## Every foot a style places is one the leg can reach (no hovering feet).
+func test_style_feet_are_reachable() -> void:
+	var model := _rig()
+	for style: StringName in BattingStyles.ORDER:
+		var p := BattingStyles.poses(style)
+		for key: String in p:
+			var pose: Dictionary = p[key]
+			var bones := _posed(model, pose)
+			for foot in ["foot_l", "foot_r"]:
+				if not pose.has(foot):
+					continue
+				var at := (bones[foot] as Transform3D).origin
+				check(at.distance_to(pose[foot]) < 0.03, "%s %s: %s reaches its spot (%.3f m off)" % [style, key, foot, at.distance_to(pose[foot])])
+	model.free()

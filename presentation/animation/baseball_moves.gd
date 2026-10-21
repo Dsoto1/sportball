@@ -59,11 +59,11 @@ static var STANCE := {
 static var STANCE_BOB := _with(STANCE, {"drop": 0.12, "hand_r": P(0.22, 1.43, 0.08), "hand_l": P(0.16, 1.36, 0.12)})
 static var STRIDE := _with(STANCE, {
 	"drop": 0.14, "hips": Vector3(8, 8, 0), "chest": Vector3(12, -26, 0), "head": Vector3(-8, 85, 0),
-	"foot_l": P(-0.46, 0.1, 0.07), "hand_r": P(0.18, 1.3, 0.06), "hand_l": P(0.12, 1.24, 0.1),
+	"foot_l": P(-0.52, 0.1, 0.07), "hand_r": P(0.18, 1.3, 0.06), "hand_l": P(0.12, 1.24, 0.1),
 })
 static var CONTACT := _with(STANCE, {
 	"drop": 0.14, "hips": Vector3(8, 50, 0), "chest": Vector3(18, 30, 0), "head": Vector3(-5, 10, 0),
-	"foot_l": P(-0.46, 0.1, 0.07), "foot_r": P(0.3, 0.14, -0.02), "toe_r": 50.0,
+	"foot_l": P(-0.52, 0.1, 0.07), "foot_r": P(0.3, 0.14, -0.02), "toe_r": 50.0,
 	"hand_r": P(-0.05, 1.08, 0.48), "hand_l": P(-0.1, 1.05, 0.44),
 	"elbow_r": P(0.5, -1, 0), "elbow_l": P(-0.5, -1, 0),
 })
@@ -72,7 +72,7 @@ static var EXTEND := _with(CONTACT, {
 	"hand_r": P(-0.42, 1.22, 0.3), "hand_l": P(-0.45, 1.2, 0.22), "elbow_l": P(-1, -0.5, 0),
 })
 static var FINISH := _with(CONTACT, {
-	"drop": 0.1, "hips": Vector3(4, 85, 0), "chest": Vector3(0, 45, -8), "head": Vector3(0, -40, 0),
+	"drop": 0.16, "hips": Vector3(4, 85, 0), "chest": Vector3(0, 45, -8), "head": Vector3(0, -40, 0),
 	"foot_r": P(0.2, 0.18, 0.0), "toe_r": 85.0,
 	"hand_r": P(-0.32, 1.55, -0.08), "hand_l": P(-0.36, 1.48, -0.12),
 	"elbow_r": P(0, -0.3, 1), "elbow_l": P(-1, -0.5, 0),
