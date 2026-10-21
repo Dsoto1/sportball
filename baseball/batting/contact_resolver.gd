@@ -40,7 +40,11 @@ static func resolve(pitch: PitchResult, swing: SwingIntent, tuning: BaseballTuni
 	var center := PitchResolver.zone_center(tuning)
 	var height := (pitch.location.y - center.y) / ((tuning.zone_top - tuning.zone_bottom) * 0.5)
 	var base_launch := tuning.power_base_launch if power else tuning.contact_base_launch
-	var launch := base_launch + swing.stick.y * tuning.stick_lift + height * tuning.launch_per_height + pitch.launch_bias
+	# His swing: uppercutters lift the ball, flat swings keep it down; a
+	# steep swing path follows the pitch height more.
+	var per_height := tuning.launch_per_height * (1.0 + (swing.tilt - SwingProfile.LEAGUE_TILT) * tuning.tilt_launch_per_height)
+	var launch := base_launch + swing.stick.y * tuning.stick_lift + height * per_height + pitch.launch_bias
+	launch += (swing.attack_angle - SwingProfile.LEAGUE_ATTACK_ANGLE) * tuning.attack_angle_launch
 	launch += rng.randfn(0.0, tuning.launch_noise + miss * tuning.mishit_launch_spread)
 	result.launch_angle = clampf(launch, -25.0, 80.0)
 
@@ -49,6 +53,8 @@ static func resolve(pitch: PitchResult, swing: SwingIntent, tuning: BaseballTuni
 	var spray := result.timing_norm * tuning.spray_per_timing * hand
 	spray += pitch.location.x / tuning.zone_half_width * tuning.spray_per_location
 	spray += swing.stick.x * tuning.stick_spray
+	# Pull hitters pull it, opposite-field swings push it the other way.
+	spray -= (swing.attack_pull - SwingProfile.LEAGUE_PULL) * tuning.attack_direction_spray * hand
 	spray += rng.randfn(0.0, tuning.spray_noise + miss * tuning.mishit_spray_spread)
 	result.spray_angle = spray
 

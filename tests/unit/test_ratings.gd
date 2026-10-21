@@ -16,9 +16,51 @@ func test_average_player_changes_nothing() -> void:
 	check_near(mods["scatter"], 1.0, 0.0001, "scatter")
 	var swing := SwingIntent.swing(SwingIntent.Type.CONTACT, 0.0)
 	Ratings.apply_batter(swing, avg, tuning())
-	check_near(swing.window_scale, 1.0, 0.0001, "window")
-	check_near(swing.power_scale, 1.0, 0.0001, "power")
+	# Only his own small swing variation (SwingProfile wobble: up to 3 deg
+	# of attack angle) remains.
+	check_near(swing.window_scale, 1.0, 3.0 * tuning().attack_angle_window + 0.0001, "window: within his own swing's variation")
+	var wobble := 1.5 * tuning().bat_speed_ev_per_mph
+	check_near(swing.power_scale, 1.0, wobble + 0.0001, "power: within his own swing's variation")
+	check_near(swing.attack_angle, SwingProfile.LEAGUE_ATTACK_ANGLE, 3.01, "attack angle near the league's")
 	check_near(Ratings.runner_speed(avg, tuning()), tuning().runner_speed, 0.0001, "runner speed")
+
+
+func test_swing_numbers_shape_contact() -> void:
+	var pitch := PitchResult.new()
+	pitch.location = PitchResolver.zone_center(tuning())
+	var launches := {}
+	var sprays := {}
+	for aa in [2.0, 18.0]:
+		var swing := SwingIntent.swing(SwingIntent.Type.CONTACT, 0.0)
+		swing.attack_angle = aa
+		var total := 0.0
+		for i in 200:
+			total += ContactResolver.resolve(pitch, swing, tuning(), MatchRng.new(i)).launch_angle
+		launches[aa] = total / 200.0
+	check(launches[18.0] > launches[2.0] + 6.0, "uppercut swings lift the ball (%.1f vs %.1f)" % [launches[18.0], launches[2.0]])
+	for pull in [-11.0, 15.0]:
+		var swing := SwingIntent.swing(SwingIntent.Type.CONTACT, 0.0)
+		swing.attack_pull = pull
+		var total := 0.0
+		for i in 200:
+			total += ContactResolver.resolve(pitch, swing, tuning(), MatchRng.new(i)).spray_angle
+		sprays[pull] = total / 200.0
+	check(sprays[15.0] < sprays[-11.0] - 15.0, "a righty pull swing sprays to left field (%.1f vs %.1f)" % [sprays[15.0], sprays[-11.0]])
+	var slow := _player({"power": 20})
+	var fast := _player({"power": 95})
+	var a := SwingIntent.swing(SwingIntent.Type.CONTACT, 0.0)
+	var b := SwingIntent.swing(SwingIntent.Type.CONTACT, 0.0)
+	Ratings.apply_batter(a, slow, tuning())
+	Ratings.apply_batter(b, fast, tuning())
+	check(b.power_scale > a.power_scale + 0.05, "bat speed drives exit velocity")
+	# Loft costs contact: an uppercut swing has a smaller timing window.
+	var flat := _player({"id": &"x_flat", "batting_style": &"slap"})
+	var steep := _player({"id": &"x_steep", "batting_style": &"leg_kick"})
+	var f := SwingIntent.swing(SwingIntent.Type.CONTACT, 0.0)
+	var u := SwingIntent.swing(SwingIntent.Type.CONTACT, 0.0)
+	Ratings.apply_batter(f, flat, tuning())
+	Ratings.apply_batter(u, steep, tuning())
+	check(u.window_scale < f.window_scale, "uppercuts whiff more than flat swings")
 
 
 func test_pitcher_ratings_and_fatigue() -> void:

@@ -88,7 +88,7 @@ func test_the_barrel_is_square_at_contact() -> void:
 	for style: StringName in BattingStyles.ORDER:
 		var start := BattingStyles.approach_bat(style, 1.0, 0.0)
 		var at := BattingStyles.swing_bat(style, BattingStyles.CONTACT_AT, start)
-		var b: Dictionary = BattingStyles.BAT[style]
+		var b: Dictionary = BattingStyles.style_attack(style)
 		check_near(at.x, float(b["attack_yaw"]), 0.5, "%s: barrel meets the ball on its attack direction" % style)
 		check_near(at.y, float(b["attack_lift"]), 0.5, "%s: and at its attack angle" % style)
 		check(absf(at.x) <= 15.0, "%s: still through the hitting zone, not around it" % style)
@@ -98,17 +98,17 @@ func test_the_barrel_is_square_at_contact() -> void:
 	for style: StringName in BattingStyles.ORDER:
 		var start := BattingStyles.approach_bat(style, 1.0, 0.0)
 		var slot := BattingStyles.swing_bat(style, BattingStyles.CONTACT_AT * BattingStyles.SLOT_AT, start)
-		var attack := float(BattingStyles.BAT[style]["attack_yaw"])
+		var attack := float(BattingStyles.style_attack(style)["attack_yaw"])
 		check(slot.y < 0.0, "%s: the barrel drops below the hands into the slot" % style)
-		check_near(BattingStyles.swing_tilt(style), float(BattingStyles.TILT[style]), 2.0, "%s: swing path tilt on target" % style)
+		check_near(BattingStyles.swing_tilt(style), BattingStyles.style_tilt(style), 2.0, "%s: swing path tilt on target" % style)
 		check(slot.x > attack + 40.0, "%s: and lags well behind them" % style)
-	check(float(BattingStyles.BAT[&"slap"]["attack_yaw"]) > 5.0, "the slap goes the other way")
-	check(float(BattingStyles.BAT[&"leg_kick"]["attack_lift"]) > float(BattingStyles.BAT[&"slap"]["attack_lift"]), "the slugger swings up, the slapper flat")
+	check(float(BattingStyles.style_attack(&"slap")["attack_yaw"]) > 5.0, "the slap goes the other way")
+	check(float(BattingStyles.style_attack(&"leg_kick")["attack_lift"]) > float(BattingStyles.style_attack(&"slap")["attack_lift"]), "the slugger swings up, the slapper flat")
 	# Statcast anchors: MLB average attack angle about 10, power 16-19,
 	# compact contact about 4; tilt 30-36.
-	check_near(float(BattingStyles.BAT[&"classic"]["attack_lift"]), 10.0, 2.0, "classic swings at the league-average attack angle")
+	check_near(float(BattingStyles.style_attack(&"classic")["attack_lift"]), 10.0, 2.0, "classic swings at the league-average attack angle")
 	for power: StringName in [&"leg_kick", &"wrap"]:
-		var aa := float(BattingStyles.BAT[power]["attack_lift"])
+		var aa := float(BattingStyles.style_attack(power)["attack_lift"])
 		check(aa >= 15.0 and aa <= 20.0, "%s swings up like a power hitter (%.0f)" % [power, aa])
 	check(BattingStyles.swing_tilt(&"leg_kick") > BattingStyles.swing_tilt(&"slap"), "power swings are steeper than compact ones")
 

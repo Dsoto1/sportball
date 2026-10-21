@@ -161,21 +161,22 @@ the table in `tools/generate_input_map.gd` and run
 
 Each park's walls, wall heights, air and surface are rules: fly balls,
 caroms off the walls and grounders play differently. Fielders play deeper
-in deeper parks. 80 AI-vs-AI games each (`tools/park_report.gd`):
+in deeper parks. 60 AI-vs-AI games each (`tools/park_report.gd`), with every
+hitter's own swing (bat speed, attack angle, pull) in play:
 
 | Park | Signature | R/G | HR/G | 2B/G | 3B/G |
 |---|---|---|---|---|---|
-| The Halo Dome | Glitterati home: symmetric, neon halo overhead | 5.16 | 1.35 | 2.19 | 0.47 |
-| Foundry Field | Gearheads home: the Boilerplate, a 34 ft iron wall in short right | 4.69 | 0.91 | 2.02 | 0.68 |
-| Ledger Street Park | the Leviathan, a 37 ft green wall in short left; deep triangle | 5.29 | 1.07 | 1.66 | 1.20 |
-| Pier 9 Ballyard | short porch in right with the bay beyond it | 4.99 | 0.96 | 1.93 | 0.57 |
-| The Kiln | thin desert air, canyon-deep outfield, brick | 5.79 | 1.00 | 1.39 | 1.38 |
-| The Icebox | cold heavy air, ivy walls | 4.70 | 0.84 | 2.09 | 0.53 |
-| Reactor Park | night game; odd angles, a 427 ft center-field notch | 5.74 | 1.06 | 1.65 | 1.10 |
-| The Horseshoe | night game; 279 / 266 ft lines, a 482 ft center field | 5.62 | 0.28 | 1.11 | 1.68 |
-| Warehouse Row | 25 ft brick wall in right, the Roundhouse warehouse beyond it | 5.53 | 0.97 | 1.98 | 1.02 |
-| Fountain Gardens | night game; big and fair, fountains beyond the wall | 5.22 | 0.89 | 1.25 | 1.20 |
-| The Vault | sealed dome on fast turf | 6.09 | 1.16 | 2.25 | 0.54 |
+| The Halo Dome | Glitterati home: symmetric, neon halo overhead | 5.42 | 1.30 | 2.40 | 0.38 |
+| Foundry Field | Gearheads home: the Boilerplate, a 34 ft iron wall in short right | 4.57 | 1.00 | 2.15 | 0.60 |
+| Ledger Street Park | the Leviathan, a 37 ft green wall in short left; deep triangle | 4.82 | 0.72 | 1.78 | 1.17 |
+| Pier 9 Ballyard | short porch in right with the bay beyond it | 6.28 | 1.38 | 1.95 | 0.58 |
+| The Kiln | thin desert air, canyon-deep outfield, brick | 5.58 | 0.90 | 1.47 | 1.78 |
+| The Icebox | cold heavy air, ivy walls | 4.60 | 0.77 | 2.00 | 0.43 |
+| Reactor Park | night game; odd angles, a 427 ft center-field notch | 5.40 | 1.08 | 1.87 | 1.28 |
+| The Horseshoe | night game; 279 / 266 ft lines, a 482 ft center field | 5.47 | 0.45 | 0.98 | 1.40 |
+| Warehouse Row | 25 ft brick wall in right, the Roundhouse warehouse beyond it | 5.47 | 1.10 | 2.05 | 0.85 |
+| Fountain Gardens | night game; big and fair, fountains beyond the wall | 4.85 | 0.85 | 1.18 | 1.32 |
+| The Vault | sealed dome on fast turf | 5.60 | 0.98 | 2.33 | 0.45 |
 
 ## Test
 

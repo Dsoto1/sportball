@@ -37,8 +37,15 @@ static func apply_batter(swing: SwingIntent, p: PlayerDef, tuning: BaseballTunin
 	if p == null:
 		return
 	swing.window_scale *= 1.0 + tuning.rating_contact_window_spread * norm(p.contact)
-	swing.power_scale = 1.0 + tuning.rating_power_ev_spread * norm(p.power)
 	swing.bats_left = p.bats_left()
+	# His swing: bat speed (mostly from power) drives exit velocity, the
+	# attack angle and direction shape the launch and spray.
+	var s := SwingProfile.for_player(p)
+	swing.power_scale = 1.0 + tuning.bat_speed_ev_per_mph * (float(s["bat_speed"]) - SwingProfile.LEAGUE_BAT_SPEED)
+	swing.attack_angle = s["attack_angle"]
+	swing.window_scale *= 1.0 - tuning.attack_angle_window * (float(s["attack_angle"]) - SwingProfile.LEAGUE_ATTACK_ANGLE)
+	swing.attack_pull = s["pull"]
+	swing.tilt = s["tilt"]
 
 
 ## Multiplier on the AI's read noise and chase rate when this player bats.

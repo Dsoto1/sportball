@@ -642,3 +642,28 @@ Decision:
 Reason: Owner's Statcast references (Vlad Jr., Paredes, Turang, Muncy, Langford, Hoskins, Ohtani) and the leaderboard: field variety for swings like player variety.
 
 Affected systems: PlayerSwing, BattingStyles (profile-aware path, slot for tilt), MatchView (profile, follow-through speed, readout), MatchDirector (power flag, readout, recap units), ContactFeedback (mph), tests, tools.
+
+## 2026-10-21 - The Swing Numbers Are Rules
+
+Decision:
+- **Rules layer:** a hitter's swing signature (`SwingProfile`, in `baseball/batting/`) is now part of the rules. Its inputs are his style, his power and contact, and a steady per-player variation, clamped to the league's range. `Ratings.apply_batter` puts it on every swing, human, AI and headless sims alike. The swing animation (`PlayerSwing`) draws the same numbers.
+- **What it does at contact:**
+  - **Bat speed → exit velocity:** +0.875% per mph over the league's 72. This replaces the power rating's direct spread; a 100-power hitter swings about 80 mph, which comes back to the same +7%.
+  - **Attack angle → launch:** +0.6° per degree over the league's 10°, so uppercutters lift the ball and flat swings keep it down.
+  - **Attack direction → spray:** 1° toward his pull field per degree of pull over the league's 2° (opposite-field swings push it the other way).
+  - **Tilt → launch vs pitch height:** steeper paths follow the pitch height more (+2% per degree over 32°).
+  - **Loft costs contact:** the timing window shrinks 2.5% per degree of attack angle over 10° (flat swings gain it), as steep swings whiff more in Statcast.
+- **The cost is what keeps it fair.** Without it, the power-heavy Glitterati went from 52.6% to 57.3% of wins over 1,200 sims, with noise about ±1.4 points. With it they're at 51.8%.
+- **League totals barely move:**
+
+  | | Effects off | Effects on |
+  |---|---|---|
+  | Runs per team per game | 2.57 | 2.49 |
+  | Home runs per plate appearance | 2.6% | 2.6% |
+  | Strikeouts | about 17.5% | 18.5% |
+
+- **Parks still play distinctly.** Pier 9's short right-field porch now gives up the most runs (6.28 R/G), as left-handed pull swings aim right at it.
+
+Reason: Owner's go-ahead to let the swing numbers affect the hitting.
+
+Affected systems: SwingProfile (new, rules), SwingIntent, Ratings, ContactResolver, BaseballTuning (Swing Signature group), PlayerSwing and BattingStyles (read the rules' numbers), tests, README park table.

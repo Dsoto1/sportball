@@ -13,11 +13,10 @@ extends RefCounted
 ## Bat lag: the barrel is in the slot this far from the press to contact,
 ## having come only this share of the way around; its depth per style is
 ## BAT slot_lift (degrees below level). The slot depths are tuned so the
-## swing path's tilt into contact (swing_tilt) lands on Statcast-like
-## targets (TILT): MLB average 32, compact swings 30, big power 36.
+## swing path's tilt into contact (swing_tilt) lands on each style's tilt
+## (style_tilt): MLB average 32, compact swings 30, big power 36.
 const SLOT_AT := 0.55
 const SLOT_YAW_SHARE := 0.35
-const TILT := {&"classic": 32.0, &"crouch": 30.0, &"open": 32.0, &"leg_kick": 36.0, &"wrap": 32.0, &"slap": 30.0}
 
 ## Approach clock: the load peaks at the pitcher's release, the stride
 ## lands at STRIDE_AT, then he holds, cocked, until he swings or takes.
@@ -43,19 +42,18 @@ const NAMES := {&"classic": "Classic", &"crouch": "Crouch", &"open": "Open", &"l
 ## The bat in his hands, per style (degrees; yaw 90 = barrel back toward the
 ## catcher, 0 = across the plate; lift above level). load_* add to the
 ## stance at the top of the load. slot_lift is how far the barrel drops
-## behind the hands before it whips through (bat lag). At contact the barrel points along
-## attack_yaw (attack direction: + lags toward the opposite field, - is out
-## front, pulling) and climbs at attack_lift (attack angle), the swing's
-## signature per BATTING_STYLE_SPEC.md. finish_yaw ends the sweep. one_hand
+## behind the hands before it whips through (bat lag). The barrel meets the
+## ball at the style's attack direction and angle (style_attack, from the
+## rules' SwingProfile), or a hitter's own (PlayerSwing). finish_yaw ends the sweep. one_hand
 ## lets the top hand go after contact. choke (m) moves the hands up the
 ## handle.
 const BAT := {
-	&"classic": {"slot_lift": -60.0, "yaw": 100.0, "lift": 50.0, "load_yaw": 15.0, "load_lift": 5.0, "waggle": 6.0, "attack_yaw": -2.0, "attack_lift": 10.0, "finish_yaw": -170.0, "finish_lift": 40.0, "one_hand": false, "choke": 0.0},
-	&"crouch": {"slot_lift": -59.0, "yaw": 105.0, "lift": 38.0, "load_yaw": 12.0, "load_lift": 0.0, "waggle": 4.0, "attack_yaw": -2.0, "attack_lift": 8.0, "finish_yaw": -165.0, "finish_lift": 30.0, "one_hand": false, "choke": 0.0},
-	&"open": {"slot_lift": -57.0, "yaw": 92.0, "lift": 58.0, "load_yaw": 20.0, "load_lift": 2.0, "waggle": 9.0, "attack_yaw": -3.0, "attack_lift": 10.0, "finish_yaw": -170.0, "finish_lift": 42.0, "one_hand": false, "choke": 0.0},
-	&"leg_kick": {"slot_lift": -70.0, "yaw": 100.0, "lift": 62.0, "load_yaw": 28.0, "load_lift": 8.0, "waggle": 3.0, "attack_yaw": -6.0, "attack_lift": 18.0, "finish_yaw": -185.0, "finish_lift": 48.0, "one_hand": false, "choke": 0.0},
-	&"wrap": {"slot_lift": -80.0, "yaw": 145.0, "lift": 28.0, "load_yaw": 15.0, "load_lift": 0.0, "waggle": 2.0, "attack_yaw": -5.0, "attack_lift": 16.0, "finish_yaw": -180.0, "finish_lift": 25.0, "one_hand": true, "choke": 0.0},
-	&"slap": {"slot_lift": -40.0, "yaw": 80.0, "lift": 32.0, "load_yaw": 6.0, "load_lift": 0.0, "waggle": 10.0, "attack_yaw": 11.0, "attack_lift": 4.0, "finish_yaw": -110.0, "finish_lift": 12.0, "one_hand": false, "choke": 0.08},
+	&"classic": {"slot_lift": -60.0, "yaw": 100.0, "lift": 50.0, "load_yaw": 15.0, "load_lift": 5.0, "waggle": 6.0, "finish_yaw": -170.0, "finish_lift": 40.0, "one_hand": false, "choke": 0.0},
+	&"crouch": {"slot_lift": -59.0, "yaw": 105.0, "lift": 38.0, "load_yaw": 12.0, "load_lift": 0.0, "waggle": 4.0, "finish_yaw": -165.0, "finish_lift": 30.0, "one_hand": false, "choke": 0.0},
+	&"open": {"slot_lift": -57.0, "yaw": 92.0, "lift": 58.0, "load_yaw": 20.0, "load_lift": 2.0, "waggle": 9.0, "finish_yaw": -170.0, "finish_lift": 42.0, "one_hand": false, "choke": 0.0},
+	&"leg_kick": {"slot_lift": -70.0, "yaw": 100.0, "lift": 62.0, "load_yaw": 28.0, "load_lift": 8.0, "waggle": 3.0, "finish_yaw": -185.0, "finish_lift": 48.0, "one_hand": false, "choke": 0.0},
+	&"wrap": {"slot_lift": -80.0, "yaw": 145.0, "lift": 28.0, "load_yaw": 15.0, "load_lift": 0.0, "waggle": 2.0, "finish_yaw": -180.0, "finish_lift": 25.0, "one_hand": true, "choke": 0.0},
+	&"slap": {"slot_lift": -40.0, "yaw": 80.0, "lift": 32.0, "load_yaw": 6.0, "load_lift": 0.0, "waggle": 10.0, "finish_yaw": -110.0, "finish_lift": 12.0, "one_hand": false, "choke": 0.08},
 }
 
 
@@ -73,16 +71,19 @@ static func _with(base: Dictionary, changes: Dictionary) -> Dictionary:
 ## (big power: leg kick or wrap; quick contact hitters: slap or open;
 ## everyone else spread over classic, crouch and open), steady per player.
 static func for_player(p: PlayerDef) -> StringName:
-	if p == null:
-		return &"classic"
-	if p.batting_style != &"" and BAT.has(p.batting_style):
-		return p.batting_style
-	var pick := absi(hash(String(p.id)))
-	if p.power >= 75:
-		return [&"leg_kick", &"wrap"][pick % 2]
-	if p.contact >= 70 and p.speed >= 65 and p.power < 55:
-		return [&"slap", &"open"][pick % 2]
-	return [&"classic", &"crouch", &"open"][pick % 3]
+	return SwingProfile.style_for(p)
+
+
+## A style's typical attack in the bat path's terms: attack_yaw (+ lags
+## toward the opposite field, - pulls) and attack_lift (attack angle).
+static func style_attack(style: StringName) -> Dictionary:
+	var s: Dictionary = SwingProfile.STYLES[style]
+	return {"attack_yaw": -float(s["pull"]), "attack_lift": float(s["attack_angle"])}
+
+
+## A style's typical swing path tilt.
+static func style_tilt(style: StringName) -> float:
+	return float(SwingProfile.STYLES[style]["tilt"])
 
 
 ## The six key poses of a style: stance, bob, load, stride, contact,
@@ -238,6 +239,7 @@ static func slot_for_tilt(style: StringName, tilt: float, profile: Dictionary = 
 ## and slot_lift with a hitter's own.
 static func swing_bat(style: StringName, p: float, start: Vector2, profile: Dictionary = {}) -> Vector2:
 	var b: Dictionary = BAT[style].duplicate()
+	b.merge(style_attack(style), true)
 	b.merge(profile, true)
 	p = clampf(p, 0.0, 1.0)
 	var attack := Vector2(float(b["attack_yaw"]), float(b["attack_lift"]))

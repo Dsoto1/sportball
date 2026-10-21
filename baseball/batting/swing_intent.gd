@@ -17,6 +17,10 @@ var bats_left: bool = false
 var window_scale: float = 1.0
 ## Multiplies the swing's top exit velocity (batter's power rating).
 var power_scale: float = 1.0
+## The hitter's swing (SwingProfile); league average changes nothing.
+var attack_angle: float = SwingProfile.LEAGUE_ATTACK_ANGLE
+var attack_pull: float = SwingProfile.LEAGUE_PULL
+var tilt: float = SwingProfile.LEAGUE_TILT
 
 
 static func take() -> SwingIntent:

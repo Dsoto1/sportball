@@ -248,6 +248,23 @@ extends Resource
 @export var rating_stuff_deception_spread: float = 0.15
 @export var rating_contact_window_spread: float = 0.18
 @export var rating_power_ev_spread: float = 0.07
+
+@export_group("Swing Signature")
+## How a hitter's swing (SwingProfile) changes contact. Exit velocity per mph
+## of bat speed over the league's 72 (replaces the power rating's spread:
+## a 100-power hitter swings about 80 mph, +7%).
+@export var bat_speed_ev_per_mph: float = 0.00875
+## Launch degrees per degree of attack angle over the league's 10.
+@export var attack_angle_launch: float = 0.6
+## Spray degrees toward his pull field per degree of pull over the league's 2.
+@export var attack_direction_spray: float = 1.0
+## Uppercuts pay for their loft in contact: the timing window shrinks by
+## this share per degree of attack angle over the league's 10 (and flat
+## swings gain it), as steep swings whiff more in Statcast.
+@export var attack_angle_window: float = 0.025
+## Steeper swing paths follow the pitch height more: launch_per_height
+## grows by this share per degree of tilt over the league's 32.
+@export var tilt_launch_per_height: float = 0.02
 @export var rating_eye_spread: float = 0.35
 @export var rating_speed_spread: float = 0.1
 @export var rating_fielder_speed_spread: float = 0.08
