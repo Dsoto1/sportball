@@ -770,3 +770,37 @@ The owner's reference sheets (`docs/stadium_refs/`, four parks so far) give ever
 Reason: Owner reference sheets for the Halo Dome, Foundry Field, Ledger Street Park and Pier 9 Ballyard.
 
 Affected systems: TeamDef, Emblem (new), SeasonLine (new), StadiumDef (decks), Stadium (decks, fascia, wall dressing, dugouts), GrayboxField (foul poles), modules (centerpiece, slogan_board, light_towers), generate_teams, generate_parks, data (teams, parks), tests (stadium, runner), tools (emblem_sheet, stadium_tour), README, stadium_refs notes.
+
+## 2026-10-21 - Scenery Modules From the Reference Sheets
+
+Ten scenery modules cover what the sheets show beyond the outfield. They share a helper (`Scenery`) for placement behind the stands and simple shapes:
+
+- waterfalls;
+- trees (palm, pine, cactus, round);
+- smokestacks (smoke) or cooling towers (steam);
+- cranes;
+- lighthouse;
+- sailboats;
+- flying craft (saucers or blimps);
+- flags;
+- statue (bull or figure);
+- bridge (with its river).
+
+Each park picks from them:
+
+| Park | Scenery |
+|---|---|
+| The Halo Dome | waterfalls flanking the centerpiece, palms, saucers |
+| Foundry Field | smokestacks, cranes, the river bridge, a waterfall |
+| Ledger Street Park | bronze bulls, shade trees |
+| Pier 9 Ballyard | lighthouse, sailboats and a tall ship on the bay, a harbor crane |
+| The Kiln | saguaros |
+| The Icebox | pines |
+| Reactor Park | cooling towers and stacks |
+| Fountain Gardens | waterfalls and trees around the fountains |
+
+Every park also has flags. The parks without sheets are drafts.
+
+Reason: Owner reference sheets; build the shared scenery now so later sheets mostly pick and tune.
+
+Affected systems: modules (ten new, Scenery helper), StadiumModules catalog, generate_parks, data/stadiums, README, stadium_refs notes.

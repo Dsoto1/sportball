@@ -39,6 +39,26 @@ params = {
 "height": 0.35
 }
 
+[sub_resource type="Resource" id="Resource_dcbhf"]
+script = ExtResource("2_6juw2")
+kind = &"trees"
+angle = 12.0
+mirrored = true
+params = {
+"count": 9,
+"kind": &"cactus",
+"span": 45.0
+}
+
+[sub_resource type="Resource" id="Resource_sbprt"]
+script = ExtResource("2_6juw2")
+kind = &"flags"
+angle = -50.0
+params = {
+"count": 10,
+"span": 100.0
+}
+
 [resource]
 script = ExtResource("3_4twl7")
 id = &"the_kiln"
@@ -60,4 +80,4 @@ attendance = 0.8
 sponsors = PackedStringArray("SUNBAKED SODA", "MESA MOTOR LODGE", "CACTUS CANDY CO.", "COPPER CANYON CHILI")
 skyline_color = Color(0.6901961, 0.5411765, 0.38431373, 1)
 window_color = Color(1, 0.9411765, 0.7529412, 1)
-pieces = Array[ExtResource("2_6juw2")]([SubResource("Resource_tqy5q"), SubResource("Resource_w7e58"), SubResource("Resource_dly8v"), SubResource("Resource_ubg3t"), SubResource("Resource_hiw75")])
+pieces = Array[ExtResource("2_6juw2")]([SubResource("Resource_tqy5q"), SubResource("Resource_w7e58"), SubResource("Resource_dly8v"), SubResource("Resource_ubg3t"), SubResource("Resource_hiw75"), SubResource("Resource_dcbhf"), SubResource("Resource_sbprt")])

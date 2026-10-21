@@ -38,6 +38,15 @@ params = {
 "height": 1.2
 }
 
+[sub_resource type="Resource" id="Resource_gnd8x"]
+script = ExtResource("2_olas1")
+kind = &"flags"
+angle = -60.0
+params = {
+"count": 16,
+"span": 120.0
+}
+
 [resource]
 script = ExtResource("3_eqcja")
 id = &"the_horseshoe"
@@ -59,4 +68,4 @@ night = true
 sponsors = PackedStringArray("OLD TOWNE TROLLEY", "HORSESHOE HAMS", "MIDNIGHT MATINEE", "NICKEL ARCADE", "LAMPLIGHTER LAGER")
 skyline_color = Color(0.101960786, 0.12156863, 0.2, 1)
 window_color = Color(1, 0.8784314, 0.627451, 1)
-pieces = Array[ExtResource("2_olas1")]([SubResource("Resource_tgobb"), SubResource("Resource_o5o6h"), SubResource("Resource_b4fev"), SubResource("Resource_2quui"), SubResource("Resource_26mby")])
+pieces = Array[ExtResource("2_olas1")]([SubResource("Resource_tgobb"), SubResource("Resource_o5o6h"), SubResource("Resource_b4fev"), SubResource("Resource_2quui"), SubResource("Resource_26mby"), SubResource("Resource_gnd8x")])

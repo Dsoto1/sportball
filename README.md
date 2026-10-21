@@ -232,6 +232,16 @@ The core is always built:
 | `warehouse` | long brick building along a line, its name on top | length, height, text |
 | `fountains` | pools with cascades and jets beyond the wall | span, basins |
 | `dome` | sealed roof; the park plays indoors | rise |
+| `waterfalls` | waterfall behind the outfield stands, into a pool | height, width |
+| `trees` | grove across a span: palms, pines, cacti, round trees | span, count, kind |
+| `smokestacks` | smokestacks with smoke, or cooling towers with steam | span, count, height, style |
+| `cranes` | lattice gantry cranes | span, count, height |
+| `lighthouse` | striped lighthouse on a rock | height |
+| `sailboats` | sailboats and a tall ship on the water | span, count |
+| `flying_craft` | saucer cars or blimps over the skyline | count, style |
+| `flags` | flagpoles along the top of the stands in club colors | span, count |
+| `statue` | bronze bull or figure on a pedestal atop the stands | figure |
+| `bridge` | arched bridge over a river behind the stands | distance, length |
 
 - **Placing pieces:** `park.add_piece(&"warehouse", -45.0, {"text": "LOFTS"})`.
 - **Checking a design:** `park.validate()` lists problems: unknown modules, settings out of range, two of a one-per-park piece, a dome with light towers, a wall scoreboard on a low wall, no scoreboard.

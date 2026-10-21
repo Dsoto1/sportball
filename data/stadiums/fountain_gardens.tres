@@ -41,6 +41,35 @@ kind = &"fountains"
 angle = 14.0
 mirrored = true
 
+[sub_resource type="Resource" id="Resource_0ixp3"]
+script = ExtResource("2_wib25")
+kind = &"waterfalls"
+angle = 9.0
+mirrored = true
+params = {
+"height": 22.0
+}
+
+[sub_resource type="Resource" id="Resource_bdrrb"]
+script = ExtResource("2_wib25")
+kind = &"trees"
+angle = 45.0
+mirrored = true
+params = {
+"count": 6,
+"kind": &"round",
+"span": 30.0
+}
+
+[sub_resource type="Resource" id="Resource_4ub2c"]
+script = ExtResource("2_wib25")
+kind = &"flags"
+angle = -50.0
+params = {
+"count": 10,
+"span": 100.0
+}
+
 [resource]
 script = ExtResource("3_hice1")
 id = &"fountain_gardens"
@@ -62,4 +91,4 @@ night = true
 sponsors = PackedStringArray("CASCADE COLA", "SPRINKLE & SONS PLUMBING", "BLUE PLAINS BBQ", "MISTY MEADOW DAIRY", "JUBILEE JEWELERS")
 skyline_color = Color(0.14901961, 0.1882353, 0.2901961, 1)
 window_color = Color(0.84705883, 0.9254902, 1, 1)
-pieces = Array[ExtResource("2_wib25")]([SubResource("Resource_k8u6i"), SubResource("Resource_q8oj0"), SubResource("Resource_kaaf5"), SubResource("Resource_48ww4"), SubResource("Resource_1xj3a"), SubResource("Resource_taq0n")])
+pieces = Array[ExtResource("2_wib25")]([SubResource("Resource_k8u6i"), SubResource("Resource_q8oj0"), SubResource("Resource_kaaf5"), SubResource("Resource_48ww4"), SubResource("Resource_1xj3a"), SubResource("Resource_taq0n"), SubResource("Resource_0ixp3"), SubResource("Resource_bdrrb"), SubResource("Resource_4ub2c")])

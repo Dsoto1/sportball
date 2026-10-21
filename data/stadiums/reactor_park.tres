@@ -38,6 +38,35 @@ params = {
 "height": 0.9
 }
 
+[sub_resource type="Resource" id="Resource_6tw7a"]
+script = ExtResource("2_smn81")
+kind = &"smokestacks"
+angle = -30.0
+params = {
+"count": 3,
+"height": 70.0,
+"span": -35.0,
+"style": &"cooling"
+}
+
+[sub_resource type="Resource" id="Resource_rqh0y"]
+script = ExtResource("2_smn81")
+kind = &"smokestacks"
+angle = 30.0
+params = {
+"count": 2,
+"span": 25.0
+}
+
+[sub_resource type="Resource" id="Resource_5b7v7"]
+script = ExtResource("2_smn81")
+kind = &"flags"
+angle = -50.0
+params = {
+"count": 10,
+"span": 100.0
+}
+
 [resource]
 script = ExtResource("3_d8aau")
 id = &"reactor_park"
@@ -58,4 +87,4 @@ night = true
 sponsors = PackedStringArray("ATOMIC FALLS POWER & LIGHT", "MUSHROOM CLOUD MALTS", "FISSION FIZZ", "RAY-GUN RADIO")
 skyline_color = Color(0.23921569, 0.24705882, 0.18039216, 1)
 window_color = Color(0.78431374, 1, 0.84705883, 1)
-pieces = Array[ExtResource("2_smn81")]([SubResource("Resource_f7572"), SubResource("Resource_mr6iu"), SubResource("Resource_lexrw"), SubResource("Resource_ubcck"), SubResource("Resource_pc4ek")])
+pieces = Array[ExtResource("2_smn81")]([SubResource("Resource_f7572"), SubResource("Resource_mr6iu"), SubResource("Resource_lexrw"), SubResource("Resource_ubcck"), SubResource("Resource_pc4ek"), SubResource("Resource_6tw7a"), SubResource("Resource_rqh0y"), SubResource("Resource_5b7v7")])

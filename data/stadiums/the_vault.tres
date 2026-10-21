@@ -30,6 +30,15 @@ angle = 34.0
 script = ExtResource("2_b78mq")
 kind = &"dome"
 
+[sub_resource type="Resource" id="Resource_ysqj7"]
+script = ExtResource("2_b78mq")
+kind = &"flags"
+angle = -50.0
+params = {
+"count": 10,
+"span": 100.0
+}
+
 [resource]
 script = ExtResource("3_c1uws")
 id = &"the_vault"
@@ -50,4 +59,4 @@ turf = true
 sponsors = PackedStringArray("STRONGBOX SECURITY", "TITAN TURF", "DOMELIGHT DINER", "PRESSURE SEAL WINDOWS", "BIG TOP BURGERS")
 skyline_color = Color(0.14901961, 0.1882353, 0.2901961, 1)
 window_color = Color(0.84705883, 0.9254902, 1, 1)
-pieces = Array[ExtResource("2_b78mq")]([SubResource("Resource_iootr"), SubResource("Resource_4i8r7"), SubResource("Resource_t1ilx"), SubResource("Resource_pt7r0")])
+pieces = Array[ExtResource("2_b78mq")]([SubResource("Resource_iootr"), SubResource("Resource_4i8r7"), SubResource("Resource_t1ilx"), SubResource("Resource_pt7r0"), SubResource("Resource_ysqj7")])

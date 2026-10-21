@@ -36,6 +36,36 @@ kind = &"skyline"
 script = ExtResource("2_un8dc")
 kind = &"halo"
 
+[sub_resource type="Resource" id="Resource_6b8ye"]
+script = ExtResource("2_un8dc")
+kind = &"waterfalls"
+angle = 11.0
+mirrored = true
+
+[sub_resource type="Resource" id="Resource_mt3jj"]
+script = ExtResource("2_un8dc")
+kind = &"trees"
+angle = 15.0
+mirrored = true
+params = {
+"count": 7,
+"kind": &"palm",
+"span": 35.0
+}
+
+[sub_resource type="Resource" id="Resource_ejy07"]
+script = ExtResource("2_un8dc")
+kind = &"flying_craft"
+
+[sub_resource type="Resource" id="Resource_pjoj3"]
+script = ExtResource("2_un8dc")
+kind = &"flags"
+angle = -50.0
+params = {
+"count": 12,
+"span": 100.0
+}
+
 [resource]
 script = ExtResource("3_bqeas")
 id = &"halo_dome"
@@ -53,4 +83,4 @@ attendance = 0.9
 sponsors = PackedStringArray("SPOTLIGHT COLA", "NEON HEIGHTS TRANSIT", "MARQUEE MOTORS", "VELVET ROPE LOUNGE", "GLAM SLAM GUM", "CRT VISION", "HEADLINER HOTELS", "ENCORE AIRWAYS")
 skyline_color = Color(0.16862746, 0.16470589, 0.32156864, 1)
 window_color = Color(1, 0.8235294, 0.47843137, 1)
-pieces = Array[ExtResource("2_un8dc")]([SubResource("Resource_fwpx2"), SubResource("Resource_8s2kh"), SubResource("Resource_rkpyr"), SubResource("Resource_rkhve"), SubResource("Resource_iofs5"), SubResource("Resource_5ix5a")])
+pieces = Array[ExtResource("2_un8dc")]([SubResource("Resource_fwpx2"), SubResource("Resource_8s2kh"), SubResource("Resource_rkpyr"), SubResource("Resource_rkhve"), SubResource("Resource_iofs5"), SubResource("Resource_5ix5a"), SubResource("Resource_6b8ye"), SubResource("Resource_mt3jj"), SubResource("Resource_ejy07"), SubResource("Resource_pjoj3")])

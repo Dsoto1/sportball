@@ -95,6 +95,18 @@ points. The Foundry sheet also has a six-color team set.
 - Yellow foul poles.
 - Wall emblems and big distance numbers.
 - Home dugout on first, VISITORS on third.
+- Scenery modules:
+  - waterfalls;
+  - trees (palm, pine, cactus, round);
+  - smokestacks and cooling towers with smoke;
+  - cranes;
+  - lighthouse;
+  - sailboats and a tall ship;
+  - flying craft;
+  - flags;
+  - statues (the Bankers' bulls);
+  - a bridge over a river.
+- Each park picks from these per its sheet or the kit table.
 
 ## What to build
 

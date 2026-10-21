@@ -43,6 +43,32 @@ script = ExtResource("2_mb518")
 kind = &"wall_scoreboard"
 angle = -28.0
 
+[sub_resource type="Resource" id="Resource_gnn5p"]
+script = ExtResource("2_mb518")
+kind = &"statue"
+angle = 22.0
+mirrored = true
+
+[sub_resource type="Resource" id="Resource_7qw1n"]
+script = ExtResource("2_mb518")
+kind = &"trees"
+angle = 30.0
+mirrored = true
+params = {
+"count": 5,
+"kind": &"round",
+"span": 25.0
+}
+
+[sub_resource type="Resource" id="Resource_p8geh"]
+script = ExtResource("2_mb518")
+kind = &"flags"
+angle = -55.0
+params = {
+"count": 14,
+"span": 110.0
+}
+
 [resource]
 script = ExtResource("3_ura6c")
 id = &"ledger_street"
@@ -63,4 +89,4 @@ attendance = 0.95
 sponsors = PackedStringArray("PEMBERTON PEANUTS", "COBBLESTONE COFFEE", "LANTERN LAUNDRY", "IRONCLAD INSURANCE", "LEDGER STREET LAGER")
 skyline_color = Color(0.3529412, 0.2901961, 0.28235295, 1)
 window_color = Color(1, 0.88235295, 0.65882355, 1)
-pieces = Array[ExtResource("2_mb518")]([SubResource("Resource_oeo3i"), SubResource("Resource_cq0mc"), SubResource("Resource_7xix8"), SubResource("Resource_up8hn"), SubResource("Resource_hcvew"), SubResource("Resource_qnulu")])
+pieces = Array[ExtResource("2_mb518")]([SubResource("Resource_oeo3i"), SubResource("Resource_cq0mc"), SubResource("Resource_7xix8"), SubResource("Resource_up8hn"), SubResource("Resource_hcvew"), SubResource("Resource_qnulu"), SubResource("Resource_gnn5p"), SubResource("Resource_7qw1n"), SubResource("Resource_p8geh")])
