@@ -129,12 +129,71 @@ off and matched in the baked animations.
 > the bat pointing toward the pitcher's side, body already leaning toward
 > first base, both hands on.
 
-## Optional extra sheets
+## Side view sheets (one per style)
 
-- **Side view:** the same prompts with the camera "from directly behind the
-  catcher, looking at the batter's back," for each style. That shows the
-  depth of the hands and the stride direction.
-- **Bunt:** "1 STANCE (classic), 2 SQUARING AROUND (pivoting the chest to
-  face the pitcher), 3 BUNT (chest facing the pitcher, knees bent, bat held
-  flat out in front at the top of the strike zone, top hand slid halfway up
-  the barrel)."
+Same five poses, seen from behind the catcher. This view shows what the
+front view hides: how far back the hands go, how far the bat tips toward the
+pitcher, and which way the stride lands. Paste this block, then the **same
+style block** as above (1-6).
+
+> Character pose reference sheet for a baseball video game. One right-handed
+> baseball batter shown five times in a single row, left to right, as five
+> key moments of one swing: 1 STANCE, 2 LOAD, 3 STRIDE, 4 CONTACT, 5 FINISH.
+> Label each panel underneath in plain capital letters.
+>
+> Camera: the same in every panel. Full body, head to cleats in frame, seen
+> from directly behind the catcher, looking out toward the pitcher. The
+> batter stands on the left side of home plate (from this view), facing the
+> plate, so we see his back and his right side; the pitcher would be far
+> away in the middle of the picture. Home plate is visible on the ground
+> at his feet. Eye-level camera, no perspective tilt, no cropping.
+>
+> Figure: athletic adult male in a plain, untextured baseball uniform: solid
+> jersey, white pants, high socks, black cleats, batting helmet, batting
+> gloves. No logos, no numbers, no text on the clothes. Neutral face. Wooden
+> bat. Clean, readable silhouette; realistic proportions and anatomy; both
+> hands clearly gripping the bat where the pose calls for it.
+>
+> Background: plain flat light gray, no field, no crowd, no shadows on the
+> background. Soft even studio light. Stylized 3D render look, like a
+> character turnaround sheet. Not a real player, no likeness of any real
+> person.
+
+## Bunt sheet (one sheet, front and side)
+
+One sheet with two rows: the bunt from the front (top row) and from behind
+the catcher (bottom row). Paste as is.
+
+> Character pose reference sheet for a baseball video game. One right-handed
+> baseball batter squaring around to bunt, shown as four key moments in two
+> rows. Top row: seen from the front of home plate, looking at the batter's
+> chest, his left shoulder toward the pitcher (screen left). Bottom row: the
+> same four moments seen from directly behind the catcher, looking out
+> toward the pitcher. Label each panel underneath in plain capital letters.
+>
+> 1 STANCE: a normal balanced batting stance, hands at the back shoulder,
+> bat angled up and back.
+> 2 SQUARING AROUND: he pivots on the balls of both feet so his chest turns
+> to face the pitcher; the back foot steps up level with the front foot;
+> the bat starts to come down in front of him.
+> 3 BUNT: chest square to the pitcher, feet shoulder-width apart and
+> parallel, knees well bent, weight slightly forward. The bat is held flat
+> and level out in front of his body at the top of the strike zone, arms
+> relaxed and slightly bent. The bottom hand stays near the knob; the top
+> hand slides about halfway up the barrel and pinches the bat from behind
+> with the fingers safely tucked. Eyes level with the bat.
+> 4 CONTACT: same as BUNT, but the bat gives back slightly toward his body as
+> if catching the ball softly, the barrel angled a little toward the first
+> base side.
+>
+> Camera: the same distance and height in every panel. Full body, head to
+> cleats in frame, eye level, no perspective tilt, no cropping.
+>
+> Figure: athletic adult male in a plain, untextured baseball uniform: solid
+> jersey, white pants, high socks, black cleats, batting helmet, batting
+> gloves. No logos, no numbers, no text on the clothes. Neutral face. Wooden
+> bat. Clean, readable silhouette; realistic proportions and anatomy.
+>
+> Background: plain flat light gray, no field, no crowd. Soft even studio
+> light. Stylized 3D render look, like a character turnaround sheet. Not a
+> real player, no likeness of any real person.
