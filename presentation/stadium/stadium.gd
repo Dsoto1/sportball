@@ -195,7 +195,7 @@ func _build_bowl() -> void:
 		_quad(st, point(a, back_a, top_a), point(b, back_b, top_b), point(b, back_b, top_b + 1.2), point(a, back_a, top_a + 1.2), def.accent_color.darkened(0.2))
 		_quad(st, point(b, back_b, 0.0), point(a, back_a, 0.0), point(a, back_a, top_a + 1.2), point(b, back_b, top_b + 1.2), def.structure_color)
 		# Outside the park: the bay on the water side, ground everywhere else.
-		var outside := def.skyline_color.darkened(0.45)
+		var outside := def.skyline_color.darkened(0.45) if def.ground_color.a == 0.0 else def.ground_color
 		var edge := back_a + 1.0
 		if is_water(mid):
 			_quad(st, point(a, edge, 0.02), point(a, WATER_EDGE, 0.02), point(b, WATER_EDGE, 0.02), point(b, back_b + 1.0, 0.02), WATER)

@@ -833,3 +833,30 @@ Water is also a deeper harbor blue now, for the bay and the fountain pools too.
 Reason: Owner request to add the sheets' water features where they belong.
 
 Affected systems: modules (water new, bridge, Scenery.water_band), StadiumModules catalog, Stadium (water color), generate_parks, data/stadiums, tests, README, notes.
+
+## 2026-10-21 - The Kiln and the Icebox Sheets
+
+- **Colors:** the Comets and Yetis take their sheets' six colors exactly. The Comets' slogan is now "Blaze a Trail".
+- **New modules:**
+  - `mountains`: snowcapped peaks, or red mesas with an optional natural arch;
+  - `rocket`;
+  - `gondola`;
+  - `icicles`.
+- **Frozen falls:** `waterfalls` gains a frozen setting for ice falls.
+- **Ground color:** a park can set the color of the ground around it (`StadiumDef.ground_color`): red sand at the Kiln, snow at the Icebox.
+- **The Kiln:**
+  - mesas ring the outfield with a natural arch beyond center;
+  - a rocket stands right of the centerpiece, with forge stacks and a few saguaros;
+  - the centerpiece is an iron gate;
+  - the wall is dark basalt, per the sheet, instead of brick.
+- **The Icebox:**
+  - peaks behind it, frozen ice falls flanking a stone arch centerpiece;
+  - pines, a gondola, icicles on every deck and on the top of the stands, snow all around;
+  - a smaller city;
+  - the wall is padded navy, per the sheet, instead of ivy.
+
+The parks' blurbs follow.
+
+Reason: Owner reference sheets for the Kiln and the Icebox.
+
+Affected systems: generate_teams (identity), generate_parks, StadiumDef (ground_color), Stadium (ground), modules (mountains, rocket, gondola, icicles new; waterfalls frozen), catalog, data, README, notes.

@@ -85,6 +85,30 @@ points. The Foundry sheet also has a six-color team set.
   - Dark: Navy Slate #1B2B44
   - Highlight: Weathered Wood #C1A878 (partly cut off on the sheet)
 
+## 05 The Kiln
+
+- Desert mesa park: red-rock cliffs and buttes, a natural stone arch beyond center, forge and industrial walkways, a rocket sculpture right of the centerpiece, a sunset sky.
+- A dark basalt wall with sandstone caps (not brick); the comet emblem in the alleys.
+- Team colors:
+  - Primary: Copper Orange #D35400
+  - Secondary: Mesa Red #A8322B
+  - Accent: Turquoise Teal #1CA3A3
+  - Support: Sandstone Beige #E6D0A8
+  - Dark: Basalt Gray #3B3B3B
+  - Highlight: Sun Gold #FFD166
+
+## 06 The Icebox
+
+- Mountain resort: snowy peaks behind, frozen ice falls flanking a stone-and-timber centerpiece, timber lodges, a gondola, pines, icicles hanging off every deck and roof edge, snow all around.
+- A padded navy wall with snowflakes (not ivy).
+- Team colors:
+  - Primary: Glacier Blue #0B6FBF
+  - Secondary: Ice White #E3F4FF
+  - Accent: Arctic Teal #00B3C7
+  - Support: Frost Gray #A7B3C2
+  - Dark: Summit Navy #0E2A4A
+  - Highlight: Aurora Mint #B6FDE0
+
 ## Built so far
 
 - Club identity: six colors per club (exact for the clubs with sheets), a slogan and an emblem.
@@ -107,6 +131,13 @@ points. The Foundry sheet also has a six-color team set.
   - statues (the Bankers' bulls);
   - a bridge over a river.
 - Each park picks from these per its sheet or the kit table.
+- From the Kiln and Icebox sheets:
+  - mountains (snowcapped peaks, or red mesas with a natural arch);
+  - a rocket sculpture;
+  - a gondola;
+  - icicles;
+  - frozen ice falls;
+  - a ground color for each park (red sand, snow).
 - Water from the aerial panels:
   - the Halo Dome: glowing canals around the plaza;
   - Foundry: a river behind the outfield with its bridge;

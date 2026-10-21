@@ -193,8 +193,8 @@ hitter's own swing (bat speed, attack angle, pull) in play:
 | Foundry Field | Gearheads home: the Boilerplate, a 34 ft iron wall in short right | 4.57 | 1.00 | 2.15 | 0.60 |
 | Ledger Street Park | the Leviathan, a 37 ft green wall in short left; deep triangle | 4.82 | 0.72 | 1.78 | 1.17 |
 | Pier 9 Ballyard | short porch in right with the bay beyond it | 6.28 | 1.38 | 1.95 | 0.58 |
-| The Kiln | thin desert air, canyon-deep outfield, brick | 5.58 | 0.90 | 1.47 | 1.78 |
-| The Icebox | cold heavy air, ivy walls | 4.60 | 0.77 | 2.00 | 0.43 |
+| The Kiln | thin desert air, canyon-deep outfield, red mesas | 5.58 | 0.90 | 1.47 | 1.78 |
+| The Icebox | cold heavy air, ice falls and peaks beyond the wall | 4.60 | 0.77 | 2.00 | 0.43 |
 | Reactor Park | night game; odd angles, a 427 ft center-field notch | 5.40 | 1.08 | 1.87 | 1.28 |
 | The Horseshoe | night game; 279 / 266 ft lines, a 482 ft center field | 5.47 | 0.45 | 0.98 | 1.40 |
 | Warehouse Row | 25 ft brick wall in right, the Roundhouse warehouse beyond it | 5.47 | 1.10 | 2.05 | 0.85 |
@@ -232,7 +232,7 @@ The core is always built:
 | `warehouse` | long brick building along a line, its name on top | length, height, text |
 | `fountains` | pools with cascades and jets beyond the wall | span, basins |
 | `dome` | sealed roof; the park plays indoors | rise |
-| `waterfalls` | waterfall behind the outfield stands, into a pool | height, width |
+| `waterfalls` | waterfall behind the outfield stands, into a pool (or a frozen ice fall) | height, width, frozen |
 | `trees` | grove across a span: palms, pines, cacti, round trees | span, count, kind |
 | `smokestacks` | smokestacks with smoke, or cooling towers with steam | span, count, height, style |
 | `cranes` | lattice gantry cranes | span, count, height |
@@ -241,6 +241,10 @@ The core is always built:
 | `flying_craft` | saucer cars or blimps over the skyline | count, style |
 | `flags` | flagpoles along the top of the stands in club colors | span, count |
 | `statue` | bronze bull or figure on a pedestal atop the stands | figure |
+| `mountains` | snowcapped peaks or red-rock mesas (with a natural arch) | style, span, count, height, distance, arch |
+| `rocket` | rocket sculpture on a launch gantry | height |
+| `gondola` | ski gondola line with cabins | span |
+| `icicles` | snow lips and icicles along deck fronts and the top of the stands | span |
 | `water` | a straight river or a moat around the stands (wide for harbor water), optionally glowing | style, distance, width, gap, span, glow |
 | `bridge` | arched bridge running out from the park; centers itself on a river there | distance, length |
 

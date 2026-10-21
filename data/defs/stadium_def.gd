@@ -39,6 +39,9 @@ extends Resource
 ## Fictional sponsors on the boards (original names only).
 @export var sponsors: PackedStringArray = []
 @export var skyline_color: Color = Color(0.25, 0.27, 0.42)
+## The ground around the park (red sand, snow...); transparent for the
+## default, a dark shade of the skyline color.
+@export var ground_color: Color = Color(0, 0, 0, 0)
 @export var window_color: Color = Color(1.0, 0.85, 0.5)
 ## The placed modules, built in order (the first scoreboard is the main
 ## one the match updates first).

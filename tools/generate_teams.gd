@@ -109,7 +109,8 @@ const REPERTOIRES := {
 ## Each club's identity: the six-color set (primary, secondary, accent,
 ## support, dark, highlight), slogan and emblem [shape, glyph]. Clubs with an
 ## owner reference sheet (docs/stadium_refs) use its colors exactly; the
-## rest are drafts until theirs arrive.
+## rest are drafts until theirs arrive. Sheets so far: Glitterati,
+## Gearheads, Bankers, Gulls, Comets, Yetis.
 const IDENTITY := {
 	&"glitterati": {"colors": ["4b2a7b", "d9a93a", "9b5cff", "a7a9b4", "141019", "f4f1fa"],
 		"slogan": "Bigger Brighter Together", "emblem": [&"halo", "*"]},
@@ -119,9 +120,9 @@ const IDENTITY := {
 		"slogan": "Interest Compounds", "emblem": [&"laurel", "B"]},
 	&"gulls": {"colors": ["0b4f8a", "30c6c1", "d64545", "f4f6f9", "1b2b44", "c1a878"],
 		"slogan": "Ride the Tide", "emblem": [&"disc", "TG"]},
-	&"comets": {"colors": ["1fa596", "b8662f", "f1e2c4", "e0a23a", "1c1410", "fff4dc"],
-		"slogan": "Burn Bright", "emblem": [&"star", ""]},
-	&"yetis": {"colors": ["3a6e9e", "f4f8fb", "9fe8ff", "8a9aa8", "152230", "ffffff"],
+	&"comets": {"colors": ["d35400", "a8322b", "1ca3a3", "e6d0a8", "3b3b3b", "ffd166"],
+		"slogan": "Blaze a Trail", "emblem": [&"star", ""]},
+	&"yetis": {"colors": ["0b6fbf", "e3f4ff", "00b3c7", "a7b3c2", "0e2a4a", "b6fde0"],
 		"slogan": "Cold Blooded", "emblem": [&"shield", "Y"]},
 	&"neutrons": {"colors": ["262626", "7dffb0", "e3c94f", "5e6b5a", "0f0f0f", "eafff2"],
 		"slogan": "Critical Mass", "emblem": [&"halo", "N"]},

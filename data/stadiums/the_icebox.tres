@@ -14,6 +14,9 @@ air_drag_scale = 1.1
 [sub_resource type="Resource" id="Resource_3lw56"]
 script = ExtResource("2_nkemg")
 kind = &"centerpiece"
+params = {
+"frame": &"arch"
+}
 
 [sub_resource type="Resource" id="Resource_77lqm"]
 script = ExtResource("2_nkemg")
@@ -33,21 +36,55 @@ kind = &"light_towers"
 script = ExtResource("2_nkemg")
 kind = &"skyline"
 params = {
-"height": 0.7
+"height": 0.4
 }
 
 [sub_resource type="Resource" id="Resource_aca4j"]
 script = ExtResource("2_nkemg")
-kind = &"trees"
-angle = 10.0
-mirrored = true
+kind = &"mountains"
+angle = -125.0
 params = {
-"count": 14,
-"kind": &"pine",
-"span": 60.0
+"count": 13,
+"distance": 540.0,
+"height": 150.0,
+"span": 250.0
 }
 
 [sub_resource type="Resource" id="Resource_qrntj"]
+script = ExtResource("2_nkemg")
+kind = &"waterfalls"
+angle = 10.0
+mirrored = true
+params = {
+"frozen": true,
+"height": 28.0
+}
+
+[sub_resource type="Resource" id="Resource_opbgw"]
+script = ExtResource("2_nkemg")
+kind = &"trees"
+angle = 22.0
+mirrored = true
+params = {
+"count": 10,
+"kind": &"pine",
+"span": 45.0
+}
+
+[sub_resource type="Resource" id="Resource_rw4av"]
+script = ExtResource("2_nkemg")
+kind = &"gondola"
+angle = -32.0
+params = {
+"span": -40.0
+}
+
+[sub_resource type="Resource" id="Resource_fknpk"]
+script = ExtResource("2_nkemg")
+kind = &"icicles"
+angle = -180.0
+
+[sub_resource type="Resource" id="Resource_mxnw4"]
 script = ExtResource("2_nkemg")
 kind = &"flags"
 angle = -50.0
@@ -60,18 +97,18 @@ params = {
 script = ExtResource("3_srjos")
 id = &"the_icebox"
 display_name = "The Icebox"
-blurb = "Yetis home · cold heavy air knocks fly balls down, ivy on every wall"
+blurb = "Yetis home · cold heavy air knocks fly balls down; ice falls and peaks beyond the wall"
 field_shape = SubResource("Resource_ojjqe")
 seat_color = Color(0.1764706, 0.2901961, 0.3882353, 1)
 seat_color_alt = Color(0.13333334, 0.22745098, 0.30980393, 1)
 structure_color = Color(0.72156864, 0.76862746, 0.8, 1)
 accent_color = Color(0.62352943, 0.9098039, 1, 1)
-outfield_wall_color = Color(0.12156863, 0.2901961, 0.15686275, 1)
-wall_style = &"ivy"
+outfield_wall_color = Color(0.078431375, 0.22745098, 0.3882353, 1)
 decks = 2
 home_fan_share = 0.5
 away_fan_share = 0.25
 sponsors = PackedStringArray("FROSTGATE FURNACES", "SNOWLINE SKIS", "YETI COCOA", "GLACIER GLASS", "NORTHWIND WOOLENS")
 skyline_color = Color(0.2901961, 0.34509805, 0.4, 1)
+ground_color = Color(0.89411765, 0.92156863, 0.9490196, 1)
 window_color = Color(0.8745098, 0.95686275, 1, 1)
-pieces = Array[ExtResource("2_nkemg")]([SubResource("Resource_3lw56"), SubResource("Resource_77lqm"), SubResource("Resource_6v7py"), SubResource("Resource_305by"), SubResource("Resource_l5q8p"), SubResource("Resource_aca4j"), SubResource("Resource_qrntj")])
+pieces = Array[ExtResource("2_nkemg")]([SubResource("Resource_3lw56"), SubResource("Resource_77lqm"), SubResource("Resource_6v7py"), SubResource("Resource_305by"), SubResource("Resource_l5q8p"), SubResource("Resource_aca4j"), SubResource("Resource_qrntj"), SubResource("Resource_opbgw"), SubResource("Resource_rw4av"), SubResource("Resource_fknpk"), SubResource("Resource_mxnw4")])

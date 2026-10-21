@@ -1,7 +1,8 @@
 extends StadiumModule
 ## A waterfall beyond the outfield: a rock or masonry face over the stands
 ## with a shimmering sheet of water spilling into a pool, lit at night.
-## Mirror it for a pair flanking the centerpiece.
+## Mirror it for a pair flanking the centerpiece. "frozen" makes it an ice
+## fall: still, pale blue-white.
 
 
 func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef) -> void:
@@ -20,10 +21,14 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	var lip := stadium.box(Vector3(width + 4.4, 0.8, 5.4), def.accent_color, fall)
 	lip.position = Vector3(0, height, -2.5)
 	lip.material_override = Stadium.glow(def.accent_color, 0.8)
-	var water := ShaderMaterial.new()
-	water.shader = Stadium.FOUNTAIN_SHADER
-	water.set_shader_parameter("color", Color(0.75, 0.92, 1.0))
-	water.set_shader_parameter("glow", 0.8 if def.night else 0.25)
+	var water: Material
+	if bool(piece.param("frozen")):
+		water = Stadium.glow(Color(0.82, 0.93, 1.0), 0.35)
+	else:
+		water = ShaderMaterial.new()
+		water.shader = Stadium.FOUNTAIN_SHADER
+		water.set_shader_parameter("color", Color(0.75, 0.92, 1.0))
+		water.set_shader_parameter("glow", 0.8 if def.night else 0.25)
 	var sheet := stadium.box(Vector3(width, height, 0.3), Color.WHITE, fall)
 	sheet.position = Vector3(0, height * 0.5, 0.2)
 	sheet.material_override = water
