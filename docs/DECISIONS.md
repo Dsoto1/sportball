@@ -352,3 +352,27 @@ Decision:
 Reason: Owner request to add all proposed pitch types, repertoires and smarter selection.
 
 Affected systems: PitchFamilyDef and pitch data, ContentLibrary, PitchResult (motion, lefty), PitchResolver, ContactResolver (launch bias), Ratings, AiPitcher, AiBatter, AutoMatch, MatchDirector, MatchView (lefty camera, batter tag), ActorView, team data, README, tests.
+
+## 2026-10-21 - Art Pass 1: First Third-Party Assets
+
+Decision:
+- **Approved assets:** the owner approved the first assets, all logged in `13_ASSET_MANIFEST.md` with their license files beside them under `assets/third_party/`:
+  - Kenney Impact Sounds, Interface Sounds and Input Prompts (CC0)
+  - ambientCG Grass004 and Ground037 (CC0)
+  - Bungee and Rajdhani (SIL OFL)
+  - Quaternius Universal Base Characters and Universal Animation Library (CC0): approved but not yet downloaded, because the itch.io flow needs the owner
+- **Fonts:** HUD text is Rajdhani; scores, callouts and title cards are Bungee.
+- **Prompts:** they use `{action}` tokens rendered as the player's own key or button glyphs (`PromptIcons`, Kenney icon fonts), and they follow the last device used.
+- **Sound:**
+  - Kenney samples for glove pops, ball landings, bag touches, UI ticks and a wood layer under the synthesized bat crack.
+  - The crowd is synthesized in code (a murmur loop plus cheers scaled by the moment), because no CC0 crowd source was reachable (Freesound returned 403 through the proxy).
+- **Field:**
+  - A world-space field shader keeps the project palette. The CC0 photo textures add only low-contrast detail and normals, never their own color.
+  - The grass gets a soft mowed diamond pattern.
+  - New field features: an infield arc, dirt cutouts at home and the bases, and a warning track.
+  - A procedural day sky now supplies the ambient light.
+- **Storage:** the remote rejects Git LFS pushes, so `assets/**` is stored as plain git objects (`.gitattributes`). Packs are trimmed to the files used: textures at 512 px, the art pass totals about 2 MB.
+
+Reason: Phase 1 readability assets, following `12_ASSET_PIPELINE.md` (free/CC0 first, manifest before import, normalized to the project's look).
+
+Affected systems: assets/, docs/13_ASSET_MANIFEST.md, .gitattributes, MatchHud, PromptIcons, MatchDirector (prompts, sound hooks), Sfx, MatchView, GrayboxField and its field shader, LivePlay (presentation events).

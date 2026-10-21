@@ -1,22 +1,37 @@
 class_name GrayboxField
 extends Node3D
-## Primitive-mesh field built from FieldLayout + tuning. Disposable Phase 0
-## placeholder: changing it never changes baseball rules.
+## Primitive-mesh field built from FieldLayout + tuning. Changing it never
+## changes baseball rules. Grass and dirt use the field surface shader:
+## project palette colors with CC0 ambientCG texture as subtle detail.
 
-const GRASS := Color(0.22, 0.46, 0.25)
-const DIRT := Color(0.62, 0.45, 0.30)
+const GRASS := Color(0.17, 0.45, 0.19)
+const DIRT := Color(0.72, 0.43, 0.24)
 const CHALK := Color(0.95, 0.95, 0.9)
 const WALL := Color(0.16, 0.22, 0.38)
 const WALL_CAP := Color(0.98, 0.72, 0.15)
 
+const SURFACE := preload("res://presentation/stadium/field_surface.gdshader")
+const GRASS_TEX := preload("res://assets/third_party/ambientcg/Grass004/Grass004_512_Color.jpg")
+const GRASS_NORMAL := preload("res://assets/third_party/ambientcg/Grass004/Grass004_512_NormalGL.jpg")
+const DIRT_TEX := preload("res://assets/third_party/ambientcg/Ground037/Ground037_512_Color.jpg")
+const DIRT_NORMAL := preload("res://assets/third_party/ambientcg/Ground037/Ground037_512_NormalGL.jpg")
+
 var _tuning: BaseballTuning
+var _grass_mat: ShaderMaterial
+var _infield_grass_mat: ShaderMaterial
+var _dirt_mat: ShaderMaterial
 
 
 func build(tuning: BaseballTuning) -> void:
 	_tuning = tuning
 	for child in get_children():
 		child.queue_free()
-	_add_box("Grass", Vector3(320, 0.1, 320), Vector3(0, -0.06, -110), GRASS)
+	_grass_mat = _surface(GRASS, GRASS_TEX, GRASS_NORMAL, 0.385, 2.5, 0.028)
+	_grass_mat.set_shader_parameter("stripe_width", 9.0)
+	_infield_grass_mat = _surface(GRASS.lightened(0.04), GRASS_TEX, GRASS_NORMAL, 0.385, 2.5, 0.02)
+	_dirt_mat = _surface(DIRT, DIRT_TEX, DIRT_NORMAL, 0.556, 3.0, 0.0)
+	_dirt_mat.set_shader_parameter("detail_strength", 0.45)
+	_add_box("Grass", Vector3(320, 0.1, 320), Vector3(0, -0.06, -110), GRASS).material_override = _grass_mat
 	_build_infield()
 	_build_foul_lines()
 	_build_fence()
@@ -27,15 +42,23 @@ func _build_infield() -> void:
 	var half := FieldLayout.BASE_DISTANCE / sqrt(2.0)
 	var dirt := _add_box("InfieldDirt", Vector3(FieldLayout.BASE_DISTANCE + 6, 0.04, FieldLayout.BASE_DISTANCE + 6), Vector3(0, -0.01, -half), DIRT)
 	dirt.rotation_degrees.y = 45.0
+	dirt.material_override = _dirt_mat
+	# The infield arc: dirt out past the bases, the way a real infield looks.
+	_add_disc("InfieldArc", 29.0, Vector3(0, -0.015, -18.4), _dirt_mat, 0.03)
 	var grass := _add_box("InfieldGrass", Vector3(FieldLayout.BASE_DISTANCE - 4, 0.05, FieldLayout.BASE_DISTANCE - 4), Vector3(0, 0.0, -half), GRASS.lightened(0.05))
 	grass.rotation_degrees.y = 45.0
+	grass.material_override = _infield_grass_mat
+	# Cutouts around home plate and each bag.
+	_add_disc("HomeCircle", 4.0, Vector3(0, 0.035, 0), _dirt_mat)
+	for base in [FieldLayout.FIRST, FieldLayout.SECOND, FieldLayout.THIRD]:
+		_add_disc("BaseCircle%d" % base, 2.6, FieldLayout.base_position(base) + Vector3(0, 0.035, 0), _dirt_mat)
 	var mound := MeshInstance3D.new()
 	var cyl := CylinderMesh.new()
 	cyl.top_radius = 2.4
 	cyl.bottom_radius = 2.8
 	cyl.height = 0.25
 	mound.mesh = cyl
-	mound.material_override = _mat(DIRT)
+	mound.material_override = _dirt_mat
 	mound.position = Vector3(0, 0.05, -18.4)
 	mound.name = "Mound"
 	add_child(mound)
@@ -70,6 +93,11 @@ func _build_fence() -> void:
 		wall.look_at_from_position(wall.position, wall.position + (p1 - p0).cross(Vector3.UP), Vector3.UP)
 		var cap := _add_box("WallCap", Vector3(length, 0.25, 0.6), mid + Vector3(0, h, 0), WALL_CAP)
 		cap.rotation = wall.rotation
+		# Warning track: a band of dirt in front of the wall.
+		var inward := -(mid.normalized()) * 2.2
+		var track := _add_box("WarningTrack", Vector3(length, 0.02, 4.4), mid + inward + Vector3(0, -0.005, 0), DIRT)
+		track.rotation = wall.rotation
+		track.material_override = _dirt_mat
 
 
 func _build_lighting() -> void:
@@ -80,14 +108,50 @@ func _build_lighting() -> void:
 	add_child(sun)
 	var env := WorldEnvironment.new()
 	var environment := Environment.new()
-	environment.background_mode = Environment.BG_COLOR
-	environment.background_color = Color(0.36, 0.55, 0.78)
-	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_color = Color(0.75, 0.78, 0.85)
-	environment.ambient_light_energy = 0.6
+	# A painted-looking day sky; ambient light comes from it.
+	var sky_mat := ProceduralSkyMaterial.new()
+	sky_mat.sky_top_color = Color(0.16, 0.38, 0.74)
+	sky_mat.sky_horizon_color = Color(0.62, 0.78, 0.93)
+	sky_mat.ground_bottom_color = Color(0.2, 0.3, 0.25)
+	sky_mat.ground_horizon_color = Color(0.62, 0.78, 0.93)
+	sky_mat.sun_angle_max = 20.0
+	var sky := Sky.new()
+	sky.sky_material = sky_mat
+	environment.background_mode = Environment.BG_SKY
+	environment.sky = sky
+	environment.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
+	environment.ambient_light_energy = 0.45
 	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.environment = environment
 	add_child(env)
+
+
+## Flat dirt or grass disc (thin cylinder) at a world position.
+func _add_disc(node_name: String, radius: float, pos: Vector3, material: Material, height: float = 0.02) -> MeshInstance3D:
+	var mi := MeshInstance3D.new()
+	var cyl := CylinderMesh.new()
+	cyl.top_radius = radius
+	cyl.bottom_radius = radius
+	cyl.height = height
+	cyl.radial_segments = 48
+	mi.mesh = cyl
+	mi.material_override = material
+	mi.position = pos
+	mi.name = node_name
+	add_child(mi)
+	return mi
+
+
+static func _surface(color: Color, tex: Texture2D, normal: Texture2D, mid: float, tile: float, stripes: float) -> ShaderMaterial:
+	var m := ShaderMaterial.new()
+	m.shader = SURFACE
+	m.set_shader_parameter("base_color", color)
+	m.set_shader_parameter("detail", tex)
+	m.set_shader_parameter("detail_normal", normal)
+	m.set_shader_parameter("detail_mid", mid)
+	m.set_shader_parameter("tile", tile)
+	m.set_shader_parameter("stripe_strength", stripes)
+	return m
 
 
 func _add_box(node_name: String, size: Vector3, pos: Vector3, color: Color) -> MeshInstance3D:
