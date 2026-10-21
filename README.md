@@ -3,10 +3,11 @@
 Stylized retro-futurist arcade baseball. **Godot 4.7.2 stable + GDScript.**
 The design brief lives in [`docs/`](docs/00_AGENT_START_HERE.md); start there.
 
-Current state: **Phase 1 — Baseball Vertical Slice.** A 6-inning
+Current state: **Phase 1 — Baseball Vertical Slice**, with a first art pass
+(rigged players, field surfaces, fonts, button icons, sound and crowd;
+every third-party asset is in `docs/13_ASSET_MANIFEST.md`). A 6-inning
 exhibition between the **Rustwater Gearheads** and the **Neon Heights
-Glitterati** (yes, Who's on first) under arcade rules, on a graybox field
-with primitive placeholders. See [`docs/PHASE1_REPORT.md`](docs/PHASE1_REPORT.md)
+Glitterati** (yes, Who's on first) under arcade rules. See [`docs/PHASE1_REPORT.md`](docs/PHASE1_REPORT.md)
 and the earlier [`docs/PHASE0_REPORT.md`](docs/PHASE0_REPORT.md).
 
 ## Run

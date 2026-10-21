@@ -376,3 +376,25 @@ Decision:
 Reason: Phase 1 readability assets, following `12_ASSET_PIPELINE.md` (free/CC0 first, manifest before import, normalized to the project's look).
 
 Affected systems: assets/, docs/13_ASSET_MANIFEST.md, .gitattributes, MatchHud, PromptIcons, MatchDirector (prompts, sound hooks), Sfx, MatchView, GrayboxField and its field shader, LivePlay (presentation events).
+
+## 2026-10-21 - Art Pass 1c: Rigged Player Bodies
+
+Decision:
+- **The body:** players are now the Quaternius mannequin from the Universal Animation Library (CC0, uploaded by the owner), replacing the procedural capsule rig. `ActorView` keeps its interface, so the gameplay and presentation code is unchanged.
+- **Look:**
+  - The body takes the team's main color and the joints its second color.
+  - An arcade build (1.35× wider, 1.12× taller) keeps players readable from the high field camera.
+  - The glove rides the left-hand bone, so a held ball is drawn in the hand.
+  - Batters and runners do not wear a glove.
+- **Pose to clip mapping:**
+  - Idle → Idle; the catcher uses Crouch_Idle.
+  - Run and chase → Jog_Fwd or Sprint, with playback matched to ground speed (3.6 and 7.2 m/s).
+  - Throw → Punch_Cross, scrubbed by throw progress.
+  - Tag → Punch_Jab; out → Death01; slide and dive → Roll.
+  - Batting → Pistol_Idle, which puts both hands together out front as the grip.
+- **Batting motion:** the library's sword swing is an overhead chop, so it isn't used. The swing stays our own timing-driven bat sweep, with the bat now following the batter's hand bone and the torso twisting half as far as the bat. Per `14_ASSET_SOURCES.md`, the polished batting, pitching, throwing and fielding animation remains custom work for Phase 2.
+- **Base Characters kit:** not used for now (122 MB, too large to upload). The mannequin covers this pass.
+
+Reason: The owner approved characters and animations for the first art pass. The capsules were the biggest visual gap.
+
+Affected systems: ActorView, MatchView (batter grip, twist, gloves), asset manifest, bot (mid-swing screenshots).

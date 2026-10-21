@@ -502,8 +502,14 @@ func _process(delta: float) -> void:
 func _update_bat() -> void:
 	if not _bat_pivot.visible:
 		return
+	var batter: ActorView = _runners.get(_batter_id)
+	if batter != null:
+		var swinging := _bat_swing_start >= 0.0 or _bat_bunt
+		batter.animate(ActorView.Pose.SWING if swinging else ActorView.Pose.BAT_STANCE, get_process_delta_time())
 	var side := -1.0 if _bats_left else 1.0
 	_bat_pivot.position = _batter_spot() + Vector3(0.3 * side, 1.0, 0.05)
+	if batter != null:
+		_bat_pivot.position = batter.grip_position()
 	# Yaw 90 = barrel back toward the catcher, 0 = across the plate, -90 =
 	# toward the pitcher. Elevation in degrees above level.
 	var yaw := 100.0 + sin(_view_clock * 3.0) * 6.0  # stance with a waggle
@@ -520,6 +526,9 @@ func _update_bat() -> void:
 	var y := deg_to_rad(yaw)
 	var e := deg_to_rad(lift)
 	var dir := Vector3(cos(e) * cos(y) * side, sin(e), cos(e) * sin(y))
+	if batter != null:
+		# The torso turns with the bat, about half as far.
+		batter.set_twist((100.0 - yaw) * 0.5 * side)
 	_bat_pivot.look_at(_bat_pivot.global_position + dir, Vector3.UP)
 
 
@@ -648,6 +657,7 @@ func _runner_actor(id: StringName, color: Color, trim: Color = Color(0, 0, 0, 0)
 	add_child(actor)
 	var p := _roster.player(id) if _roster != null else null
 	actor.setup(color, String(id).get_slice("_", 1))
+	actor.set_glove_visible(false)
 	if p != null:
 		actor.set_look(color, "#%d %s" % [p.number, p.display_name.to_upper()], trim)
 	elif trim.a > 0.0:

@@ -27,6 +27,7 @@ var _did_pinch_hit := false
 var _did_clock := false
 var _waiting_clock := false
 var _bunt_shot := 0
+var _swing_shots := 0
 
 
 func _initialize() -> void:
@@ -132,6 +133,9 @@ func _drive() -> void:
 					_send(swing, true)
 					if swing == &"swing_bunt":
 						_bunt_shot = 3
+					elif _swing_shots < 2:
+						_swing_shots += 1
+						_bunt_shot = 7  # mid-swing
 					_events_down.append(swing)
 		MatchDirector.Phase.BALL_IN_PLAY:
 			if entered:
