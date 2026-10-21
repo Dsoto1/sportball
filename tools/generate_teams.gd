@@ -110,7 +110,7 @@ const REPERTOIRES := {
 ## support, dark, highlight), slogan and emblem [shape, glyph]. Clubs with an
 ## owner reference sheet (docs/stadium_refs) use its colors exactly; the
 ## rest are drafts until theirs arrive. Sheets so far: Glitterati,
-## Gearheads, Bankers, Gulls, Comets, Yetis.
+## Gearheads, Bankers, Gulls, Comets, Yetis, Neutrons, Lamplighters.
 const IDENTITY := {
 	&"glitterati": {"colors": ["4b2a7b", "d9a93a", "9b5cff", "a7a9b4", "141019", "f4f1fa"],
 		"slogan": "Bigger Brighter Together", "emblem": [&"halo", "*"]},
@@ -124,10 +124,10 @@ const IDENTITY := {
 		"slogan": "Blaze a Trail", "emblem": [&"star", ""]},
 	&"yetis": {"colors": ["0b6fbf", "e3f4ff", "00b3c7", "a7b3c2", "0e2a4a", "b6fde0"],
 		"slogan": "Cold Blooded", "emblem": [&"shield", "Y"]},
-	&"neutrons": {"colors": ["262626", "7dffb0", "e3c94f", "5e6b5a", "0f0f0f", "eafff2"],
-		"slogan": "Critical Mass", "emblem": [&"halo", "N"]},
-	&"lamplighters": {"colors": ["7a1f3d", "ff4f7b", "f2ead8", "d9b45a", "1a0d14", "fff3e0"],
-		"slogan": "Light Up the Night", "emblem": [&"diamond", "ML"]},
+	&"neutrons": {"colors": ["39d353", "ffd733", "1b1b1b", "6b7c85", "3b3e43", "e6f7ff"],
+		"slogan": "Critical Mass", "emblem": [&"atom", ""]},
+	&"lamplighters": {"colors": ["0b2a4a", "f0c04b", "b61e2e", "f6e7c3", "3a3f47", "ffe7a3"],
+		"slogan": "Light Up the Night", "emblem": [&"shield", "ML"]},
 	&"conductors": {"colors": ["d79a1e", "1f4f34", "1c1c1c", "8a3a2a", "121212", "f6ead0"],
 		"slogan": "All Aboard", "emblem": [&"gear", "IC"]},
 	&"swans": {"colors": ["1e4fb0", "f7f7fa", "6fd6ff", "c9a548", "0f1d3d", "ffffff"],

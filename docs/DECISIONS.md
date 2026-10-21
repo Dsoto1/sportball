@@ -860,3 +860,28 @@ The parks' blurbs follow.
 Reason: Owner reference sheets for the Kiln and the Icebox.
 
 Affected systems: generate_teams (identity), generate_parks, StadiumDef (ground_color), Stadium (ground), modules (mountains, rocket, gondola, icicles new; waterfalls frozen), catalog, data, README, notes.
+
+## 2026-10-21 - Reactor Park and the Horseshoe Sheets
+
+- **Colors:** the Neutrons and Lamplighters take their sheets' six colors exactly.
+- **Emblems:** the Neutrons get a new `atom` emblem shape (three orbits around a ball), and the Lamplighters a lantern-gold "ML" shield.
+- **New modules:**
+  - `pipes`;
+  - `viaduct` (with a lit train);
+  - `lamps`;
+  - `bunting`.
+- **Tinted steam:** smokestacks gain a `tint` that colors and lights the plume in the park's accent, for the reactor's green steam.
+- **Reactor Park:**
+  - four cooling towers venting green steam flank the centerpiece, with two working stacks;
+  - lit pipe runs over the outfield stands;
+  - the palette follows the sheet: dark steel, concrete and reactor green, not the old yellow.
+- **The Horseshoe:**
+  - an elevated train on a brick viaduct beyond right field;
+  - gas lamps around the bowl;
+  - bunting on the deck fronts;
+  - brown stone, navy and lantern gold instead of hot pink.
+- **Ledger Street Park** also gets bunting, as its sheet shows.
+
+Reason: Owner reference sheets for Reactor Park and the Horseshoe.
+
+Affected systems: generate_teams, generate_parks, Emblem (atom), modules (pipes, viaduct, lamps, bunting new; smokestacks tint), catalog, data, README, notes.

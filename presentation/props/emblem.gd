@@ -5,7 +5,7 @@ class_name Emblem
 ## finished logo drops in without code. Used on boards, walls, dugouts and
 ## banners.
 
-const SHAPES := [&"disc", &"shield", &"gear", &"halo", &"diamond", &"laurel", &"star"]
+const SHAPES := [&"disc", &"shield", &"gear", &"halo", &"diamond", &"laurel", &"star", &"atom"]
 const FONT := preload("res://assets/third_party/fonts/bungee/Bungee-Regular.ttf")
 
 
@@ -31,6 +31,17 @@ static func build(team: TeamDef, size: float = 1.0, glow: float = 0.3) -> Node3D
 		&"halo":
 			# A tilted ring of light with the mark rising through it.
 			_layer(root, _ring(_ellipse(r, r * 0.42, 48), _ellipse(r * 0.8, r * 0.27, 48)), team.secondary_color, glow * 2.0, 0.0)
+		&"atom":
+			# Three orbits around a nucleus (a ball).
+			for i in 3:
+				var orbit := _ring(_ellipse(r, r * 0.34, 40), _ellipse(r * 0.86, r * 0.24, 40))
+				var turned := PackedVector3Array()
+				var basis := Basis(Vector3.BACK, PI * i / 3.0)
+				for v in orbit:
+					turned.append(basis * v)
+				_layer(root, turned, team.primary_color, glow * 2.0, lift * i)
+			_layer(root, _poly(_circle(r * 0.26, 24)), team.highlight_color, glow, lift * 4.0)
+			_layer(root, _ring(_circle(r * 0.26, 24), _circle(r * 0.22, 24)), team.secondary_color, glow, lift * 5.0)
 		&"laurel":
 			_layer(root, _poly(_circle(r * 0.62, 40)), team.primary_color, glow, 0.0)
 			_layer(root, _ring(_circle(r * 0.62, 40), _circle(r * 0.56, 40)), team.secondary_color, glow, lift)

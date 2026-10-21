@@ -40,11 +40,28 @@ params = {
 
 [sub_resource type="Resource" id="Resource_gnd8x"]
 script = ExtResource("2_olas1")
-kind = &"flags"
-angle = -60.0
+kind = &"viaduct"
+angle = 14.0
 params = {
-"count": 16,
-"span": 120.0
+"height": 18.0,
+"span": 40.0
+}
+
+[sub_resource type="Resource" id="Resource_1t2v1"]
+script = ExtResource("2_olas1")
+kind = &"lamps"
+angle = -150.0
+params = {
+"count": 44,
+"span": 300.0
+}
+
+[sub_resource type="Resource" id="Resource_ugxod"]
+script = ExtResource("2_olas1")
+kind = &"bunting"
+angle = 50.0
+params = {
+"span": 260.0
 }
 
 [resource]
@@ -53,11 +70,11 @@ id = &"the_horseshoe"
 display_name = "The Horseshoe"
 blurb = "Lamplighters home · night ball in a horseshoe: 279-foot lines, a 482-foot center field"
 field_shape = SubResource("Resource_vaedo")
-seat_color = Color(0.105882354, 0.16470589, 0.2901961, 1)
-seat_color_alt = Color(0.078431375, 0.1254902, 0.21960784, 1)
-structure_color = Color(0.84705883, 0.8156863, 0.7372549, 1)
-accent_color = Color(1, 0.30980393, 0.48235294, 1)
-outfield_wall_color = Color(0.101960786, 0.23921569, 0.16470589, 1)
+seat_color = Color(0.08627451, 0.16078432, 0.2901961, 1)
+seat_color_alt = Color(0.0627451, 0.1254902, 0.22745098, 1)
+structure_color = Color(0.47843137, 0.3529412, 0.26666668, 1)
+accent_color = Color(0.9411765, 0.7529412, 0.29411766, 1)
+outfield_wall_color = Color(0.05882353, 0.14117648, 0.2509804, 1)
 foul_rows = 28
 outfield_rows = 20
 decks = 2
@@ -68,4 +85,4 @@ night = true
 sponsors = PackedStringArray("OLD TOWNE TROLLEY", "HORSESHOE HAMS", "MIDNIGHT MATINEE", "NICKEL ARCADE", "LAMPLIGHTER LAGER")
 skyline_color = Color(0.101960786, 0.12156863, 0.2, 1)
 window_color = Color(1, 0.8784314, 0.627451, 1)
-pieces = Array[ExtResource("2_olas1")]([SubResource("Resource_tgobb"), SubResource("Resource_o5o6h"), SubResource("Resource_b4fev"), SubResource("Resource_2quui"), SubResource("Resource_26mby"), SubResource("Resource_gnd8x")])
+pieces = Array[ExtResource("2_olas1")]([SubResource("Resource_tgobb"), SubResource("Resource_o5o6h"), SubResource("Resource_b4fev"), SubResource("Resource_2quui"), SubResource("Resource_26mby"), SubResource("Resource_gnd8x"), SubResource("Resource_1t2v1"), SubResource("Resource_ugxod")])

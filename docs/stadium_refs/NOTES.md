@@ -109,6 +109,30 @@ points. The Foundry sheet also has a six-color team set.
   - Dark: Summit Navy #0E2A4A
   - Highlight: Aurora Mint #B6FDE0
 
+## 07 Reactor Park
+
+- A nuclear plant ballpark: cooling towers venting green-lit steam behind the outfield, pipes and gantries over the stands, green neon trim, atom emblems on the wall, a dark steel and concrete palette.
+- A gate centerpiece with the atom-and-ball emblem.
+- Team colors:
+  - Primary: Reactor Green #39D353
+  - Secondary: Neutron Yellow #FFD733
+  - Accent: Radiation Black #1B1B1B
+  - Support: Steel Gray #6B7C85
+  - Dark: Concrete Gray #3B3E43
+  - Highlight: Glow White #E6F7FF
+
+## 08 The Horseshoe
+
+- A classic urban park at dusk: brown stone arcades, an elevated train on a brick viaduct beyond right field, gas lamps along every rail, red-white-blue bunting on the deck fronts, a city skyline.
+- A crest centerpiece with the lantern shield; a navy wall with lantern-gold numbers.
+- Team colors:
+  - Primary: Midnight Navy #0B2A4A
+  - Secondary: Lantern Gold #F0C04B
+  - Accent: Crimson Red #B61E2E
+  - Support: Ivory Cream #F6E7C3
+  - Dark: Iron Gray #3A3F47
+  - Highlight: Warm Light #FFE7A3
+
 ## Built so far
 
 - Club identity: six colors per club (exact for the clubs with sheets), a slogan and an emblem.
@@ -138,6 +162,13 @@ points. The Foundry sheet also has a six-color team set.
   - icicles;
   - frozen ice falls;
   - a ground color for each park (red sand, snow).
+- From the Reactor and Horseshoe sheets:
+  - pipes (lit runs along the stands);
+  - a viaduct with a train;
+  - gas lamps;
+  - bunting (also at Ledger Street);
+  - green-tinted steam;
+  - an atom emblem shape.
 - Water from the aerial panels:
   - the Halo Dome: glowing canals around the plaza;
   - Foundry: a river behind the outfield with its bridge;

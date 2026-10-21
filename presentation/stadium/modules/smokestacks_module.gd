@@ -42,6 +42,12 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 		smoke.mesh = puff
 		var mat := StandardMaterial3D.new()
 		mat.albedo_color = Color(0.92, 0.92, 0.95, 0.35) if cooling else Color(0.25, 0.24, 0.24, 0.45)
+		# "tint" glows the plume in the park's accent (the reactor's green steam).
+		var tint := float(piece.param("tint"))
+		if tint > 0.0:
+			var c := Color(mat.albedo_color.lerp(def.accent_color, tint), mat.albedo_color.a)
+			mat.albedo_color = c
+			mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		smoke.material_override = mat

@@ -41,33 +41,46 @@ params = {
 [sub_resource type="Resource" id="Resource_6tw7a"]
 script = ExtResource("2_smn81")
 kind = &"smokestacks"
-angle = -30.0
+angle = -24.0
 params = {
-"count": 3,
-"height": 70.0,
-"span": -35.0,
-"style": &"cooling"
+"count": 2,
+"height": 75.0,
+"span": -30.0,
+"style": &"cooling",
+"tint": 0.6
 }
 
 [sub_resource type="Resource" id="Resource_rqh0y"]
 script = ExtResource("2_smn81")
 kind = &"smokestacks"
-angle = 30.0
+angle = 24.0
 params = {
 "count": 2,
-"span": 25.0
+"height": 70.0,
+"span": 30.0,
+"style": &"cooling",
+"tint": 0.6
 }
 
 [sub_resource type="Resource" id="Resource_5b7v7"]
 script = ExtResource("2_smn81")
-kind = &"flags"
-angle = -50.0
+kind = &"smokestacks"
+angle = 46.0
 params = {
-"count": 10,
-"span": 100.0
+"count": 2,
+"height": 45.0,
+"span": 14.0
 }
 
 [sub_resource type="Resource" id="Resource_3c86f"]
+script = ExtResource("2_smn81")
+kind = &"pipes"
+angle = -48.0
+params = {
+"span": 96.0
+}
+
+[sub_resource type="Resource" id="Resource_rbxcs"]
 script = ExtResource("2_smn81")
 kind = &"water"
 angle = 25.0
@@ -82,11 +95,11 @@ id = &"reactor_park"
 display_name = "Reactor Park"
 blurb = "Neutrons home · odd angles and a deep center-field notch behind a tall reactor wall"
 field_shape = SubResource("Resource_v7mxf")
-seat_color = Color(0.16862746, 0.16862746, 0.16862746, 1)
-seat_color_alt = Color(0.12156863, 0.12156863, 0.12156863, 1)
-structure_color = Color(0.7882353, 0.7058824, 0.34509805, 1)
-accent_color = Color(0.49019608, 1, 0.6901961, 1)
-outfield_wall_color = Color(0.22745098, 0.22745098, 0.16470589, 1)
+seat_color = Color(0.16470589, 0.18039216, 0.1882353, 1)
+seat_color_alt = Color(0.1254902, 0.14117648, 0.14901961, 1)
+structure_color = Color(0.29411766, 0.31764707, 0.32941177, 1)
+accent_color = Color(0.22352941, 0.827451, 0.3254902, 1)
+outfield_wall_color = Color(0.11764706, 0.14901961, 0.13333334, 1)
 wall_style = &"iron"
 decks = 3
 home_fan_share = 0.45
@@ -96,4 +109,4 @@ night = true
 sponsors = PackedStringArray("ATOMIC FALLS POWER & LIGHT", "MUSHROOM CLOUD MALTS", "FISSION FIZZ", "RAY-GUN RADIO")
 skyline_color = Color(0.23921569, 0.24705882, 0.18039216, 1)
 window_color = Color(0.78431374, 1, 0.84705883, 1)
-pieces = Array[ExtResource("2_smn81")]([SubResource("Resource_f7572"), SubResource("Resource_mr6iu"), SubResource("Resource_lexrw"), SubResource("Resource_ubcck"), SubResource("Resource_pc4ek"), SubResource("Resource_6tw7a"), SubResource("Resource_rqh0y"), SubResource("Resource_5b7v7"), SubResource("Resource_3c86f")])
+pieces = Array[ExtResource("2_smn81")]([SubResource("Resource_f7572"), SubResource("Resource_mr6iu"), SubResource("Resource_lexrw"), SubResource("Resource_ubcck"), SubResource("Resource_pc4ek"), SubResource("Resource_6tw7a"), SubResource("Resource_rqh0y"), SubResource("Resource_5b7v7"), SubResource("Resource_3c86f"), SubResource("Resource_rbxcs")])

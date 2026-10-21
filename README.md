@@ -234,7 +234,7 @@ The core is always built:
 | `dome` | sealed roof; the park plays indoors | rise |
 | `waterfalls` | waterfall behind the outfield stands, into a pool (or a frozen ice fall) | height, width, frozen |
 | `trees` | grove across a span: palms, pines, cacti, round trees | span, count, kind |
-| `smokestacks` | smokestacks with smoke, or cooling towers with steam | span, count, height, style |
+| `smokestacks` | smokestacks with smoke, or cooling towers with steam (tintable) | span, count, height, style, tint |
 | `cranes` | lattice gantry cranes | span, count, height |
 | `lighthouse` | striped lighthouse on a rock | height |
 | `sailboats` | sailboats and a tall ship on the water | span, count |
@@ -245,6 +245,10 @@ The core is always built:
 | `rocket` | rocket sculpture on a launch gantry | height |
 | `gondola` | ski gondola line with cabins | span |
 | `icicles` | snow lips and icicles along deck fronts and the top of the stands | span |
+| `pipes` | industrial pipe runs along the top of the stands, the top one lit | span, runs |
+| `viaduct` | elevated railway on brick arches with a lit train | span, height, distance, train |
+| `lamps` | gas-lamp posts along the top of the stands | span, count |
+| `bunting` | half-fan bunting along the deck fronts | span, every, club_colors |
 | `water` | a straight river or a moat around the stands (wide for harbor water), optionally glowing | style, distance, width, gap, span, glow |
 | `bridge` | arched bridge running out from the park; centers itself on a river there | distance, length |
 
