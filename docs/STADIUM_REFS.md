@@ -1,12 +1,24 @@
 # Ballpark Reference Prompts
 
+## Instructions for the image agent
+
+Using this document, generate **11 separate images, one per park** in
+"Park blocks" below. For each image, combine the "Shared block" with that
+park's block. Do not put several parks in one image, and do not render any
+of this document's text, headings or labels into the images. Name each
+image after its park, numbered as listed (for example `01_halo_dome.png`,
+`02_foundry_field.png`, … `11_the_vault.png`). Skip the "Optional extra
+shots" unless asked.
+
+## About these prompts
+
 Prompts for one reference image per ballpark in `tools/generate_parks.gd`.
 
 - **What the images are for:** each park's look, mood, materials and landmarks.
 - **What they don't decide:** the playing field. Wall distances, wall heights and foul lines are game rules (`FieldShape`), already set and sim-tested; the image should only show them roughly right.
 - **Names:** all names are original, and no real ballpark is copied. Each park borrows one familiar MLB idea and makes it our own.
 
-## Shared block (paste before every park)
+## Shared block (combine with every park)
 
 > Concept art reference for a stylized retro-futurist arcade baseball video
 > game: a ballpark that is also a concert venue and an amusement park.
