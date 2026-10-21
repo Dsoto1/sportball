@@ -139,7 +139,7 @@ func _build_fence() -> void:
 ## floods, brighter fill, no sky at all.
 func _build_lighting() -> void:
 	var night := _park != null and _park.night
-	var roof := _park != null and _park.roof
+	var roof := _park != null and _park.is_roofed()
 	var sun := DirectionalLight3D.new()
 	sun.name = "Sun" if not (night or roof) else "Floodlights"
 	sun.rotation_degrees = Vector3(-55, 35, 0) if not (night or roof) else Vector3(-72, 15, 0)

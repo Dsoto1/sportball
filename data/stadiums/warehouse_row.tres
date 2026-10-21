@@ -1,20 +1,42 @@
 [gd_resource type="Resource" script_class="StadiumDef" format=3]
 
-[ext_resource type="Script" path="res://data/defs/field_shape.gd" id="1_sp61e"]
-[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="2_8vd4l"]
+[ext_resource type="Script" path="res://data/defs/field_shape.gd" id="1_8vd4l"]
+[ext_resource type="Script" path="res://data/defs/stadium_piece.gd" id="2_3mioo"]
+[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="3_m4u46"]
 
-[sub_resource type="Resource" id="Resource_3mioo"]
-script = ExtResource("1_sp61e")
+[sub_resource type="Resource" id="Resource_wdxq1"]
+script = ExtResource("1_8vd4l")
 id = &"warehouse_row"
 display_name = "Warehouse Row"
 points = PackedVector3Array(-45, 101, 2.4, -25, 111, 2.4, -8, 123, 2.4, 0, 122, 2.4, 14, 115, 2.4, 20, 112, 2.4, 21.5, 110, 7.6, 45, 97, 7.6)
 
+[sub_resource type="Resource" id="Resource_llfex"]
+script = ExtResource("2_3mioo")
+kind = &"scoreboard"
+angle = 27.0
+
+[sub_resource type="Resource" id="Resource_dhncx"]
+script = ExtResource("2_3mioo")
+kind = &"light_towers"
+
+[sub_resource type="Resource" id="Resource_50gy8"]
+script = ExtResource("2_3mioo")
+kind = &"skyline"
+params = {
+"height": 0.9
+}
+
+[sub_resource type="Resource" id="Resource_3ko6v"]
+script = ExtResource("2_3mioo")
+kind = &"warehouse"
+angle = 45.0
+
 [resource]
-script = ExtResource("2_8vd4l")
+script = ExtResource("3_m4u46")
 id = &"warehouse_row"
 display_name = "Warehouse Row"
 blurb = "Conductors home · a 25-foot brick wall in right and the old Roundhouse warehouse looming over it"
-field_shape = SubResource("Resource_3mioo")
+field_shape = SubResource("Resource_wdxq1")
 seat_color = Color(0.12156863, 0.3529412, 0.22745098, 1)
 seat_color_alt = Color(0.09411765, 0.2901961, 0.18431373, 1)
 structure_color = Color(0.2901961, 0.24705882, 0.22745098, 1)
@@ -23,11 +45,10 @@ outfield_wall_color = Color(0.47843137, 0.2, 0.14117648, 1)
 wall_style = &"brick"
 foul_rows = 24
 outfield_rows = 12
-skyline_height = 0.9
 home_fan_share = 0.5
 away_fan_share = 0.3
 attendance = 0.92
-landmark = &"warehouse"
 sponsors = PackedStringArray("ROUNDHOUSE STORAGE CO.", "HARBORLIGHT CRAB SHACK", "BRASS RAIL BITTERS", "OLD LINE LOCKSMITHS", "CANAL STREET CANDY")
 skyline_color = Color(0.31764707, 0.28235295, 0.28235295, 1)
 window_color = Color(1, 0.88235295, 0.65882355, 1)
+pieces = Array[ExtResource("2_3mioo")]([SubResource("Resource_llfex"), SubResource("Resource_dhncx"), SubResource("Resource_50gy8"), SubResource("Resource_3ko6v")])

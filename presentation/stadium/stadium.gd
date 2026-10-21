@@ -1,11 +1,13 @@
 class_name Stadium
 extends Node3D
-## The ballpark around the field, built in code from a StadiumDef: a
-## stepped seating bowl (outfield bleachers, a dark batter's eye in center,
-## aisles), a crowd of billboard fans that jumps on big moments, a live
-## scoreboard, dugouts, a backstop net, distance markers, light towers and,
-## for the Halo Dome, the glowing halo ring hung with sponsor boards over a
-## city skyline. Presentation only: the field's rules live in BaseballTuning.
+## The ballpark around the field, built in code from a StadiumDef. The core
+## every park has: a stepped seating bowl (outfield bleachers, a dark
+## batter's eye in center, aisles), a crowd of billboard fans that jumps on
+## big moments, dugouts, a backstop net and distance markers. Everything
+## else is a module placed by the park's pieces (StadiumModules: scoreboards,
+## light towers, skyline, halo, bay, warehouse, fountains, dome), built with
+## the kit below (box, label, glow, point, profile). Presentation only: the
+## field's rules live in BaseballTuning.
 
 const CROWD_SHADER := preload("res://presentation/stadium/crowd.gdshader")
 const SKYLINE_SHADER := preload("res://presentation/stadium/skyline.gdshader")
@@ -26,46 +28,41 @@ const WATER := Color(0.12, 0.4, 0.58)
 ## How far out the bay reaches (meters from home).
 const WATER_EDGE := 420.0
 
-var _def: StadiumDef
-var _tuning: BaseballTuning
+## The park being built and its rules (for wall distances and heights).
+var def: StadiumDef
+var tuning: BaseballTuning
+## Seeded from the park, so a park looks the same every visit.
+var rng := RandomNumberGenerator.new()
 var _crowd_mat: ShaderMaterial
 var _excitement := 0.0
-var _rng := RandomNumberGenerator.new()
+var _water: Array[StadiumPiece] = []
+var _names := {}
 ## Every scoreboard in the park: {cells, lamps, batter, first_column}.
 var _boards: Array[Dictionary] = []
 var _board_key := ""
 
 
-func build(tuning: BaseballTuning, def: StadiumDef, home: TeamDef, away: TeamDef) -> void:
-	_tuning = tuning
-	_def = def
-	_rng.seed = hash(def.id)
+func build(p_tuning: BaseballTuning, p_def: StadiumDef, home: TeamDef, away: TeamDef) -> void:
+	tuning = p_tuning
+	def = p_def
+	rng.seed = hash(def.id)
+	_boards.clear()
+	_names.clear()
+	_board_key = ""
 	for child in get_children():
 		child.queue_free()
+	_water = def.pieces_of(&"bay")
+	# The core every park has: the bowl and its crowd, the batter's eye,
+	# dugouts, backstop and wall markers. Then its modules, in order.
 	_build_bowl()
 	_build_crowd(home, away)
 	_build_batters_eye()
 	_build_dugouts(home, away)
 	_build_backstop()
 	_build_markers()
-	if not def.roof:
-		_build_towers()
-	_build_scoreboard(home, away)
-	if def.wall_scoreboard:
-		_build_wall_scoreboard(home, away, def.wall_scoreboard_angle)
-	if def.water_side != 0:
-		_build_water(def.water_side)
-	if def.halo:
-		_build_halo()
-	if def.skyline and not def.roof:
-		_build_skyline()
-	match def.landmark:
-		&"warehouse":
-			_build_warehouse()
-		&"fountains":
-			_build_fountains()
-	if def.roof:
-		_build_roof()
+	for piece in def.pieces:
+		if piece != null:
+			StadiumModules.build(self, piece, home, away)
 
 
 ## The crowd reacts (0..1); it settles back over a couple of seconds.
@@ -82,14 +79,15 @@ func _process(delta: float) -> void:
 # --- Bowl ---------------------------------------------------------------
 
 ## Inner edge radius, first row height and row count at a spray angle.
-func _profile(angle: float) -> Vector3:
+## Modules use it to stand behind or on top of the stands.
+func profile(angle: float) -> Vector3:
 	var a := absf(angle)
 	var inner := 0.0
 	if a <= 45.0:
-		inner = FieldLayout.fence_distance(angle, _tuning) + 5.0
+		inner = FieldLayout.fence_distance(angle, tuning) + 5.0
 	else:
 		# Start from this side's own corner, then close in behind home.
-		var corner := FieldLayout.fence_distance(signf(angle) * 45.0, _tuning) + 5.0
+		var corner := FieldLayout.fence_distance(signf(angle) * 45.0, tuning) + 5.0
 		for i in range(1, FOUL_EDGE.size()):
 			if a <= FOUL_EDGE[i][0]:
 				var t: float = (a - FOUL_EDGE[i - 1][0]) / (FOUL_EDGE[i][0] - FOUL_EDGE[i - 1][0])
@@ -97,41 +95,46 @@ func _profile(angle: float) -> Vector3:
 				inner = lerpf(start, FOUL_EDGE[i][1], t)
 				break
 	var foul := smoothstep(40.0, 60.0, a)
-	var first := lerpf(FieldLayout.fence_height(clampf(angle, -45.0, 45.0), _tuning) + 0.6, 1.3, foul)
-	var rows := roundf(lerpf(float(_def.outfield_rows), float(_def.foul_rows), foul))
-	if _is_water(angle):
+	var first := lerpf(FieldLayout.fence_height(clampf(angle, -45.0, 45.0), tuning) + 0.6, 1.3, foul)
+	var rows := roundf(lerpf(float(def.outfield_rows), float(def.foul_rows), foul))
+	if is_water(angle):
 		rows = minf(rows, 5.0)  # a low wall of seats along the water
 	return Vector3(inner, first, rows)
 
 
-func _is_water(angle: float) -> bool:
-	return _def.water_side != 0 and signf(angle) == signf(_def.water_side) and absf(angle) > 18.0 and absf(angle) < 62.0
+## Open water at this spray angle: within 22 degrees of a bay piece.
+func is_water(angle: float) -> bool:
+	for bay in _water:
+		var side := signf(bay.angle) if bay.angle != 0.0 else 1.0
+		if signf(angle) == side and absf(absf(angle) - absf(bay.angle)) < 22.0:
+			return true
+	return false
 
 
 func _is_aisle(angle: float) -> bool:
 	return fmod(absf(angle) + 0.5, AISLE_EVERY) < 1.0
 
 
-func _point(angle: float, radius: float, height: float) -> Vector3:
+func point(angle: float, radius: float, height: float) -> Vector3:
 	return FieldLayout.direction_for_spray(angle) * radius + Vector3.UP * height
 
 
 func _build_bowl() -> void:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var riser := _def.structure_color.darkened(0.35)
+	var riser := def.structure_color.darkened(0.35)
 	var eye := Color(0.06, 0.1, 0.09)
 	var a := -180.0
 	while a < 180.0:
 		var b := a + ANGLE_STEP
-		var pa := _profile(a)
-		var pb := _profile(b)
+		var pa := profile(a)
+		var pb := profile(b)
 		var mid := (a + b) * 0.5
 		var rows := int(maxf(pa.z, pb.z))
 		for k in rows:
-			var seat := _def.seat_color if k % 2 == 0 else _def.seat_color_alt
+			var seat := def.seat_color if k % 2 == 0 else def.seat_color_alt
 			if _is_aisle(mid):
-				seat = _def.structure_color
+				seat = def.structure_color
 			if absf(mid) < BATTERS_EYE:
 				seat = eye
 			var ra := pa.x + k * ROW_DEPTH
@@ -141,22 +144,22 @@ func _build_bowl() -> void:
 			var below_a := 0.0 if k == 0 else ha - ROW_RISE
 			var below_b := 0.0 if k == 0 else hb - ROW_RISE
 			# Riser (the step's face), then the tread (where fans sit).
-			_quad(st, _point(a, ra, below_a), _point(b, rb, below_b), _point(b, rb, hb), _point(a, ra, ha), riser if absf(mid) >= BATTERS_EYE else eye)
-			_quad(st, _point(a, ra, ha), _point(b, rb, hb), _point(b, rb + ROW_DEPTH, hb), _point(a, ra + ROW_DEPTH, ha), seat)
+			_quad(st, point(a, ra, below_a), point(b, rb, below_b), point(b, rb, hb), point(a, ra, ha), riser if absf(mid) >= BATTERS_EYE else eye)
+			_quad(st, point(a, ra, ha), point(b, rb, hb), point(b, rb + ROW_DEPTH, hb), point(a, ra + ROW_DEPTH, ha), seat)
 		# Back of the stand: a facade down to the ground with a trim band.
 		var top_a := pa.y + (rows - 1) * ROW_RISE
 		var top_b := pb.y + (rows - 1) * ROW_RISE
 		var back_a := pa.x + rows * ROW_DEPTH
 		var back_b := pb.x + rows * ROW_DEPTH
-		_quad(st, _point(a, back_a, top_a), _point(b, back_b, top_b), _point(b, back_b, top_b + 1.2), _point(a, back_a, top_a + 1.2), _def.accent_color.darkened(0.2))
-		_quad(st, _point(b, back_b, 0.0), _point(a, back_a, 0.0), _point(a, back_a, top_a + 1.2), _point(b, back_b, top_b + 1.2), _def.structure_color)
+		_quad(st, point(a, back_a, top_a), point(b, back_b, top_b), point(b, back_b, top_b + 1.2), point(a, back_a, top_a + 1.2), def.accent_color.darkened(0.2))
+		_quad(st, point(b, back_b, 0.0), point(a, back_a, 0.0), point(a, back_a, top_a + 1.2), point(b, back_b, top_b + 1.2), def.structure_color)
 		# Outside the park: the bay on the water side, ground everywhere else.
-		var outside := _def.skyline_color.darkened(0.45)
+		var outside := def.skyline_color.darkened(0.45)
 		var edge := back_a + 1.0
-		if _is_water(mid):
-			_quad(st, _point(a, edge, 0.02), _point(a, WATER_EDGE, 0.02), _point(b, WATER_EDGE, 0.02), _point(b, back_b + 1.0, 0.02), WATER)
+		if is_water(mid):
+			_quad(st, point(a, edge, 0.02), point(a, WATER_EDGE, 0.02), point(b, WATER_EDGE, 0.02), point(b, back_b + 1.0, 0.02), WATER)
 			edge = WATER_EDGE
-		_quad(st, _point(a, edge, 0.0), _point(a, 950.0, 0.0), _point(b, 950.0, 0.0), _point(b, edge if edge == WATER_EDGE else back_b + 1.0, 0.0), outside)
+		_quad(st, point(a, edge, 0.0), point(a, 950.0, 0.0), point(b, 950.0, 0.0), point(b, edge if edge == WATER_EDGE else back_b + 1.0, 0.0), outside)
 		a = b
 	st.generate_normals()
 	var mi := MeshInstance3D.new()
@@ -186,14 +189,14 @@ func _build_crowd(home: TeamDef, away: TeamDef) -> void:
 	var seats: Array[Vector3] = []
 	var a := -180.0
 	while a < 180.0:
-		var p := _profile(a)
+		var p := profile(a)
 		for k in int(p.z):
 			var radius := p.x + k * ROW_DEPTH + ROW_DEPTH * 0.55
 			var step_deg := rad_to_deg(SEAT_SPACING / radius)
 			var s := a
 			while s < a + ANGLE_STEP:
-				if not _is_aisle(s) and absf(s) >= BATTERS_EYE + 1.0 and _rng.randf() < _def.attendance:
-					seats.append(_point(s + _rng.randf_range(-0.1, 0.1) * step_deg, radius, p.y + k * ROW_RISE))
+				if not _is_aisle(s) and absf(s) >= BATTERS_EYE + 1.0 and rng.randf() < def.attendance:
+					seats.append(point(s + rng.randf_range(-0.1, 0.1) * step_deg, radius, p.y + k * ROW_RISE))
 				s += step_deg
 		a += ANGLE_STEP
 	var mm := MultiMesh.new()
@@ -208,16 +211,16 @@ func _build_crowd(home: TeamDef, away: TeamDef) -> void:
 	var neutral := [Color(0.92, 0.92, 0.9), Color(0.35, 0.35, 0.38), Color(0.85, 0.2, 0.2), Color(0.95, 0.8, 0.2), Color(0.2, 0.6, 0.65), Color(0.15, 0.15, 0.18)]
 	for i in seats.size():
 		mm.set_instance_transform(i, Transform3D(Basis(), seats[i]))
-		var roll := _rng.randf()
+		var roll := rng.randf()
 		var shirt: Color
-		if roll < _def.home_fan_share:
-			shirt = home.primary_color if _rng.randf() < 0.65 else home.secondary_color
-		elif roll < _def.home_fan_share + _def.away_fan_share:
-			shirt = away.primary_color if _rng.randf() < 0.7 else away.secondary_color
+		if roll < def.home_fan_share:
+			shirt = home.primary_color if rng.randf() < 0.65 else home.secondary_color
+		elif roll < def.home_fan_share + def.away_fan_share:
+			shirt = away.primary_color if rng.randf() < 0.7 else away.secondary_color
 		else:
-			shirt = neutral[_rng.randi_range(0, neutral.size() - 1)]
-		mm.set_instance_color(i, shirt.lightened(_rng.randf_range(-0.1, 0.1)))
-		mm.set_instance_custom_data(i, Color(_rng.randf(), _rng.randf(), 1.0 if _rng.randf() < 0.55 else 0.0, _rng.randf()))
+			shirt = neutral[rng.randi_range(0, neutral.size() - 1)]
+		mm.set_instance_color(i, shirt.lightened(rng.randf_range(-0.1, 0.1)))
+		mm.set_instance_custom_data(i, Color(rng.randf(), rng.randf(), 1.0 if rng.randf() < 0.55 else 0.0, rng.randf()))
 	var mmi := MultiMeshInstance3D.new()
 	mmi.name = "Crowd"
 	mmi.multimesh = mm
@@ -232,11 +235,11 @@ func _build_crowd(home: TeamDef, away: TeamDef) -> void:
 
 ## A dark wall above the center-field bleachers so the pitch reads cleanly.
 func _build_batters_eye() -> void:
-	var p := _profile(0.0)
+	var p := profile(0.0)
 	var top := p.y + p.z * ROW_RISE
-	var box := _box(Vector3(2.0 * BATTERS_EYE * PI / 180.0 * (p.x + p.z * ROW_DEPTH), 6.0, 1.0), Color(0.06, 0.1, 0.09))
-	box.position = _point(0.0, p.x + p.z * ROW_DEPTH, top + 3.0)
-	box.name = "BattersEye"
+	var eye := box(Vector3(2.0 * BATTERS_EYE * PI / 180.0 * (p.x + p.z * ROW_DEPTH), 6.0, 1.0), Color(0.06, 0.1, 0.09))
+	eye.position = point(0.0, p.x + p.z * ROW_DEPTH, top + 3.0)
+	eye.name = "BattersEye"
 
 
 func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
@@ -244,21 +247,21 @@ func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
 	for side: float in [-1.0, 1.0]:
 		var club := home if side < 0.0 else away
 		var angle := 82.0 * side
-		var radius := _profile(angle).x - 4.5
-		var center := _point(angle, radius, 0.0)
+		var radius := profile(angle).x - 4.5
+		var center := point(angle, radius, 0.0)
 		var dugout := Node3D.new()
 		dugout.name = "Dugout_%s" % club.abbreviation
 		add_child(dugout)
 		dugout.look_at_from_position(center, Vector3.ZERO, Vector3.UP)
-		var back := _box(Vector3(14.0, 2.4, 0.4), _def.structure_color.darkened(0.5), dugout)
+		var back := box(Vector3(14.0, 2.4, 0.4), def.structure_color.darkened(0.5), dugout)
 		back.position = Vector3(0, 1.0, 1.6)
-		var bench := _box(Vector3(13.0, 0.5, 1.0), club.secondary_color, dugout)
+		var bench := box(Vector3(13.0, 0.5, 1.0), club.secondary_color, dugout)
 		bench.position = Vector3(0, 0.25, 1.0)
-		var roof := _box(Vector3(14.6, 0.35, 3.6), club.primary_color, dugout)
+		var roof := box(Vector3(14.6, 0.35, 3.6), club.primary_color, dugout)
 		roof.position = Vector3(0, 2.3, 0.2)
-		var rail := _box(Vector3(14.6, 0.12, 0.12), _def.accent_color, dugout)
+		var rail := box(Vector3(14.6, 0.12, 0.12), def.accent_color, dugout)
 		rail.position = Vector3(0, 1.1, -1.4)
-		var sign := _label(club.team_name.to_upper(), 64, Color.WHITE, dugout)
+		var sign := label(club.team_name.to_upper(), 64, Color.WHITE, dugout)
 		sign.position = Vector3(0, 2.3, -1.65)
 		sign.rotation.y = PI
 
@@ -266,11 +269,11 @@ func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
 func _build_backstop() -> void:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var radius := _profile(180.0).x - 1.5
+	var radius := profile(180.0).x - 1.5
 	var a := 140.0
 	while a < 220.0:
 		var b := a + 4.0
-		_quad(st, _point(a, radius, 0.0), _point(b, radius, 0.0), _point(b, radius, 9.0), _point(a, radius, 9.0), Color(0.1, 0.1, 0.12, 0.28))
+		_quad(st, point(a, radius, 0.0), point(b, radius, 0.0), point(b, radius, 9.0), point(a, radius, 9.0), Color(0.1, 0.1, 0.12, 0.28))
 		a = b
 	var mi := MeshInstance3D.new()
 	mi.name = "Backstop"
@@ -287,109 +290,39 @@ func _build_backstop() -> void:
 ## Distances painted on the wall, in feet as on any ballpark wall.
 func _build_markers() -> void:
 	for angle: float in [-45.0, -22.0, 0.0, 22.0, 45.0]:
-		var d := FieldLayout.fence_distance(angle, _tuning)
-		var label := _label(str(roundi(d * 3.2808)), 110, _def.accent_color)
+		var d := FieldLayout.fence_distance(angle, tuning)
+		var marker := label(str(roundi(d * 3.2808)), 110, def.accent_color)
 		# Flat against the wall: its facing follows the wall's curve here.
-		var before := FieldLayout.direction_for_spray(angle - 1.0) * FieldLayout.fence_distance(angle - 1.0, _tuning)
-		var after := FieldLayout.direction_for_spray(angle + 1.0) * FieldLayout.fence_distance(angle + 1.0, _tuning)
-		var inward := (after - before).cross(Vector3.UP).normalized()
-		if inward.dot(-FieldLayout.direction_for_spray(angle)) < 0.0:
-			inward = -inward
-		var spot := _point(angle, d, minf(FieldLayout.fence_height(angle, _tuning) * 0.55, 2.2)) + inward * 0.7
-		label.look_at_from_position(spot, spot - inward, Vector3.UP)
-
-
-func _build_towers() -> void:
-	for angle: float in [-128.0, -72.0, -32.0, 32.0, 72.0, 128.0]:
-		var p := _profile(angle)
-		var radius := p.x + p.z * ROW_DEPTH + 4.0
-		var base := _point(angle, radius, 0.0)
-		var height := 46.0
-		var pole := _box(Vector3(1.4, height, 1.4), _def.structure_color.darkened(0.2))
-		pole.position = base + Vector3.UP * height * 0.5
-		var bank := Node3D.new()
-		add_child(bank)
-		bank.look_at_from_position(base + Vector3.UP * height, FIELD_CENTER, Vector3.UP)
-		var frame := _box(Vector3(9.0, 5.0, 0.8), _def.structure_color.darkened(0.4), bank)
-		frame.position = Vector3.ZERO
-		for row in 3:
-			for col in 6:
-				var lamp := _box(Vector3(1.2, 1.2, 0.3), Color.WHITE, bank)
-				lamp.position = Vector3(-3.75 + col * 1.5, -1.5 + row * 1.5, -0.5)
-				lamp.material_override = _glow(Color(1.0, 0.97, 0.85), 6.0 if _def.night else 2.5)
+		var inward := wall_inward(angle)
+		var spot := point(angle, d, minf(FieldLayout.fence_height(angle, tuning) * 0.55, 2.2)) + inward * 0.7
+		marker.look_at_from_position(spot, spot - inward, Vector3.UP)
 
 
 # --- Scoreboard -----------------------------------------------------------
 
-func _build_scoreboard(home: TeamDef, away: TeamDef) -> void:
-	var angle := 27.0
-	var p := _profile(angle)
-	var center := _point(angle, p.x + p.z * ROW_DEPTH + 3.0, p.y + p.z * ROW_RISE + 9.5)
-	var board := Node3D.new()
-	board.name = "Scoreboard"
-	add_child(board)
-	# Local +Z faces home plate, so labels read from the field.
-	board.look_at_from_position(center, center + (center - Vector3(0, center.y, 0)), Vector3.UP)
-	var frame := _box(Vector3(34.0, 17.0, 1.2), _def.structure_color.darkened(0.55), board)
-	frame.position = Vector3(0, 0, -0.6)
-	var trim := _box(Vector3(34.6, 0.5, 1.4), _def.accent_color, board)
-	trim.position = Vector3(0, 8.6, -0.5)
-	trim.material_override = _glow(_def.accent_color, 1.4)
-	var screen := _box(Vector3(32.0, 13.0, 0.2), Color(0.03, 0.04, 0.08), board)
-	screen.position = Vector3(0, -0.8, 0.05)
-	var legs := _box(Vector3(30.0, 6.0, 0.8), _def.structure_color.darkened(0.3), board)
-	legs.position = Vector3(0, -11.0, -0.6)
-	var title := _label(_def.display_name.to_upper(), 120, _def.accent_color, board)
-	title.position = Vector3(0, 6.6, 0.3)
-	_boards.append(_board_face(board, home, away, 1.0, Color(1.0, 0.92, 0.6), Color(0.75, 0.8, 0.95), true))
-
-
-## A hand-operated scoreboard set into a tall outfield wall: white numbers
-## on painted panels, slotted in by hand (no batter line).
-func _build_wall_scoreboard(home: TeamDef, away: TeamDef, angle: float) -> void:
-	var d := FieldLayout.fence_distance(angle, _tuning)
-	var h := FieldLayout.fence_height(angle, _tuning)
-	if h < 6.0:
-		return
-	var before := FieldLayout.direction_for_spray(angle - 1.0) * FieldLayout.fence_distance(angle - 1.0, _tuning)
-	var after := FieldLayout.direction_for_spray(angle + 1.0) * FieldLayout.fence_distance(angle + 1.0, _tuning)
-	var inward := (after - before).cross(Vector3.UP).normalized()
-	if inward.dot(-FieldLayout.direction_for_spray(angle)) < 0.0:
-		inward = -inward
-	var spot := _point(angle, d, h * 0.55) + inward * 0.3
-	var board := Node3D.new()
-	board.name = "WallScoreboard"
-	add_child(board)
-	board.look_at_from_position(spot, spot - inward, Vector3.UP)
-	board.scale = Vector3.ONE * 0.42
-	var panel := _box(Vector3(30.0, 11.0, 0.3), _def.outfield_wall_color.darkened(0.35), board)
-	panel.position = Vector3(0, 0, -0.2)
-	_boards.append(_board_face(board, home, away, 1.0, Color.WHITE, Color(0.85, 0.9, 0.85), false))
-
-
 ## Line score grid (9 innings, R H E), team names and count lamps on a board
 ## whose local +Z faces the field. Returns the board's updatable parts.
-func _board_face(board: Node3D, home: TeamDef, away: TeamDef, _size: float, number_color: Color, header_color: Color, with_batter: bool) -> Dictionary:
+func board_face(board: Node3D, home: TeamDef, away: TeamDef, number_color: Color, header_color: Color, with_batter: bool) -> Dictionary:
 	var cells := {}
 	for c in 12:
 		var x := -9.0 + c * 2.1
 		var header: String = "%d" % (c + 1) if c < 9 else ["R", "H", "E"][c - 9]
-		var h := _label(header, 72, header_color, board)
+		var h := label(header, 72, header_color, board)
 		h.position = Vector3(x, 3.6, 0.3)
 		for row in 2:
-			var cell := _label("", 88, number_color, board)
+			var cell := label("", 88, number_color, board)
 			cell.position = Vector3(x, 1.4 - row * 2.4, 0.3)
 			cells[Vector2i(c, row)] = cell
 	for row in 2:
 		var club := away if row == 0 else home
-		var name := _label(club.abbreviation, 88, MatchHud.text_color(club), board)
+		var name := label(club.abbreviation, 88, MatchHud.text_color(club), board)
 		name.position = Vector3(-13.0, 1.4 - row * 2.4, 0.3)
 	# Count lamps: balls, strikes, outs.
 	var lamps := {}
 	var groups := {"B": [3, Color(0.3, 1.0, 0.4)], "S": [2, Color(1.0, 0.3, 0.25)], "O": [2, Color(1.0, 0.75, 0.2)]}
 	var gx := -12.0
 	for key in ["B", "S", "O"]:
-		var tag := _label(key, 72, Color.WHITE, board)
+		var tag := label(key, 72, Color.WHITE, board)
 		tag.position = Vector3(gx, -3.6, 0.3)
 		var bulbs: Array[MeshInstance3D] = []
 		for i in groups[key][0]:
@@ -405,7 +338,7 @@ func _board_face(board: Node3D, home: TeamDef, away: TeamDef, _size: float, numb
 		gx += 7.5
 	var batter: Label3D = null
 	if with_batter:
-		batter = _label("", 72, Color.WHITE, board)
+		batter = label("", 72, Color.WHITE, board)
 		batter.position = Vector3(0, -5.8, 0.3)
 	return {"cells": cells, "lamps": lamps, "batter": batter}
 
@@ -441,263 +374,66 @@ func update_scoreboard(state: MatchState, roster: MatchRoster) -> void:
 			var bulbs: Array = lamps[k][0]
 			for i in bulbs.size():
 				var on: bool = i < lit[k]
-				(bulbs[i] as MeshInstance3D).material_override = _glow(lamps[k][1], 2.2) if on else GrayboxField._mat(Color(0.12, 0.12, 0.14))
+				(bulbs[i] as MeshInstance3D).material_override = glow(lamps[k][1], 2.2) if on else GrayboxField._mat(Color(0.12, 0.12, 0.14))
 		if board["batter"] != null:
 			board["batter"].text = "AT BAT  #%d %s" % [p.number, p.display_name.to_upper()] if p != null else ""
 
 
-# --- Halo and skyline ------------------------------------------------------
+# --- Kit for modules --------------------------------------------------------
 
-## The Halo Dome's landmark: a glowing ring over the park on four pylons,
-## its underside hung with sponsor boards.
-func _build_halo() -> void:
-	var height := 58.0
-	var radius := 150.0
-	var ring := MeshInstance3D.new()
-	ring.name = "Halo"
-	var torus := TorusMesh.new()
-	torus.inner_radius = radius - 3.0
-	torus.outer_radius = radius + 3.0
-	torus.rings = 96
-	torus.ring_segments = 12
-	ring.mesh = torus
-	ring.position = FIELD_CENTER + Vector3.UP * height
-	ring.material_override = _glow(_def.accent_color, 1.8)
-	ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(ring)
-	for i in 4:
-		var a := TAU * (i + 0.5) / 4.0
-		var foot := FIELD_CENTER + Vector3(cos(a), 0.0, sin(a)) * radius
-		var pylon := _box(Vector3(4.0, height, 4.0), _def.structure_color)
-		pylon.position = foot + Vector3.UP * height * 0.5
-		var stripe := _box(Vector3(4.2, height, 0.6), _def.accent_color)
-		stripe.position = foot + Vector3.UP * height * 0.5
-		stripe.material_override = _glow(_def.seat_color.lightened(0.3), 1.2)
-		stripe.look_at_from_position(stripe.position, Vector3(FIELD_CENTER.x, stripe.position.y, FIELD_CENTER.z), Vector3.UP)
-	var count := _def.sponsors.size()
-	for i in count:
-		var a := TAU * i / count
-		var spot := FIELD_CENTER + Vector3(cos(a), 0.0, sin(a)) * (radius - 1.0) + Vector3.UP * (height - 6.5)
-		var board := Node3D.new()
-		add_child(board)
-		# Local +Z toward the middle of the park, so the text reads from inside.
-		board.look_at_from_position(spot, spot + (spot - Vector3(FIELD_CENTER.x, spot.y, FIELD_CENTER.z)), Vector3.UP)
-		var panel := _box(Vector3(34.0, 7.0, 0.8), _def.seat_color.darkened(0.3), board)
-		panel.position = Vector3(0, 0, -0.4)
-		var edge := _box(Vector3(34.4, 0.4, 1.0), _def.accent_color, board)
-		edge.position = Vector3(0, -3.6, -0.3)
-		edge.material_override = _glow(_def.accent_color, 1.5)
-		var text := _label(_def.sponsors[i], 230, Color.WHITE, board)
-		text.position = Vector3(0, 0, 0.1)
-		text.modulate = Color(1.0, 0.97, 0.9)
+## A node name not yet used in this park ("Warehouse", "Warehouse2", ...),
+## so a park can hold more than one of a module.
+func unique_name(base: String) -> String:
+	var n: int = _names.get(base, 0) + 1
+	_names[base] = n
+	return base if n == 1 else "%s%d" % [base, n]
 
 
-## The bay beyond one side of the outfield (home runs splash down).
-func _build_water(side: int) -> void:
-	# The water itself is part of the ground ring (see _build_bowl); boats bob on it.
-	for i in 5:
-		var boat := _box(Vector3(6.0, 1.6, 2.4), Color.WHITE if i % 2 == 0 else _def.accent_color)
-		boat.position = FieldLayout.direction_for_spray(side * (22.0 + i * 7.0)) * (150.0 + i * 14.0) + Vector3(0, 0.6, 0)
-		boat.rotation.y = i * 0.7
+## A scoreboard face (from board_face) the match keeps up to date.
+func add_board(board: Dictionary) -> void:
+	_boards.append(board)
 
 
-func _build_skyline() -> void:
-	var mat := ShaderMaterial.new()
-	mat.shader = SKYLINE_SHADER
-	mat.set_shader_parameter("wall_color", _def.skyline_color)
-	mat.set_shader_parameter("window_color", _def.window_color)
-	# At night more of the city is awake and its windows glow brighter.
-	mat.set_shader_parameter("lit_share", 0.5 if _def.night else 0.22)
-	mat.set_shader_parameter("glow", 1.6 if _def.night else 0.35)
-	var count := 40
-	for i in count:
-		var a := TAU * (i + _rng.randf_range(-0.3, 0.3)) / count
-		var radius := _rng.randf_range(520.0, 700.0)
-		# Taller toward the far side so the city peeks over the outfield.
-		var behind_center := maxf(-sin(a), 0.0)
-		var size := Vector3(_rng.randf_range(26.0, 55.0), (_rng.randf_range(30.0, 70.0) + 90.0 * behind_center * _rng.randf()) * _def.skyline_height, _rng.randf_range(26.0, 55.0))
-		var tower := _box(size, _def.skyline_color)
-		tower.material_override = mat
-		tower.position = FIELD_CENTER + Vector3(cos(a) * radius, size.y * 0.5, sin(a) * radius)
-		tower.rotation.y = _rng.randf_range(0.0, PI)
-		tower.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+## The direction off the outfield wall toward the field at a spray angle
+## (the wall's own facing, following its curve).
+func wall_inward(angle: float) -> Vector3:
+	var before := FieldLayout.direction_for_spray(angle - 1.0) * FieldLayout.fence_distance(angle - 1.0, tuning)
+	var after := FieldLayout.direction_for_spray(angle + 1.0) * FieldLayout.fence_distance(angle + 1.0, tuning)
+	var inward := (after - before).cross(Vector3.UP).normalized()
+	if inward.dot(-FieldLayout.direction_for_spray(angle)) < 0.0:
+		inward = -inward
+	return inward
 
 
-# --- Landmarks --------------------------------------------------------------
-
-## A long brick warehouse beyond the right-field stands, parallel to the
-## line, its windows lit and its name painted along the top.
-func _build_warehouse() -> void:
-	var line := FieldLayout.direction_for_spray(_tuning.foul_line_angle)
-	var outward := Vector3(-line.z, 0.0, line.x)  # away from the field, right of the line
-	var p := _profile(_tuning.foul_line_angle + 20.0)
-	var setback := p.x * 0.45 + p.z * ROW_DEPTH + 14.0
-	var size := Vector3(22.0, 30.0, 250.0)
-	var center := line * 175.0 + outward * setback + Vector3.UP * size.y * 0.5
-	var mat := ShaderMaterial.new()
-	mat.shader = SKYLINE_SHADER
-	mat.set_shader_parameter("wall_color", _def.outfield_wall_color.darkened(0.1))
-	mat.set_shader_parameter("window_color", _def.window_color)
-	mat.set_shader_parameter("lit_share", 0.45 if _def.night else 0.12)
-	mat.set_shader_parameter("glow", 1.4 if _def.night else 0.25)
-	var building := Node3D.new()
-	building.name = "Warehouse"
-	add_child(building)
-	building.look_at_from_position(center, center + line, Vector3.UP)
-	var body := _box(size, _def.outfield_wall_color, building)
-	body.material_override = mat
-	var cornice := _box(Vector3(size.x + 1.2, 1.4, size.z + 1.2), _def.structure_color, building)
-	cornice.position.y = size.y * 0.5
-	for i in 6:
-		var stack := _box(Vector3(2.4, 7.0, 2.4), _def.structure_color.darkened(0.2), building)
-		stack.position = Vector3(0.0, size.y * 0.5 + 3.5, -size.z * 0.4 + i * size.z * 0.16)
-	var sign := _label(_def.sponsors[0] if not _def.sponsors.is_empty() else "WAREHOUSE", 900, _def.accent_color, building)
-	sign.rotation.y = -PI * 0.5  # read from the field side
-	sign.position = Vector3(-size.x * 0.5 - 0.15, size.y * 0.5 - 4.0, 0.0)
-
-
-## Pools beyond the outfield wall in both power alleys: a cascade spills
-## over the back and a row of jets rises and falls, lit at night.
-func _build_fountains() -> void:
-	var jet_mat := ShaderMaterial.new()
-	jet_mat.shader = FOUNTAIN_SHADER
-	jet_mat.set_shader_parameter("color", _def.accent_color.lerp(Color(0.85, 0.95, 1.0), 0.3))
-	jet_mat.set_shader_parameter("glow", 0.7 if _def.night else 0.15)
-	var water := _glow(WATER.lightened(0.15), 0.6 if _def.night else 0.0)
-	for side: float in [-1.0, 1.0]:
-		var a0 := 14.0 * side
-		var a1 := 40.0 * side
-		var steps := 10
-		for i in steps:
-			var a := lerpf(a0, a1, (i + 0.5) / steps)
-			var p := _profile(a)
-			var radius := p.x + p.z * ROW_DEPTH + 7.0
-			var spot := FieldLayout.direction_for_spray(a) * radius
-			var basin := _box(Vector3(14.0, 0.6, 9.0), _def.structure_color)
-			basin.position = spot + Vector3.UP * 0.3
-			basin.look_at_from_position(basin.position, basin.position + FieldLayout.direction_for_spray(a), Vector3.UP)
-			var surface := _box(Vector3(13.4, 0.1, 8.4), WATER, basin)
-			surface.position.y = 0.32
-			surface.material_override = water
-			var cascade := _box(Vector3(14.0, 8.0, 1.2), _def.structure_color.darkened(0.15), basin)
-			cascade.position = Vector3(0.0, 4.0, -4.5)
-			var sheet := _box(Vector3(13.0, 7.6, 0.2), WATER, basin)
-			sheet.position = Vector3(0.0, 4.0, -3.8)
-			sheet.material_override = jet_mat
-			for j in 3:
-				var jet := MeshInstance3D.new()
-				var cyl := CylinderMesh.new()
-				cyl.top_radius = 0.25
-				cyl.bottom_radius = 0.6
-				cyl.height = 1.0
-				jet.mesh = cyl
-				jet.material_override = jet_mat
-				jet.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-				jet.position = Vector3(-4.0 + j * 4.0, 0.3, 0.0)
-				jet.set_instance_shader_parameter("phase", float(i * 3 + j) * 0.7)
-				jet.set_instance_shader_parameter("peak", 9.0 + 4.0 * float((i + j) % 3))
-				basin.add_child(jet)
-
-
-## A sealed dome: a ribbed shell over the bowl, catwalk rings hung with
-## light banks, a glowing crown at the top.
-func _build_roof() -> void:
-	var radius := 215.0
-	var rim := 22.0
-	var rise := 70.0
-	var center := FIELD_CENTER + Vector3(0.0, 0.0, 10.0)
-	var shell := MeshInstance3D.new()
-	shell.name = "Roof"
-	var dome := SphereMesh.new()
-	dome.radius = radius
-	dome.height = rise * 2.0
-	dome.is_hemisphere = true
-	dome.radial_segments = 64
-	dome.rings = 16
-	dome.flip_faces = true
-	shell.mesh = dome
-	shell.position = center + Vector3.UP * rim
-	var roof_mat := GrayboxField._mat(_def.structure_color.darkened(0.45))
-	roof_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-	shell.material_override = roof_mat
-	shell.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(shell)
-	var wall := MeshInstance3D.new()
-	var cyl := CylinderMesh.new()
-	cyl.top_radius = radius
-	cyl.bottom_radius = radius
-	cyl.height = rim
-	cyl.radial_segments = 64
-	cyl.cap_top = false
-	cyl.cap_bottom = false
-	cyl.flip_faces = true
-	wall.mesh = cyl
-	wall.position = center + Vector3.UP * rim * 0.5
-	wall.material_override = roof_mat
-	wall.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(wall)
-	# Ribs and catwalks: thin glowing rings at a few heights up the shell.
-	for k in 4:
-		var u := (k + 1) / 5.0
-		var ring := MeshInstance3D.new()
-		var torus := TorusMesh.new()
-		var r := radius * sqrt(1.0 - u * u)
-		torus.inner_radius = r - 1.2
-		torus.outer_radius = r
-		torus.rings = 96
-		ring.mesh = torus
-		ring.position = center + Vector3.UP * (rim + rise * u - 1.0)
-		ring.material_override = _glow(_def.accent_color if k % 2 == 0 else _def.structure_color, 1.2 if k % 2 == 0 else 0.0)
-		ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		add_child(ring)
-	for i in 12:
-		var a := TAU * i / 12.0
-		var bank := _box(Vector3(10.0, 1.0, 4.0), Color.WHITE)
-		bank.position = center + Vector3(cos(a), 0.0, sin(a)) * radius * 0.55 + Vector3.UP * (rim + rise * 0.8)
-		bank.material_override = _glow(Color(1.0, 0.97, 0.88), 5.0)
-		bank.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	var crown := MeshInstance3D.new()
-	var disc := CylinderMesh.new()
-	disc.top_radius = 24.0
-	disc.bottom_radius = 24.0
-	disc.height = 1.0
-	crown.mesh = disc
-	crown.position = center + Vector3.UP * (rim + rise - 0.8)
-	crown.material_override = _glow(_def.accent_color, 2.5)
-	add_child(crown)
-
-
-# --- Helpers ----------------------------------------------------------------
-
-func _box(size: Vector3, color: Color, parent: Node = null) -> MeshInstance3D:
+func box(size: Vector3, color: Color, parent: Node = null) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
-	var box := BoxMesh.new()
-	box.size = size
-	mi.mesh = box
+	var mesh := BoxMesh.new()
+	mesh.size = size
+	mi.mesh = mesh
 	mi.material_override = GrayboxField._mat(color)
 	(parent if parent != null else self).add_child(mi)
 	return mi
 
 
-func _label(text: String, size: int, color: Color, parent: Node = null) -> Label3D:
-	var label := Label3D.new()
-	label.text = text
-	label.font = DISPLAY_FONT
-	label.font_size = size
-	label.pixel_size = 0.012
-	label.modulate = color
-	label.outline_size = 0
-	label.double_sided = false
-	(parent if parent != null else self).add_child(label)
-	return label
+func label(text: String, size: int, color: Color, parent: Node = null) -> Label3D:
+	var l := Label3D.new()
+	l.text = text
+	l.font = DISPLAY_FONT
+	l.font_size = size
+	l.pixel_size = 0.012
+	l.modulate = color
+	l.outline_size = 0
+	l.double_sided = false
+	(parent if parent != null else self).add_child(l)
+	return l
 
 
-func _face_home(node: Node3D) -> void:
+func face_home(node: Node3D) -> void:
 	var p := node.position
 	node.look_at_from_position(p, p + (p - Vector3(0, p.y, 0)), Vector3.UP)
 
 
-static func _glow(color: Color, energy: float) -> StandardMaterial3D:
+static func glow(color: Color, energy: float) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
 	m.albedo_color = color
 	m.emission_enabled = true

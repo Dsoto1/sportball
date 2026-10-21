@@ -13,7 +13,7 @@ func test_both_parks_have_data() -> void:
 		var park := content().team(id).stadium_def
 		check(park != null, "%s has a home park" % id)
 		check(park.sponsors.size() > 0, "%s park has sponsor boards" % id)
-	check(content().team(&"glitterati").stadium_def.halo, "the Halo Dome has its halo")
+	check(content().team(&"glitterati").stadium_def.has_piece(&"halo"), "the Halo Dome has its halo")
 
 
 func test_stadium_builds_bowl_crowd_and_landmarks() -> void:
@@ -40,8 +40,8 @@ func test_no_fans_in_the_batters_eye() -> void:
 func test_stands_stay_out_of_play() -> void:
 	var st := _build()
 	for angle in range(-45, 46, 5):
-		check(st._profile(angle).x > FieldLayout.fence_distance(angle, tuning()), "seats behind the wall at %d°" % angle)
-	check(st._profile(180.0).x > 15.0, "room for the batting camera behind home")
+		check(st.profile(angle).x > FieldLayout.fence_distance(angle, tuning()), "seats behind the wall at %d°" % angle)
+	check(st.profile(180.0).x > 15.0, "room for the batting camera behind home")
 	st.free()
 
 
@@ -68,9 +68,10 @@ func test_every_park_builds_with_its_own_shape() -> void:
 		var st := Stadium.new()
 		st.build(t, park, content().team(&"glitterati"), content().team(&"gearheads"))
 		for angle in range(-45, 46, 5):
-			check(st._profile(angle).x > FieldLayout.fence_distance(angle, t), "%s: seats behind the wall at %d°" % [park.id, angle])
+			check(st.profile(angle).x > FieldLayout.fence_distance(angle, t), "%s: seats behind the wall at %d°" % [park.id, angle])
 		seen[str(park.field_shape.points)] = true
-		check_eq(st.has_node("WallScoreboard"), park.wall_scoreboard, "%s wall scoreboard" % park.id)
+		check_eq(st.has_node("WallScoreboard"), park.has_piece(&"wall_scoreboard"), "%s wall scoreboard" % park.id)
+		check(park.validate().is_empty(), "%s is a valid design: %s" % [park.id, park.validate()])
 		st.free()
 	check(content().parks.size() >= 7, "a catalog of parks (%d)" % content().parks.size())
 	check_eq(seen.size(), content().parks.size(), "every park has its own layout")
@@ -98,6 +99,7 @@ func test_landmark_parks_build_their_landmarks() -> void:
 	st.free()
 	st = _build_park(&"the_vault")
 	check(st.has_node("Roof"), "the Vault is roofed")
+	check(not st.has_node("LightTowers") and not st.has_node("Skyline"), "and has no towers or sky")
 	st.free()
 	check(content().park(&"the_vault").turf, "the Vault plays on turf")
 	check(content().park(&"the_horseshoe").night, "the Horseshoe is a night game")
@@ -116,3 +118,100 @@ func test_bat_is_turned_from_knob_to_barrel() -> void:
 	check_near(aabb.size.z, BatMesh.LENGTH, 0.01, "bat is full length")
 	check(aabb.position.z + aabb.size.z <= 0.001, "knob at the grip end (z = 0), barrel toward -Z")
 	check(aabb.size.x > 0.1 and aabb.size.x < 0.13, "barrel about 11 cm across (%.3f)" % aabb.size.x)
+
+
+# --- Modules -----------------------------------------------------------------
+
+func _blank_park() -> StadiumDef:
+	var park: StadiumDef = content().park(&"the_kiln").duplicate()
+	park.pieces = []
+	return park
+
+
+func _build_def(park: StadiumDef) -> Stadium:
+	var st := Stadium.new()
+	st.build(content().tuning_for(park), park, content().team(&"glitterati"), content().team(&"gearheads"))
+	return st
+
+
+func test_every_module_builds_on_its_own() -> void:
+	for kind: StringName in StadiumModules.kinds():
+		var park := _blank_park()
+		park.add_piece(&"scoreboard")
+		park.add_piece(kind)
+		var st := _build_def(park)
+		var spec := StadiumModules.info(kind)
+		check(st.get_child_count() > 7, "%s adds to the park" % spec["name"])
+		check(not String(spec["about"]).is_empty(), "%s describes itself for the designer" % kind)
+		for key in spec["params"]:
+			check(StadiumModules.default_param(kind, key) != null, "%s.%s has a default" % [kind, key])
+		st.free()
+
+
+func test_a_park_is_just_its_pieces() -> void:
+	var park := _blank_park()
+	var st := _build_def(park)
+	for node in ["SeatingBowl", "Crowd", "BattersEye", "Backstop"]:
+		check(st.has_node(node), "the core has %s" % node)
+	check(not st.has_node("Scoreboard") and not st.has_node("LightTowers"), "nothing else without pieces")
+	st.free()
+	# Move the scoreboard and add a second warehouse down the left-field line.
+	park.add_piece(&"scoreboard", -35.0)
+	park.add_piece(&"warehouse", 45.0)
+	park.add_piece(&"warehouse", -45.0, {"text": "LEFT FIELD LOFTS"})
+	st = _build_def(park)
+	check((st.get_node("Scoreboard") as Node3D).position.x < 0.0, "the scoreboard moved to left field")
+	check(st.has_node("Warehouse") and st.has_node("Warehouse2"), "two warehouses, one each side")
+	check(park.validate().is_empty(), "a valid design: %s" % park.validate())
+	st.free()
+
+
+func test_mirrored_pieces_build_both_sides() -> void:
+	var park := _blank_park()
+	park.add_piece(&"scoreboard")
+	park.add_piece(&"fountains", 14.0, {"basins": 4}, true)
+	var st := _build_def(park)
+	var sides := []
+	for name in ["Fountains", "Fountains2"]:
+		check(st.has_node(name), "has %s" % name)
+		sides.append(signf((st.get_node(name).get_child(0) as Node3D).position.x))
+	check(sides.size() == 2 and sides[0] != sides[1], "one pool set in each power alley")
+	st.free()
+
+
+func test_bay_follows_its_piece() -> void:
+	var park := _blank_park()
+	park.add_piece(&"scoreboard")
+	park.add_piece(&"bay", -40.0)
+	var st := _build_def(park)
+	check(st.is_water(-40.0) and not st.is_water(40.0), "the bay moved to left field")
+	check(st.profile(-40.0).z <= 5.0, "with low stands along it")
+	st.free()
+
+
+func test_validation_catches_bad_designs() -> void:
+	var park := _blank_park()
+	check(park.validate().size() == 1, "a park needs a scoreboard")
+	park.add_piece(&"scoreboard")
+	check(park.validate().is_empty(), "a scoreboard is enough")
+	park.add_piece(&"dome")
+	park.add_piece(&"light_towers")
+	check(Array(park.validate()).any(func(p: String) -> bool: return p.contains("can't share")), "no light towers under a dome")
+	park = _blank_park()
+	park.add_piece(&"scoreboard")
+	park.add_piece(&"halo")
+	park.add_piece(&"halo")
+	park.add_piece(&"wall_scoreboard", 0.0)
+	park.add_piece(&"warehouse", 90.0, {"height": 500.0, "colour": 1})
+	park.add_piece(&"moat")
+	var problems := " | ".join(park.validate())
+	for expect in ["only one Halo Ring", "needs a wall 6 m", "outside -45..45", "height 500", "no setting 'colour'", "unknown module 'moat'"]:
+		check(problems.contains(expect), "flags: %s (%s)" % [expect, problems])
+
+
+func test_recolor_for_a_club() -> void:
+	var team := content().team(&"gearheads")
+	var park := content().park(&"halo_dome").recolored(team.primary_color, team.secondary_color)
+	check(park != content().park(&"halo_dome"), "a copy, the original untouched")
+	check(park.seat_color.is_equal_approx(team.primary_color.darkened(0.35)), "seats in the club's color")
+	check_eq(park.pieces.size(), content().park(&"halo_dome").pieces.size(), "same pieces")

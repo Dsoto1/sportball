@@ -1,30 +1,47 @@
 [gd_resource type="Resource" script_class="StadiumDef" format=3]
 
-[ext_resource type="Script" path="res://data/defs/field_shape.gd" id="1_toylq"]
-[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="2_483po"]
+[ext_resource type="Script" path="res://data/defs/field_shape.gd" id="1_483po"]
+[ext_resource type="Script" path="res://data/defs/stadium_piece.gd" id="2_nkemg"]
+[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="3_srjos"]
 
-[sub_resource type="Resource" id="Resource_nkemg"]
-script = ExtResource("1_toylq")
+[sub_resource type="Resource" id="Resource_ojjqe"]
+script = ExtResource("1_483po")
 id = &"the_icebox"
 display_name = "The Icebox"
 points = PackedVector3Array(-45, 99, 4.6, -22, 112, 4.6, 0, 118, 4.6, 22, 112, 4.6, 45, 99, 4.6)
 air_drag_scale = 1.1
 
+[sub_resource type="Resource" id="Resource_3lw56"]
+script = ExtResource("2_nkemg")
+kind = &"scoreboard"
+angle = 27.0
+
+[sub_resource type="Resource" id="Resource_77lqm"]
+script = ExtResource("2_nkemg")
+kind = &"light_towers"
+
+[sub_resource type="Resource" id="Resource_6v7py"]
+script = ExtResource("2_nkemg")
+kind = &"skyline"
+params = {
+"height": 0.7
+}
+
 [resource]
-script = ExtResource("2_483po")
+script = ExtResource("3_srjos")
 id = &"the_icebox"
 display_name = "The Icebox"
 blurb = "Yetis home · cold heavy air knocks fly balls down, ivy on every wall"
-field_shape = SubResource("Resource_nkemg")
+field_shape = SubResource("Resource_ojjqe")
 seat_color = Color(0.1764706, 0.2901961, 0.3882353, 1)
 seat_color_alt = Color(0.13333334, 0.22745098, 0.30980393, 1)
 structure_color = Color(0.72156864, 0.76862746, 0.8, 1)
 accent_color = Color(0.62352943, 0.9098039, 1, 1)
 outfield_wall_color = Color(0.12156863, 0.2901961, 0.15686275, 1)
 wall_style = &"ivy"
-skyline_height = 0.7
 home_fan_share = 0.5
 away_fan_share = 0.25
 sponsors = PackedStringArray("FROSTGATE FURNACES", "SNOWLINE SKIS", "YETI COCOA", "GLACIER GLASS", "NORTHWIND WOOLENS")
 skyline_color = Color(0.2901961, 0.34509805, 0.4, 1)
 window_color = Color(0.8745098, 0.95686275, 1, 1)
+pieces = Array[ExtResource("2_nkemg")]([SubResource("Resource_3lw56"), SubResource("Resource_77lqm"), SubResource("Resource_6v7py")])

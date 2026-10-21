@@ -201,6 +201,34 @@ hitter's own swing (bat speed, attack angle, pull) in play:
 | Fountain Gardens | night game; big and fair, fountains beyond the wall | 4.85 | 0.85 | 1.18 | 1.32 |
 | The Vault | sealed dome on fast turf | 5.60 | 0.98 | 2.33 | 0.45 |
 
+### Building a park
+
+The look is built from layers, so a park (or a future stadium designer) only edits data:
+
+- **Field shape:** `FieldShape`, the rules (walls, heights, air, surface).
+- **Palette:** the `StadiumDef` colors. `recolored(primary, secondary)` gives a copy in a club's colors.
+- **Bowl and crowd:** rows, attendance and fan shares.
+- **Setting:** night, turf.
+- **Pieces:** `StadiumDef.pieces`, a list of placed `StadiumPiece`s (kind, spray angle, size, mirrored, settings).
+
+The core (bowl, crowd, batter's eye, dugouts, backstop, wall markers) is always built. Each piece is a module from `StadiumModules.CATALOG`:
+
+| Module | What it is | Settings |
+|---|---|---|
+| `scoreboard` | video board over the stands (the first is the main board) | height |
+| `wall_scoreboard` | hand-operated board in a wall 6 m or taller | none |
+| `light_towers` | six floodlight towers | height |
+| `skyline` | city ring, windows lit at night | height, count |
+| `halo` | glowing ring on pylons, hung with sponsor boards | height, radius |
+| `bay` | water beyond one side, low stands, boats | boats |
+| `warehouse` | long brick building along a line, its name on top | length, height, text |
+| `fountains` | pools with cascades and jets beyond the wall | span, basins |
+| `dome` | sealed roof; the park plays indoors | rise |
+
+- **Placing pieces:** `park.add_piece(&"warehouse", -45.0, {"text": "LOFTS"})`.
+- **Checking a design:** `park.validate()` lists problems: unknown modules, settings out of range, two of a one-per-park piece, a dome with light towers, a wall scoreboard on a low wall, no scoreboard.
+- **Adding a module:** one script under `presentation/stadium/modules/` and one catalog entry.
+
 ## Test
 
 ```sh

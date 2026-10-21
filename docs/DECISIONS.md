@@ -716,3 +716,29 @@ The six styles' feet come from Baseball Savant's batting-stance tracking (229 ML
 Reason: Owner request to calibrate the stances from Savant.
 
 Affected systems: BattingStyles (FEET, _place_feet, box limits), MatchView (BATTER_SPOT), tests (stances match Statcast, box), foot diagram tool.
+
+## 2026-10-21 - Modular Ballparks
+
+Parks are now built from data layers, so a stadium designer or team designer can come later without rewriting the builder.
+
+- **Pieces, not flags:** the old one-off flags are gone (`halo`, `roof`, `skyline`, `water_side`, `wall_scoreboard`, `landmark`). In their place, `StadiumDef.pieces` holds `StadiumPiece`s: kind, spray angle, size, mirrored and kind-specific settings. Any piece can go in any park, more than once where that makes sense (two warehouses, fountains in both alleys).
+- **Catalog:** `StadiumModules.CATALOG` is the one place that knows each module:
+  - its display name, description and category;
+  - whether it is placed by angle, and its allowed range;
+  - its settings as [default, min, max], ready for designer sliders;
+  - whether it is one per park, what it can't share a park with;
+  - the script that builds it.
+- **Modules:** each one is a small `StadiumModule` script in `presentation/stadium/modules/`. They build with the Stadium's public kit: `box`, `label`, `glow`, `point`, `profile`, `wall_inward`, `board_face`, `add_board`, `unique_name`.
+- **Core:** the bowl, crowd, batter's eye, dugouts, backstop and wall markers are always built.
+- **Standard set:** `StadiumModules.STANDARD` (scoreboard, light towers, skyline) is what a new park starts with.
+- **Designer API:**
+  - `add_piece`, `remove_piece`, `pieces_of`, `has_piece`, `StadiumModules.new_piece`.
+  - `validate()`: unknown kinds, settings out of range, duplicates, clashes (a dome with towers, skyline or halo), a wall scoreboard on a wall under 6 m, no scoreboard.
+  - `is_roofed()`: true when the park has a dome.
+  - `recolored(primary, secondary)`: a copy of the park in a club's colors, the team designer's starting point.
+- **Same parks:** `tools/generate_parks.gd` writes pieces, and every shipped park validates clean. Before and after tour renders of six parks match.
+- **Tests:** every module builds alone, a park with no pieces is just the core, a moved scoreboard and a second warehouse, mirrored fountains, a bay on the other side, validation messages, recoloring.
+
+Reason: Owner request for modular stadium designs as a foundation for a future stadium or team designer.
+
+Affected systems: StadiumDef, StadiumPiece (new), StadiumModules and modules/ (new), Stadium (core plus kit), GrayboxField (`is_roofed`), generate_parks, data/stadiums (regenerated), tests (stadium), README.

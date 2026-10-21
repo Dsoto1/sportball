@@ -4,6 +4,9 @@ extends SceneTree
 ## Run before generate_teams.gd, which links each club to its home park.
 ## Shapes are (spray deg, wall distance m, wall height m) from the left-field
 ## line (-45) to the right-field line (+45). All names are original.
+## Pieces are [kind, angle, params, mirrored] (StadiumModules.CATALOG), added
+## after the standard set (scoreboard, light towers, skyline at the park's
+## skyline_height) unless a park lists its own "standard".
 
 const PARKS := [
 	{
@@ -11,7 +14,8 @@ const PARKS := [
 		"blurb": "Glitterati home · symmetrical, padded glass-and-gold wall",
 		"shape": [[-45, 96, 3.4], [-30, 104, 3.4], [-15, 112, 3.4], [0, 116, 4.2], [15, 112, 3.4], [30, 104, 3.4], [45, 96, 3.4]], "air": 1.0,
 		"seat_color": Color("3d2466"), "seat_color_alt": Color("2c1a4d"), "structure_color": Color("8f8aa3"), "accent_color": Color("ffc94a"),
-		"outfield_wall_color": Color("2a1c4f"), "wall_style": &"padded", "home_fan_share": 0.62, "away_fan_share": 0.12, "attendance": 0.9, "halo": true,
+		"outfield_wall_color": Color("2a1c4f"), "wall_style": &"padded", "home_fan_share": 0.62, "away_fan_share": 0.12, "attendance": 0.9,
+		"pieces": [[&"halo"]],
 		"sponsors": ["SPOTLIGHT COLA", "NEON HEIGHTS TRANSIT", "MARQUEE MOTORS", "VELVET ROPE LOUNGE", "GLAM SLAM GUM", "CRT VISION", "HEADLINER HOTELS", "ENCORE AIRWAYS"],
 		"skyline_color": Color("2b2a52"), "window_color": Color("ffd27a"), "skyline_height": 1.0,
 	},
@@ -21,7 +25,8 @@ const PARKS := [
 		"shape": [[-45, 101, 2.6], [-25, 116, 2.6], [0, 121, 2.6], [13, 113, 2.6], [14.5, 111, 10.5], [30, 99, 10.5], [45, 90, 10.5]], "air": 1.0,
 		"seat_color": Color("6b3a22"), "seat_color_alt": Color("4f2b19"), "structure_color": Color("8a7d70"), "accent_color": Color("ff8a2a"),
 		"outfield_wall_color": Color("2e2a2a"), "wall_style": &"iron", "home_fan_share": 0.6, "away_fan_share": 0.15, "attendance": 0.75,
-		"foul_rows": 20, "outfield_rows": 12, "wall_scoreboard": true, "wall_scoreboard_angle": 26.0,
+		"foul_rows": 20, "outfield_rows": 12,
+		"pieces": [[&"wall_scoreboard", 26.0]],
 		"sponsors": ["RIVET & SONS HARDWARE", "RUSTWATER FERRY", "SPROCKET DINER", "LUGNUT BREWS", "FORGE & ANVIL", "BOILERMAKERS UNION"],
 		"skyline_color": Color("4a4040"), "window_color": Color("ffb35c"), "skyline_height": 0.6,
 	},
@@ -31,7 +36,8 @@ const PARKS := [
 		"shape": [[-45, 94.5, 11.3], [-30, 101, 11.3], [-14, 111, 11.3], [-12.5, 114, 4.0], [0, 119, 4.0], [12, 128, 4.0], [24, 116, 1.8], [33, 104, 1.8], [45, 92, 1.0]], "air": 1.0,
 		"seat_color": Color("1f4a33"), "seat_color_alt": Color("173828"), "structure_color": Color("8a4b3c"), "accent_color": Color("f2e6c8"),
 		"outfield_wall_color": Color("1d5235"), "wall_style": &"padded", "home_fan_share": 0.5, "away_fan_share": 0.3, "attendance": 0.95,
-		"foul_rows": 22, "outfield_rows": 10, "wall_scoreboard": true, "wall_scoreboard_angle": -28.0,
+		"foul_rows": 22, "outfield_rows": 10,
+		"pieces": [[&"wall_scoreboard", -28.0]],
 		"sponsors": ["PEMBERTON PEANUTS", "COBBLESTONE COFFEE", "LANTERN LAUNDRY", "IRONCLAD INSURANCE", "LEDGER STREET LAGER"],
 		"skyline_color": Color("5a4a48"), "window_color": Color("ffe1a8"), "skyline_height": 0.8,
 	},
@@ -41,7 +47,8 @@ const PARKS := [
 		"shape": [[-45, 101, 2.4], [-20, 115, 2.4], [0, 123, 2.4], [20, 110, 2.4], [32, 101, 2.4], [45, 94, 2.4]], "air": 1.03,
 		"seat_color": Color("1d3b5c"), "seat_color_alt": Color("152c45"), "structure_color": Color("c9c4b6"), "accent_color": Color("ff6b4a"),
 		"outfield_wall_color": Color("133047"), "wall_style": &"padded", "home_fan_share": 0.45, "away_fan_share": 0.35, "attendance": 0.88,
-		"foul_rows": 24, "outfield_rows": 8, "water_side": 1,
+		"foul_rows": 24, "outfield_rows": 8,
+		"pieces": [[&"bay", 40.0]],
 		"sponsors": ["SALTWIND SAILS", "PIER 9 OYSTERS", "TIDECALLER TAXI", "BUOY BEVERAGES", "FOGHORN FRIES"],
 		"skyline_color": Color("37465e"), "window_color": Color("ffe9b0"), "skyline_height": 0.9,
 	},
@@ -89,7 +96,8 @@ const PARKS := [
 		"shape": [[-45, 101, 2.4], [-25, 111, 2.4], [-8, 123, 2.4], [0, 122, 2.4], [14, 115, 2.4], [20, 112, 2.4], [21.5, 110, 7.6], [45, 97, 7.6]], "air": 1.0,
 		"seat_color": Color("1f5a3a"), "seat_color_alt": Color("184a2f"), "structure_color": Color("4a3f3a"), "accent_color": Color("ff9b3d"),
 		"outfield_wall_color": Color("7a3324"), "wall_style": &"brick", "home_fan_share": 0.5, "away_fan_share": 0.3, "attendance": 0.92,
-		"foul_rows": 24, "outfield_rows": 12, "landmark": &"warehouse",
+		"foul_rows": 24, "outfield_rows": 12,
+		"pieces": [[&"warehouse", 45.0]],
 		"sponsors": ["ROUNDHOUSE STORAGE CO.", "HARBORLIGHT CRAB SHACK", "BRASS RAIL BITTERS", "OLD LINE LOCKSMITHS", "CANAL STREET CANDY"],
 		"skyline_color": Color("514848"), "window_color": Color("ffe1a8"), "skyline_height": 0.9,
 	},
@@ -99,7 +107,8 @@ const PARKS := [
 		"shape": [[-45, 101, 3.7], [-22, 118, 3.7], [0, 125, 3.7], [22, 118, 3.7], [45, 101, 3.7]], "air": 1.0,
 		"seat_color": Color("1e3f7a"), "seat_color_alt": Color("173263"), "structure_color": Color("e5e8ee"), "accent_color": Color("6fd6ff"),
 		"outfield_wall_color": Color("16336a"), "wall_style": &"padded", "home_fan_share": 0.5, "away_fan_share": 0.25, "attendance": 0.8,
-		"foul_rows": 24, "outfield_rows": 5, "night": true, "landmark": &"fountains",
+		"foul_rows": 24, "outfield_rows": 5, "night": true,
+		"pieces": [[&"fountains", 14.0, {}, true]],
 		"sponsors": ["CASCADE COLA", "SPRINKLE & SONS PLUMBING", "BLUE PLAINS BBQ", "MISTY MEADOW DAIRY", "JUBILEE JEWELERS"],
 		"skyline_color": Color("26304a"), "window_color": Color("d8ecff"), "skyline_height": 0.6,
 	},
@@ -109,9 +118,10 @@ const PARKS := [
 		"shape": [[-45, 100, 3.0], [-22, 114, 3.0], [0, 122, 3.0], [22, 114, 3.0], [45, 100, 3.0]], "air": 0.97, "surface": 1.3,
 		"seat_color": Color("2a2f3a"), "seat_color_alt": Color("20242d"), "structure_color": Color("9aa3b5"), "accent_color": Color("ff5ad0"),
 		"outfield_wall_color": Color("1c2236"), "wall_style": &"padded", "home_fan_share": 0.5, "away_fan_share": 0.25, "attendance": 0.7,
-		"foul_rows": 26, "outfield_rows": 14, "roof": true, "turf": true, "skyline": false,
+		"foul_rows": 26, "outfield_rows": 14, "turf": true,
+		"pieces": [[&"dome"]], "standard": [&"scoreboard"],
 		"sponsors": ["STRONGBOX SECURITY", "TITAN TURF", "DOMELIGHT DINER", "PRESSURE SEAL WINDOWS", "BIG TOP BURGERS"],
-		"skyline_color": Color("26304a"), "window_color": Color("d8ecff"), "skyline_height": 0.0,
+		"skyline_color": Color("26304a"), "window_color": Color("d8ecff"),
 	},
 ]
 
@@ -130,8 +140,16 @@ func _init() -> void:
 		shape.air_drag_scale = spec["air"]
 		shape.surface_speed = spec.get("surface", 1.0)
 		park.field_shape = shape
+		for kind: StringName in spec.get("standard", StadiumModules.STANDARD):
+			var tall: float = spec.get("skyline_height", 1.0)
+			park.add_piece(kind, NAN, {"height": tall} if kind == &"skyline" and tall != 1.0 else {})
+		for p in spec.get("pieces", []):
+			park.add_piece(p[0], p[1] if p.size() > 1 else NAN, p[2] if p.size() > 2 else {}, p[3] if p.size() > 3 else false)
+		var problems := park.validate()
+		if not problems.is_empty():
+			push_error("%s: %s" % [park.id, ", ".join(problems)])
 		for key in spec:
-			if key in ["shape", "air", "surface"]:
+			if key in ["shape", "air", "surface", "pieces", "standard", "skyline_height"]:
 				continue
 			var value: Variant = spec[key]
 			park.set(key, PackedStringArray(value) if key == "sponsors" else value)

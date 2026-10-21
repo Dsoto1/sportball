@@ -1,21 +1,38 @@
 [gd_resource type="Resource" script_class="StadiumDef" format=3]
 
-[ext_resource type="Script" path="res://data/defs/field_shape.gd" id="1_dfbru"]
-[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="2_0dxv1"]
+[ext_resource type="Script" path="res://data/defs/field_shape.gd" id="1_0dxv1"]
+[ext_resource type="Script" path="res://data/defs/stadium_piece.gd" id="2_6juw2"]
+[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="3_4twl7"]
 
-[sub_resource type="Resource" id="Resource_6juw2"]
-script = ExtResource("1_dfbru")
+[sub_resource type="Resource" id="Resource_stsw7"]
+script = ExtResource("1_0dxv1")
 id = &"the_kiln"
 display_name = "The Kiln"
 points = PackedVector3Array(-45, 105, 4.3, -25, 119, 4.3, 0, 127, 4.3, 25, 119, 4.3, 45, 106, 4.3)
 air_drag_scale = 0.82
 
+[sub_resource type="Resource" id="Resource_tqy5q"]
+script = ExtResource("2_6juw2")
+kind = &"scoreboard"
+angle = 27.0
+
+[sub_resource type="Resource" id="Resource_w7e58"]
+script = ExtResource("2_6juw2")
+kind = &"light_towers"
+
+[sub_resource type="Resource" id="Resource_dly8v"]
+script = ExtResource("2_6juw2")
+kind = &"skyline"
+params = {
+"height": 0.35
+}
+
 [resource]
-script = ExtResource("2_0dxv1")
+script = ExtResource("3_4twl7")
 id = &"the_kiln"
 display_name = "The Kiln"
 blurb = "Comets home · thin desert air carries the ball, so the outfield is a canyon"
-field_shape = SubResource("Resource_6juw2")
+field_shape = SubResource("Resource_stsw7")
 seat_color = Color(0.6509804, 0.3529412, 0.19607843, 1)
 seat_color_alt = Color(0.5411765, 0.28235295, 0.14901961, 1)
 structure_color = Color(0.8509804, 0.7254902, 0.5411765, 1)
@@ -24,10 +41,10 @@ outfield_wall_color = Color(0.47843137, 0.24313726, 0.13333334, 1)
 wall_style = &"brick"
 foul_rows = 24
 outfield_rows = 18
-skyline_height = 0.35
 home_fan_share = 0.45
 away_fan_share = 0.3
 attendance = 0.8
 sponsors = PackedStringArray("SUNBAKED SODA", "MESA MOTOR LODGE", "CACTUS CANDY CO.", "COPPER CANYON CHILI")
 skyline_color = Color(0.6901961, 0.5411765, 0.38431373, 1)
 window_color = Color(1, 0.9411765, 0.7529412, 1)
+pieces = Array[ExtResource("2_6juw2")]([SubResource("Resource_tqy5q"), SubResource("Resource_w7e58"), SubResource("Resource_dly8v")])
