@@ -1,5 +1,10 @@
 # Batting Style Reference Prompts
 
+> **Superseded as the authority** by [`BATTING_STYLE_SPEC.md`](BATTING_STYLE_SPEC.md)
+> (the owner's revised spec: locked world rules, per-style mechanics, QA
+> checklist). The first generated sheet is `batting_styles_reference.jpg`.
+> The prompts below are kept for making more images.
+
 Prompts for reference images of the six batting styles in
 `presentation/animation/batting_styles.gd`. Each image is one **pose sheet**:
 the same batter in five key poses, left to right, so the poses can be read

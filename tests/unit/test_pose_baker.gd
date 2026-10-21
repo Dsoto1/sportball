@@ -88,10 +88,15 @@ func test_the_barrel_is_square_at_contact() -> void:
 	for style: StringName in BattingStyles.ORDER:
 		var start := BattingStyles.approach_bat(style, 1.0, 0.0)
 		var at := BattingStyles.swing_bat(style, BattingStyles.CONTACT_AT, start)
-		check_near(at.x, 0.0, 0.5, "%s: barrel across the plate at contact" % style)
+		var b: Dictionary = BattingStyles.BAT[style]
+		check_near(at.x, float(b["attack_yaw"]), 0.5, "%s: barrel meets the ball on its attack direction" % style)
+		check_near(at.y, float(b["attack_lift"]), 0.5, "%s: and at its attack angle" % style)
+		check(absf(at.x) <= 15.0, "%s: still through the hitting zone, not around it" % style)
 		var finish := BattingStyles.swing_bat(style, 1.0, start)
 		check_eq(finish.x, float(BattingStyles.BAT[style]["finish_yaw"]), "%s: sweeps through to its finish" % style)
 	check(MatchView.SWING_TIME * BattingStyles.CONTACT_AT < 0.08, "contact lands within 80 ms of the press")
+	check(float(BattingStyles.BAT[&"slap"]["attack_yaw"]) > 5.0, "the slap goes the other way")
+	check(float(BattingStyles.BAT[&"leg_kick"]["attack_lift"]) > float(BattingStyles.BAT[&"slap"]["attack_lift"]), "the slugger swings up, the slapper flat")
 
 
 func test_styles_suit_the_hitter() -> void:
@@ -107,3 +112,36 @@ func test_styles_suit_the_hitter() -> void:
 	check([&"slap", &"open"].has(BattingStyles.for_player(slapper)), "quick contact hitters slap")
 	slapper.batting_style = &"crouch"
 	check_eq(BattingStyles.for_player(slapper), &"crouch", "a set style wins")
+
+
+## BATTING_STYLE_SPEC.md's QA checklist, checked on every style's poses.
+func test_styles_obey_the_batters_box() -> void:
+	for style: StringName in BattingStyles.ORDER:
+		var p := BattingStyles.poses(style)
+		for key: String in p:
+			var pose: Dictionary = p[key]
+			for foot in ["foot_l", "foot_r"]:
+				var at: Vector3 = pose.get(foot, BaseballMoves.STANCE[foot])
+				# Body space: +Z toward the plate.
+				check(at.z < BattingStyles.PLATE_CLEAR, "%s %s: %s stays off the plate" % [style, key, foot])
+				check(absf(at.x) < 0.7, "%s %s: %s stays in the box" % [style, key, foot])
+		# The rear foot is anchored through the load.
+		check_eq(p["load"].get("foot_r", BaseballMoves.STANCE["foot_r"]), p["stance"].get("foot_r", BaseballMoves.STANCE["foot_r"]), "%s: rear foot anchored through the load" % style)
+		# The lead foot strides toward the pitcher, not across the plate.
+		var from: Vector3 = p["load"]["foot_l"]
+		var to: Vector3 = p["stride"]["foot_l"]
+		check(absf(to.z - from.z) <= 0.5 * absf(to.x - from.x) + 0.05, "%s: stride goes at the pitcher" % style)
+		check(to.x > from.x - 0.001, "%s: stride lands toward the pitcher's side" % style)
+	var stride := func(style: StringName) -> float:
+		var p := BattingStyles.poses(style)
+		return float(p["stride"]["foot_l"].x - p["stance"]["foot_l"].x)
+	for style: StringName in BattingStyles.ORDER:
+		if style != &"leg_kick":
+			check(stride.call(&"leg_kick") > stride.call(style), "leg kick strides farther than %s" % style)
+		if style != &"slap":
+			check(stride.call(&"slap") < stride.call(style), "slap strides shorter than %s" % style)
+	var crouch := BattingStyles.poses(&"crouch")
+	var classic := BattingStyles.poses(&"classic")
+	check(float(crouch["stance"]["drop"]) > float(classic["stance"]["drop"]), "the crouch sits lowest")
+	check(float(crouch["finish"]["drop"]) > float(classic["finish"]["drop"]), "and finishes lower")
+	check(BattingStyles.ONE_HAND_RELEASE > BattingStyles.CONTACT_AT, "a one-hand release only comes after contact")

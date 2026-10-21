@@ -16,6 +16,11 @@ const LOAD_AT := 0.5
 const STRIDE_AT := 0.85
 ## Swing clock: the barrel meets the ball here, the rest is follow-through.
 const CONTACT_AT := 0.2
+## A one-hand finish lets the top hand go only after this (well past contact).
+const ONE_HAND_RELEASE := 0.5
+## Body space (m, forward = toward the plate): no foot may reach the plate.
+## The batter stands 0.85 m from its middle; its near edge is 0.63 away.
+const PLATE_CLEAR := 0.45
 
 ## Style ids, in the order a roster's styles are handed out when a player
 ## sets none.
@@ -24,15 +29,19 @@ const NAMES := {&"classic": "Classic", &"crouch": "Crouch", &"open": "Open", &"l
 
 ## The bat in his hands, per style (degrees; yaw 90 = barrel back toward the
 ## catcher, 0 = across the plate; lift above level). load_* add to the
-## stance at the top of the load. finish_yaw ends the sweep. one_hand lets
-## the top hand go after contact. choke (m) moves the hands up the handle.
+## stance at the top of the load. At contact the barrel points along
+## attack_yaw (attack direction: + lags toward the opposite field, - is out
+## front, pulling) and climbs at attack_lift (attack angle), the swing's
+## signature per BATTING_STYLE_SPEC.md. finish_yaw ends the sweep. one_hand
+## lets the top hand go after contact. choke (m) moves the hands up the
+## handle.
 const BAT := {
-	&"classic": {"yaw": 100.0, "lift": 50.0, "load_yaw": 15.0, "load_lift": 5.0, "waggle": 6.0, "finish_yaw": -170.0, "finish_lift": 40.0, "one_hand": false, "choke": 0.0},
-	&"crouch": {"yaw": 105.0, "lift": 38.0, "load_yaw": 12.0, "load_lift": 0.0, "waggle": 4.0, "finish_yaw": -165.0, "finish_lift": 35.0, "one_hand": false, "choke": 0.0},
-	&"open": {"yaw": 92.0, "lift": 58.0, "load_yaw": 20.0, "load_lift": 2.0, "waggle": 9.0, "finish_yaw": -170.0, "finish_lift": 42.0, "one_hand": false, "choke": 0.0},
-	&"leg_kick": {"yaw": 100.0, "lift": 62.0, "load_yaw": 28.0, "load_lift": 8.0, "waggle": 3.0, "finish_yaw": -185.0, "finish_lift": 48.0, "one_hand": false, "choke": 0.0},
-	&"wrap": {"yaw": 145.0, "lift": 28.0, "load_yaw": 15.0, "load_lift": 0.0, "waggle": 2.0, "finish_yaw": -180.0, "finish_lift": 25.0, "one_hand": true, "choke": 0.0},
-	&"slap": {"yaw": 88.0, "lift": 45.0, "load_yaw": 8.0, "load_lift": 0.0, "waggle": 10.0, "finish_yaw": -120.0, "finish_lift": 15.0, "one_hand": false, "choke": 0.08},
+	&"classic": {"yaw": 100.0, "lift": 50.0, "load_yaw": 15.0, "load_lift": 5.0, "waggle": 6.0, "attack_yaw": 0.0, "attack_lift": 6.0, "finish_yaw": -170.0, "finish_lift": 40.0, "one_hand": false, "choke": 0.0},
+	&"crouch": {"yaw": 105.0, "lift": 38.0, "load_yaw": 12.0, "load_lift": 0.0, "waggle": 4.0, "attack_yaw": 0.0, "attack_lift": 3.0, "finish_yaw": -165.0, "finish_lift": 30.0, "one_hand": false, "choke": 0.0},
+	&"open": {"yaw": 92.0, "lift": 58.0, "load_yaw": 20.0, "load_lift": 2.0, "waggle": 9.0, "attack_yaw": -3.0, "attack_lift": 6.0, "finish_yaw": -170.0, "finish_lift": 42.0, "one_hand": false, "choke": 0.0},
+	&"leg_kick": {"yaw": 100.0, "lift": 62.0, "load_yaw": 28.0, "load_lift": 8.0, "waggle": 3.0, "attack_yaw": -6.0, "attack_lift": 12.0, "finish_yaw": -185.0, "finish_lift": 48.0, "one_hand": false, "choke": 0.0},
+	&"wrap": {"yaw": 145.0, "lift": 28.0, "load_yaw": 15.0, "load_lift": 0.0, "waggle": 2.0, "attack_yaw": -5.0, "attack_lift": 9.0, "finish_yaw": -180.0, "finish_lift": 25.0, "one_hand": true, "choke": 0.0},
+	&"slap": {"yaw": 80.0, "lift": 32.0, "load_yaw": 6.0, "load_lift": 0.0, "waggle": 10.0, "attack_yaw": 12.0, "attack_lift": 0.0, "finish_yaw": -110.0, "finish_lift": 12.0, "one_hand": false, "choke": 0.08},
 }
 
 
@@ -92,8 +101,12 @@ static func poses(style: StringName) -> Dictionary:
 				"hips": Vector3(6, 18, 0), "chest": Vector3(10, -2, 0), "head": Vector3(-8, 70, 0),
 				"foot_l": P(-0.3, 0.1, -0.2), "toe_l": 35.0,
 			})
-			# A toe tap closes him up before he strides.
+			# A toe tap closes him up, then a short stride from there.
 			load = _with(load, {"foot_l": P(-0.2, 0.17, -0.02), "toe_l": 0.0, "hips": Vector3(8, -12, 0), "chest": Vector3(12, -30, 0)})
+			stride = _with(stride, {"foot_l": P(-0.4, 0.1, 0.06)})
+			contact = _with(contact, {"foot_l": P(-0.4, 0.1, 0.06)})
+			extend = _with(extend, {"foot_l": P(-0.4, 0.1, 0.06)})
+			finish = _with(finish, {"foot_l": P(-0.4, 0.1, 0.06)})
 		&"leg_kick":
 			stance = _with(stance, {"drop": 0.06, "chest": Vector3(8, -18, 0)})
 			load = _with(load, {
@@ -117,10 +130,12 @@ static func poses(style: StringName) -> Dictionary:
 			stance = _with(stance, {
 				"drop": 0.14, "chest": Vector3(16, -12, 0),
 				"foot_l": P(-0.28, 0.1, 0.06), "foot_r": P(0.3, 0.1, -0.02),
-				"hand_r": P(0.18, 1.3, 0.17), "hand_l": P(0.12, 1.25, 0.2),
+				# Lower and out in front of the back shoulder, bat flatter.
+				"hand_r": P(0.14, 1.18, 0.25), "hand_l": P(0.08, 1.13, 0.28),
+				"elbow_r": P(1, -1, 0), "elbow_l": P(-0.2, -1, 0.3),
 			})
-			load = _with(stance, {"hips": Vector3(10, -8, 0), "chest": Vector3(16, -20, 0), "hand_r": P(0.21, 1.31, 0.14), "hand_l": P(0.15, 1.26, 0.17)})
-			stride = _with(stride, {"drop": 0.15, "foot_l": P(-0.36, 0.1, 0.08), "foot_r": P(0.3, 0.1, -0.02), "hand_r": P(0.16, 1.26, 0.12), "hand_l": P(0.1, 1.2, 0.15)})
+			load = _with(stance, {"hips": Vector3(10, -8, 0), "chest": Vector3(16, -20, 0), "hand_r": P(0.18, 1.2, 0.22), "hand_l": P(0.12, 1.15, 0.25)})
+			stride = _with(stride, {"drop": 0.15, "foot_l": P(-0.36, 0.1, 0.08), "foot_r": P(0.3, 0.1, -0.02), "hand_r": P(0.16, 1.18, 0.2), "hand_l": P(0.1, 1.13, 0.23)})
 			contact = _with(contact, {"foot_l": P(-0.36, 0.1, 0.08), "hips": Vector3(8, 40, 0), "chest": Vector3(16, 22, 0)})
 			extend = _with(extend, {"foot_l": P(-0.36, 0.1, 0.08), "hips": Vector3(6, 55, 0), "chest": Vector3(12, 30, 0)})
 			# Compact: hands stay level and out front, he's already leaving the box.
@@ -155,10 +170,11 @@ static func approach_bat(style: StringName, a: float, clock: float) -> Vector2:
 static func swing_bat(style: StringName, p: float, start: Vector2) -> Vector2:
 	var b: Dictionary = BAT[style]
 	p = clampf(p, 0.0, 1.0)
+	var attack := Vector2(float(b["attack_yaw"]), float(b["attack_lift"]))
 	if p < CONTACT_AT:
 		# Accelerating into the zone: slow off the shoulder, fast at the ball.
 		var u := p / CONTACT_AT
-		return Vector2(lerpf(start.x, 0.0, u * u), lerpf(start.y, 5.0, u))
+		return Vector2(lerpf(start.x, attack.x, u * u), lerpf(start.y, attack.y, u))
 	var v := (p - CONTACT_AT) / (1.0 - CONTACT_AT)
 	var out := 1.0 - (1.0 - v) * (1.0 - v)
-	return Vector2(lerpf(0.0, float(b["finish_yaw"]), out), lerpf(5.0, float(b["finish_lift"]), smoothstep(0.0, 0.7, v)))
+	return Vector2(lerpf(attack.x, float(b["finish_yaw"]), out), lerpf(attack.y, float(b["finish_lift"]), smoothstep(0.0, 0.7, v)))

@@ -634,7 +634,7 @@ func _update_bat() -> void:
 	elif _bat_swing_start >= 0.0:
 		var p := (_view_clock - _bat_swing_start) / SWING_TIME
 		bat = BattingStyles.swing_bat(style, p, _swing_from)
-		one_hand = bool(BattingStyles.BAT[style]["one_hand"]) and p > 0.5
+		one_hand = bool(BattingStyles.BAT[style]["one_hand"]) and p > BattingStyles.ONE_HAND_RELEASE
 		if batter != null:
 			batter.animate(ActorView.Pose.SWING, delta, 0.0, false, p)
 	elif batter != null:

@@ -536,3 +536,24 @@ Decision:
 Reason: Owner request to nail down the swing: different batter styles (stance, grip, wind-up, stride) and a satisfying crack on a good hit.
 
 Affected systems: BattingStyles, BaseballMoves (style moves), ActorView (approach, finish, style), BatGrip (one hand, choke), MatchView (approach clock, style bat path, trail, bat toss), PlayAnimator (finish hold), PlayerDef.batting_style, tests.
+
+## 2026-10-21 - Batting Styles Follow the Owner's Spec
+
+Decision:
+- **`docs/BATTING_STYLE_SPEC.md` (the owner's) is the authority for the six styles.** The generated sheet `docs/batting_styles_reference.jpg` is a visual guide only.
+- **Each style meets the ball its own way,** per the spec's Statcast vocabulary:
+  - The attack direction (`attack_yaw`): the slap goes the other way (+12°); leg kick, wrap and open are slightly pull-side.
+  - The attack angle (`attack_lift`): leg kick 12°, wrap 9°, classic and open 6°, crouch 3°, slap flat.
+- **Slap:** hands lower and farther out front, bat flatter, shorter and lower finish.
+- **Open:** a short stride from its closed-up toe tap, no longer the classic stride.
+- **The spec's QA checklist is a test on every style's poses:**
+  - No foot reaches the plate and both stay in the box.
+  - The rear foot is anchored through the load.
+  - The stride goes at the pitcher, not across the plate.
+  - The leg kick strides farthest and the slap shortest.
+  - The crouch sits and finishes lowest.
+  - A one-hand release only comes after contact.
+
+Reason: Owner's revised batting spec and first reference sheet.
+
+Affected systems: BattingStyles, MatchView (one-hand release constant), tests, docs.
