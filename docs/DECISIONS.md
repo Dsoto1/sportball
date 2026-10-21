@@ -973,3 +973,28 @@ Affected systems: StadiumSurfaces, ModelKit (new), StadiumDef (surfaces, facade_
 Reason: Owner reference sheet.
 
 Affected systems: generate_parks, slogan board module, stadium_refs notes.
+
+## 2026-10-21 - Facades and Canopies on the Stands
+
+The sheets' tall, layered stands (arcades, windows, steel frames, roofs) are now two modules.
+
+- **`arcade`:** an upper facade standing on the back of the stands. It is built bay by bay so it follows the bowl, with columns, a cornice and club banners every few bays. Four styles:
+  - **arches:** arched openings that glow warm at night;
+  - **windows:** two rows of windows;
+  - **truss:** open steel framing with X-bracing;
+  - **timber:** the same frame in wood.
+- **`canopy`:** a sloped roof over the top rows, in steel or timber, with a lit front edge and struts down to the stands.
+- **Per park:**
+  - Arches: the Halo Dome, Ledger Street, the Kiln, the Horseshoe, Fountain Gardens.
+  - Windows: Warehouse Row.
+  - Truss: Foundry, Reactor Park, the Vault.
+  - Timber: Pier 9 and the Icebox.
+  - Canopies where the sheets show roofs.
+  - Every park's pair runs from 50° to the corner behind home on both sides (mirrored).
+- **Mirrored spans:** mirrored pieces now flip their span, so the mirror sweeps away from center rather than across the outfield (tested).
+- **Ground fix:** the ground outside the parks sat 2 cm above the field's 320 m grass slab and flickered green in high views. It sits 10 cm up now, with water raised above it.
+- **Tour camera:** the aerial shot moved higher and farther back.
+
+Reason: Owner request for facade detail on the stands.
+
+Affected systems: modules (arcade, canopy new), StadiumModules (mirrored spans), Stadium (ground height), water module, generate_parks, stadium_tour, tests, README.

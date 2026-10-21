@@ -345,3 +345,18 @@ func test_surfaces_and_models_load() -> void:
 	for park in content().parks:
 		for kind in [park.facade_surface, park.structure_surface, park.stand_surface]:
 			check(kind == &"" or StadiumSurfaces.KINDS.has(kind), "%s uses known surfaces (%s)" % [park.id, kind])
+
+
+func test_mirrored_spans_sweep_away_from_center() -> void:
+	var park := _blank_park()
+	park.add_piece(&"centerpiece")
+	park.add_piece(&"arcade", 50.0, {"span": 100.0}, true)
+	var st := _build_def(park)
+	for name in ["Arcade", "Arcade2"]:
+		var arcade: Node3D = st.get_node(name)
+		var lo := INF
+		for mi: MeshInstance3D in arcade.find_children("*", "MeshInstance3D", true, false):
+			for v in (mi.mesh as ArrayMesh).surface_get_arrays(0)[Mesh.ARRAY_VERTEX] if mi.mesh is ArrayMesh else []:
+				lo = minf(lo, absf(rad_to_deg(atan2(v.x, -v.z))))
+		check(lo > 45.0, "%s stays out of the outfield (nearest %.0f°)" % [name, lo])
+	st.free()

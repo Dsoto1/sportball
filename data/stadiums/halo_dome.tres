@@ -76,6 +76,27 @@ params = {
 "width": 12.0
 }
 
+[sub_resource type="Resource" id="Resource_dmp26"]
+script = ExtResource("2_un8dc")
+kind = &"arcade"
+angle = 50.0
+mirrored = true
+params = {
+"banners": 4,
+"height": 11.0,
+"style": &"arches"
+}
+
+[sub_resource type="Resource" id="Resource_hpvue"]
+script = ExtResource("2_un8dc")
+kind = &"canopy"
+angle = 52.0
+mirrored = true
+params = {
+"height": 11.7,
+"style": &"steel"
+}
+
 [resource]
 script = ExtResource("3_bqeas")
 id = &"halo_dome"
@@ -96,4 +117,4 @@ window_color = Color(1, 0.8235294, 0.47843137, 1)
 facade_color = Color(0.41568628, 0.3529412, 0.54901963, 1)
 facade_surface = &"marble"
 structure_surface = &"steel"
-pieces = Array[ExtResource("2_un8dc")]([SubResource("Resource_fwpx2"), SubResource("Resource_8s2kh"), SubResource("Resource_rkpyr"), SubResource("Resource_rkhve"), SubResource("Resource_iofs5"), SubResource("Resource_5ix5a"), SubResource("Resource_6b8ye"), SubResource("Resource_mt3jj"), SubResource("Resource_ejy07"), SubResource("Resource_pjoj3"), SubResource("Resource_yath7")])
+pieces = Array[ExtResource("2_un8dc")]([SubResource("Resource_fwpx2"), SubResource("Resource_8s2kh"), SubResource("Resource_rkpyr"), SubResource("Resource_rkhve"), SubResource("Resource_iofs5"), SubResource("Resource_5ix5a"), SubResource("Resource_6b8ye"), SubResource("Resource_mt3jj"), SubResource("Resource_ejy07"), SubResource("Resource_pjoj3"), SubResource("Resource_yath7"), SubResource("Resource_dmp26"), SubResource("Resource_hpvue")])

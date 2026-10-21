@@ -241,6 +241,22 @@ const CATALOG := {
 		"excludes": [&"dome"],
 		"script": preload("res://presentation/stadium/modules/searchlights_module.gd"),
 	},
+	&"arcade": {
+		"name": "Arcade Facade", "category": &"structure", "unique": false, "placed": true,
+		"about": "The upper facade on the back of the stands across span degrees: arched openings, two rows of windows, or an open steel or timber frame, with columns, a cornice and club banners. Openings glow at night.",
+		"angle": 50.0, "angle_range": [-180.0, 180.0],
+		"params": {"style": [&"arches"], "span": [130.0, -360.0, 360.0], "height": [9.0, 4.0, 20.0], "bay": [7.0, 3.0, 16.0], "banners": [4, 0, 20]},
+		"choices": {"style": [&"arches", &"windows", &"truss", &"timber"]},
+		"script": preload("res://presentation/stadium/modules/arcade_module.gd"),
+	},
+	&"canopy": {
+		"name": "Canopy", "category": &"structure", "unique": false, "placed": true,
+		"about": "A roof over the top rows of the stands across span degrees, in steel or timber, with a lit front edge and struts.",
+		"angle": 55.0, "angle_range": [-180.0, 180.0],
+		"params": {"style": [&"steel"], "span": [120.0, -360.0, 360.0], "depth": [9.0, 3.0, 20.0], "height": [10.0, 3.0, 24.0]},
+		"choices": {"style": [&"steel", &"timber"]},
+		"script": preload("res://presentation/stadium/modules/canopy_module.gd"),
+	},
 	&"dome": {
 		"name": "Dome", "category": &"structure", "unique": true, "placed": false,
 		"about": "A sealed roof over the whole park: catwalk rings, light banks, a glowing crown. Indoor light.",
@@ -289,6 +305,10 @@ static func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, away: Te
 		var twin: StadiumPiece = piece.duplicate()
 		twin.angle = -piece.angle
 		twin.mirrored = false
+		# A span sweeps the other way on the mirror side.
+		if piece.params.has("span") or spec["params"].has("span"):
+			twin.params = piece.params.duplicate()
+			twin.params["span"] = -float(piece.param("span"))
 		module.build(stadium, twin, home, away)
 
 

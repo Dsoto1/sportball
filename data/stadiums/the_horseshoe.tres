@@ -64,6 +64,17 @@ params = {
 "span": 260.0
 }
 
+[sub_resource type="Resource" id="Resource_oqwa8"]
+script = ExtResource("2_olas1")
+kind = &"arcade"
+angle = 50.0
+mirrored = true
+params = {
+"banners": 6,
+"height": 12.0,
+"style": &"arches"
+}
+
 [resource]
 script = ExtResource("3_eqcja")
 id = &"the_horseshoe"
@@ -88,4 +99,4 @@ window_color = Color(1, 0.8784314, 0.627451, 1)
 facade_color = Color(0.6039216, 0.47843137, 0.36862746, 1)
 facade_surface = &"stone"
 structure_surface = &"brick"
-pieces = Array[ExtResource("2_olas1")]([SubResource("Resource_tgobb"), SubResource("Resource_o5o6h"), SubResource("Resource_b4fev"), SubResource("Resource_2quui"), SubResource("Resource_26mby"), SubResource("Resource_gnd8x"), SubResource("Resource_1t2v1"), SubResource("Resource_ugxod")])
+pieces = Array[ExtResource("2_olas1")]([SubResource("Resource_tgobb"), SubResource("Resource_o5o6h"), SubResource("Resource_b4fev"), SubResource("Resource_2quui"), SubResource("Resource_26mby"), SubResource("Resource_gnd8x"), SubResource("Resource_1t2v1"), SubResource("Resource_ugxod"), SubResource("Resource_oqwa8")])

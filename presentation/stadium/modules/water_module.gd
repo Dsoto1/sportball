@@ -25,10 +25,10 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 		var band_a := Scenery.water_band(stadium, piece, a)
 		var band_b := Scenery.water_band(stadium, piece, b)
 		if band_a.y > band_a.x and band_b.y > band_b.x:
-			var p0 := stadium.point(a, band_a.x, 0.04)
-			var p1 := stadium.point(b, band_b.x, 0.04)
-			var p2 := stadium.point(b, band_b.y, 0.04)
-			var p3 := stadium.point(a, band_a.y, 0.04)
+			var p0 := stadium.point(a, band_a.x, 0.16)
+			var p1 := stadium.point(b, band_b.x, 0.16)
+			var p2 := stadium.point(b, band_b.y, 0.16)
+			var p3 := stadium.point(a, band_a.y, 0.16)
 			for p in [p0, p2, p1, p0, p3, p2]:
 				st.set_normal(Vector3.UP)
 				st.add_vertex(p)

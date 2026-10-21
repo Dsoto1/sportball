@@ -205,9 +205,10 @@ func _build_bowl() -> void:
 		var outside := def.skyline_color.darkened(0.45) if def.ground_color.a == 0.0 else def.ground_color
 		var edge := back_a + 1.0
 		if is_water(mid):
-			_quad(st, point(a, edge, 0.02), point(a, WATER_EDGE, 0.02), point(b, WATER_EDGE, 0.02), point(b, back_b + 1.0, 0.02), WATER)
+			_quad(st, point(a, edge, 0.14), point(a, WATER_EDGE, 0.14), point(b, WATER_EDGE, 0.14), point(b, back_b + 1.0, 0.14), WATER)
 			edge = WATER_EDGE
-		_quad(ground, point(a, edge, 0.0), point(a, 950.0, 0.0), point(b, 950.0, 0.0), point(b, edge if edge == WATER_EDGE else back_b + 1.0, 0.0), outside)
+		# Above the field's 320 m grass slab (top at -0.01), so the two never flicker.
+		_quad(ground, point(a, edge, 0.1), point(a, 950.0, 0.1), point(b, 950.0, 0.1), point(b, edge if edge == WATER_EDGE else back_b + 1.0, 0.1), outside)
 		a = b
 	st.generate_normals()
 	var mi := MeshInstance3D.new()

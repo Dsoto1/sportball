@@ -12,7 +12,7 @@ var _park_id: StringName = &""
 const SHOTS := [
 	[Vector3(-20, 4, -60), Vector3(-60, 2, -78)],
 	[Vector3(10, 10, -40), Vector3(50, 20, -125)],
-	[Vector3(0, 40, 120), Vector3(0, 30, -60)],
+	[Vector3(0, 85, 150), Vector3(0, 0, -50)],
 	[Vector3(0, 1.6, -40), Vector3(0, 3, -112)],
 	[Vector3(0, 9, 8), Vector3(0, 5, -60)],
 	[Vector3(30, 6, -30), Vector3(-80, 10, 40)],

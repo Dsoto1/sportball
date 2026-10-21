@@ -231,6 +231,8 @@ The core is always built:
 | `bay` | water beyond one side, low stands, boats | boats |
 | `warehouse` | long brick building along a line, its name on top | length, height, text |
 | `fountains` | pools with cascades and jets beyond the wall | span, basins |
+| `arcade` | upper facade on the back of the stands: arches, windows, or an open steel or timber frame, with columns, cornice and club banners | style, span, height, bay, banners |
+| `canopy` | roof over the top rows, steel or timber, lit front edge | style, span, depth, height |
 | `dome` | sealed roof; the park plays indoors | rise |
 | `vault_door` | giant round bank-vault door in a tall wall behind the stands | radius |
 | `searchlights` | beams sweeping into the night sky | span, count, length |
