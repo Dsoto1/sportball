@@ -1309,3 +1309,10 @@ Reason: Owner request for another detail pass against the sheets. The balance ch
 - Simplify now runs with a tighter error (0.0005-0.001) and `--lock-border`, so silhouettes and texture seams hold.
 - Textures are 2048 px instead of 1024. The Meshy folder is now 53 MB (Git LFS).
 - Godot's importer generates mesh LODs for these files, so distant pieces draw fewer triangles automatically.
+
+## 2026-10-22 - Back Faces Culled from Stadium Models
+
+- Stadium pieces only face the bowl, so their backs are never seen. The new `tools/cull_back.py` drops triangles whose normal points away from home (local -Z, beyond a 0.25 tolerance so sides seen at an angle stay) and compacts the vertices.
+- This removes 30-40% of each Meshy model. The simplify targets were kept, so the visible faces now get roughly 1.5 times the triangles.
+- **Pipeline for every Meshy stadium piece:** weld, cull_back, weld, simplify (to the target, error 0.0008), repack_glb at 2048 px, then regrade_glb where the colors need it.
+- Pieces must face +Z (Meshy's front). If a piece is ever placed to be seen from behind, cull it with a higher threshold or not at all.
