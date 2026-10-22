@@ -1204,3 +1204,12 @@ Reason: Owner request for another detail pass against the sheets. The balance ch
 - The owner found the remaining waterfalls (Sakura Gate's gorge, Fountain Gardens' terraces) a mess. They're pulled from every park until one can be made to look right, likely as a sculpted model.
 - Blossom trees (Sakura Gate) and cypresses (Fountain Gardens) take their place.
 - The module stays in the catalog.
+
+## 2026-10-22 - Shared Kit Only Where the Sheets Show It
+
+- Every park carried the same string lights, lantern rows, lamp posts and flags, the biggest source of sameness. Rereading the 18 sheets:
+  - **String lights:** no sheet shows strings of bulbs. They stay only as the Horseshoe's lamplit strands and Sakura Gate's paper lanterns.
+  - **Lantern rows:** kept at the Horseshoe, Sakura Gate, the Vault and Ledger Street.
+  - **Lamp posts or braziers:** kept at the Horseshoe, Ledger Street, the Vault, Warehouse Row, Forum Field, Firelight and Amber Gate.
+  - **Flags:** kept at Ledger Street, Pier 9, Fountain Gardens, Forum Field, Citadel Park and Amber Gate.
+- 39 pieces were removed in all.

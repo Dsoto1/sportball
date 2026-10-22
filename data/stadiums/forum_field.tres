@@ -136,14 +136,6 @@ params = {
 
 [sub_resource type="Resource" id="Resource_jlfwj"]
 script = ExtResource("2_57hhn")
-kind = &"string_lights"
-angle = -150.0
-params = {
-"color": Color(1, 0.7529412, 0.4392157, 1)
-}
-
-[sub_resource type="Resource" id="Resource_mttdo"]
-script = ExtResource("2_57hhn")
 kind = &"props"
 angle = -46.0
 params = {
@@ -155,7 +147,7 @@ params = {
 "tint": 0.6
 }
 
-[sub_resource type="Resource" id="Resource_feanw"]
+[sub_resource type="Resource" id="Resource_mttdo"]
 script = ExtResource("2_57hhn")
 kind = &"props"
 angle = -46.0
@@ -191,4 +183,4 @@ window_color = Color(1, 0.88235295, 0.65882355, 1)
 facade_color = Color(0.8392157, 0.7490196, 0.57254905, 1)
 facade_surface = &"stone"
 structure_surface = &"marble"
-pieces = Array[ExtResource("2_57hhn")]([SubResource("Resource_2rkht"), SubResource("Resource_sdusm"), SubResource("Resource_l7em3"), SubResource("Resource_ore7e"), SubResource("Resource_yo6yi"), SubResource("Resource_3h0k8"), SubResource("Resource_ts7w3"), SubResource("Resource_qx4f8"), SubResource("Resource_kaonq"), SubResource("Resource_w8j6t"), SubResource("Resource_y2yj7"), SubResource("Resource_calg2"), SubResource("Resource_5xwdd"), SubResource("Resource_jlfwj"), SubResource("Resource_mttdo"), SubResource("Resource_feanw")])
+pieces = Array[ExtResource("2_57hhn")]([SubResource("Resource_2rkht"), SubResource("Resource_sdusm"), SubResource("Resource_l7em3"), SubResource("Resource_ore7e"), SubResource("Resource_yo6yi"), SubResource("Resource_3h0k8"), SubResource("Resource_ts7w3"), SubResource("Resource_qx4f8"), SubResource("Resource_kaonq"), SubResource("Resource_w8j6t"), SubResource("Resource_y2yj7"), SubResource("Resource_calg2"), SubResource("Resource_5xwdd"), SubResource("Resource_jlfwj"), SubResource("Resource_mttdo")])

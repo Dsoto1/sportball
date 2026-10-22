@@ -140,14 +140,6 @@ params = {
 
 [sub_resource type="Resource" id="Resource_t5nf2"]
 script = ExtResource("2_mb518")
-kind = &"string_lights"
-angle = -150.0
-params = {
-"color": Color(1, 0.88235295, 0.65882355, 1)
-}
-
-[sub_resource type="Resource" id="Resource_7ah7a"]
-script = ExtResource("2_mb518")
 kind = &"planters"
 angle = -46.0
 params = {
@@ -156,7 +148,7 @@ params = {
 "span": 92.0
 }
 
-[sub_resource type="Resource" id="Resource_tnswc"]
+[sub_resource type="Resource" id="Resource_7ah7a"]
 script = ExtResource("2_mb518")
 kind = &"props"
 angle = -150.0
@@ -166,7 +158,7 @@ params = {
 "model": &"lantern"
 }
 
-[sub_resource type="Resource" id="Resource_54fgl"]
+[sub_resource type="Resource" id="Resource_tnswc"]
 script = ExtResource("2_mb518")
 kind = &"props"
 angle = -46.0
@@ -202,4 +194,4 @@ window_color = Color(1, 0.88235295, 0.65882355, 1)
 facade_color = Color(0.627451, 0.3137255, 0.23529412, 1)
 facade_surface = &"brick"
 structure_surface = &"stone"
-pieces = Array[ExtResource("2_mb518")]([SubResource("Resource_oeo3i"), SubResource("Resource_cq0mc"), SubResource("Resource_7xix8"), SubResource("Resource_up8hn"), SubResource("Resource_hcvew"), SubResource("Resource_qnulu"), SubResource("Resource_gnn5p"), SubResource("Resource_7qw1n"), SubResource("Resource_p8geh"), SubResource("Resource_rnwrq"), SubResource("Resource_52ddh"), SubResource("Resource_1hcmg"), SubResource("Resource_3bbly"), SubResource("Resource_jlw3u"), SubResource("Resource_3btit"), SubResource("Resource_t5nf2"), SubResource("Resource_7ah7a"), SubResource("Resource_tnswc"), SubResource("Resource_54fgl")])
+pieces = Array[ExtResource("2_mb518")]([SubResource("Resource_oeo3i"), SubResource("Resource_cq0mc"), SubResource("Resource_7xix8"), SubResource("Resource_up8hn"), SubResource("Resource_hcvew"), SubResource("Resource_qnulu"), SubResource("Resource_gnn5p"), SubResource("Resource_7qw1n"), SubResource("Resource_p8geh"), SubResource("Resource_rnwrq"), SubResource("Resource_52ddh"), SubResource("Resource_1hcmg"), SubResource("Resource_3bbly"), SubResource("Resource_jlw3u"), SubResource("Resource_3btit"), SubResource("Resource_t5nf2"), SubResource("Resource_7ah7a"), SubResource("Resource_tnswc")])

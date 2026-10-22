@@ -78,15 +78,6 @@ params = {
 
 [sub_resource type="Resource" id="Resource_7a83r"]
 script = ExtResource("2_07v1h")
-kind = &"flags"
-angle = -50.0
-params = {
-"count": 10,
-"span": 100.0
-}
-
-[sub_resource type="Resource" id="Resource_tpvtf"]
-script = ExtResource("2_07v1h")
 kind = &"water"
 angle = 10.0
 params = {
@@ -94,7 +85,7 @@ params = {
 "width": 70.0
 }
 
-[sub_resource type="Resource" id="Resource_a0pts"]
+[sub_resource type="Resource" id="Resource_tpvtf"]
 script = ExtResource("2_07v1h")
 kind = &"arcade"
 angle = 50.0
@@ -105,7 +96,7 @@ params = {
 "style": &"truss"
 }
 
-[sub_resource type="Resource" id="Resource_1cgio"]
+[sub_resource type="Resource" id="Resource_a0pts"]
 script = ExtResource("2_07v1h")
 kind = &"arcade"
 angle = 11.0
@@ -117,7 +108,7 @@ params = {
 "style": &"truss"
 }
 
-[sub_resource type="Resource" id="Resource_cg6nc"]
+[sub_resource type="Resource" id="Resource_1cgio"]
 script = ExtResource("2_07v1h")
 kind = &"canopy"
 angle = 52.0
@@ -126,48 +117,11 @@ params = {
 "style": &"steel"
 }
 
-[sub_resource type="Resource" id="Resource_tsrjm"]
+[sub_resource type="Resource" id="Resource_cg6nc"]
 script = ExtResource("2_07v1h")
 kind = &"wall_art"
 params = {
 "motif": &"gear"
-}
-
-[sub_resource type="Resource" id="Resource_51qwj"]
-script = ExtResource("2_07v1h")
-kind = &"lamps"
-angle = -150.0
-params = {
-"count": 34,
-"span": 300.0
-}
-
-[sub_resource type="Resource" id="Resource_vh3h6"]
-script = ExtResource("2_07v1h")
-kind = &"string_lights"
-angle = -150.0
-params = {
-"color": Color(1, 0.7019608, 0.36078432, 1)
-}
-
-[sub_resource type="Resource" id="Resource_maeoh"]
-script = ExtResource("2_07v1h")
-kind = &"lamps"
-angle = -46.0
-params = {
-"count": 16,
-"span": 92.0,
-"style": &"brazier"
-}
-
-[sub_resource type="Resource" id="Resource_oo2qw"]
-script = ExtResource("2_07v1h")
-kind = &"props"
-angle = -150.0
-params = {
-"every": 9,
-"height": 7.5,
-"model": &"lantern"
 }
 
 [resource]
@@ -195,4 +149,4 @@ window_color = Color(1, 0.7019608, 0.36078432, 1)
 facade_color = Color(0.5411765, 0.2901961, 0.19607843, 1)
 facade_surface = &"brick"
 structure_surface = &"steel"
-pieces = Array[ExtResource("2_07v1h")]([SubResource("Resource_ml5p1"), SubResource("Resource_4aj37"), SubResource("Resource_0ohw5"), SubResource("Resource_s8cmx"), SubResource("Resource_05um3"), SubResource("Resource_sr515"), SubResource("Resource_rr4sb"), SubResource("Resource_rep1b"), SubResource("Resource_vvbo7"), SubResource("Resource_7a83r"), SubResource("Resource_tpvtf"), SubResource("Resource_a0pts"), SubResource("Resource_1cgio"), SubResource("Resource_cg6nc"), SubResource("Resource_tsrjm"), SubResource("Resource_51qwj"), SubResource("Resource_vh3h6"), SubResource("Resource_maeoh"), SubResource("Resource_oo2qw")])
+pieces = Array[ExtResource("2_07v1h")]([SubResource("Resource_ml5p1"), SubResource("Resource_4aj37"), SubResource("Resource_0ohw5"), SubResource("Resource_s8cmx"), SubResource("Resource_05um3"), SubResource("Resource_sr515"), SubResource("Resource_rr4sb"), SubResource("Resource_rep1b"), SubResource("Resource_vvbo7"), SubResource("Resource_7a83r"), SubResource("Resource_tpvtf"), SubResource("Resource_a0pts"), SubResource("Resource_1cgio"), SubResource("Resource_cg6nc")])

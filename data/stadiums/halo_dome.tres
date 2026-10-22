@@ -63,15 +63,6 @@ kind = &"flying_craft"
 
 [sub_resource type="Resource" id="Resource_ejy07"]
 script = ExtResource("2_un8dc")
-kind = &"flags"
-angle = -50.0
-params = {
-"count": 12,
-"span": 100.0
-}
-
-[sub_resource type="Resource" id="Resource_pjoj3"]
-script = ExtResource("2_un8dc")
 kind = &"water"
 params = {
 "gap": 24.0,
@@ -80,7 +71,7 @@ params = {
 "width": 12.0
 }
 
-[sub_resource type="Resource" id="Resource_yath7"]
+[sub_resource type="Resource" id="Resource_pjoj3"]
 script = ExtResource("2_un8dc")
 kind = &"arcade"
 angle = 50.0
@@ -91,7 +82,7 @@ params = {
 "style": &"arches"
 }
 
-[sub_resource type="Resource" id="Resource_dmp26"]
+[sub_resource type="Resource" id="Resource_yath7"]
 script = ExtResource("2_un8dc")
 kind = &"arcade"
 angle = 11.0
@@ -106,7 +97,7 @@ params = {
 "towers": 3
 }
 
-[sub_resource type="Resource" id="Resource_hpvue"]
+[sub_resource type="Resource" id="Resource_dmp26"]
 script = ExtResource("2_un8dc")
 kind = &"canopy"
 angle = 52.0
@@ -115,7 +106,7 @@ params = {
 "style": &"steel"
 }
 
-[sub_resource type="Resource" id="Resource_faqeu"]
+[sub_resource type="Resource" id="Resource_hpvue"]
 script = ExtResource("2_un8dc")
 kind = &"wall_art"
 params = {
@@ -123,24 +114,7 @@ params = {
 "motif": &"star"
 }
 
-[sub_resource type="Resource" id="Resource_oevcm"]
-script = ExtResource("2_un8dc")
-kind = &"lamps"
-angle = -150.0
-params = {
-"count": 40,
-"span": 300.0
-}
-
-[sub_resource type="Resource" id="Resource_2m2fl"]
-script = ExtResource("2_un8dc")
-kind = &"string_lights"
-angle = -150.0
-params = {
-"color": Color(1, 0.8352941, 0.41960785, 1)
-}
-
-[sub_resource type="Resource" id="Resource_3b8d8"]
+[sub_resource type="Resource" id="Resource_faqeu"]
 script = ExtResource("2_un8dc")
 kind = &"planters"
 angle = -46.0
@@ -150,17 +124,7 @@ params = {
 "span": 92.0
 }
 
-[sub_resource type="Resource" id="Resource_5t8gj"]
-script = ExtResource("2_un8dc")
-kind = &"props"
-angle = -150.0
-params = {
-"every": 7,
-"height": 7.5,
-"model": &"lantern"
-}
-
-[sub_resource type="Resource" id="Resource_b3ivy"]
+[sub_resource type="Resource" id="Resource_oevcm"]
 script = ExtResource("2_un8dc")
 kind = &"props"
 angle = -46.0
@@ -194,4 +158,4 @@ window_color = Color(1, 0.8235294, 0.47843137, 1)
 facade_color = Color(0.41568628, 0.3529412, 0.54901963, 1)
 facade_surface = &"marble"
 structure_surface = &"steel"
-pieces = Array[ExtResource("2_un8dc")]([SubResource("Resource_fwpx2"), SubResource("Resource_8s2kh"), SubResource("Resource_rkpyr"), SubResource("Resource_rkhve"), SubResource("Resource_iofs5"), SubResource("Resource_5ix5a"), SubResource("Resource_6b8ye"), SubResource("Resource_mt3jj"), SubResource("Resource_ejy07"), SubResource("Resource_pjoj3"), SubResource("Resource_yath7"), SubResource("Resource_dmp26"), SubResource("Resource_hpvue"), SubResource("Resource_faqeu"), SubResource("Resource_oevcm"), SubResource("Resource_2m2fl"), SubResource("Resource_3b8d8"), SubResource("Resource_5t8gj"), SubResource("Resource_b3ivy")])
+pieces = Array[ExtResource("2_un8dc")]([SubResource("Resource_fwpx2"), SubResource("Resource_8s2kh"), SubResource("Resource_rkpyr"), SubResource("Resource_rkhve"), SubResource("Resource_iofs5"), SubResource("Resource_5ix5a"), SubResource("Resource_6b8ye"), SubResource("Resource_mt3jj"), SubResource("Resource_ejy07"), SubResource("Resource_pjoj3"), SubResource("Resource_yath7"), SubResource("Resource_dmp26"), SubResource("Resource_hpvue"), SubResource("Resource_faqeu"), SubResource("Resource_oevcm")])

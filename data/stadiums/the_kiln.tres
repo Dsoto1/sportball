@@ -78,15 +78,6 @@ params = {
 
 [sub_resource type="Resource" id="Resource_6coa7"]
 script = ExtResource("2_6juw2")
-kind = &"flags"
-angle = -50.0
-params = {
-"count": 10,
-"span": 100.0
-}
-
-[sub_resource type="Resource" id="Resource_nqdqv"]
-script = ExtResource("2_6juw2")
 kind = &"arcade"
 angle = 50.0
 mirrored = true
@@ -98,7 +89,7 @@ params = {
 "style": &"kit"
 }
 
-[sub_resource type="Resource" id="Resource_ku2ib"]
+[sub_resource type="Resource" id="Resource_nqdqv"]
 script = ExtResource("2_6juw2")
 kind = &"arcade"
 angle = 11.0
@@ -113,38 +104,11 @@ params = {
 "towers": 3
 }
 
-[sub_resource type="Resource" id="Resource_u2mh8"]
+[sub_resource type="Resource" id="Resource_ku2ib"]
 script = ExtResource("2_6juw2")
 kind = &"wall_art"
 params = {
 "motif": &"star"
-}
-
-[sub_resource type="Resource" id="Resource_654st"]
-script = ExtResource("2_6juw2")
-kind = &"lamps"
-angle = -150.0
-params = {
-"count": 30,
-"span": 300.0
-}
-
-[sub_resource type="Resource" id="Resource_7sj0f"]
-script = ExtResource("2_6juw2")
-kind = &"string_lights"
-angle = -150.0
-params = {
-"color": Color(1, 0.7529412, 0.4392157, 1)
-}
-
-[sub_resource type="Resource" id="Resource_tbkoc"]
-script = ExtResource("2_6juw2")
-kind = &"props"
-angle = -150.0
-params = {
-"every": 9,
-"height": 7.5,
-"model": &"lantern"
 }
 
 [resource]
@@ -174,4 +138,4 @@ facade_color = Color(0.69803923, 0.3529412, 0.23529412, 1)
 facade_surface = &"rock"
 structure_surface = &"stone"
 ground_surface = &"sand"
-pieces = Array[ExtResource("2_6juw2")]([SubResource("Resource_tqy5q"), SubResource("Resource_w7e58"), SubResource("Resource_dly8v"), SubResource("Resource_ubg3t"), SubResource("Resource_hiw75"), SubResource("Resource_dcbhf"), SubResource("Resource_sbprt"), SubResource("Resource_1aefi"), SubResource("Resource_6coa7"), SubResource("Resource_nqdqv"), SubResource("Resource_ku2ib"), SubResource("Resource_u2mh8"), SubResource("Resource_654st"), SubResource("Resource_7sj0f"), SubResource("Resource_tbkoc")])
+pieces = Array[ExtResource("2_6juw2")]([SubResource("Resource_tqy5q"), SubResource("Resource_w7e58"), SubResource("Resource_dly8v"), SubResource("Resource_ubg3t"), SubResource("Resource_hiw75"), SubResource("Resource_dcbhf"), SubResource("Resource_sbprt"), SubResource("Resource_1aefi"), SubResource("Resource_6coa7"), SubResource("Resource_nqdqv"), SubResource("Resource_ku2ib")])
