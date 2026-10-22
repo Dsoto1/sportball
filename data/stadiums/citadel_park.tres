@@ -37,16 +37,26 @@ params = {
 
 [sub_resource type="Resource" id="Resource_0qmui"]
 script = ExtResource("2_j3t4y")
+kind = &"hero"
+params = {
+"distance": 170.0,
+"height": 190.0,
+"model": &"cathedral_spires"
+}
+
+[sub_resource type="Resource" id="Resource_qg3hj"]
+script = ExtResource("2_j3t4y")
 kind = &"landmarks"
 angle = -50.0
 params = {
+"center_gap": 18.0,
 "height": 42.0,
 "roof": Color(0.12156863, 0.28235295, 0.56078434, 1),
 "rows": 3,
 "style": &"castle"
 }
 
-[sub_resource type="Resource" id="Resource_qg3hj"]
+[sub_resource type="Resource" id="Resource_xj6r1"]
 script = ExtResource("2_j3t4y")
 kind = &"arcade"
 angle = 50.0
@@ -62,7 +72,7 @@ params = {
 "towers": 4
 }
 
-[sub_resource type="Resource" id="Resource_xj6r1"]
+[sub_resource type="Resource" id="Resource_d0nb8"]
 script = ExtResource("2_j3t4y")
 kind = &"arcade"
 angle = 11.0
@@ -79,21 +89,13 @@ params = {
 "towers": 2
 }
 
-[sub_resource type="Resource" id="Resource_d0nb8"]
+[sub_resource type="Resource" id="Resource_5ij81"]
 script = ExtResource("2_j3t4y")
 kind = &"statue"
 angle = 15.0
 mirrored = true
 params = {
 "figure": &"knight"
-}
-
-[sub_resource type="Resource" id="Resource_5ij81"]
-script = ExtResource("2_j3t4y")
-kind = &"cathedral"
-angle = -6.0
-params = {
-"distance": 150.0
 }
 
 [sub_resource type="Resource" id="Resource_2lqch"]

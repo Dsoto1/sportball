@@ -103,6 +103,14 @@ const CATALOG := {
 		"choices": {"style": [&"castle", &"industrial", &"town", &"harbor", &"pagoda"]},
 		"script": preload("res://presentation/stadium/modules/landmarks_module.gd"),
 	},
+	&"hero": {
+		"name": "Signature landmark", "category": &"scenery", "unique": false, "placed": true,
+		"about": "One sculpted landmark model (cliff, cathedral, domed bank...) behind the outfield stands, facing home plate, rising over them.",
+		"angle": 0.0, "angle_range": [-180.0, 180.0],
+		"params": {"model": [&"cathedral_spires"], "height": [60.0, 10.0, 200.0], "distance": [20.0, -20.0, 300.0], "base": [0.0, -20.0, 80.0], "turn": [0.0, -180.0, 180.0]},
+		"choices": {"model": [&"sakura_cliff", &"cathedral_spires", &"domed_bank"]},
+		"script": preload("res://presentation/stadium/modules/hero_module.gd"),
+	},
 	&"trees": {
 		"name": "Trees", "category": &"scenery", "unique": false, "placed": true,
 		"about": "A grove behind the stands across span degrees: palms, pines, cacti, round shade trees, cypresses or blossoming trees.",

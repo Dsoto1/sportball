@@ -9,6 +9,9 @@ const CITY := "res://assets/third_party/kenney/city-kit-commercial/"
 ## Hero props and facade bays generated for this game (Artlist AI,
 ## Hyper3D Rodin; see docs/ARTLIST_CREDITS.md and the asset manifest).
 const ART := "res://assets/generated/artlist/stadium/"
+## Signature landmarks generated with Meshy (text-to-3D, simplified to
+## about 60-100k triangles with gltf-transform; see docs/ARTLIST_CREDITS.md).
+const MESHY := "res://assets/generated/meshy/stadium/"
 
 const SETS := {
 	&"palm": [NATURE + "tree_palmDetailedTall.glb", NATURE + "tree_palmTall.glb", NATURE + "tree_palmBend.glb"],
@@ -37,6 +40,9 @@ const SETS := {
 	&"lantern_cluster": [ART + "lantern_cluster.glb"],
 	&"column": [ART + "column.glb"],
 	&"planter_urn": [ART + "planter_urn.glb"],
+	&"sakura_cliff": [MESHY + "sakura_cliff.glb"],
+	&"cathedral_spires": [MESHY + "cathedral_spires.glb"],
+	&"domed_bank": [MESHY + "domed_bank.glb"],
 	&"block": [CITY + "low-detail-building-a.glb", CITY + "low-detail-building-b.glb", CITY + "low-detail-building-c.glb", CITY + "low-detail-building-d.glb", CITY + "low-detail-building-wide-a.glb"],
 }
 

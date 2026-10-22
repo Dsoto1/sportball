@@ -1244,3 +1244,19 @@ Reason: Owner request for another detail pass against the sheets. The balance ch
   - The rhythm of pavilions and towers stays on top of that.
   - Mirror twins get the mirrored pattern.
 - `Stadium.facade_factor` is the single source of these heights, and `facade_height` uses it. Lanterns, urns, signs and landmarks standing on a facade follow its skyline.
+
+## 2026-10-22 - Signature Landmarks (Meshy Test Batch)
+
+- **Free assets first:**
+  - Kenney's Train Kit and Space Kit were added (CC0, KEN-012 and KEN-013).
+  - Quaternius packs download only through Google Drive, and Poly Pizza, OpenGameArt and Sketchfab are all blocked by the environment's network. None of the free sources has the one-off hero piece each sheet is built around.
+- **Meshy:** the owner approved a test batch of three, at 30 credits each (90 total; 3,030 of 3,120 left):
+  - Sakura Gate: a rocky waterfall cliff with blossoms and a red bridge.
+  - Citadel Park: a gothic cathedral spire cluster.
+  - Ledger Street: a domed brick bank with a clock tower.
+- **Processing:** the raw models were 3-5M triangles each (120-180 MB). gltf-transform weld and simplify cut them to 60-100k triangles, and the textures were repacked to 1024 px JPEG, leaving 3-5 MB each.
+- **New `hero` module:** one sculpted model standing on the back of the stands at an angle, a set distance out, scaled to a height and turned to face home, with an optional extra yaw.
+  - Sakura Gate: the cliff frames the left of the scoreboard.
+  - Citadel Park: the cathedral rises behind the scoreboard, replacing the hand-built `cathedral` piece. The castle landmark rows leave it a wider center gap.
+  - Ledger Street: the bank stands right of the board.
+- **Next:** the owner decides whether to make the other 11 parks' landmarks.
