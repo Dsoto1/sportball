@@ -373,3 +373,17 @@ func test_boards_stand_above_the_facades() -> void:
 		st.free()
 	check_eq(content().park(&"the_kiln").sky_kind(), &"golden", "the Kiln plays at golden hour")
 	check_eq(content().park(&"the_vault").sky_kind(), &"night", "the Vault plays at night")
+
+
+func test_every_facade_style_and_tower_cap_builds() -> void:
+	var spec: Dictionary = StadiumModules.info(&"arcade")
+	for style: StringName in spec["choices"]["style"]:
+		for cap: StringName in spec["choices"]["cap"]:
+			var park := _blank_park()
+			park.add_piece(&"centerpiece")
+			park.add_piece(&"arcade", 50.0, {"style": style, "towers": 3, "cap": cap})
+			check(park.validate().is_empty(), "%s/%s is a valid design: %s" % [style, cap, park.validate()])
+			var st := _build_def(park)
+			var arcade: Node3D = st.get_node("Arcade")
+			check(arcade.find_children("*", "MeshInstance3D", true, false).size() > 3, "%s with %s towers builds" % [style, cap])
+			st.free()

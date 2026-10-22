@@ -100,8 +100,11 @@ angle = 50.0
 mirrored = true
 params = {
 "banners": 4,
+"cap": &"flat",
 "height": 11.0,
-"style": &"truss"
+"style": &"truss",
+"tower_height": 9.0,
+"towers": 5
 }
 
 [sub_resource type="Resource" id="Resource_0emfr"]

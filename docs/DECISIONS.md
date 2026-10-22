@@ -1046,3 +1046,25 @@ Obvious upgrades from the sheet comparison, each making a park more its own.
 Reason: Owner request to improve and differentiate the parks where it's obvious.
 
 Affected systems: modules (wall_art new; centerpiece crown; waterfalls frozen look; pipes on skyline), catalog, generate_parks, README.
+
+## 2026-10-22 - More Facade Styles and Towers
+
+The arcade facade had four styles. The sheets (and the proposed clubs' citadels, shrines and sky cities) need more.
+
+- **New styles:**
+  - **colonnade:** free-standing columns over a balustrade, no wall;
+  - **glass:** a lit glass curtain wall with mullions;
+  - **battlements:** a stone wall with arrow slits and crenellations.
+- **Towers:** any arcade can have towers every few bays, rising a set height above it and lit by a window. Caps: spire, dome, tiered pagoda roof or crenellated top. The pagoda cap is ready for the Kitsune park when it's built.
+- **Applied:**
+  - The Halo Dome's outfield is a glass wall with domed towers.
+  - The Icebox's outfield is castle battlements with blue spires, like its sheet's stone keep.
+  - Fountain Gardens' outfield is a colonnade.
+  - The Kiln's outfield has crenellated adobe towers.
+  - Ledger Street gets spired clock towers, the Horseshoe domed towers, and the Vault crenellated watchtowers along their foul-side facades.
+- **Proposed clubs:** two more sheets noted, not built: the Emberpeak Vulcans and the Ironspire Sentinels.
+- **Test:** every style with every cap builds and validates.
+
+Reason: Owner observation that the different designs need more facade types.
+
+Affected systems: arcade module, catalog, generate_parks, tests, README, notes.

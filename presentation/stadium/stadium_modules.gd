@@ -243,10 +243,10 @@ const CATALOG := {
 	},
 	&"arcade": {
 		"name": "Arcade Facade", "category": &"structure", "unique": false, "placed": true,
-		"about": "The upper facade on the back of the stands across span degrees: arched openings, two rows of windows, or an open steel or timber frame, with columns, a cornice and club banners. Openings glow at night.",
+		"about": "The upper facade on the back of the stands across span degrees: arches, windows, open steel or timber frames, a colonnade, a glass curtain wall or battlements, with columns, a cornice, club banners and optional towers (spire, dome, pagoda or crenellated caps). Openings glow at night.",
 		"angle": 50.0, "angle_range": [-180.0, 180.0],
-		"params": {"style": [&"arches"], "span": [130.0, -360.0, 360.0], "height": [9.0, 4.0, 20.0], "bay": [7.0, 3.0, 16.0], "banners": [4, 0, 20]},
-		"choices": {"style": [&"arches", &"windows", &"truss", &"timber"]},
+		"params": {"style": [&"arches"], "span": [130.0, -360.0, 360.0], "height": [9.0, 4.0, 20.0], "bay": [7.0, 3.0, 16.0], "banners": [4, 0, 20], "towers": [0, 0, 20], "tower_height": [8.0, 2.0, 40.0], "cap": [&"spire"]},
+		"choices": {"style": [&"arches", &"windows", &"truss", &"timber", &"colonnade", &"glass", &"battlements"], "cap": [&"spire", &"dome", &"pagoda", &"flat"]},
 		"script": preload("res://presentation/stadium/modules/arcade_module.gd"),
 	},
 	&"canopy": {

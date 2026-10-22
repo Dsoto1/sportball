@@ -5,7 +5,14 @@ extends StadiumModule
 ##            marble, brick parks);
 ##   windows: a wall with two rows of tall windows (warehouses, mills);
 ##   truss:   an open steel frame with X-bracing (industrial parks);
-##   timber:  the same open frame in timber (lodges, piers).
+##   timber:  the same open frame in timber (lodges, piers);
+##   colonnade: free-standing columns over a balustrade, no wall (gardens,
+##            classical parks);
+##   glass:   a lit glass curtain wall with mullions (modern, sky cities);
+##   battlements: a stone wall with arrow slits and crenellations on top
+##            (citadels, castles).
+## Every "towers" bays a tower rises "tower_height" m above the facade,
+## capped with a spire, dome, tiered pagoda roof or crenellations ("cap").
 ## The openings glow warm at night. Every "banners" bays a column carries
 ## a hanging banner in the club's color with its emblem (0 for none).
 
@@ -17,6 +24,7 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	var bay := float(piece.param("bay"))
 	var span := float(piece.param("span"))
 	var open_frame := style in [&"truss", &"timber"]
+	var no_wall := open_frame or style == &"colonnade"
 	var frame_surface: StringName = &"wood" if style == &"timber" else (&"steel" if style == &"truss" else &"structure")
 	var frame_color := def.structure_color.darkened(0.15) if not open_frame else (Color(0.42, 0.3, 0.2) if style == &"timber" else def.structure_color.darkened(0.35))
 	var wall := SurfaceTool.new()
@@ -26,6 +34,11 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	var holes := SurfaceTool.new()
 	holes.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var banner_spots: Array[Transform3D] = []
+	var glass := SurfaceTool.new()
+	glass.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var merlon_spots: Array = []
+	var tower_spots: Array[Vector3] = []
+	var every_tower := int(piece.param("towers"))
 	# Bay edges: each carries its own back-of-stands radius and base height,
 	# so the facade follows the bowl without gaps.
 	var radius_mid := stadium.stand_top(piece.angle + span * 0.5).x
@@ -42,7 +55,21 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 		var p := func(t: float, y_off: float, inset: float = 0.0) -> Vector3:
 			var a := lerpf(e0.x, e1.x, t)
 			return stadium.point(a, lerpf(e0.y, e1.y, t) - inset, lerpf(e0.z, e1.z, t) + y_off)
-		if not open_frame:
+		if style == &"colonnade":
+			# Balustrade along the bottom, a second column mid-bay.
+			_quad(frame, p.call(0.0, 0.0, 0.1), p.call(1.0, 0.0, 0.1), p.call(1.0, 1.1, 0.1), p.call(0.0, 1.1, 0.1))
+			var mid := lerpf(e0.x, e1.x, 0.5)
+			_column(frame, stadium, mid, lerpf(e0.y, e1.y, 0.5), lerpf(e0.z, e1.z, 0.5), height + 0.6, maxf(bay * col, 0.6), 0.6)
+		elif style == &"glass":
+			_quad(glass, p.call(0.0, 0.0), p.call(1.0, 0.0), p.call(1.0, height), p.call(0.0, height))
+			_quad(frame, p.call(0.0, height * 0.5 - 0.15, 0.3), p.call(1.0, height * 0.5 - 0.15, 0.3), p.call(1.0, height * 0.5 + 0.15, 0.3), p.call(0.0, height * 0.5 + 0.15, 0.3))
+			_quad(frame, p.call(0.48, 0.0, 0.3), p.call(0.52, 0.0, 0.3), p.call(0.52, height, 0.3), p.call(0.48, height, 0.3))
+		elif style == &"battlements":
+			_quad(wall, p.call(0.0, 0.0), p.call(1.0, 0.0), p.call(1.0, height), p.call(0.0, height))
+			for c in [0.33, 0.67]:
+				_quad(holes, p.call(c - 0.03, height * 0.35, 0.35), p.call(c + 0.03, height * 0.35, 0.35), p.call(c + 0.03, height * 0.8, 0.35), p.call(c - 0.03, height * 0.8, 0.35))
+			merlon_spots.append([e0, e1])
+		elif not open_frame:
 			_quad(wall, p.call(0.0, 0.0), p.call(1.0, 0.0), p.call(1.0, height), p.call(0.0, height))
 			# Openings: arched (rectangle + half disc) or two rows of windows.
 			if style == &"arches":
@@ -72,6 +99,8 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 		# The column at this bay's start, standing proud of the wall.
 		var cw := maxf(bay * col, 0.6)
 		_column(frame, stadium, e0.x, e0.y, e0.z, height + 0.6, cw, 0.6)
+		if every_tower > 0 and i > 0 and i % every_tower == 0:
+			tower_spots.append(e0)
 		if int(piece.param("banners")) > 0 and i % int(piece.param("banners")) == 0 and i > 0:
 			var at := stadium.point(e0.x, e0.y - 0.7, e0.z + height * 0.55)
 			banner_spots.append(Transform3D(Basis(), at))
@@ -91,6 +120,26 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	lit.emission_energy_multiplier = 0.7 if def.night else 0.1
 	lit.cull_mode = BaseMaterial3D.CULL_DISABLED
 	_commit(root, holes, lit)
+	var pane := StandardMaterial3D.new()
+	pane.albedo_color = Color(def.window_color.lerp(Color(0.5, 0.75, 1.0), 0.6), 0.55)
+	pane.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	pane.metallic = 0.6
+	pane.roughness = 0.08
+	pane.emission_enabled = true
+	pane.emission = def.window_color
+	pane.emission_energy_multiplier = 0.9 if def.night else 0.12
+	pane.cull_mode = BaseMaterial3D.CULL_DISABLED
+	_commit(root, glass, pane)
+	# Crenellations: two merlons per bay along the top.
+	for pair: Array in merlon_spots:
+		var a0: Vector3 = pair[0]
+		var a1: Vector3 = pair[1]
+		for t in [0.25, 0.75]:
+			var merlon := stadium.box(Vector3(maxf(bay * 0.22, 0.8), 1.4, 0.9), def.facade_tint(), root, &"facade")
+			merlon.position = stadium.point(lerpf(a0.x, a1.x, t), lerpf(a0.y, a1.y, t) - 0.2, lerpf(a0.z, a1.z, t) + height + 1.4)
+			stadium.face_home(merlon)
+	for e in tower_spots:
+		_tower(stadium, root, piece, e, height, bay, home)
 	for spot in banner_spots:
 		var banner := Node3D.new()
 		root.add_child(banner)
@@ -103,6 +152,46 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 		var mark := Emblem.build(home, 1.7, 0.3)
 		mark.position = Vector3(0, height * 0.08, 0.16)
 		banner.add_child(mark)
+
+
+## A tower standing through the facade at a bay edge, with its cap and a
+## lit window.
+func _tower(stadium: Stadium, root: Node3D, piece: StadiumPiece, e: Vector3, height: float, bay: float, home: TeamDef) -> void:
+	var def := stadium.def
+	var tw := clampf(bay * 0.55, 2.5, 6.0)
+	var tall := height + float(piece.param("tower_height")) * piece.size
+	var tower := Node3D.new()
+	root.add_child(tower)
+	tower.position = stadium.point(e.x, e.y + tw * 0.2, e.z)
+	stadium.face_home(tower)
+	var body := stadium.box(Vector3(tw, tall, tw), def.facade_tint().darkened(0.08), tower, &"facade")
+	body.position.y = tall * 0.5
+	var window := stadium.box(Vector3(tw * 0.3, tw * 0.6, 0.1), def.window_color, tower)
+	window.position = Vector3(0, tall - tw * 0.9, tw * 0.5 + 0.05)
+	window.material_override = Stadium.glow(def.window_color, 1.6 if def.night else 0.3)
+	var roof := home.primary_color.darkened(0.2)
+	match StringName(piece.param("cap")):
+		&"spire":
+			var spire := Scenery.cylinder(tower, tw * 0.75, 0.0, tw * 1.8, roof, 8)
+			spire.position.y = tall + tw * 0.9
+		&"dome":
+			var dome := Scenery.sphere(tower, tw * 0.62, def.accent_color.darkened(0.15), 0.9)
+			dome.position.y = tall
+			var finial := Scenery.cylinder(tower, 0.15, 0.0, tw * 0.6, def.accent_color, 6)
+			finial.position.y = tall + tw * 0.75
+		&"pagoda":
+			for k in 3:
+				var w := tw * (1.25 - k * 0.28)
+				var eave := Scenery.cylinder(tower, w * 0.95, w * 0.35, tw * 0.32, roof, 4)
+				eave.rotation.y = PI * 0.25
+				eave.position.y = tall + k * tw * 0.5 + tw * 0.16
+				if k < 2:
+					var drum := stadium.box(Vector3(w * 0.5, tw * 0.22, w * 0.5), def.facade_tint(), tower, &"facade")
+					drum.position.y = tall + k * tw * 0.5 + tw * 0.42
+		_:
+			for m in 4:
+				var merlon := stadium.box(Vector3(tw * 0.26, tw * 0.3, tw * 0.26), def.facade_tint().darkened(0.08), tower, &"facade")
+				merlon.position = Vector3((-0.37 + 0.74 * (m % 2)) * tw, tall + tw * 0.15, (-0.37 + 0.74 * (m / 2)) * tw)
 
 
 ## A box-like column at a spray angle: front and two sides.

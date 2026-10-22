@@ -125,7 +125,7 @@ params = {
 "banners": 3,
 "height": 15.0,
 "span": 36.0,
-"style": &"arches"
+"style": &"colonnade"
 }
 
 [sub_resource type="Resource" id="Resource_csqm1"]

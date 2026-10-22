@@ -97,9 +97,12 @@ angle = 11.0
 mirrored = true
 params = {
 "banners": 3,
+"cap": &"dome",
 "height": 16.0,
 "span": 36.0,
-"style": &"arches"
+"style": &"glass",
+"tower_height": 14.0,
+"towers": 3
 }
 
 [sub_resource type="Resource" id="Resource_faqeu"]

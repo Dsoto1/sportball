@@ -191,6 +191,9 @@ points. The Foundry sheet also has a six-color team set.
 - **Skyward Aviators, Cloudreach Stadium:** a floating-island park with airships, skybridges and propeller towers.
 - **Crimson Dunes Scorpions, Amber Gate Park:** a desert canyon city with scorpion statues, an oasis and sandstone arches.
 
+- **Emberpeak Vulcans, Firelight Park:** a volcanic island with lava-lit cliffs, aqueducts, a lighthouse and an erupting volcano.
+- **Ironspire Sentinels, Citadel Park:** a fortified citadel with towers, battlements, knight statues, banners and a cathedral skyline.
+
 Owner's rule: new clubs and parks are noted here for later; the eleven listed parks come first. The Vault (the Safecrackers' dome) sheet hasn't come yet.
 
 ## Built so far
