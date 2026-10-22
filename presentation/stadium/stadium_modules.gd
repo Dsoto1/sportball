@@ -255,7 +255,7 @@ const CATALOG := {
 		"name": "Arcade Facade", "category": &"structure", "unique": false, "placed": true,
 		"about": "The upper facade on the back of the stands across span degrees: arches, windows, open steel or timber frames, a colonnade, a glass curtain wall or battlements, with columns, a cornice, club banners and optional towers (spire, dome, pagoda or crenellated caps). Openings glow at night.",
 		"angle": 50.0, "angle_range": [-180.0, 180.0],
-		"params": {"style": [&"arches"], "span": [130.0, -360.0, 360.0], "height": [9.0, 4.0, 30.0], "bay": [7.0, 3.0, 16.0], "banners": [4, 0, 20], "towers": [0, 0, 20], "tower_height": [8.0, 2.0, 40.0], "cap": [&"spire"], "tiers": [1, 1, 4], "kit": [&"colosseum"], "tint": [0.6, 0.0, 1.0], "pavilion": [5, 0, 20]},
+		"params": {"style": [&"arches"], "span": [130.0, -360.0, 360.0], "height": [9.0, 4.0, 30.0], "bay": [7.0, 3.0, 16.0], "banners": [4, 0, 20], "towers": [0, 0, 20], "tower_height": [8.0, 2.0, 40.0], "cap": [&"spire"], "tiers": [1, 1, 4], "kit": [&"colosseum"], "tint": [0.6, 0.0, 1.0], "pavilion": [5, 0, 20], "massing": [0.22, 0.0, 0.6], "block": [4, 1, 20]},
 		"choices": {"style": [&"arches", &"windows", &"truss", &"timber", &"colonnade", &"glass", &"battlements", &"eaves", &"carved", &"kit"], "cap": [&"spire", &"dome", &"pagoda", &"flat"], "kit": [&"colosseum", &"gothic", &"temple", &"victorian"]},
 		"script": preload("res://presentation/stadium/modules/arcade_module.gd"),
 	},

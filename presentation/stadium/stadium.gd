@@ -159,8 +159,29 @@ func facade_height(angle: float) -> float:
 			if a < lo:
 				a += 360.0
 			if a >= lo and a <= hi:
-				best = maxf(best, float(piece.param("height")) * piece.size + 0.7)
+				best = maxf(best, float(piece.param("height")) * piece.size * facade_factor(piece, sp[0], sp[1], a) + 0.7)
 	return best
+
+
+## Facade massing: an arcade run is grouped into blocks of "block" bays,
+## each standing a step taller or lower (up to "massing" of its height), so
+## it reads as a row of buildings rather than one wall. The factor for the
+## bay of the run (from start across span) that holds this angle; a mirror
+## twin gets the mirror pattern.
+const MASSING_STEPS := [0.0, 1.0, -0.55, 0.6, -0.25, 0.85, 0.3]
+
+
+func facade_factor(piece: StadiumPiece, start: float, span: float, angle: float) -> float:
+	var m := float(piece.param("massing"))
+	if m <= 0.0 or span == 0.0:
+		return 1.0
+	var bay := float(piece.param("bay"))
+	var radius_mid := stand_top(start + span * 0.5).x
+	var steps := maxi(1, int(absf(deg_to_rad(span)) * radius_mid / bay))
+	var i := clampi(int((angle - start) / span * steps), 0, steps - 1)
+	var block := maxi(1, int(piece.param("block")))
+	var k := absi(hash(str(absf(start)) + ":" + str(i / block))) % MASSING_STEPS.size()
+	return 1.0 + m * float(MASSING_STEPS[k])
 
 
 ## The top of everything standing on the back of the stands at an angle:

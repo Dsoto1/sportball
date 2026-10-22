@@ -1236,3 +1236,11 @@ Reason: Owner request for another detail pass against the sheets. The balance ch
   - Sculpted models are centered on their origin, so the pagodas now stand on their base.
   - Tinted trees use a cached tinted mesh copy, since per-surface overrides logged null-material errors.
   - The model contact-sheet tool fits any number of models and takes a name filter.
+
+## 2026-10-22 - Facade Massing
+
+- Each arcade facade ran at one height around the bowl. Bays now group into blocks (`block`, default 4 bays), and each block stands a step taller or lower, up to `massing` of the facade height (default 22%).
+  - Return walls close each block's end where the height steps.
+  - The rhythm of pavilions and towers stays on top of that.
+  - Mirror twins get the mirrored pattern.
+- `Stadium.facade_factor` is the single source of these heights, and `facade_height` uses it. Lanterns, urns, signs and landmarks standing on a facade follow its skyline.

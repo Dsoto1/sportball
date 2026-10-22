@@ -20,7 +20,9 @@ extends StadiumModule
 ## Arches stack in "tiers" rows (2-3 for a colosseum or an aqueduct).
 ## Every "towers" bays a tower rises "tower_height" m above the facade,
 ## capped with a spire, dome, tiered pagoda roof or crenellations ("cap").
-## The openings glow warm at night. Every "banners" bays a column carries
+## Bays group into blocks of "block" bays that step taller or lower (up to
+## "massing" of the height; see Stadium.facade_factor), so a run reads as
+## a row of buildings. The openings glow warm at night. Every "banners" bays a column carries
 ## a hanging banner in the club's color with its emblem (0 for none).
 
 
@@ -68,9 +70,11 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 		var top := stadium.stand_top(a)
 		edges.append(Vector3(a, top.x + 0.2, top.y + 0.4))
 	var col := 0.11  # column width as a share of the bay
+	var prev_h := -1.0
 	for i in steps:
 		var e0 := edges[i]
 		var e1 := edges[i + 1]
+		var hb := height * stadium.facade_factor(piece, piece.angle, span, lerpf(e0.x, e1.x, 0.5))
 		var p := func(t: float, y_off: float, inset: float = 0.0) -> Vector3:
 			var a := lerpf(e0.x, e1.x, t)
 			return stadium.point(a, lerpf(e0.y, e1.y, t) - inset, lerpf(e0.z, e1.z, t) + y_off)
@@ -78,39 +82,39 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 			# Balustrade along the bottom, a second column mid-bay.
 			_quad(frame, p.call(0.0, 0.0, 0.1), p.call(1.0, 0.0, 0.1), p.call(1.0, 1.1, 0.1), p.call(0.0, 1.1, 0.1))
 			var mid := lerpf(e0.x, e1.x, 0.5)
-			_column(frame, stadium, mid, lerpf(e0.y, e1.y, 0.5), lerpf(e0.z, e1.z, 0.5), height + 0.6, maxf(bay * col, 0.6), 0.6)
+			_column(frame, stadium, mid, lerpf(e0.y, e1.y, 0.5), lerpf(e0.z, e1.z, 0.5), hb + 0.6, maxf(bay * col, 0.6), 0.6)
 		elif style == &"glass":
-			_quad(glass, p.call(0.0, 0.0), p.call(1.0, 0.0), p.call(1.0, height), p.call(0.0, height))
-			_quad(frame, p.call(0.0, height * 0.5 - 0.15, 0.3), p.call(1.0, height * 0.5 - 0.15, 0.3), p.call(1.0, height * 0.5 + 0.15, 0.3), p.call(0.0, height * 0.5 + 0.15, 0.3))
-			_quad(frame, p.call(0.48, 0.0, 0.3), p.call(0.52, 0.0, 0.3), p.call(0.52, height, 0.3), p.call(0.48, height, 0.3))
+			_quad(glass, p.call(0.0, 0.0), p.call(1.0, 0.0), p.call(1.0, hb), p.call(0.0, hb))
+			_quad(frame, p.call(0.0, hb * 0.5 - 0.15, 0.3), p.call(1.0, hb * 0.5 - 0.15, 0.3), p.call(1.0, hb * 0.5 + 0.15, 0.3), p.call(0.0, hb * 0.5 + 0.15, 0.3))
+			_quad(frame, p.call(0.48, 0.0, 0.3), p.call(0.52, 0.0, 0.3), p.call(0.52, hb, 0.3), p.call(0.48, hb, 0.3))
 		elif style == &"eaves":
-			_quad(wall, p.call(0.0, 0.0), p.call(1.0, 0.0), p.call(1.0, height * 0.82), p.call(0.0, height * 0.82))
+			_quad(wall, p.call(0.0, 0.0), p.call(1.0, 0.0), p.call(1.0, hb * 0.82), p.call(0.0, hb * 0.82))
 			for c in [0.3, 0.7]:
-				_quad(holes, p.call(c - 0.12, height * 0.2, 0.35), p.call(c + 0.12, height * 0.2, 0.35), p.call(c + 0.12, height * 0.65, 0.35), p.call(c - 0.12, height * 0.65, 0.35))
+				_quad(holes, p.call(c - 0.12, hb * 0.2, 0.35), p.call(c + 0.12, hb * 0.2, 0.35), p.call(c + 0.12, hb * 0.65, 0.35), p.call(c - 0.12, hb * 0.65, 0.35))
 			# Tiled eave: sloping out over the bay, its ends lifted.
-			_quad(roofs, p.call(0.0, height * 0.82, -0.2), p.call(1.0, height * 0.82, -0.2), p.call(1.0, height * 0.82 - 1.0, 2.2), p.call(0.0, height * 0.82 - 1.0, 2.2))
-			_quad(roofs, p.call(0.0, height + 0.6, 0.6), p.call(1.0, height + 0.6, 0.6), p.call(1.0, height * 0.82, -0.6), p.call(0.0, height * 0.82, -0.6))
-			lantern_spots.append(stadium.point(lerpf(e0.x, e1.x, 0.5), lerpf(e0.y, e1.y, 0.5) - 1.8, lerpf(e0.z, e1.z, 0.5) + height * 0.62))
+			_quad(roofs, p.call(0.0, hb * 0.82, -0.2), p.call(1.0, hb * 0.82, -0.2), p.call(1.0, hb * 0.82 - 1.0, 2.2), p.call(0.0, hb * 0.82 - 1.0, 2.2))
+			_quad(roofs, p.call(0.0, hb + 0.6, 0.6), p.call(1.0, hb + 0.6, 0.6), p.call(1.0, hb * 0.82, -0.6), p.call(0.0, hb * 0.82, -0.6))
+			lantern_spots.append(stadium.point(lerpf(e0.x, e1.x, 0.5), lerpf(e0.y, e1.y, 0.5) - 1.8, lerpf(e0.z, e1.z, 0.5) + hb * 0.62))
 		elif style == &"carved":
-			_quad(rock, p.call(0.0, 0.0), p.call(1.0, 0.0), p.call(1.0, height), p.call(0.0, height))
+			_quad(rock, p.call(0.0, 0.0), p.call(1.0, 0.0), p.call(1.0, hb), p.call(0.0, hb))
 			var chord := 0.3
-			var spring := height * 0.45
+			var spring := hb * 0.45
 			_quad(holes, p.call(0.5 - chord, 0.0, 0.35), p.call(0.5 + chord, 0.0, 0.35), p.call(0.5 + chord, spring, 0.35), p.call(0.5 - chord, spring, 0.35))
 			for k in 10:
 				var t0 := PI * k / 10.0
 				var t1 := PI * (k + 1) / 10.0
 				_tri(holes, p.call(0.5, spring, 0.35), p.call(0.5 + cos(t0) * chord, spring + sin(t0) * chord * bay, 0.35), p.call(0.5 + cos(t1) * chord, spring + sin(t1) * chord * bay, 0.35))
 		elif style == &"battlements":
-			_quad(wall, p.call(0.0, 0.0), p.call(1.0, 0.0), p.call(1.0, height), p.call(0.0, height))
+			_quad(wall, p.call(0.0, 0.0), p.call(1.0, 0.0), p.call(1.0, hb), p.call(0.0, hb))
 			for c in [0.33, 0.67]:
-				_quad(holes, p.call(c - 0.03, height * 0.35, 0.35), p.call(c + 0.03, height * 0.35, 0.35), p.call(c + 0.03, height * 0.8, 0.35), p.call(c - 0.03, height * 0.8, 0.35))
-			merlon_spots.append([e0, e1])
+				_quad(holes, p.call(c - 0.03, hb * 0.35, 0.35), p.call(c + 0.03, hb * 0.35, 0.35), p.call(c + 0.03, hb * 0.8, 0.35), p.call(c - 0.03, hb * 0.8, 0.35))
+			merlon_spots.append([e0, e1, hb])
 		elif not open_frame:
-			_quad(wall, p.call(0.0, 0.0), p.call(1.0, 0.0), p.call(1.0, height), p.call(0.0, height))
+			_quad(wall, p.call(0.0, 0.0), p.call(1.0, 0.0), p.call(1.0, hb), p.call(0.0, hb))
 			# Openings: arched (rectangle + half disc) or two rows of windows.
 			if style == &"arches":
 				var tiers := int(piece.param("tiers"))
-				var tier_h := height / tiers
+				var tier_h := hb / tiers
 				for tier in tiers:
 					var y0 := tier * tier_h
 					var w := 0.5 - col
@@ -126,39 +130,45 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 						_quad(frame, p.call(0.0, y0 - 0.25, 0.5), p.call(1.0, y0 - 0.25, 0.5), p.call(1.0, y0 + 0.25, 0.5), p.call(0.0, y0 + 0.25, 0.5))
 			else:
 				for row in 2:
-					var y0 := height * (0.12 + row * 0.44)
-					var y1 := y0 + height * 0.32
+					var y0 := hb * (0.12 + row * 0.44)
+					var y1 := y0 + hb * 0.32
 					for side: float in [-1.0, 1.0]:
 						var c := 0.5 + side * 0.2
 						_quad(holes, p.call(c - 0.12, y0, 0.35), p.call(c + 0.12, y0, 0.35), p.call(c + 0.12, y1, 0.35), p.call(c - 0.12, y1, 0.35))
 		else:
 			# Open frame: top and bottom chords and an X of braces.
 			var t := 0.06
-			_quad(frame, p.call(0.0, height - 0.8, 0.0), p.call(1.0, height - 0.8, 0.0), p.call(1.0, height, 0.0), p.call(0.0, height, 0.0))
+			_quad(frame, p.call(0.0, hb - 0.8, 0.0), p.call(1.0, hb - 0.8, 0.0), p.call(1.0, hb, 0.0), p.call(0.0, hb, 0.0))
 			_quad(frame, p.call(0.0, 0.0, 0.0), p.call(1.0, 0.0, 0.0), p.call(1.0, 0.7, 0.0), p.call(0.0, 0.7, 0.0))
-			_quad(frame, p.call(0.0, 0.7, 0.0), p.call(t, 0.7, 0.0), p.call(1.0, height - 0.8, 0.0), p.call(1.0 - t, height - 0.8, 0.0))
-			_quad(frame, p.call(1.0 - t, 0.7, 0.0), p.call(1.0, 0.7, 0.0), p.call(t, height - 0.8, 0.0), p.call(0.0, height - 0.8, 0.0))
+			_quad(frame, p.call(0.0, 0.7, 0.0), p.call(t, 0.7, 0.0), p.call(1.0, hb - 0.8, 0.0), p.call(1.0 - t, hb - 0.8, 0.0))
+			_quad(frame, p.call(1.0 - t, 0.7, 0.0), p.call(1.0, 0.7, 0.0), p.call(t, hb - 0.8, 0.0), p.call(0.0, hb - 0.8, 0.0))
 		# Rhythm: every "pavilion" bays one rises higher under a pediment
 		# (a gable on open frames), so the run isn't one bay copied across.
 		var rhythm := int(piece.param("pavilion"))
 		if rhythm > 0 and i % rhythm == rhythm / 2 and style != &"eaves":
-			var top_h := height * 1.28
+			var top_h := hb * 1.28
 			var target := frame if no_wall or style == &"glass" else wall
-			_quad(target, p.call(0.0, height, 0.2), p.call(1.0, height, 0.2), p.call(1.0, top_h, 0.2), p.call(0.0, top_h, 0.2))
+			_quad(target, p.call(0.0, hb, 0.2), p.call(1.0, hb, 0.2), p.call(1.0, top_h, 0.2), p.call(0.0, top_h, 0.2))
 			_tri(frame, p.call(-0.04, top_h, 0.45), p.call(1.04, top_h, 0.45), p.call(0.5, top_h + bay * 0.32, 0.45))
 			_quad(frame, p.call(-0.04, top_h - 0.3, 0.5), p.call(1.04, top_h - 0.3, 0.5), p.call(1.04, top_h + 0.1, 0.5), p.call(-0.04, top_h + 0.1, 0.5))
 			if not no_wall:
-				_quad(holes, p.call(0.4, height + 0.6, 0.38), p.call(0.6, height + 0.6, 0.38), p.call(0.6, top_h - 0.8, 0.38), p.call(0.4, top_h - 0.8, 0.38))
+				_quad(holes, p.call(0.4, hb + 0.6, 0.38), p.call(0.6, hb + 0.6, 0.38), p.call(0.6, top_h - 0.8, 0.38), p.call(0.4, top_h - 0.8, 0.38))
+		# Where the massing steps, a return wall closes the taller block's end.
+		if prev_h >= 0.0 and absf(prev_h - hb) > 0.1 and not no_wall:
+			var lo := minf(prev_h, hb)
+			var hi := maxf(prev_h, hb) + 0.7
+			_quad(wall, stadium.point(e0.x, e0.y - 0.6, e0.z + lo), stadium.point(e0.x, e0.y + 0.4, e0.z + lo), stadium.point(e0.x, e0.y + 0.4, e0.z + hi), stadium.point(e0.x, e0.y - 0.6, e0.z + hi))
+		prev_h = hb
 		# The column at this bay's start, standing proud of the wall.
 		var cw := maxf(bay * col, 0.6)
-		_column(frame, stadium, e0.x, e0.y, e0.z, height + 0.6, cw, 0.6)
+		_column(frame, stadium, e0.x, e0.y, e0.z, hb + 0.6, cw, 0.6)
 		if every_tower > 0 and i > 0 and i % every_tower == 0:
 			tower_spots.append(e0)
 		if int(piece.param("banners")) > 0 and i % int(piece.param("banners")) == 0 and i > 0:
-			var at := stadium.point(e0.x, e0.y - 0.7, e0.z + height * 0.55)
+			var at := stadium.point(e0.x, e0.y - 0.7, e0.z + hb * 0.55)
 			banner_spots.append(Transform3D(Basis(), at))
 		# Cornice: a band along the top, proud of the wall.
-		_quad(frame, p.call(0.0, height, 0.5), p.call(1.0, height, 0.5), p.call(1.0, height + 0.7, 0.5), p.call(0.0, height + 0.7, 0.5))
+		_quad(frame, p.call(0.0, hb, 0.5), p.call(1.0, hb, 0.5), p.call(1.0, hb + 0.7, 0.5), p.call(0.0, hb + 0.7, 0.5))
 	var last := edges[steps]
 	_column(frame, stadium, last.x, last.y, last.z, height + 0.6, maxf(bay * col, 0.6), 0.6)
 	var root := Node3D.new()
@@ -194,9 +204,10 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	for pair: Array in merlon_spots:
 		var a0: Vector3 = pair[0]
 		var a1: Vector3 = pair[1]
+		var mh: float = pair[2]
 		for t in [0.25, 0.75]:
 			var merlon := stadium.box(Vector3(maxf(bay * 0.22, 0.8), 1.4, 0.9), def.facade_tint(), root, &"facade")
-			merlon.position = stadium.point(lerpf(a0.x, a1.x, t), lerpf(a0.y, a1.y, t) - 0.2, lerpf(a0.z, a1.z, t) + height + 1.4)
+			merlon.position = stadium.point(lerpf(a0.x, a1.x, t), lerpf(a0.y, a1.y, t) - 0.2, lerpf(a0.z, a1.z, t) + mh + 1.4)
 			stadium.face_home(merlon)
 	for t in tower_spots.size():
 		_tower(stadium, root, piece, tower_spots[t], height, bay, home, t)
@@ -256,7 +267,7 @@ func _build_kit(stadium: Stadium, piece: StadiumPiece, home: TeamDef) -> void:
 		# Every "pavilion" bays one stands taller and steps forward, so the
 		# facade has a rhythm instead of one bay copied straight across.
 		var pavilion := rhythm > 0 and i % rhythm == rhythm / 2
-		var bay_h := height * (1.28 if pavilion else 1.0)
+		var bay_h := height * stadium.facade_factor(piece, piece.angle, span, lerpf(a0, a1, 0.5)) * (1.28 if pavilion else 1.0)
 		var scale := Vector3(width / maxf(mesh_box.size.x, 0.01), bay_h / maxf(mesh_box.size.y, 0.01), bay_h / maxf(mesh_box.size.y, 0.01))
 		var fit := Transform3D(basis.scaled_local(scale), (p0 + p1) * 0.5 + facing * (0.8 if pavilion else 0.0))
 		# A gentle per-bay tone shift (weathering), lighter on pavilions.
