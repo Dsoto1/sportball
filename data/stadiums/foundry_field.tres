@@ -176,6 +176,13 @@ attendance = 0.75
 sky = &"sunset"
 mowing = "stripes"
 mowing_width = 8.0
+grandstand = {
+"roof": &"sawtooth",
+"roof_color": Color(0.3529412, 0.22745098, 0.17254902, 1),
+"set": &"foundry",
+"suites": &"glass",
+"surface": &"steel"
+}
 dirt_color = Color(0.55, 0.33, 0.22, 1)
 sponsors = PackedStringArray("RIVET & SONS HARDWARE", "RUSTWATER FERRY", "SPROCKET DINER", "LUGNUT BREWS", "FORGE & ANVIL", "BOILERMAKERS UNION")
 skyline_color = Color(0.2901961, 0.2509804, 0.2509804, 1)

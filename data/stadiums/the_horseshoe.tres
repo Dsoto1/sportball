@@ -176,6 +176,13 @@ attendance = 0.9
 night = true
 sky = &"dusk"
 mowing_width = 7.0
+grandstand = {
+"roof": &"barrel",
+"roof_color": Color(0.24313726, 0.2901961, 0.26666668, 1),
+"set": &"lamp",
+"suites": &"arches",
+"surface": &"steel"
+}
 sponsors = PackedStringArray("OLD TOWNE TROLLEY", "HORSESHOE HAMS", "MIDNIGHT MATINEE", "NICKEL ARCADE", "LAMPLIGHTER LAGER")
 skyline_color = Color(0.101960786, 0.12156863, 0.2, 1)
 window_color = Color(1, 0.8784314, 0.627451, 1)

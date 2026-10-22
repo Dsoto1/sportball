@@ -184,6 +184,13 @@ away_fan_share = 0.35
 attendance = 0.88
 mowing = "diagonal"
 mowing_width = 7.0
+grandstand = {
+"roof": &"gable",
+"roof_color": Color(0.5411765, 0.41568628, 0.2901961, 1),
+"set": &"pier",
+"suites": &"glass",
+"surface": &"wood"
+}
 sponsors = PackedStringArray("SALTWIND SAILS", "PIER 9 OYSTERS", "TIDECALLER TAXI", "BUOY BEVERAGES", "FOGHORN FRIES")
 skyline_color = Color(0.21568628, 0.27450982, 0.36862746, 1)
 window_color = Color(1, 0.9137255, 0.6901961, 1)

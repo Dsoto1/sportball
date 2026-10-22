@@ -231,6 +231,13 @@ attendance = 0.88
 sky = &"golden"
 mowing = "diamond"
 mowing_width = 8.0
+grandstand = {
+"roof": &"sail",
+"roof_color": Color(0.9019608, 0.8117647, 0.627451, 1),
+"set": &"desert",
+"suites": &"arches",
+"surface": &"stone"
+}
 grass_color = Color(0.24, 0.42, 0.15, 1)
 dirt_color = Color(0.72, 0.38, 0.2, 1)
 sponsors = PackedStringArray("OASIS SPRINGS", "CARAVAN KEBAB", "SANDSTORM SUNSCREEN", "DUNE BUGGY RENTALS")

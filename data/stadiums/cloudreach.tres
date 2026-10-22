@@ -153,6 +153,13 @@ decks = 3
 home_fan_share = 0.55
 away_fan_share = 0.25
 mowing = "sunburst"
+grandstand = {
+"roof": &"sail",
+"roof_color": Color(0.95686275, 0.9647059, 0.98039216, 1),
+"set": &"sky",
+"suites": &"glass",
+"surface": &"steel"
+}
 sponsors = PackedStringArray("ZEPHYR AIRLINES", "PROPWASH PRETZELS", "CUMULUS COFFEE", "HIGH ALTITUDE HATS")
 skyline_color = Color(0.42352942, 0.56078434, 0.72156864, 1)
 ground_color = Color(0.93333334, 0.9490196, 0.972549, 1)

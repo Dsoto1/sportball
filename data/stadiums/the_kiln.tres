@@ -156,6 +156,13 @@ attendance = 0.8
 sky = &"golden"
 mowing = "rings"
 mowing_width = 10.0
+grandstand = {
+"roof": &"barrel",
+"roof_color": Color(0.627451, 0.34509805, 0.22745098, 1),
+"set": &"kiln",
+"suites": &"arches",
+"surface": &"rock"
+}
 grass_color = Color(0.22, 0.4, 0.14, 1)
 dirt_color = Color(0.66, 0.3, 0.17, 1)
 sponsors = PackedStringArray("SUNBAKED SODA", "MESA MOTOR LODGE", "CACTUS CANDY CO.", "COPPER CANYON CHILI")

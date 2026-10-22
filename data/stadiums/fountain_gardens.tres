@@ -227,6 +227,13 @@ away_fan_share = 0.25
 attendance = 0.8
 mowing = "rings"
 mowing_width = 8.0
+grandstand = {
+"roof": &"sail",
+"roof_color": Color(0.9490196, 0.9411765, 0.91764706, 1),
+"set": &"garden",
+"suites": &"arches",
+"surface": &"marble"
+}
 grass_color = Color(0.15, 0.42, 0.15, 1)
 sponsors = PackedStringArray("CASCADE COLA", "SPRINKLE & SONS PLUMBING", "BLUE PLAINS BBQ", "MISTY MEADOW DAIRY", "JUBILEE JEWELERS")
 skyline_color = Color(0.14901961, 0.1882353, 0.2901961, 1)

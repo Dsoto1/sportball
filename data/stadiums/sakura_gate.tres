@@ -229,6 +229,13 @@ attendance = 0.9
 sky = &"sunset"
 mowing = "diagonal"
 mowing_width = 6.0
+grandstand = {
+"roof": &"pagoda",
+"roof_color": Color(0.22745098, 0.16470589, 0.16470589, 1),
+"set": &"temple",
+"suites": &"screens",
+"surface": &"wood"
+}
 grass_color = Color(0.16, 0.42, 0.13, 1)
 dirt_color = Color(0.6, 0.36, 0.24, 1)
 sponsors = PackedStringArray("LANTERN TEA HOUSE", "PETAL RAMEN", "FOXFIRE FIREWORKS", "MOUNTAIN SPRING SODA")

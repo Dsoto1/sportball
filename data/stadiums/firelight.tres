@@ -161,6 +161,13 @@ away_fan_share = 0.2
 attendance = 0.9
 sky = &"sunset"
 mowing = "stripes"
+grandstand = {
+"roof": &"battlement",
+"roof_color": Color(0.22745098, 0.17254902, 0.15686275, 1),
+"set": &"volcano",
+"suites": &"arches",
+"surface": &"rock"
+}
 grass_color = Color(0.14, 0.34, 0.11, 1)
 dirt_color = Color(0.42, 0.24, 0.17, 1)
 sponsors = PackedStringArray("MAGMA HOT SAUCE", "OBSIDIAN OPTICS", "CALDERA COFFEE", "ASHFALL INSURANCE")

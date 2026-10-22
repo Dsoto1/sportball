@@ -189,6 +189,13 @@ away_fan_share = 0.25
 sky = &"underwater"
 mowing = "rings"
 mowing_width = 12.0
+grandstand = {
+"roof": &"barrel",
+"roof_color": Color(0.18431373, 0.41568628, 0.41568628, 1),
+"set": &"atlantis",
+"suites": &"portholes",
+"surface": &"stone"
+}
 grass_color = Color(0.1, 0.38, 0.2, 1)
 sponsors = PackedStringArray("ABYSS AQUARIUM", "KELP COLA", "DEEP DIVE GEAR", "PEARL DIVER BANK")
 skyline_color = Color(0.07058824, 0.22745098, 0.28235295, 1)

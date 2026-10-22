@@ -573,19 +573,26 @@ func grandstand(angle: float) -> float:
 	return smoothstep(GRAND_FROM, GRAND_FULL, absf(wrapf(angle, -180.0, 180.0)))
 
 
-## The grandstand's suites: a glazed band (lit from inside) on the back
-## wall under each overhanging deck, with mullions every few degrees, and its roof: a deck
-## cantilevered over the top rows on columns from the back of the stands,
-## its front edge trimmed in the park's accent.
+## The grandstand behind home, in the park's architecture
+## (StadiumDef.grandstand): the suites' fronts on the back wall under each
+## overhanging deck (glass, arches, timber screens or portholes, lit from
+## inside), a roof over the top rows on columns (flat, gable, barrel, sail,
+## pagoda, sawtooth or battlement, in the park's roof material and color)
+## and the architecture set's towers at its two ends.
 func _build_grandstand() -> void:
+	var style: Dictionary = def.grandstand
+	var roof_kind: StringName = style.get("roof", &"flat")
+	var suites: StringName = style.get("suites", &"glass")
 	var glass := SurfaceTool.new()
 	glass.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var frame := SurfaceTool.new()
 	frame.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var roof := SurfaceTool.new()
+	roof.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var mullion := def.structure_color.darkened(0.5).srgb_to_linear()
-	# A pale soffit under the roof (lit by the field below, as real ones read).
-	var roof_color := def.structure_color.lerp(Color(0.85, 0.84, 0.8), 0.55).srgb_to_linear()
+	var wall := def.facade_tint().srgb_to_linear()
 	var trim := def.accent_color.srgb_to_linear()
+	var timber := Color(0.36, 0.22, 0.12).srgb_to_linear()
 	var roofed := not def.is_roofed()
 	var a := GRAND_FROM
 	while a < 180.0 - 0.01:
@@ -611,55 +618,170 @@ func _build_grandstand() -> void:
 				var hi_b := row_height(sb, pb, k) - FASCIA_DROP - 0.15
 				if hi_a - lo_a < 1.0:
 					continue
-				_quad(glass, point(sa, ra, lo_a), point(sb, rb, lo_b), point(sb, rb, hi_b), point(sa, ra, hi_a), Color.WHITE)
-				# A mullion at each step, a sill under the glass.
-				if int(a) % 3 == 0:
-					_quad(frame, point(sa, ra - 0.04, lo_a), point(sa, ra - 0.04, hi_a), point(sa + 0.15, ra - 0.04, hi_a), point(sa + 0.15, ra - 0.04, lo_a), mullion)
-				_quad(frame, point(sa, ra - 0.05, lo_a - 0.2), point(sb, rb - 0.05, lo_b - 0.2), point(sb, rb - 0.05, lo_b), point(sa, ra - 0.05, lo_a), mullion)
-			# The roof over the top rows.
+				_suite_bay(suites, glass, frame, sa, sb, ra, rb, lo_a, lo_b, hi_a, hi_b, int(a), mullion, wall, timber)
 			if roofed:
-				var ta := stand_top(sa)
-				var tb := stand_top(sb)
-				var ya := ta.y + 6.5
-				var yb := tb.y + 6.5
-				var da := GRAND_ROOF_DEPTH * ga
-				var db := GRAND_ROOF_DEPTH * gb
-				if maxf(da, db) > 1.0:
-					var back_a := point(sa, ta.x + 0.5, ya)
-					var back_b := point(sb, tb.x + 0.5, yb)
-					var front_a := point(sa, ta.x - da, ya + da * 0.12)
-					var front_b := point(sb, tb.x - db, yb + db * 0.12)
-					_quad(frame, back_a, back_b, front_b, front_a, roof_color)
-					_quad(frame, front_a, front_b, front_b + Vector3.UP * 0.9, front_a + Vector3.UP * 0.9, trim)
-					_quad(frame, back_a + Vector3.UP * 0.9, back_b + Vector3.UP * 0.9, front_b + Vector3.UP * 0.9, front_a + Vector3.UP * 0.9, roof_color.darkened(0.2))
-					# Columns from the back of the stands every few degrees.
-					if int(a) % 6 == 0:
-						var foot := point(sa, ta.x + 0.3, ta.y)
-						var across := (point(sa + 0.5, ta.x, 0.0) - point(sa - 0.5, ta.x, 0.0)).normalized() * 0.3
-						var outward := point(sa, 1.0, 0.0).normalized() * 0.3
-						var top := Vector3(foot.x, ya, foot.z)
-						_quad(frame, foot - across, foot + across, top + across, top - across, mullion)
-						_quad(frame, foot - across - outward, foot - across, top - across, top - across - outward, mullion)
+				_roof_bay(roof_kind, roof, frame, sa, sb, ga, gb, int(a), mullion, trim)
 		a = b
-	for part: Array in [[glass, "Suites"], [frame, "GrandstandFrame"]]:
+	for part: Array in [[glass, "Suites"], [frame, "GrandstandFrame"], [roof, "GrandstandRoof"]]:
 		var tool: SurfaceTool = part[0]
 		tool.generate_normals()
 		var mi := MeshInstance3D.new()
 		mi.name = part[1]
 		mi.mesh = tool.commit()
+		var m: BaseMaterial3D
 		if part[1] == "Suites":
-			var m := glow(def.window_color.lerp(Color(0.55, 0.7, 0.85), 0.6), 1.4 if def.night else 0.6)
+			m = glow(def.window_color.lerp(Color(0.55, 0.7, 0.85), 0.6 if suites == &"glass" else 0.2), 1.4 if def.night else 0.6)
 			m.albedo_color = Color(0.2, 0.3, 0.42)
 			m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-			m.cull_mode = BaseMaterial3D.CULL_DISABLED
-			mi.material_override = m
+		elif part[1] == "GrandstandRoof":
+			var tint: Color = style.get("roof_color", def.structure_color)
+			m = StadiumSurfaces.material(style.get("surface", &""), tint).duplicate()
+			m.albedo_color = tint
+			m.vertex_color_use_as_albedo = false
 		else:
-			var m := StandardMaterial3D.new()
+			m = StandardMaterial3D.new()
 			m.vertex_color_use_as_albedo = true
 			m.roughness = 0.7
-			m.cull_mode = BaseMaterial3D.CULL_DISABLED
-			mi.material_override = m
+		m.cull_mode = BaseMaterial3D.CULL_DISABLED
+		mi.material_override = m
 		add_child(mi)
+	_grandstand_towers(StringName(style.get("set", &"")))
+
+
+## One degree of suite front between spray angles sa and sb.
+func _suite_bay(kind: StringName, glass: SurfaceTool, frame: SurfaceTool, sa: float, sb: float, ra: float, rb: float, lo_a: float, lo_b: float, hi_a: float, hi_b: float, step: int, mullion: Color, wall: Color, timber: Color) -> void:
+	var sill := func() -> void: _quad(frame, point(sa, ra - 0.05, lo_a - 0.2), point(sb, rb - 0.05, lo_b - 0.2), point(sb, rb - 0.05, lo_b), point(sa, ra - 0.05, lo_a), mullion)
+	match kind:
+		&"arches":
+			# Bays three degrees wide between piers, each glazed under a
+			# round-headed arch: the spandrels fill the corners above it.
+			_quad(glass, point(sa, ra, lo_a), point(sb, rb, lo_b), point(sb, rb, hi_b), point(sa, ra, hi_a), Color.WHITE)
+			var u0 := float(step % 3) / 3.0
+			var u1 := u0 + 1.0 / 3.0
+			var spring_a := lerpf(lo_a, hi_a, 0.62)
+			var spring_b := lerpf(lo_b, hi_b, 0.62)
+			# The arch's curve over the bay: height at u (0..1 across it).
+			var curve := func(u: float, lo: float, hi: float) -> float: return lerpf(lerpf(lo, hi, 0.62), hi - 0.1, sqrt(maxf(0.0, 1.0 - pow(u * 2.0 - 1.0, 2.0))))
+			var ya: float = curve.call(u0, lo_a, hi_a)
+			var yb: float = curve.call(u1, lo_b, hi_b)
+			_quad(frame, point(sa, ra - 0.05, ya), point(sb, rb - 0.05, yb), point(sb, rb - 0.05, hi_b + 0.05), point(sa, ra - 0.05, hi_a + 0.05), wall)
+			if step % 3 == 0:
+				_quad(frame, point(sa, ra - 0.06, lo_a - 0.2), point(sa, ra - 0.06, hi_a), point(sa + 0.45, ra - 0.06, hi_a), point(sa + 0.45, ra - 0.06, lo_a - 0.2), wall)
+				_quad(frame, point(sa - 0.05, ra - 0.07, spring_a - 0.15), point(sa - 0.05, ra - 0.07, spring_a + 0.1), point(sa + 0.5, ra - 0.07, spring_a + 0.1), point(sa + 0.5, ra - 0.07, spring_a - 0.15), wall.darkened(0.25))
+			sill.call()
+		&"screens":
+			# Timber slats over warm-lit rooms, a rail top and bottom.
+			_quad(glass, point(sa, ra, lo_a), point(sb, rb, lo_b), point(sb, rb, hi_b), point(sa, ra, hi_a), Color.WHITE)
+			for t in [0.0, 0.5]:
+				var s0 := lerpf(sa, sb, t)
+				_quad(frame, point(s0, ra - 0.05, lo_a), point(s0, ra - 0.05, hi_a), point(s0 + 0.12, ra - 0.05, hi_a), point(s0 + 0.12, ra - 0.05, lo_a), timber)
+			for y: float in [0.0, 0.5, 1.0]:
+				var ha := lerpf(lo_a, hi_a, y)
+				var hb := lerpf(lo_b, hi_b, y)
+				_quad(frame, point(sa, ra - 0.08, ha - 0.08), point(sb, rb - 0.08, hb - 0.08), point(sb, rb - 0.08, hb + 0.08), point(sa, ra - 0.08, ha + 0.08), timber)
+		&"portholes":
+			# A plated wall with a round window every three degrees.
+			_quad(frame, point(sa, ra - 0.03, lo_a - 0.2), point(sb, rb - 0.03, lo_b - 0.2), point(sb, rb - 0.03, hi_b), point(sa, ra - 0.03, hi_a), wall)
+			if step % 3 == 1:
+				var mid := (sa + sb) * 0.5
+				var r := (ra + rb) * 0.5 - 0.08
+				var cy := (lo_a + hi_a) * 0.5
+				var rad := minf((hi_a - lo_a) * 0.36, 0.9)
+				var deg := rad_to_deg(rad / r)
+				for i in 10:
+					var t0 := TAU * i / 10.0
+					var t1 := TAU * (i + 1) / 10.0
+					var c := point(mid, r, cy)
+					var p0 := point(mid + cos(t0) * deg, r, cy + sin(t0) * rad)
+					var p1 := point(mid + cos(t1) * deg, r, cy + sin(t1) * rad)
+					_quad(glass, c, p0, p1, c, Color.WHITE)
+					var q0 := point(mid + cos(t0) * deg * 1.25, r + 0.01, cy + sin(t0) * rad * 1.25)
+					var q1 := point(mid + cos(t1) * deg * 1.25, r + 0.01, cy + sin(t1) * rad * 1.25)
+					_quad(frame, p0, q0, q1, p1, mullion)
+		_:
+			_quad(glass, point(sa, ra, lo_a), point(sb, rb, lo_b), point(sb, rb, hi_b), point(sa, ra, hi_a), Color.WHITE)
+			if step % 3 == 0:
+				_quad(frame, point(sa, ra - 0.04, lo_a), point(sa, ra - 0.04, hi_a), point(sa + 0.15, ra - 0.04, hi_a), point(sa + 0.15, ra - 0.04, lo_a), mullion)
+			sill.call()
+
+
+## The roof's rise over the top rows at depth u (0 at the back, 1 at the
+## front edge), in multiples of the roof's depth, and at spray angle s.
+func _roof_rise(kind: StringName, u: float, s: float) -> float:
+	match kind:
+		&"gable":
+			return 0.06 + 0.2 * (1.0 - absf(u * 2.0 - 1.0))
+		&"barrel":
+			return 0.05 + 0.26 * sin(PI * u)
+		&"sail":
+			# Cloth pulled up to the masts every six degrees, sagging between.
+			var mast := absf(cos(deg_to_rad(s) * 30.0))
+			return 0.1 * u + (0.22 * mast - 0.05) * sin(PI * clampf(u * 1.1, 0.0, 1.0))
+		&"pagoda":
+			return 0.12 + 0.06 * u + 0.32 * pow(u, 4.0) - 0.12 * pow(1.0 - u, 2.0) * 0.0
+		&"sawtooth":
+			return 0.04 + 0.14 * fmod(u * 3.0, 1.0)
+	return 0.12 * u
+
+
+func _roof_bay(kind: StringName, roof: SurfaceTool, frame: SurfaceTool, sa: float, sb: float, ga: float, gb: float, step: int, column: Color, trim: Color) -> void:
+	var ta := stand_top(sa)
+	var tb := stand_top(sb)
+	var da := GRAND_ROOF_DEPTH * ga
+	var db := GRAND_ROOF_DEPTH * gb
+	if maxf(da, db) < 1.0:
+		return
+	var base_a := ta.y + 6.5
+	var base_b := tb.y + 6.5
+	var n := 12
+	var edge_a := Vector3.ZERO
+	var edge_b := Vector3.ZERO
+	for i in n:
+		var u0 := float(i) / n
+		var u1 := float(i + 1) / n
+		var p0a := point(sa, ta.x + 0.5 - (da + 0.5) * u0, base_a + _roof_rise(kind, u0, sa) * GRAND_ROOF_DEPTH)
+		var p0b := point(sb, tb.x + 0.5 - (db + 0.5) * u0, base_b + _roof_rise(kind, u0, sb) * GRAND_ROOF_DEPTH)
+		var p1a := point(sa, ta.x + 0.5 - (da + 0.5) * u1, base_a + _roof_rise(kind, u1, sa) * GRAND_ROOF_DEPTH)
+		var p1b := point(sb, tb.x + 0.5 - (db + 0.5) * u1, base_b + _roof_rise(kind, u1, sb) * GRAND_ROOF_DEPTH)
+		# Sawtooth: the steep faces are glazed north-lights.
+		_quad(roof, p0a, p0b, p1b, p1a, Color.WHITE)
+		edge_a = p1a
+		edge_b = p1b
+	# The front edge: a fascia in the park's accent; a battlement's is a
+	# crenellated parapet.
+	var h := 0.9
+	if kind == &"battlement":
+		h = 2.4 if step % 2 == 0 else 1.2
+	_quad(frame, edge_a, edge_b, edge_b + Vector3.UP * h, edge_a + Vector3.UP * h, trim if kind != &"battlement" else column.lightened(0.15))
+	if kind == &"pagoda" and step % 4 == 0:
+		# A ridge ornament along the eaves.
+		_quad(frame, edge_a + Vector3.UP * 0.9, edge_b + Vector3.UP * 0.9, edge_b + Vector3.UP * 1.5, edge_a + Vector3.UP * 1.5, trim)
+	# Columns from the back of the stands every six degrees (masts for a
+	# sail, standing on up through it).
+	if step % 6 == 0:
+		var foot := point(sa, ta.x + 0.3, ta.y)
+		var across := (point(sa + 0.5, ta.x, 0.0) - point(sa - 0.5, ta.x, 0.0)).normalized() * 0.3
+		var outward := point(sa, 1.0, 0.0).normalized() * 0.3
+		var top := Vector3(foot.x, base_a + (9.0 if kind == &"sail" else 0.0), foot.z)
+		_quad(frame, foot - across, foot + across, top + across, top - across, column)
+		_quad(frame, foot - across - outward, foot - across, top - across, top - across - outward, column)
+
+
+## The park's architecture-set towers standing at the grandstand's two
+## ends, on the back of the stands, a little taller than its roof.
+func _grandstand_towers(set_name: StringName) -> void:
+	var role := StringName("set_%s_tower" % set_name)
+	if set_name == &"" or not ModelKit.has(role):
+		return
+	for side: float in [-1.0, 1.0]:
+		var angle := (GRAND_FROM + 6.0) * side
+		var top := stand_top(angle)
+		var tower := ModelKit.spawn(role, top.y + 16.0, RandomNumberGenerator.new())
+		tower.name = "GrandstandTower"
+		add_child(tower)
+		var at := point(angle, top.x + 4.0, 0.0)
+		tower.look_at_from_position(at, Vector3(0, 0, 0), Vector3.UP)
+		tower.rotate_object_local(Vector3.UP, PI)
 
 
 ## The foul-territory wall's height at a spray angle: taller behind home.

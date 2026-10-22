@@ -218,6 +218,13 @@ away_fan_share = 0.2
 attendance = 0.95
 mowing = "diamond"
 mowing_width = 10.0
+grandstand = {
+"roof": &"gable",
+"roof_color": Color(0.72156864, 0.5254902, 0.3529412, 1),
+"set": &"forum",
+"suites": &"arches",
+"surface": &"marble"
+}
 dirt_color = Color(0.7, 0.45, 0.28, 1)
 sponsors = PackedStringArray("GLADIATOR GYROS", "AQUEDUCT WATER CO.", "LAUREL & SONS", "CHARIOT CAR WASH")
 skyline_color = Color(0.5411765, 0.41568628, 0.2901961, 1)

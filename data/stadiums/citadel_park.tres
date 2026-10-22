@@ -160,6 +160,13 @@ decks = 3
 away_fan_share = 0.2
 attendance = 0.9
 mowing_width = 11.0
+grandstand = {
+"roof": &"battlement",
+"roof_color": Color(0.41568628, 0.45490196, 0.5019608, 1),
+"set": &"gothic",
+"suites": &"arches",
+"surface": &"stone"
+}
 sponsors = PackedStringArray("RAMPART ROOFING", "SQUIRE SANDWICHES", "PORTCULLIS PARKING", "BASTION BANK")
 skyline_color = Color(0.2901961, 0.2901961, 0.34509805, 1)
 window_color = Color(1, 0.8352941, 0.6039216, 1)

@@ -67,6 +67,13 @@ func sky_kind() -> StringName:
 ## Mowed band width in m, and the grass and infield dirt colors (alpha 0:
 ## the defaults).
 @export var mowing_width: float = 9.0
+## The grandstand behind home in the park's architecture:
+##   "roof": flat, gable, barrel, sail (tension cloth on masts), pagoda
+##     (upswept eaves), sawtooth (factory north-lights), battlement;
+##   "suites": glass, arches, screens (timber slats), portholes;
+##   "surface": the roof's material (StadiumSurfaces), "roof_color";
+##   "set": the architecture set whose towers stand at its two ends.
+@export var grandstand: Dictionary = {}
 @export var grass_color: Color = Color(0, 0, 0, 0)
 @export var dirt_color: Color = Color(0, 0, 0, 0)
 ## Fictional sponsors on the boards (original names only).

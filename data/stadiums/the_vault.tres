@@ -189,6 +189,13 @@ night = true
 sky = &"night"
 turf = true
 mowing = "diamond"
+grandstand = {
+"roof": &"flat",
+"roof_color": Color(0.16470589, 0.18039216, 0.21176471, 1),
+"set": &"vault",
+"suites": &"portholes",
+"surface": &"steel"
+}
 sponsors = PackedStringArray("STRONGBOX SECURITY", "TITAN TURF", "DOMELIGHT DINER", "PRESSURE SEAL WINDOWS", "BIG TOP BURGERS")
 skyline_color = Color(0.11764706, 0.14117648, 0.2, 1)
 window_color = Color(1, 0.8352941, 0.6039216, 1)

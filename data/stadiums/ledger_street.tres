@@ -215,6 +215,13 @@ decks = 2
 home_fan_share = 0.5
 away_fan_share = 0.3
 attendance = 0.95
+grandstand = {
+"roof": &"gable",
+"roof_color": Color(0.43529412, 0.54901963, 0.4862745, 1),
+"set": &"bank",
+"suites": &"arches",
+"surface": &"stone"
+}
 sponsors = PackedStringArray("PEMBERTON PEANUTS", "COBBLESTONE COFFEE", "LANTERN LAUNDRY", "IRONCLAD INSURANCE", "LEDGER STREET LAGER")
 skyline_color = Color(0.3529412, 0.2901961, 0.28235295, 1)
 window_color = Color(1, 0.88235295, 0.65882355, 1)

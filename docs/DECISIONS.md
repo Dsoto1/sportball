@@ -1538,3 +1538,18 @@ overhang (lit from inside, brighter at night, mullions every few degrees),
 and a roof cantilevered 16 m over the top rows on columns, its front
 edge trimmed in the park's accent. Everything built on the stands' top
 (facades, terraces, the crowd) follows the taller profile.
+
+## Grandstand in each park's architecture
+
+StadiumDef.grandstand styles the grandstand behind home per park, from its
+sheet and architecture set:
+- roof: flat (Reactor, Vault), gable (Ledger Street, Pier Nine, Icebox,
+  Forum), barrel (Halo Dome, Kiln, Horseshoe, Deepwater), sail: tension
+  cloth on masts (Fountain Gardens, Cloudreach, Amber Gate), pagoda with
+  upswept eaves (Sakura Gate), sawtooth factory north-lights (Foundry,
+  Warehouse Row), battlement with crenellated parapet (Citadel, Firelight);
+- suites: glass, round-headed arches between piers, timber screens
+  (Icebox, Sakura), or portholes in a plated wall (Vault, Deepwater);
+- the roof in the park's material and color.
+Most parks' architecture-set towers already frame the grandstand's ends.
+The set's towers are placed there only when present.
