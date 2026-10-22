@@ -1108,3 +1108,18 @@ Reason: Owner request to build the new teams (18 total) from their sheets, with 
 - **Balance:** the first 18-club round robin (136 games each) ran .294 (Sentinels) to .603 (Safecrackers). The Sentinels and Kitsune got more offense and pitching, the Swans a little more of both, and the Safecrackers and Krakens were toned down. A rerun is in progress.
 
 Reason: Owner request to use the Artlist budget for depth and detail in the parks.
+
+## 2026-10-22 - Tinted Bays, Facade Rhythm and Tower Detail
+
+- **Tinted bays:** the sculpted bays now take each park's facade color. A small shader (`bay_tint.gdshader`) keeps the model texture's lightness, so the carved detail stays, and shifts its hue toward the MultiMesh instance color. The `tint` setting is the strength (default 0.6).
+- **Rhythm:** facades no longer repeat one bay straight across.
+  - Every `pavilion` bays (default 5), one bay rises 28% higher. On built facades it gets a pediment and a lit window. On kit facades it steps 0.8 m forward and reads lighter.
+  - Kit bays also shift tone gently bay to bay, like weathering.
+- **Towers:**
+  - every second tower stands about 35% taller;
+  - shafts gain a plinth, string courses and stacked lit windows;
+  - spires: a trim eave, a flared skirt, the spire, a gold collar, a ball finial and a pennant in alternating club colors;
+  - domes: a ribbed drum, a lit lantern and a finial;
+  - flat tops: a corbelled parapet with merlons on all four sides.
+
+Reason: Owner request to tint the bays to each park, add detail to the hand-built shapes, and vary facades instead of repeating one design.

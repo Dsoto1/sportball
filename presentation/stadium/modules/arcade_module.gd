@@ -24,6 +24,9 @@ extends StadiumModule
 ## a hanging banner in the club's color with its emblem (0 for none).
 
 
+const BAY_TINT := preload("res://presentation/stadium/bay_tint.gdshader")
+
+
 func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef) -> void:
 	var def := stadium.def
 	var style := StringName(piece.param("style"))
@@ -135,6 +138,17 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 			_quad(frame, p.call(0.0, 0.0, 0.0), p.call(1.0, 0.0, 0.0), p.call(1.0, 0.7, 0.0), p.call(0.0, 0.7, 0.0))
 			_quad(frame, p.call(0.0, 0.7, 0.0), p.call(t, 0.7, 0.0), p.call(1.0, height - 0.8, 0.0), p.call(1.0 - t, height - 0.8, 0.0))
 			_quad(frame, p.call(1.0 - t, 0.7, 0.0), p.call(1.0, 0.7, 0.0), p.call(t, height - 0.8, 0.0), p.call(0.0, height - 0.8, 0.0))
+		# Rhythm: every "pavilion" bays one rises higher under a pediment
+		# (a gable on open frames), so the run isn't one bay copied across.
+		var rhythm := int(piece.param("pavilion"))
+		if rhythm > 0 and i % rhythm == rhythm / 2 and style != &"eaves":
+			var top_h := height * 1.28
+			var target := frame if no_wall or style == &"glass" else wall
+			_quad(target, p.call(0.0, height, 0.2), p.call(1.0, height, 0.2), p.call(1.0, top_h, 0.2), p.call(0.0, top_h, 0.2))
+			_tri(frame, p.call(-0.04, top_h, 0.45), p.call(1.04, top_h, 0.45), p.call(0.5, top_h + bay * 0.32, 0.45))
+			_quad(frame, p.call(-0.04, top_h - 0.3, 0.5), p.call(1.04, top_h - 0.3, 0.5), p.call(1.04, top_h + 0.1, 0.5), p.call(-0.04, top_h + 0.1, 0.5))
+			if not no_wall:
+				_quad(holes, p.call(0.4, height + 0.6, 0.38), p.call(0.6, height + 0.6, 0.38), p.call(0.6, top_h - 0.8, 0.38), p.call(0.4, top_h - 0.8, 0.38))
 		# The column at this bay's start, standing proud of the wall.
 		var cw := maxf(bay * col, 0.6)
 		_column(frame, stadium, e0.x, e0.y, e0.z, height + 0.6, cw, 0.6)
@@ -184,8 +198,8 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 			var merlon := stadium.box(Vector3(maxf(bay * 0.22, 0.8), 1.4, 0.9), def.facade_tint(), root, &"facade")
 			merlon.position = stadium.point(lerpf(a0.x, a1.x, t), lerpf(a0.y, a1.y, t) - 0.2, lerpf(a0.z, a1.z, t) + height + 1.4)
 			stadium.face_home(merlon)
-	for e in tower_spots:
-		_tower(stadium, root, piece, e, height, bay, home)
+	for t in tower_spots.size():
+		_tower(stadium, root, piece, tower_spots[t], height, bay, home, t)
 	for spot in banner_spots:
 		var banner := Node3D.new()
 		root.add_child(banner)
@@ -218,8 +232,12 @@ func _build_kit(stadium: Stadium, piece: StadiumPiece, home: TeamDef) -> void:
 	stadium.add_child(root)
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.use_colors = true
 	mm.mesh = kit["mesh"]
 	mm.instance_count = steps
+	var tint_to := stadium.def.facade_tint()
+	var strength := float(piece.param("tint"))
+	var rhythm := int(piece.param("pavilion"))
 	var every_tower := int(piece.param("towers"))
 	for i in steps:
 		var a0 := piece.angle + span * i / steps
@@ -235,61 +253,122 @@ func _build_kit(stadium: Stadium, piece: StadiumPiece, home: TeamDef) -> void:
 			facing = -facing
 		# Local axes: X along the bay, Y up, Z toward the field.
 		var basis := Basis(across, Vector3.UP, facing)
-		var scale := Vector3(width / maxf(mesh_box.size.x, 0.01), height / maxf(mesh_box.size.y, 0.01), height / maxf(mesh_box.size.y, 0.01))
-		var fit := Transform3D(basis.scaled_local(scale), (p0 + p1) * 0.5)
+		# Every "pavilion" bays one stands taller and steps forward, so the
+		# facade has a rhythm instead of one bay copied straight across.
+		var pavilion := rhythm > 0 and i % rhythm == rhythm / 2
+		var bay_h := height * (1.28 if pavilion else 1.0)
+		var scale := Vector3(width / maxf(mesh_box.size.x, 0.01), bay_h / maxf(mesh_box.size.y, 0.01), bay_h / maxf(mesh_box.size.y, 0.01))
+		var fit := Transform3D(basis.scaled_local(scale), (p0 + p1) * 0.5 + facing * (0.8 if pavilion else 0.0))
+		# A gentle per-bay tone shift (weathering), lighter on pavilions.
+		var tone := 1.0 + 0.06 * sin(i * 2.3) + (0.1 if pavilion else 0.0)
+		mm.set_instance_color(i, Color(tint_to.r * tone, tint_to.g * tone, tint_to.b * tone, strength))
 		var origin := Transform3D(Basis(), -Vector3(mesh_box.get_center().x, mesh_box.position.y, mesh_box.get_center().z))
 		mm.set_instance_transform(i, fit * origin * (kit["transform"] as Transform3D))
 		if every_tower > 0 and i > 0 and i % every_tower == 0:
-			_tower(stadium, root, piece, Vector3(a0, t0.x + 0.2, t0.y + 0.4), height, bay, home)
+			_tower(stadium, root, piece, Vector3(a0, t0.x + 0.2, t0.y + 0.4), height, bay, home, i / every_tower)
 	var mmi := MultiMeshInstance3D.new()
 	mmi.multimesh = mm
+	mmi.material_override = _bay_material(kit["mesh"])
 	root.add_child(mmi)
+
+
+## The bay's own textures in the tint shader.
+static func _bay_material(mesh: Mesh) -> ShaderMaterial:
+	var source := mesh.surface_get_material(0) as StandardMaterial3D
+	var mat := ShaderMaterial.new()
+	mat.shader = BAY_TINT
+	if source != null:
+		mat.set_shader_parameter("albedo_tex", source.albedo_texture)
+		if source.normal_texture != null:
+			mat.set_shader_parameter("normal_tex", source.normal_texture)
+			mat.set_shader_parameter("has_normal", true)
+		var orm: Texture2D = source.roughness_texture if source.roughness_texture != null else source.metallic_texture
+		if orm != null:
+			mat.set_shader_parameter("orm_tex", orm)
+			mat.set_shader_parameter("has_orm", true)
+	return mat
 
 
 ## A tower standing through the facade at a bay edge, with its cap and a
 ## lit window.
-func _tower(stadium: Stadium, root: Node3D, piece: StadiumPiece, e: Vector3, height: float, bay: float, home: TeamDef) -> void:
+func _tower(stadium: Stadium, root: Node3D, piece: StadiumPiece, e: Vector3, height: float, bay: float, home: TeamDef, index: int = 0) -> void:
 	var def := stadium.def
-	if StringName(piece.param("cap")) == &"pagoda":
+	# Alternate towers stand taller, so a run of them reads as a skyline.
+	var lift := 1.0 + 0.35 * float(index % 2) + 0.15 * float(index % 3 == 2)
+	var cap := StringName(piece.param("cap"))
+	if cap == &"pagoda":
 		# A sculpted five-tier pagoda standing through the facade.
-		var pagoda := ModelKit.spawn(&"pagoda", height + float(piece.param("tower_height")) * piece.size + 6.0, RandomNumberGenerator.new())
+		var pagoda := ModelKit.spawn(&"pagoda", (height + float(piece.param("tower_height")) * piece.size) * lift + 6.0, RandomNumberGenerator.new())
 		root.add_child(pagoda)
 		pagoda.position = stadium.point(e.x, e.y + 1.5, e.z)
 		return
 	var tw := clampf(bay * 0.55, 2.5, 6.0)
-	var tall := height + float(piece.param("tower_height")) * piece.size
+	var tall := height + float(piece.param("tower_height")) * piece.size * lift
+	var stone := def.facade_tint().darkened(0.08)
+	var trim := def.facade_tint().lightened(0.18)
 	var tower := Node3D.new()
 	root.add_child(tower)
 	tower.position = stadium.point(e.x, e.y + tw * 0.2, e.z)
 	stadium.face_home(tower)
-	var body := stadium.box(Vector3(tw, tall, tw), def.facade_tint().darkened(0.08), tower, &"facade")
+	var body := stadium.box(Vector3(tw, tall, tw), stone, tower, &"facade")
 	body.position.y = tall * 0.5
-	var window := stadium.box(Vector3(tw * 0.3, tw * 0.6, 0.1), def.window_color, tower)
-	window.position = Vector3(0, tall - tw * 0.9, tw * 0.5 + 0.05)
-	window.material_override = Stadium.glow(def.window_color, 1.6 if def.night else 0.3)
-	var roof := home.primary_color.darkened(0.2) if StringName(piece.param("cap")) != &"pagoda" else Color(0.14, 0.13, 0.15)
-	match StringName(piece.param("cap")):
+	# Plinth, string courses and stacked lit windows up the field face.
+	var plinth := stadium.box(Vector3(tw * 1.12, tall * 0.08, tw * 1.12), stone.darkened(0.15), tower, &"facade")
+	plinth.position.y = tall * 0.04
+	var courses := maxi(2, int(tall / 7.0))
+	for c in courses:
+		var band := stadium.box(Vector3(tw * 1.06, 0.35, tw * 1.06), trim, tower, &"facade")
+		band.position.y = tall * float(c + 1) / (courses + 1)
+	var lit := Stadium.glow(def.window_color, 1.6 if def.night else 0.3)
+	for w in mini(3, courses):
+		var window := stadium.box(Vector3(tw * 0.26, tw * 0.5, 0.12), def.window_color, tower)
+		window.position = Vector3(0, tall * (float(w) + 1.5) / (courses + 1), tw * 0.5 + 0.05)
+		window.material_override = lit
+	var roof := home.primary_color.darkened(0.2)
+	match cap:
 		&"spire":
-			var spire := Scenery.cylinder(tower, tw * 0.75, 0.0, tw * 1.8, roof, 8)
-			spire.position.y = tall + tw * 0.9
+			# A flared skirt, a collar, the spire, a ball finial and a pennant.
+			var eave := stadium.box(Vector3(tw * 1.18, 0.5, tw * 1.18), trim, tower, &"facade")
+			eave.position.y = tall + 0.25
+			var skirt := Scenery.cylinder(tower, tw * 0.86, tw * 0.62, tw * 0.45, roof, 8)
+			skirt.position.y = tall + 0.5 + tw * 0.22
+			var spire := Scenery.cylinder(tower, tw * 0.62, 0.05, tw * 2.0, roof, 8)
+			spire.position.y = tall + 0.5 + tw * 0.45 + tw * 1.0
+			var collar := Scenery.cylinder(tower, tw * 0.3, tw * 0.3, 0.3, def.accent_color, 8)
+			collar.position.y = tall + 0.5 + tw * 1.25
+			collar.material_override = Stadium.glow(def.accent_color, 0.4)
+			var top := tall + 0.5 + tw * 2.45
+			var ball := Scenery.sphere(tower, tw * 0.1, def.accent_color)
+			ball.position.y = top + 0.1
+			var mast := Scenery.cylinder(tower, 0.06, 0.06, tw * 0.9, Color(0.2, 0.2, 0.2), 4)
+			mast.position.y = top + tw * 0.45
+			var pennant := stadium.box(Vector3(tw * 0.55, tw * 0.22, 0.05), home.primary_color if index % 2 == 0 else home.secondary_color, tower)
+			pennant.position = Vector3(tw * 0.28, top + tw * 0.75, 0)
 		&"dome":
-			var dome := Scenery.sphere(tower, tw * 0.62, def.accent_color.darkened(0.15), 0.9)
-			dome.position.y = tall
-			var finial := Scenery.cylinder(tower, 0.15, 0.0, tw * 0.6, def.accent_color, 6)
-			finial.position.y = tall + tw * 0.75
-		&"pagoda":
-			for k in 3:
-				var w := tw * (1.25 - k * 0.28)
-				var eave := Scenery.cylinder(tower, w * 0.95, w * 0.35, tw * 0.32, roof, 4)
-				eave.rotation.y = PI * 0.25
-				eave.position.y = tall + k * tw * 0.5 + tw * 0.16
-				if k < 2:
-					var drum := stadium.box(Vector3(w * 0.5, tw * 0.22, w * 0.5), def.facade_tint(), tower, &"facade")
-					drum.position.y = tall + k * tw * 0.5 + tw * 0.42
+			var drum := Scenery.cylinder(tower, tw * 0.55, tw * 0.55, tw * 0.4, trim, 16)
+			drum.position.y = tall + tw * 0.2
+			for k in 8:
+				var rib := stadium.box(Vector3(0.18, tw * 0.42, 0.18), stone, tower)
+				var ang := TAU * k / 8.0
+				rib.position = Vector3(cos(ang) * tw * 0.56, tall + tw * 0.2, sin(ang) * tw * 0.56)
+			var dome := Scenery.sphere(tower, tw * 0.56, def.accent_color.darkened(0.15), 0.9)
+			dome.position.y = tall + tw * 0.4
+			var lantern := Scenery.cylinder(tower, tw * 0.14, tw * 0.14, tw * 0.3, def.window_color, 8)
+			lantern.position.y = tall + tw * 0.95
+			lantern.material_override = lit
+			var finial := Scenery.cylinder(tower, 0.12, 0.0, tw * 0.6, def.accent_color, 6)
+			finial.position.y = tall + tw * 1.4
 		_:
-			for m in 4:
-				var merlon := stadium.box(Vector3(tw * 0.26, tw * 0.3, tw * 0.26), def.facade_tint().darkened(0.08), tower, &"facade")
-				merlon.position = Vector3((-0.37 + 0.74 * (m % 2)) * tw, tall + tw * 0.15, (-0.37 + 0.74 * (m / 2)) * tw)
+			# Corbelled parapet: a projecting band, then merlons on all sides.
+			var corbel := stadium.box(Vector3(tw * 1.2, tw * 0.22, tw * 1.2), stone.darkened(0.1), tower, &"facade")
+			corbel.position.y = tall + tw * 0.11
+			for side in 4:
+				for m in 3:
+					var merlon := stadium.box(Vector3(tw * 0.24, tw * 0.32, tw * 0.2), stone, tower, &"facade")
+					var along := (-0.38 + 0.38 * m) * tw
+					var out := tw * 0.5
+					var p: Vector3 = [Vector3(along, 0, out), Vector3(along, 0, -out), Vector3(out, 0, along), Vector3(-out, 0, along)][side]
+					merlon.position = p + Vector3.UP * (tall + tw * 0.38)
 
 
 ## A box-like column at a spray angle: front and two sides.
