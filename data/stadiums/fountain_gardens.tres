@@ -128,6 +128,23 @@ params = {
 "style": &"arches"
 }
 
+[sub_resource type="Resource" id="Resource_csqm1"]
+script = ExtResource("2_wib25")
+kind = &"wall_art"
+params = {
+"every": 7.0,
+"motif": &"blossom"
+}
+
+[sub_resource type="Resource" id="Resource_yye1n"]
+script = ExtResource("2_wib25")
+kind = &"lamps"
+angle = -150.0
+params = {
+"count": 36,
+"span": 300.0
+}
+
 [resource]
 script = ExtResource("3_hice1")
 id = &"fountain_gardens"
@@ -151,4 +168,4 @@ window_color = Color(0.84705883, 0.9254902, 1, 1)
 facade_color = Color(0.8392157, 0.8117647, 0.73333335, 1)
 facade_surface = &"marble"
 structure_surface = &"stone"
-pieces = Array[ExtResource("2_wib25")]([SubResource("Resource_k8u6i"), SubResource("Resource_q8oj0"), SubResource("Resource_kaaf5"), SubResource("Resource_48ww4"), SubResource("Resource_1xj3a"), SubResource("Resource_taq0n"), SubResource("Resource_0ixp3"), SubResource("Resource_bdrrb"), SubResource("Resource_4ub2c"), SubResource("Resource_o7030"), SubResource("Resource_xncfn"), SubResource("Resource_vtwq7"), SubResource("Resource_2eyij"), SubResource("Resource_gvaj5"), SubResource("Resource_v23bh")])
+pieces = Array[ExtResource("2_wib25")]([SubResource("Resource_k8u6i"), SubResource("Resource_q8oj0"), SubResource("Resource_kaaf5"), SubResource("Resource_48ww4"), SubResource("Resource_1xj3a"), SubResource("Resource_taq0n"), SubResource("Resource_0ixp3"), SubResource("Resource_bdrrb"), SubResource("Resource_4ub2c"), SubResource("Resource_o7030"), SubResource("Resource_xncfn"), SubResource("Resource_vtwq7"), SubResource("Resource_2eyij"), SubResource("Resource_gvaj5"), SubResource("Resource_v23bh"), SubResource("Resource_csqm1"), SubResource("Resource_yye1n")])

@@ -55,6 +55,19 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	trim.material_override = Stadium.glow(def.accent_color, 1.6)
 	var screen := stadium.box(Vector3(34.0, 20.0, 0.2), home.dark_color, board)
 	screen.position = Vector3(0, 0, 0.0)
+	if bool(piece.param("crown")):
+		# A glowing ring floating over the board (the Halo Dome's crown).
+		var ring := MeshInstance3D.new()
+		var torus := TorusMesh.new()
+		torus.inner_radius = 12.5
+		torus.outer_radius = 13.6
+		torus.rings = 64
+		torus.ring_segments = 10
+		ring.mesh = torus
+		ring.material_override = Stadium.glow(def.accent_color, 0.9)
+		ring.position = Vector3(0, 18.0, 0.0)
+		ring.rotation_degrees.x = 70.0
+		board.add_child(ring)
 	if bool(piece.param("clock")):
 		# A station clock crowns it; the emblem moves beside the name.
 		var face := Scenery.cylinder(board, 4.2, 4.2, 0.6, Color(0.96, 0.94, 0.86), 32)

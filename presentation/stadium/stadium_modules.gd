@@ -16,7 +16,7 @@ const CATALOG := {
 		"name": "Centerpiece", "category": &"boards", "unique": true, "placed": false,
 		"about": "The board in straightaway center: club name under its emblem and the batter's card. Framed as a board, gate or arch.",
 		"angle": 0.0, "angle_range": [0.0, 0.0],
-		"params": {"height": [17.0, 12.0, 28.0], "frame": [&"board"], "clock": [false]},
+		"params": {"height": [17.0, 12.0, 28.0], "frame": [&"board"], "clock": [false], "crown": [false]},
 		"choices": {"frame": [&"board", &"gate", &"arch"]},
 		"script": preload("res://presentation/stadium/modules/centerpiece_module.gd"),
 	},
@@ -256,6 +256,14 @@ const CATALOG := {
 		"params": {"style": [&"steel"], "span": [120.0, -360.0, 360.0], "depth": [9.0, 3.0, 20.0], "height": [0.5, 0.0, 24.0]},
 		"choices": {"style": [&"steel", &"timber"]},
 		"script": preload("res://presentation/stadium/modules/canopy_module.gd"),
+	},
+	&"wall_art": {
+		"name": "Wall Art", "category": &"boards", "unique": false, "placed": false,
+		"about": "Motifs painted along the outfield wall between the numbers and emblems: waves, snowflakes, zigzag bolts, blossoms, gears, stars, crossed bars or the club emblem.",
+		"angle": 0.0, "angle_range": [0.0, 0.0],
+		"params": {"motif": [&"emblem"], "every": [8.0, 4.0, 20.0], "glow": [0.0, 0.0, 3.0]},
+		"choices": {"motif": [&"emblem", &"waves", &"snowflake", &"zigzag", &"blossom", &"gear", &"star", &"crossed"]},
+		"script": preload("res://presentation/stadium/modules/wall_art_module.gd"),
 	},
 	&"dome": {
 		"name": "Dome", "category": &"structure", "unique": true, "placed": false,

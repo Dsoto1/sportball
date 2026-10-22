@@ -125,6 +125,24 @@ params = {
 "style": &"steel"
 }
 
+[sub_resource type="Resource" id="Resource_ghcdt"]
+script = ExtResource("2_b78mq")
+kind = &"wall_art"
+params = {
+"every": 10.0,
+"glow": 1.5,
+"motif": &"crossed"
+}
+
+[sub_resource type="Resource" id="Resource_lscrl"]
+script = ExtResource("2_b78mq")
+kind = &"lamps"
+angle = -150.0
+params = {
+"count": 34,
+"span": 300.0
+}
+
 [resource]
 script = ExtResource("3_c1uws")
 id = &"the_vault"
@@ -149,4 +167,4 @@ skyline_color = Color(0.11764706, 0.14117648, 0.2, 1)
 window_color = Color(1, 0.8352941, 0.6039216, 1)
 facade_color = Color(0.3529412, 0.36862746, 0.4, 1)
 structure_surface = &"steel"
-pieces = Array[ExtResource("2_b78mq")]([SubResource("Resource_iootr"), SubResource("Resource_4i8r7"), SubResource("Resource_t1ilx"), SubResource("Resource_pt7r0"), SubResource("Resource_ysqj7"), SubResource("Resource_mjxe6"), SubResource("Resource_mtp5g"), SubResource("Resource_w3um4"), SubResource("Resource_ewyli"), SubResource("Resource_eijjg"), SubResource("Resource_aq1kd"), SubResource("Resource_mhk2s"), SubResource("Resource_0emfr"), SubResource("Resource_ssaq4")])
+pieces = Array[ExtResource("2_b78mq")]([SubResource("Resource_iootr"), SubResource("Resource_4i8r7"), SubResource("Resource_t1ilx"), SubResource("Resource_pt7r0"), SubResource("Resource_ysqj7"), SubResource("Resource_mjxe6"), SubResource("Resource_mtp5g"), SubResource("Resource_w3um4"), SubResource("Resource_ewyli"), SubResource("Resource_eijjg"), SubResource("Resource_aq1kd"), SubResource("Resource_mhk2s"), SubResource("Resource_0emfr"), SubResource("Resource_ssaq4"), SubResource("Resource_ghcdt"), SubResource("Resource_lscrl")])

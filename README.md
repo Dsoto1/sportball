@@ -221,7 +221,7 @@ The core is always built:
 
 | Module | What it is | Settings |
 |---|---|---|
-| `centerpiece` | board in straightaway center: club name under its emblem (or a station clock), the batter's card | height, frame (board, gate, arch), clock |
+| `centerpiece` | board in straightaway center: club name under its emblem (or a station clock), the batter's card | height, frame (board, gate, arch), clock, crown |
 | `scoreboard` | line-score board over the stands | height |
 | `slogan_board` | lit sign with the emblem, the park's name and the club's slogan | height, text |
 | `wall_scoreboard` | hand-operated board in a wall 6 m or taller | none |
@@ -233,6 +233,7 @@ The core is always built:
 | `fountains` | pools with cascades and jets beyond the wall | span, basins |
 | `arcade` | upper facade on the back of the stands: arches, windows, or an open steel or timber frame, with columns, cornice and club banners | style, span, height, bay, banners |
 | `canopy` | roof over the top rows, steel or timber, lit front edge | style, span, depth, height |
+| `wall_art` | motifs along the outfield wall: waves, snowflakes, zigzag bolts, blossoms, gears, stars, crossed bars, emblem | motif, every, glow |
 | `dome` | sealed roof; the park plays indoors | rise |
 | `vault_door` | giant round bank-vault door in a tall wall behind the stands | radius |
 | `searchlights` | beams sweeping into the night sky | span, count, length |

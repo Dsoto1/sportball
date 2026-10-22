@@ -24,7 +24,7 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	lip.material_override = Stadium.glow(def.accent_color, 0.8)
 	var water: Material
 	if bool(piece.param("frozen")):
-		water = Stadium.glow(Color(0.82, 0.93, 1.0), 0.35)
+		water = StadiumSurfaces.material(&"marble", Color(0.62, 0.82, 0.97), false, 2.0)
 	else:
 		water = ShaderMaterial.new()
 		water.shader = Stadium.FOUNTAIN_SHADER

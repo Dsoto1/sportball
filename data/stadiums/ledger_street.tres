@@ -118,6 +118,23 @@ params = {
 "style": &"arches"
 }
 
+[sub_resource type="Resource" id="Resource_3btit"]
+script = ExtResource("2_mb518")
+kind = &"wall_art"
+params = {
+"every": 10.0,
+"motif": &"emblem"
+}
+
+[sub_resource type="Resource" id="Resource_t5nf2"]
+script = ExtResource("2_mb518")
+kind = &"lamps"
+angle = -150.0
+params = {
+"count": 40,
+"span": 300.0
+}
+
 [resource]
 script = ExtResource("3_ura6c")
 id = &"ledger_street"
@@ -141,4 +158,4 @@ window_color = Color(1, 0.88235295, 0.65882355, 1)
 facade_color = Color(0.627451, 0.3137255, 0.23529412, 1)
 facade_surface = &"brick"
 structure_surface = &"stone"
-pieces = Array[ExtResource("2_mb518")]([SubResource("Resource_oeo3i"), SubResource("Resource_cq0mc"), SubResource("Resource_7xix8"), SubResource("Resource_up8hn"), SubResource("Resource_hcvew"), SubResource("Resource_qnulu"), SubResource("Resource_gnn5p"), SubResource("Resource_7qw1n"), SubResource("Resource_p8geh"), SubResource("Resource_rnwrq"), SubResource("Resource_52ddh"), SubResource("Resource_1hcmg"), SubResource("Resource_3bbly"), SubResource("Resource_jlw3u")])
+pieces = Array[ExtResource("2_mb518")]([SubResource("Resource_oeo3i"), SubResource("Resource_cq0mc"), SubResource("Resource_7xix8"), SubResource("Resource_up8hn"), SubResource("Resource_hcvew"), SubResource("Resource_qnulu"), SubResource("Resource_gnn5p"), SubResource("Resource_7qw1n"), SubResource("Resource_p8geh"), SubResource("Resource_rnwrq"), SubResource("Resource_52ddh"), SubResource("Resource_1hcmg"), SubResource("Resource_3bbly"), SubResource("Resource_jlw3u"), SubResource("Resource_3btit"), SubResource("Resource_t5nf2")])

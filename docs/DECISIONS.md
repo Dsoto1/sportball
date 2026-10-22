@@ -1021,3 +1021,28 @@ A side-by-side of every sheet's main view with our matching render showed three 
 Reason: Owner direction to make the parks look like their reference sheets.
 
 Affected systems: StadiumDef (sky), GrayboxField (skies, lighting, field colors), Stadium (skyline_top, facade_height, no shadows), modules (boards, signs, centerpiece, statues, flags, lamps, waterfalls, canopy, light towers), generate_parks, tests.
+
+## 2026-10-22 - Per-Park Signature Touches
+
+Obvious upgrades from the sheet comparison, each making a park more its own.
+
+- **`wall_art`:** motifs along the outfield wall between the numbers and emblems, in club colors, optionally glowing.
+  - Pier 9: waves.
+  - The Icebox: snowflakes.
+  - Reactor Park: glowing green zigzag bolts.
+  - Fountain Gardens: blossoms.
+  - Foundry: gears.
+  - The Halo Dome, the Kiln and the Horseshoe: stars.
+  - Warehouse Row and the Vault: crossed bars (red neon at the Vault).
+  - Ledger Street: the club emblem.
+- **Lanterns:** gas lamps line the top of the stands wherever a sheet shows them.
+- **Halo Dome:** a gold ring crowns the centerpiece (new `crown` setting on `centerpiece`).
+- **The Kiln:** the outfield backdrop drops to 6 m, the rocket rises to 70 m and the mesas come nearer and taller, so the rocket and the natural arch tower over the park as on the sheet.
+- **The Icebox:**
+  - bigger ice falls flanking the centerpiece, now icy blue stone rather than flat white;
+  - icicles along the outfield.
+- **Reactor Park:** glowing pipe runs along the top of the outfield backdrop. Pipes now stand on the skyline.
+
+Reason: Owner request to improve and differentiate the parks where it's obvious.
+
+Affected systems: modules (wall_art new; centerpiece crown; waterfalls frozen look; pipes on skyline), catalog, generate_parks, README.

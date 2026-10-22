@@ -13,6 +13,9 @@ points = PackedVector3Array(-45, 96, 3.4, -30, 104, 3.4, -15, 112, 3.4, 0, 116, 
 [sub_resource type="Resource" id="Resource_fwpx2"]
 script = ExtResource("2_un8dc")
 kind = &"centerpiece"
+params = {
+"crown": true
+}
 
 [sub_resource type="Resource" id="Resource_8s2kh"]
 script = ExtResource("2_un8dc")
@@ -108,6 +111,23 @@ params = {
 "style": &"steel"
 }
 
+[sub_resource type="Resource" id="Resource_oevcm"]
+script = ExtResource("2_un8dc")
+kind = &"wall_art"
+params = {
+"glow": 0.8,
+"motif": &"star"
+}
+
+[sub_resource type="Resource" id="Resource_2m2fl"]
+script = ExtResource("2_un8dc")
+kind = &"lamps"
+angle = -150.0
+params = {
+"count": 40,
+"span": 300.0
+}
+
 [resource]
 script = ExtResource("3_bqeas")
 id = &"halo_dome"
@@ -129,4 +149,4 @@ window_color = Color(1, 0.8235294, 0.47843137, 1)
 facade_color = Color(0.41568628, 0.3529412, 0.54901963, 1)
 facade_surface = &"marble"
 structure_surface = &"steel"
-pieces = Array[ExtResource("2_un8dc")]([SubResource("Resource_fwpx2"), SubResource("Resource_8s2kh"), SubResource("Resource_rkpyr"), SubResource("Resource_rkhve"), SubResource("Resource_iofs5"), SubResource("Resource_5ix5a"), SubResource("Resource_6b8ye"), SubResource("Resource_mt3jj"), SubResource("Resource_ejy07"), SubResource("Resource_pjoj3"), SubResource("Resource_yath7"), SubResource("Resource_dmp26"), SubResource("Resource_hpvue"), SubResource("Resource_faqeu")])
+pieces = Array[ExtResource("2_un8dc")]([SubResource("Resource_fwpx2"), SubResource("Resource_8s2kh"), SubResource("Resource_rkpyr"), SubResource("Resource_rkhve"), SubResource("Resource_iofs5"), SubResource("Resource_5ix5a"), SubResource("Resource_6b8ye"), SubResource("Resource_mt3jj"), SubResource("Resource_ejy07"), SubResource("Resource_pjoj3"), SubResource("Resource_yath7"), SubResource("Resource_dmp26"), SubResource("Resource_hpvue"), SubResource("Resource_faqeu"), SubResource("Resource_oevcm"), SubResource("Resource_2m2fl")])

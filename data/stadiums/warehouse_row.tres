@@ -139,6 +139,23 @@ params = {
 "style": &"steel"
 }
 
+[sub_resource type="Resource" id="Resource_8belc"]
+script = ExtResource("2_3mioo")
+kind = &"wall_art"
+params = {
+"every": 10.0,
+"motif": &"crossed"
+}
+
+[sub_resource type="Resource" id="Resource_55i50"]
+script = ExtResource("2_3mioo")
+kind = &"lamps"
+angle = -150.0
+params = {
+"count": 34,
+"span": 300.0
+}
+
 [resource]
 script = ExtResource("3_m4u46")
 id = &"warehouse_row"
@@ -163,4 +180,4 @@ window_color = Color(1, 0.88235295, 0.65882355, 1)
 facade_color = Color(0.5411765, 0.24313726, 0.18039216, 1)
 facade_surface = &"brick"
 structure_surface = &"steel"
-pieces = Array[ExtResource("2_3mioo")]([SubResource("Resource_llfex"), SubResource("Resource_dhncx"), SubResource("Resource_50gy8"), SubResource("Resource_3ko6v"), SubResource("Resource_5iq4d"), SubResource("Resource_di3l1"), SubResource("Resource_8s8n4"), SubResource("Resource_nehh2"), SubResource("Resource_eebaf"), SubResource("Resource_t0e0d"), SubResource("Resource_1sk07"), SubResource("Resource_fx584"), SubResource("Resource_i7bf1"), SubResource("Resource_gd51j"), SubResource("Resource_cgic4"), SubResource("Resource_l5mj6")])
+pieces = Array[ExtResource("2_3mioo")]([SubResource("Resource_llfex"), SubResource("Resource_dhncx"), SubResource("Resource_50gy8"), SubResource("Resource_3ko6v"), SubResource("Resource_5iq4d"), SubResource("Resource_di3l1"), SubResource("Resource_8s8n4"), SubResource("Resource_nehh2"), SubResource("Resource_eebaf"), SubResource("Resource_t0e0d"), SubResource("Resource_1sk07"), SubResource("Resource_fx584"), SubResource("Resource_i7bf1"), SubResource("Resource_gd51j"), SubResource("Resource_cgic4"), SubResource("Resource_l5mj6"), SubResource("Resource_8belc"), SubResource("Resource_55i50")])

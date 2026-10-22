@@ -18,7 +18,7 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 		var prev := Vector3.ZERO
 		for i in steps + 1:
 			var angle := piece.angle + span * i / steps
-			var top := stadium.stand_top(angle)
+			var top := stadium.skyline_top(angle)
 			var p := stadium.point(angle, top.x + 1.0 + run * 0.4, top.y + lift)
 			if i > 0:
 				var pipe := Scenery.cylinder(root, 0.45, 0.45, prev.distance_to(p), Color.WHITE, 10)
