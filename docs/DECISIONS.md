@@ -1298,3 +1298,14 @@ Reason: Owner request for another detail pass against the sheets. The balance ch
 - **Placed at:**
   - Citadel Park, Ledger Street and Warehouse Row: roof terraces.
   - The Horseshoe, Forum Field and Amber Gate: a mid balcony plus the roof.
+
+## 2026-10-22 - Meshy Models at Higher Detail
+
+- The owner saw distortion on the simplified Meshy models. They were re-simplified from the original downloads at higher targets:
+  - Landmarks: 200-300k triangles.
+  - Stand bay: about 70k (it repeats around the bowl).
+  - Backdrop block: about 90k.
+  - Tower and gatehouse: 50k each.
+- Simplify now runs with a tighter error (0.0005-0.001) and `--lock-border`, so silhouettes and texture seams hold.
+- Textures are 2048 px instead of 1024. The Meshy folder is now 53 MB (Git LFS).
+- Godot's importer generates mesh LODs for these files, so distant pieces draw fewer triangles automatically.
