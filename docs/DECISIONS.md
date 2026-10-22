@@ -1500,3 +1500,15 @@ home-plate and baseline panels.
   flight back over the screen or into the side seats), followed by a
   camera beside the plate until it lands; fans where it lands react. The
   look uses its own random generator, so seeded matches are unchanged.
+
+## The field wall round foul territory
+
+The stands used to start straight off the grass in foul territory, with
+only a faint net behind home: no wall, so from above the crowd seemed to
+stand on the field. Now every park has a padded wall from each foul pole
+round behind home, at the front of the stands, in the outfield wall's
+color with a cap rail, 2 m high (3 m behind the plate, the backstop
+net above it), and the warning-track dirt in front of it as along the
+outfield. The stands start on top of the wall. The dugouts moved in to
+the photo-real spot: along the baselines between home and first/third
+(95 degrees off center), cut into the wall, parallel to the lines.

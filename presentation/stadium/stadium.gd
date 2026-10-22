@@ -44,9 +44,15 @@ const SEAT_TOP := 0.85
 ## (first-base side home, third-base side visitors), DUGOUT_WIDTH m wide,
 ## sunk into the front of the stands, whose first rows lift to
 ## DUGOUT_ROOF m over them.
-const DUGOUT_ANGLE := 80.0
+const DUGOUT_ANGLE := 95.0
 const DUGOUT_WIDTH := 18.0
 const DUGOUT_ROOF := 2.9
+## The padded wall round the foul territory, foul pole to foul pole behind
+## home (the stands start on top of it), taller behind the plate, with a
+## dirt track in front as along the outfield wall.
+const FIELD_WALL := 2.0
+const BACKSTOP_WALL := 3.0
+const TRACK_WIDTH := 4.4
 const FIELD_CENTER := Vector3(0.0, 0.0, -45.0)
 const WATER := Color(0.06, 0.22, 0.36)
 ## How far out the bay reaches (meters from home).
@@ -132,7 +138,7 @@ func profile(angle: float) -> Vector3:
 	var a := absf(angle)
 	var inner := FieldLayout.fence_distance(angle, tuning) + 5.0 if a <= 45.0 else profile_inner(angle)
 	var foul := smoothstep(40.0, 60.0, a)
-	var first := lerpf(FieldLayout.fence_height(clampf(angle, -45.0, 45.0), tuning) + 0.6, 1.3, foul)
+	var first := lerpf(FieldLayout.fence_height(clampf(angle, -45.0, 45.0), tuning) + 0.6, field_wall_height(angle) + 0.3, foul)
 	var outfield := float(def.outfield_rows)
 	if def.outfield_open > 0.0:
 		outfield *= smoothstep(def.outfield_open, def.outfield_open + 10.0, a)
@@ -552,6 +558,11 @@ func _build_batters_eye() -> void:
 	eye.name = "BattersEye"
 
 
+## The foul-territory wall's height at a spray angle: taller behind home.
+func field_wall_height(angle: float) -> float:
+	return lerpf(FIELD_WALL, BACKSTOP_WALL, smoothstep(130.0, 150.0, absf(wrapf(angle, -180.0, 180.0))))
+
+
 ## Half the dugout's opening in the stands' front wall, in degrees.
 func dugout_half_angle() -> float:
 	return rad_to_deg(asin(DUGOUT_WIDTH * 0.5 / profile_inner(DUGOUT_ANGLE)))
@@ -638,25 +649,75 @@ func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
 		add_fans(spots, "Bench_%s" % club.abbreviation, club)
 
 
+## The field's wall round the foul territory: from each foul pole round
+## behind home, at the front of the stands, padded in the outfield wall's
+## color with a cap rail and a dirt track in front, open at the dugouts;
+## behind the plate it stands taller with the backstop net above it.
 func _build_backstop() -> void:
-	var st := SurfaceTool.new()
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var radius := profile(180.0).x - 1.5
-	var a := 140.0
-	while a < 220.0:
-		var b := a + 4.0
-		_quad(st, point(a, radius, 0.0), point(b, radius, 0.0), point(b, radius, 9.0), point(a, radius, 9.0), Color(0.1, 0.1, 0.12, 0.28))
-		a = b
-	var mi := MeshInstance3D.new()
-	mi.name = "Backstop"
-	mi.mesh = st.commit()
-	var mat := StandardMaterial3D.new()
-	mat.vertex_color_use_as_albedo = true
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mi.material_override = mat
-	add_child(mi)
+	var pad := SurfaceTool.new()
+	pad.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var track := SurfaceTool.new()
+	track.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var net := SurfaceTool.new()
+	net.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var wall_color := def.outfield_wall_color
+	var cap := def.accent_color.darkened(0.35)
+	for side: float in [-1.0, 1.0]:
+		var a := 45.0
+		while a < 180.0 - 0.01:
+			var b := minf(a + 1.0, 180.0)
+			var sa := a * side
+			var sb := b * side
+			var ra := profile(sa).x - 0.15
+			var rb := profile(sb).x - 0.15
+			var mid := (a + b) * 0.5
+			# Out past the poles the outfield wall's own track runs on.
+			if a >= 44.0:
+				var t0 := smoothstep(45.0, 50.0, a)
+				var t1 := smoothstep(45.0, 50.0, b)
+				_quad(track, point(sa, ra - TRACK_WIDTH * t0, 0.012), point(sa, ra, 0.012), point(sb, rb, 0.012), point(sb, rb - TRACK_WIDTH * t1, 0.012), Color.WHITE)
+			if absf(mid - DUGOUT_ANGLE) > dugout_half_angle() and not is_water(sa):
+				var ha := profile(sa).y - 0.3
+				var hb := profile(sb).y - 0.3
+				_quad(pad, point(sa, ra, 0.0), point(sb, rb, 0.0), point(sb, rb, hb), point(sa, ra, ha), wall_color)
+				_quad(pad, point(sa, ra - 0.12, ha), point(sb, rb - 0.12, hb), point(sb, rb - 0.12, hb + 0.18), point(sa, ra - 0.12, ha + 0.18), cap)
+				_quad(pad, point(sa, ra - 0.12, ha + 0.18), point(sb, rb - 0.12, hb + 0.18), point(sb, rb + 0.3, hb + 0.18), point(sa, ra + 0.3, ha + 0.18), cap.darkened(0.2))
+				_quad(pad, point(sa, ra - 0.12, ha), point(sb, rb - 0.12, hb), point(sb, rb, hb), point(sa, ra, ha), cap.darkened(0.3))
+			# The backstop net over the wall behind the plate.
+			if a >= 140.0:
+				var h := BACKSTOP_WALL + 0.2
+				_quad(net, point(sa, ra, h), point(sb, rb, h), point(sb, rb + 1.5, h + 9.0), point(sa, ra + 1.5, h + 9.0), Color.WHITE)
+			a = b
+	pad.generate_normals()
+	var walls := MeshInstance3D.new()
+	walls.name = "FieldWall"
+	walls.mesh = pad.commit()
+	var pad_mat := StandardMaterial3D.new()
+	pad_mat.vertex_color_use_as_albedo = true
+	pad_mat.vertex_color_is_srgb = true
+	pad_mat.roughness = 0.75
+	pad_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	walls.material_override = pad_mat
+	add_child(walls)
+	track.generate_normals()
+	var dirt := MeshInstance3D.new()
+	dirt.name = "FoulTrack"
+	dirt.mesh = track.commit()
+	var dirt_mat := GrayboxField._surface(GrayboxField.DIRT, GrayboxField.DIRT_TEX, GrayboxField.DIRT_NORMAL, 0.556, 3.0, 0.0)
+	dirt_mat.set_shader_parameter("detail_strength", 0.45)
+	dirt.material_override = dirt_mat
+	add_child(dirt)
+	net.generate_normals()
+	var netting := MeshInstance3D.new()
+	netting.name = "Backstop"
+	netting.mesh = net.commit()
+	var net_mat := StandardMaterial3D.new()
+	net_mat.albedo_color = Color(0.08, 0.08, 0.1, 0.32)
+	net_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	net_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	net_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	netting.material_override = net_mat
+	add_child(netting)
 
 
 ## The wall's dressing: distances in big numbers (the foul-pole distances
