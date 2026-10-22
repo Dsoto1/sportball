@@ -112,13 +112,13 @@ params = {
 
 [sub_resource type="Resource" id="Resource_3gmcm"]
 script = ExtResource("2_lnk5g")
-kind = &"waterfalls"
+kind = &"trees"
 angle = 7.0
 mirrored = true
 params = {
-"height": 20.0,
-"tree": &"blossom",
-"width": 14.0
+"count": 4,
+"kind": &"blossom",
+"span": 8.0
 }
 
 [sub_resource type="Resource" id="Resource_vhmi4"]

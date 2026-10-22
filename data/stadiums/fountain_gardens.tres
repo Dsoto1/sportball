@@ -38,13 +38,13 @@ mirrored = true
 
 [sub_resource type="Resource" id="Resource_taq0n"]
 script = ExtResource("2_wib25")
-kind = &"waterfalls"
+kind = &"trees"
 angle = 9.0
 mirrored = true
 params = {
-"height": 22.0,
-"style": &"terrace",
-"width": 12.0
+"count": 3,
+"kind": &"cypress",
+"span": 6.0
 }
 
 [sub_resource type="Resource" id="Resource_0ixp3"]

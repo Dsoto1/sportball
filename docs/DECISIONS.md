@@ -1198,3 +1198,9 @@ Reason: Owner request for another detail pass against the sheets. The balance ch
     - Flower boxes, and a back wall with pilasters, ball finials, arched niches and climbing vines.
   - The catalog notes waterfalls are meant to be used sparingly.
 - **Swan statue:** the generic "figure" statue was a bare peg. Fountain Gardens now has marble swans with raised wings and arched necks, and the figure is a robed statue holding an urn.
+
+## 2026-10-22 - Waterfalls Pulled
+
+- The owner found the remaining waterfalls (Sakura Gate's gorge, Fountain Gardens' terraces) a mess. They're pulled from every park until one can be made to look right, likely as a sculpted model.
+- Blossom trees (Sakura Gate) and cypresses (Fountain Gardens) take their place.
+- The module stays in the catalog.
