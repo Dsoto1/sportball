@@ -1595,3 +1595,29 @@ arrive within 0.7 s of the first); the nearest other outfielder backs up a
 ball in the outfield; everyone else takes a few ready steps and holds, and
 infielders cover bases once the ball is secured. A ball left loose on the
 ground 1.5 s past its projected pickup sends the nearest teammate after it.
+
+## Pitching view and broadcast HUD after the owner's reference
+
+The owner supplied a reference frame for pitching (a broadcast-style
+over-the-shoulder shot with a full HUD). Following its layout, not its
+branding:
+- Camera: over the pitcher's throwing shoulder, 7.5 m behind him, a long
+  lens (23 degree FOV): he fills the lower middle-left, the plate, batter
+  and catcher sit right of center. Floating name tags are hidden at the
+  plate and on the mound (the HUD names everyone).
+- Target box: while the user aims, the strike zone and the aim cursor are
+  drawn 2.2x round the zone's middle, with orange scope brackets; back to
+  true size when the ball is released, so the pitch arrives where it goes.
+- HUD (ui/hud/match_hud.gd): scorebug top left (club badges and colors,
+  runs, inning, count and outs lamps, bases); the pitcher's card (today's
+  IP H R BB K from the events, a stamina bar from fatigue) and the
+  batter's card (season AVG HR RBI, today's hits in at-bats); a mini field
+  top right with the runners and the lead runner's speed. Pitching adds
+  the repertoire down the left (key, ball in the pitch's tell color, name,
+  mph for this pitcher now), the picked pitch's card on the right
+  (velocity, a 3x3 break chart, H and V movement in inches, control), the
+  controls under it and the options bottom left.
+- Keys 1-5 pick a pitch straight off the list; a gamepad keeps LB/RB
+  (its face buttons are taken: A starts the meter).
+- GameLines reads today's lines from MatchState events, which now carry
+  the pitcher on plate appearances, outs and runs.

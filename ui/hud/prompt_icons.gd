@@ -9,7 +9,7 @@ const PAD_FONT := "res://assets/third_party/kenney/input-prompts/kenney_input_xb
 
 ## Glyph code points, from the pack's *_map.txt files.
 const GLYPHS := {
-	&"keyboard_1": 0xE003, &"keyboard_2": 0xE005, &"keyboard_3": 0xE007, &"keyboard_4": 0xE009,
+	&"keyboard_1": 0xE003, &"keyboard_2": 0xE005, &"keyboard_3": 0xE007, &"keyboard_4": 0xE009, &"keyboard_5": 0xE00B,
 	&"keyboard_arrows_all": 0xE026, &"keyboard_arrows_horizontal": 0xE029,
 	&"keyboard_b": 0xE036, &"keyboard_e": 0xE05A, &"keyboard_f": 0xE066, &"keyboard_j": 0xE08C,
 	&"keyboard_k": 0xE08E, &"keyboard_p": 0xE0A3, &"keyboard_q": 0xE0B3, &"keyboard_r": 0xE0B9,
@@ -30,6 +30,11 @@ const ACTIONS := {
 	&"pitch_prev": [[&"keyboard_q"], [&"xbox_lb"]],
 	&"pitch_next": [[&"keyboard_e"], [&"xbox_rb"]],
 	&"pitch_primary": [[&"keyboard_space"], [&"xbox_button_a"]],
+	&"pitch_slot_1": [[&"keyboard_1"], [&"xbox_lb"]],
+	&"pitch_slot_2": [[&"keyboard_2"], [&"xbox_lb"]],
+	&"pitch_slot_3": [[&"keyboard_3"], [&"xbox_lb"]],
+	&"pitch_slot_4": [[&"keyboard_4"], [&"xbox_lb"]],
+	&"pitch_slot_5": [[&"keyboard_5"], [&"xbox_lb"]],
 	&"pickoff": [[&"keyboard_f"], [&"xbox_lt"]],
 	&"slide_step": [[&"keyboard_shift"], [&"xbox_rt"]],
 	&"open_subs": [[&"keyboard_p"], [&"xbox_button_y"]],

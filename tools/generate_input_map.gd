@@ -18,6 +18,12 @@ const BINDINGS := {
 	&"pitch_primary": [["key", KEY_SPACE], ["key", KEY_J], ["mouse", MOUSE_BUTTON_LEFT], ["button", JOY_BUTTON_A]],
 	&"pitch_next": [["key", KEY_E], ["button", JOY_BUTTON_RIGHT_SHOULDER]],
 	&"pitch_prev": [["key", KEY_Q], ["button", JOY_BUTTON_LEFT_SHOULDER]],
+	# Pick a pitch straight off the list (keyboard; a pad cycles with LB/RB).
+	&"pitch_slot_1": [["key", KEY_1]],
+	&"pitch_slot_2": [["key", KEY_2]],
+	&"pitch_slot_3": [["key", KEY_3]],
+	&"pitch_slot_4": [["key", KEY_4]],
+	&"pitch_slot_5": [["key", KEY_5]],
 	&"throw_base_1": [["key", KEY_1], ["button", JOY_BUTTON_B]],
 	&"throw_base_2": [["key", KEY_2], ["button", JOY_BUTTON_Y]],
 	&"throw_base_3": [["key", KEY_3], ["button", JOY_BUTTON_X]],

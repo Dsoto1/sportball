@@ -127,6 +127,7 @@ func start_match(seed_value: int) -> void:
 	_view.clear_debug_play()
 	_view.set_roster(roster)
 	_hud.set_roster(roster)
+	_hud.tuning = tuning
 	if _park_index < 0 or _venue_follows_home:
 		_park_index = maxi(content.parks.find(roster.teams[1].stadium_def), 0)
 	_apply_park()
@@ -441,6 +442,9 @@ func _process_pre_pitch(delta: float) -> void:
 	if Input.is_action_just_pressed(&"pitch_prev"):
 		_selected_pitch = (_selected_pitch + count - 1) % count
 		_view.sfx.play(&"ui_tick")
+	for slot in mini(count, 5):
+		if Input.is_action_just_pressed(StringName("pitch_slot_%d" % (slot + 1))):
+			_selected_pitch = slot
 	if Input.is_action_just_pressed(&"slide_step"):
 		_slide_step = not _slide_step
 		_view.sfx.play(&"ui_toggle")

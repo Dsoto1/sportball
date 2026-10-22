@@ -290,7 +290,7 @@ func _score_run(runner: StringName) -> void:
 	var team := batting_team()
 	score[team] += 1
 	_half_runs += 1
-	emit(DomainEvent.RUN_SCORED, {"runner": runner, "team": team, "score": score.duplicate()})
+	emit(DomainEvent.RUN_SCORED, {"runner": runner, "team": team, "score": score.duplicate(), "pitcher": pitcher(fielding_team())})
 	if not is_top and inning >= innings_scheduled and score[HOME] > score[AWAY]:
 		_finish_game(&"walk_off")
 	elif not is_top and _mercy_inning() and score[HOME] - score[AWAY] >= rules.mercy_runs:
@@ -301,14 +301,14 @@ func _record_out(runner: StringName, base: int, kind: StringName) -> void:
 	if game_over:
 		return
 	outs += 1
-	emit(DomainEvent.OUT_RECORDED, {"runner": runner, "base": base, "kind": kind, "outs": outs})
+	emit(DomainEvent.OUT_RECORDED, {"runner": runner, "base": base, "kind": kind, "outs": outs, "pitcher": pitcher(fielding_team())})
 	if outs >= OUTS_PER_HALF:
 		_end_half()
 
 
 func _end_plate_appearance(result: StringName) -> void:
 	var team := batting_team()
-	emit(DomainEvent.PLATE_APPEARANCE_ENDED, {"batter": current_batter(), "result": result})
+	emit(DomainEvent.PLATE_APPEARANCE_ENDED, {"batter": current_batter(), "result": result, "pitcher": pitcher(fielding_team())})
 	balls = 0
 	strikes = 0
 	pickoffs_this_pa = 0

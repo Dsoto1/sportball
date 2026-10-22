@@ -15,7 +15,9 @@ const CAMERA_SPOTS := {
 	# Telephoto from behind and right of the plate: batter on the left,
 	# pitcher and zone large and clear.
 	CameraMode.BAT: [Vector3(1.5, 3.4, 9.0), Vector3(0.0, 1.0, -9.0)],
-	CameraMode.PITCH: [Vector3(0.4, 2.7, -24.5), Vector3(0.0, 0.9, 0.0)],
+	# Over the pitcher's throwing shoulder, close and long-lens: he fills the
+	# lower left, the plate, batter and catcher sit right of center.
+	CameraMode.PITCH: [Vector3(-0.9, 2.35, -25.8), Vector3(0.35, 1.0, 0.0)],
 	CameraMode.FIELD: [Vector3(0.0, 30.0, 40.0), Vector3.ZERO],  # offset from the field focus
 }
 
@@ -39,6 +41,8 @@ var _batter_id: StringName = &""
 var _runners := {}
 var _zone: Node3D
 var _cursor: MeshInstance3D
+## The orange target ring round the magnified zone while aiming a pitch.
+var _reticle: Node3D
 var _cursor_inner: MeshInstance3D
 var _debug_root: Node3D
 var _trajectory_line: MeshInstance3D
@@ -83,6 +87,8 @@ const BALL_SHADER := preload("res://presentation/props/baseball.gdshader")
 ## How fast the ball tumbles (radians per meter travelled), so its seams spin.
 const BALL_SPIN := 9.0
 const BALL_RADIUS := 0.045
+## How much bigger the strike zone is drawn while the user aims a pitch.
+const PITCH_ZONE_MAGNIFY := 2.2
 ## The ball is drawn at least this many degrees across (readability), so it
 ## grows with distance from the camera (up to BALL_MAX_SCALE).
 const BALL_MIN_DEGREES := 0.32
@@ -172,18 +178,19 @@ func setup(p_tuning: BaseballTuning) -> void:
 	_build_debug()
 
 
-const CAMERA_FOV := {CameraMode.BAT: 34.0, CameraMode.PITCH: 50.0, CameraMode.FIELD: 55.0, CameraMode.FLIGHT: 50.0}
+const CAMERA_FOV := {CameraMode.BAT: 34.0, CameraMode.PITCH: 23.0, CameraMode.FIELD: 55.0, CameraMode.FLIGHT: 50.0}
 
 
 func set_camera_mode(mode: CameraMode) -> void:
 	_camera_mode = mode
 	# The HUD names the batter; over his head the tag would cover the pitcher.
-	var batter: ActorView = _runners.get(_batter_id)
-	if batter != null:
-		batter.set_tag_visible(mode != CameraMode.BAT)
-	var catcher := tuning.fielder_ids.find(&"c")
-	if catcher >= 0 and catcher < _fielders.size():
-		_fielders[catcher].set_tag_visible(mode != CameraMode.BAT)
+	# At the plate and on the mound the HUD names everyone; floating tags
+	# would only cover the pitcher, batter and catcher through the long lens.
+	var tags := mode == CameraMode.FIELD or mode == CameraMode.FLIGHT
+	for actor: ActorView in _runners.values():
+		actor.set_tag_visible(tags)
+	for actor in _fielders:
+		actor.set_tag_visible(tags)
 
 
 ## Point the ball-in-play camera tracks.
@@ -383,7 +390,7 @@ func reset_for_pitch(state: MatchState) -> void:
 	_batting_home = state.batting_team() == MatchState.HOME
 	var batter := _runner_actor(state.current_batter(), batting_color, batting_trim)
 	_batter_id = state.current_batter()
-	batter.set_tag_visible(_camera_mode != CameraMode.BAT)
+	batter.set_tag_visible(_camera_mode == CameraMode.FIELD or _camera_mode == CameraMode.FLIGHT)
 	var hitter := _roster.player(state.current_batter()) if _roster != null else null
 	_bats_left = hitter != null and hitter.bats_left()
 	batter.set_lefty(_bats_left)
@@ -555,6 +562,16 @@ func show_pitch_marker(pitch: PitchResult) -> void:
 
 ## cursor_radius 0 hides the cursor.
 func set_cursor(at: Vector2, outer_radius: float, inner_radius: float, color: Color) -> void:
+	# Pitching: while the user aims, the zone (with the cursor in it) is
+	# drawn magnified round its middle, a target box big enough to work
+	# with from behind the mound; back to true size once the ball is let go,
+	# so the pitch arrives where it really goes.
+	var magnify := _camera_mode == CameraMode.PITCH and outer_radius > 0.0
+	var k := PITCH_ZONE_MAGNIFY if magnify else 1.0
+	var mid := Vector3(0.0, (tuning.zone_top + tuning.zone_bottom) * 0.5, 0.0)
+	_zone.scale = Vector3(k, k, 1.0)
+	_zone.position = mid * (1.0 - k)
+	_reticle.visible = magnify
 	_cursor.visible = outer_radius > 0.0
 	_cursor_inner.visible = inner_radius > 0.0
 	_cursor.position = Vector3(at.x, at.y, 0.03)
@@ -748,6 +765,7 @@ func _process(delta: float) -> void:
 	if _camera == null:
 		return
 	_view_clock += delta
+	_size_ball()
 	var flash_age := _view_clock - _flash_start
 	_flash.visible = flash_age < 0.18
 	if _flash.visible:
@@ -1231,12 +1249,15 @@ func _clear_runners() -> void:
 
 func _update_shadow() -> void:
 	_ball_shadow.position = Vector3(_ball.position.x, 0.03, _ball.position.z)
-	# Readability: the ball grows with camera distance (presentation only).
-	if _camera != null:
-		var wanted := deg_to_rad(BALL_MIN_DEGREES) * _camera.position.distance_to(_ball.position) * 0.5 / BALL_RADIUS
-		var grow := clampf(wanted, 1.0, BALL_MAX_SCALE)
-		_ball.scale = Vector3.ONE * grow
-		_ball_shadow.scale = Vector3(grow, 1.0, grow)
+	_ball_shadow.scale = Vector3(_ball.scale.x, 1.0, _ball.scale.x)
+
+
+## Readability: the ball grows with its distance from the camera, measured
+## as size on screen (so a long lens zooms nothing extra). Every frame, so
+## it never keeps a size from an earlier shot.
+func _size_ball() -> void:
+	var wanted := deg_to_rad(BALL_MIN_DEGREES) * (_camera.fov / 55.0) * _camera.global_position.distance_to(_ball.global_position) * 0.5 / BALL_RADIUS
+	_ball.scale = Vector3.ONE * clampf(wanted, 1.0, BALL_MAX_SCALE)
 
 
 func _build_zone() -> void:
@@ -1275,6 +1296,23 @@ func _build_zone() -> void:
 	_throw_target.scale = Vector3.ONE * 1.6
 	_throw_target.visible = false
 	add_child(_throw_target)
+	_reticle = Node3D.new()
+	_reticle.position = Vector3(0, mid_y, 0.02)
+	_reticle.visible = false
+	_zone.add_child(_reticle)
+	# Two orange brackets either side of the zone, like a scope's.
+	for side: float in [-1.0, 1.0]:
+		for k in 7:
+			var a := deg_to_rad(-48.0 + k * 16.0)
+			var seg := MeshInstance3D.new()
+			var box := BoxMesh.new()
+			box.size = Vector3(0.022, h * 0.17, 0.01)
+			seg.mesh = box
+			var r := h * 0.78
+			seg.position = Vector3(side * cos(a) * r, sin(a) * r, 0.0)
+			seg.rotation.z = a * side
+			seg.material_override = _unshaded(Color(1.0, 0.62, 0.12, 0.95))
+			_reticle.add_child(seg)
 	_cursor = _ring(Color(1.0, 0.85, 0.2))
 	_cursor_inner = _ring(Color(1.0, 0.95, 0.6))
 	_zone.add_child(_cursor)
