@@ -45,3 +45,41 @@ Progress from improvised local park to iconic spectacle venue. Upgrades can impr
 ## History
 
 Persist championships, records, retired players, rivalries, signature moments, awards, career totals, and franchise milestones. The save file should become a story archive.
+
+## Later: My Player Mode (handheld sports-RPG feel)
+
+Not scheduled yet; noted so later work lines up with it. A single-player
+career where you create one player and play their story. Its structure and
+feel should borrow heavily from Game Boy Advance sports RPGs: Mario Golf:
+Advance Tour, Mario Tennis: Power Tour and similar JRPG-style sports games.
+Borrow the structure and the feel, never their characters, names, art or
+music (same originality rule as the rest of the project).
+
+Elements to carry over:
+
+- **A walkable hub.** A small top-down town or baseball academy, with
+  dorms, a practice field, a shop, a clubhouse and a coach's office. You
+  explore between games instead of clicking through menus.
+- **People with something to say.** NPC teammates, rivals and coaches with
+  dialogue boxes and portraits. Talking to them unlocks tips, side
+  challenges and training partners.
+- **Ladder of rivals.** Each area has a rival or a top club to beat:
+  challenge matches and short tournaments are the story beats. Winning
+  opens the next area, park or league tier.
+- **Experience and levels.** XP from games, challenges and training. On a
+  level-up you spend stat points (contact, power, eye, speed, arm, glove,
+  and pitching stats for two-way players), with an end-of-game results
+  screen that fills the XP bar.
+- **Training mini-games.** Short, skill-based drills (batting cage targets,
+  fielding relays, pitching to a zone grid) that raise specific stats and
+  teach the controls.
+- **Gear and a shop.** Bats, gloves and cleats with stat trade-offs, bought
+  with prize money.
+- **Special moves.** Signature swings and pitches learned from mentors or
+  unlocked by level, tied to the game's "show" systems.
+- **Carry-over.** The finished player can be drafted into exhibition and
+  franchise modes. This mirrors carrying your handheld character over to
+  the console game.
+- **Presentation.** A pixel-art or low-poly chibi hub, menus in the style
+  of a JRPG text window, cheerful chiptune-flavored music, and quick,
+  arcade-length matches.
