@@ -21,6 +21,7 @@ const SHOTS := [
 	[Vector3(30, 6, -30), Vector3(-80, 10, 40)],
 ]
 var _shots: Array = SHOTS
+var _cheer := -1.0
 
 
 func _initialize() -> void:
@@ -39,7 +40,13 @@ func _initialize() -> void:
 		for k in 8:
 			var a := PI * 0.5 + TAU * k / 8.0
 			_shots.append([center + Vector3(cos(a) * 175.0, 75.0, sin(a) * 175.0), center + Vector3(0, -10, 0)])
+	for a: String in OS.get_cmdline_user_args():
+		if a.begins_with("cheer:"):
+			# Hold the crowd at this excitement (0 calm .. 1 a home run).
+			_cheer = a.substr(6).to_float()
 	root.add_child(load("res://app/main.tscn").instantiate())
+
+
 func _process(_d: float) -> bool:
 	_frames += 1
 	if _view == null:
@@ -59,6 +66,8 @@ func _process(_d: float) -> bool:
 			_view.set_park(content.tuning_for(park), park)
 			_view.set_roster(playing)
 		return false
+	if _cheer >= 0.0 and _view._stadium != null:
+		_view._stadium._excitement = _cheer
 	if _frames < 30:
 		return false
 	if _i >= _shots.size():

@@ -10,6 +10,8 @@ extends Node3D
 ## field's rules live in BaseballTuning.
 
 const CROWD_SHADER := preload("res://presentation/stadium/crowd.gdshader")
+## Fans baked from the player mannequin (tools/bake_crowd.gd).
+const CROWD_ATLAS := preload("res://assets/generated/crowd/crowd_atlas.png")
 const SKYLINE_SHADER := preload("res://presentation/stadium/skyline.gdshader")
 const FOUNTAIN_SHADER := preload("res://presentation/stadium/fountain.gdshader")
 const DISPLAY_FONT := preload("res://assets/third_party/fonts/bungee/Bungee-Regular.ttf")
@@ -357,8 +359,9 @@ func add_fans(seats: Array[Vector3], node_name: String = "Fans") -> void:
 	mm.use_colors = true
 	mm.use_custom_data = true
 	var quad := QuadMesh.new()
-	quad.size = Vector2(0.62, 1.0)
-	quad.center_offset = Vector3(0.0, 0.5, 0.0)
+	# The atlas cell: 2.4 m tall, 1.2 wide, feet 0.15 m above its bottom.
+	quad.size = Vector2(1.2, 2.4)
+	quad.center_offset = Vector3(0.0, 1.05, 0.0)
 	mm.mesh = quad
 	mm.instance_count = seats.size()
 	var neutral := [Color(0.92, 0.92, 0.9), Color(0.35, 0.35, 0.38), Color(0.85, 0.2, 0.2), Color(0.95, 0.8, 0.2), Color(0.2, 0.6, 0.65), Color(0.15, 0.15, 0.18)]
@@ -373,13 +376,14 @@ func add_fans(seats: Array[Vector3], node_name: String = "Fans") -> void:
 		else:
 			shirt = neutral[rng.randi_range(0, neutral.size() - 1)]
 		mm.set_instance_color(i, shirt.lightened(rng.randf_range(-0.1, 0.1)))
-		mm.set_instance_custom_data(i, Color(rng.randf(), rng.randf(), 1.0 if rng.randf() < 0.55 else 0.0, rng.randf()))
+		mm.set_instance_custom_data(i, Color(rng.randf(), rng.randf(), rng.randf(), rng.randf()))
 	var mmi := MultiMeshInstance3D.new()
 	mmi.name = unique_name(node_name)
 	mmi.multimesh = mm
 	if _crowd_mat == null:
 		_crowd_mat = ShaderMaterial.new()
 		_crowd_mat.shader = CROWD_SHADER
+		_crowd_mat.set_shader_parameter("atlas", CROWD_ATLAS)
 	mmi.material_override = _crowd_mat
 	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mmi)

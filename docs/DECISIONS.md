@@ -1435,3 +1435,16 @@ Reason: Owner request for another detail pass against the sheets. The balance ch
 - **Tools:**
   - `tools/flight_shots.gd` renders a home run's camera sequence for a park.
   - `tools/board_shots.gd` renders the board flat.
+
+## Crowd: fans baked from the player mannequin
+
+The stands were procedural silhouettes (a head, a body, two arm bars). The
+crowd is now an impostor atlas baked from the game's own rigged mannequin
+(`tools/bake_crowd.gd` → `assets/generated/crowd/crowd_atlas.png`): six
+poses (seated, seated clapping, standing clapping, arms-up cheer, jump, fist
+pump), four frames each. Red encodes the body region and green the light,
+so `crowd.gdshader` recolors every fan: shirt from the club/neutral mix,
+pants, shoes, skin and hair varied per seat. Excitement picks the poses;
+each fan's temperament decides who stays seated and who is first up, and a
+small per-fan lag makes the stands ripple on a home run. Still one
+MultiMesh draw per section, no new paid assets.
