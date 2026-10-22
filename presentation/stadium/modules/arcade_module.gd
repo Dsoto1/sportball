@@ -235,6 +235,9 @@ func _build_kit(stadium: Stadium, piece: StadiumPiece, home: TeamDef) -> void:
 	var mesh_box: AABB = kit["aabb"]
 	var height := float(piece.param("height")) * piece.size
 	var bay := float(piece.param("bay"))
+	# Bay 0: as wide as the model's own proportions at this height.
+	if bay <= 0.0:
+		bay = height * mesh_box.size.x / maxf(mesh_box.size.y, 0.01)
 	var span := float(piece.param("span"))
 	var radius_mid := stadium.stand_top(piece.angle + span * 0.5).x
 	var steps := maxi(1, int(absf(deg_to_rad(span)) * radius_mid / bay))

@@ -14,7 +14,8 @@ points = PackedVector3Array(-45, 94.5, 11.3, -30, 101, 11.3, -14, 111, 11.3, -12
 script = ExtResource("2_mb518")
 kind = &"centerpiece"
 params = {
-"frame": &"arch"
+"frame": &"model",
+"frame_model": &"set_bank_gate"
 }
 
 [sub_resource type="Resource" id="Resource_cq0mc"]
@@ -62,9 +63,9 @@ kind = &"landmarks"
 angle = -50.0
 params = {
 "height": 40.0,
+"model": &"set_bank_block",
 "rows": 3,
-"stone": Color(0.7882353, 0.6901961, 0.5411765, 1),
-"style": &"town"
+"style": &"model"
 }
 
 [sub_resource type="Resource" id="Resource_7qw1n"]
@@ -130,13 +131,15 @@ kind = &"arcade"
 angle = 50.0
 mirrored = true
 params = {
-"banners": 5,
-"bay": 9.0,
-"cap": &"spire",
-"height": 9.0,
-"kit": &"victorian",
+"banners": 0,
+"bay": 0.0,
+"height": 12.0,
+"kit": &"bank_set",
+"pavilion": 0,
 "style": &"kit",
+"tint": 0.0,
 "tower_height": 10.0,
+"tower_model": &"set_bank_tower",
 "towers": 5
 }
 
@@ -146,12 +149,16 @@ kind = &"arcade"
 angle = 11.0
 mirrored = true
 params = {
-"banners": 3,
-"cap": &"dome",
+"banners": 0,
+"bay": 0.0,
 "height": 14.0,
+"kit": &"bank_set",
+"pavilion": 0,
 "span": 36.0,
-"style": &"arches",
+"style": &"kit",
+"tint": 0.0,
 "tower_height": 12.0,
+"tower_model": &"set_bank_tower",
 "towers": 3
 }
 

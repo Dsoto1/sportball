@@ -13,6 +13,10 @@ points = PackedVector3Array(-45, 101, 3.7, -22, 118, 3.7, 0, 125, 3.7, 22, 118, 
 [sub_resource type="Resource" id="Resource_k8u6i"]
 script = ExtResource("2_wib25")
 kind = &"centerpiece"
+params = {
+"frame": &"model",
+"frame_model": &"set_garden_gate"
+}
 
 [sub_resource type="Resource" id="Resource_q8oj0"]
 script = ExtResource("2_wib25")
@@ -37,9 +41,9 @@ angle = -50.0
 params = {
 "gap": 60.0,
 "height": 36.0,
+"model": &"set_garden_block",
 "rows": 2,
-"stone": Color(0.8392157, 0.78431374, 0.68235296, 1),
-"style": &"town"
+"style": &"model"
 }
 
 [sub_resource type="Resource" id="Resource_taq0n"]
@@ -120,11 +124,16 @@ kind = &"arcade"
 angle = 50.0
 mirrored = true
 params = {
-"banners": 5,
-"bay": 9.0,
-"height": 10.0,
-"kit": &"colosseum",
-"style": &"kit"
+"banners": 0,
+"bay": 0.0,
+"height": 12.0,
+"kit": &"garden_set",
+"pavilion": 0,
+"style": &"kit",
+"tint": 0.0,
+"tower_height": 16.0,
+"tower_model": &"set_garden_tower",
+"towers": 3
 }
 
 [sub_resource type="Resource" id="Resource_v23bh"]
@@ -133,10 +142,17 @@ kind = &"arcade"
 angle = 11.0
 mirrored = true
 params = {
-"banners": 3,
+"banners": 0,
+"bay": 0.0,
 "height": 15.0,
+"kit": &"garden_set",
+"pavilion": 0,
 "span": 36.0,
-"style": &"colonnade"
+"style": &"kit",
+"tint": 0.0,
+"tower_height": 16.0,
+"tower_model": &"set_garden_tower",
+"towers": 3
 }
 
 [sub_resource type="Resource" id="Resource_csqm1"]

@@ -1316,3 +1316,37 @@ Reason: Owner request for another detail pass against the sheets. The balance ch
 - This removes 30-40% of each Meshy model. The simplify targets were kept, so the visible faces now get roughly 1.5 times the triangles.
 - **Pipeline for every Meshy stadium piece:** weld, cull_back, weld, simplify (to the target, error 0.0008), repack_glb at 2048 px, then regrade_glb where the colors need it.
 - Pieces must face +Z (Meshy's front). If a piece is ever placed to be seen from behind, cull it with a higher threshold or not at all.
+
+## 2026-10-22 - Architecture Sets for All 18 Parks
+
+- After the Citadel pilot, the owner approved the roll-out with Meshy: 68 sections for the other 17 parks (2,040 credits; 870 left of the Meshy balance).
+- **One style per park, read from its sheet:**
+
+| Park | Set | Style |
+|---|---|---|
+| Halo Dome | deco | Art deco |
+| Foundry Field | foundry | Riveted foundry |
+| Ledger Street | bank | Brick and limestone bank |
+| Pier 9 | pier | Timber harbor |
+| The Kiln | kiln | Red sandstone and copper |
+| The Icebox | alpine | Alpine lodge |
+| Reactor Park | reactor | Concrete reactor |
+| The Horseshoe | lamp | Victorian gaslight |
+| Warehouse Row | rail | Railway brick |
+| Fountain Gardens | garden | Marble garden |
+| The Vault | vault | Gunmetal deco vault |
+| Sakura Gate | temple | Japanese temple |
+| Deepwater | atlantis | Atlantean |
+| Cloudreach | sky | Steampunk sky city |
+| Forum Field | forum | Roman forum |
+| Firelight | volcano | Basalt volcano fortress |
+| Amber Gate | desert | Carved desert palace |
+
+- Each set has four sections (stand bay, tower, backdrop block, scoreboard gatehouse), prompted with the same style wording.
+- **Code:**
+  - `ModelKit.ARCH_SETS` registers every set's four roles (`set_<name>_<section>`, plus the arcade kit `<name>_set`).
+  - The arcade `bay` 0 sizes each bay to the model's own proportions.
+  - Short side facades on set parks are raised to 12 m so the bays read at scale.
+  - A new test checks that every model a park names exists.
+- **Pipeline:** the generation prompts, processing script and park converter used for the roll-out are recorded with the session scratch tools. Each section goes through weld, cull_back, weld, simplify, then repack_glb at 2048 px.
+- **Repository size:** the 75 Meshy models take about 420 MB as GLB, plus about 155 MB of textures Godot extracts on import, all in Git LFS.

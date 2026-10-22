@@ -14,6 +14,10 @@ air_drag_scale = 1.03
 [sub_resource type="Resource" id="Resource_4y8qj"]
 script = ExtResource("2_84kiu")
 kind = &"centerpiece"
+params = {
+"frame": &"model",
+"frame_model": &"set_pier_gate"
+}
 
 [sub_resource type="Resource" id="Resource_o48xx"]
 script = ExtResource("2_84kiu")
@@ -38,10 +42,9 @@ angle = -50.0
 params = {
 "gap": 30.0,
 "height": 30.0,
-"roof": Color(0.5411765, 0.18039216, 0.16470589, 1),
+"model": &"set_pier_block",
 "rows": 2,
-"stone": Color(0.8509804, 0.8235294, 0.7647059, 1),
-"style": &"harbor"
+"style": &"model"
 }
 
 [sub_resource type="Resource" id="Resource_end53"]
@@ -106,8 +109,15 @@ angle = 50.0
 mirrored = true
 params = {
 "banners": 0,
-"height": 8.0,
-"style": &"timber"
+"bay": 0.0,
+"height": 12.0,
+"kit": &"pier_set",
+"pavilion": 0,
+"style": &"kit",
+"tint": 0.0,
+"tower_height": 16.0,
+"tower_model": &"set_pier_tower",
+"towers": 3
 }
 
 [sub_resource type="Resource" id="Resource_o77yj"]
@@ -116,10 +126,17 @@ kind = &"arcade"
 angle = 11.0
 mirrored = true
 params = {
-"banners": 3,
+"banners": 0,
+"bay": 0.0,
 "height": 13.0,
+"kit": &"pier_set",
+"pavilion": 0,
 "span": 36.0,
-"style": &"timber"
+"style": &"kit",
+"tint": 0.0,
+"tower_height": 16.0,
+"tower_model": &"set_pier_tower",
+"towers": 3
 }
 
 [sub_resource type="Resource" id="Resource_0r8xy"]

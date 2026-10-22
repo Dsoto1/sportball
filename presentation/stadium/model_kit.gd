@@ -43,28 +43,44 @@ const SETS := {
 	&"sakura_cliff": [MESHY + "sakura_cliff.glb"],
 	&"cathedral_spires": [MESHY + "cathedral_spires.glb"],
 	&"domed_bank": [MESHY + "domed_bank.glb"],
-	# Architecture sets: one style per park, in sections (stand bay, tower,
-	# backdrop block, scoreboard gate) so the whole park reads as one build.
-	&"bay_gothic_set": [MESHY + "gothic_bay.glb"],
-	&"set_gothic_tower": [MESHY + "gothic_tower.glb"],
-	&"set_gothic_block": [MESHY + "gothic_block.glb"],
-	&"set_gothic_gate": [MESHY + "gothic_gate.glb"],
 	&"block": [CITY + "low-detail-building-a.glb", CITY + "low-detail-building-b.glb", CITY + "low-detail-building-c.glb", CITY + "low-detail-building-d.glb", CITY + "low-detail-building-wide-a.glb"],
 }
 
+## Architecture sets: one style per park in four sections, so a whole park
+## reads as one build. Each set name gives four roles: "set_<name>_bay"
+## (the stand facade bay, also the arcade kit "<name>_set"), "_tower",
+## "_block" (backdrop rows) and "_gate" (the scoreboard frame), from
+## MESHY + "<name>_<section>.glb".
+const ARCH_SETS := [&"gothic", &"deco", &"foundry", &"bank", &"pier", &"kiln", &"alpine", &"reactor", &"lamp", &"rail", &"garden", &"vault", &"temple", &"atlantis", &"sky", &"forum", &"volcano", &"desert"]
+const SECTIONS := [&"bay", &"tower", &"block", &"gate"]
+
 static var _scenes := {}
 static var _heights := {}
+static var _roles := {}
+
+
+## Every role: SETS plus the architecture-set sections.
+static func roles() -> Dictionary:
+	if _roles.is_empty():
+		_roles = SETS.duplicate()
+		for set_name: StringName in ARCH_SETS:
+			for section: StringName in SECTIONS:
+				var path := MESHY + "%s_%s.glb" % [set_name, section]
+				_roles[StringName("set_%s_%s" % [set_name, section])] = [path]
+			_roles[StringName("bay_%s_set" % set_name)] = [MESHY + "%s_bay.glb" % set_name]
+	return _roles
 
 
 static func has(role: StringName) -> bool:
-	return SETS.has(role)
+	var list: Array = roles().get(role, [])
+	return not list.is_empty() and ResourceLoader.exists(list[0])
 
 
 ## A random variant of a role, scaled uniformly to `height` m, base on the
 ## ground at its origin. `tint` recolors foliage-like surfaces (any material
 ## whose name says leaf) when its alpha is above zero.
 static func spawn(role: StringName, height: float, rng: RandomNumberGenerator, tint: Color = Color(0, 0, 0, 0)) -> Node3D:
-	var list: Array = SETS[role]
+	var list: Array = roles()[role]
 	var path: String = list[rng.randi_range(0, list.size() - 1)]
 	if not _scenes.has(path):
 		_scenes[path] = load(path)
@@ -83,7 +99,7 @@ static func spawn(role: StringName, height: float, rng: RandomNumberGenerator, t
 ## The first mesh of a role's first variant, with its transform inside the
 ## model and its bounds (for batching repeated pieces into a MultiMesh).
 static func mesh_of(role: StringName) -> Dictionary:
-	var path: String = SETS[role][0]
+	var path: String = roles()[role][0]
 	if not _scenes.has(path):
 		_scenes[path] = load(path)
 	var node: Node3D = (_scenes[path] as PackedScene).instantiate()

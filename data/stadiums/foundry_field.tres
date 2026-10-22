@@ -14,7 +14,8 @@ points = PackedVector3Array(-45, 101, 2.6, -25, 116, 2.6, 0, 121, 2.6, 13, 113, 
 script = ExtResource("2_07v1h")
 kind = &"centerpiece"
 params = {
-"frame": &"gate",
+"frame": &"model",
+"frame_model": &"set_foundry_gate",
 "pillar_cap": &"brazier"
 }
 
@@ -41,8 +42,9 @@ angle = -50.0
 params = {
 "gap": 30.0,
 "height": 40.0,
+"model": &"set_foundry_block",
 "rows": 3,
-"style": &"industrial"
+"style": &"model"
 }
 
 [sub_resource type="Resource" id="Resource_sr515"]
@@ -103,8 +105,15 @@ angle = 50.0
 mirrored = true
 params = {
 "banners": 0,
-"height": 10.0,
-"style": &"truss"
+"bay": 0.0,
+"height": 12.0,
+"kit": &"foundry_set",
+"pavilion": 0,
+"style": &"kit",
+"tint": 0.0,
+"tower_height": 16.0,
+"tower_model": &"set_foundry_tower",
+"towers": 3
 }
 
 [sub_resource type="Resource" id="Resource_1cgio"]
@@ -113,10 +122,17 @@ kind = &"arcade"
 angle = 11.0
 mirrored = true
 params = {
-"banners": 3,
+"banners": 0,
+"bay": 0.0,
 "height": 15.0,
+"kit": &"foundry_set",
+"pavilion": 0,
 "span": 36.0,
-"style": &"truss"
+"style": &"kit",
+"tint": 0.0,
+"tower_height": 16.0,
+"tower_model": &"set_foundry_tower",
+"towers": 3
 }
 
 [sub_resource type="Resource" id="Resource_cg6nc"]

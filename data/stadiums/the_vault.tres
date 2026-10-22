@@ -16,7 +16,8 @@ surface_speed = 1.3
 script = ExtResource("2_b78mq")
 kind = &"centerpiece"
 params = {
-"frame": &"gate"
+"frame": &"model",
+"frame_model": &"set_vault_gate"
 }
 
 [sub_resource type="Resource" id="Resource_4i8r7"]
@@ -41,9 +42,9 @@ kind = &"landmarks"
 angle = -50.0
 params = {
 "height": 48.0,
+"model": &"set_vault_block",
 "rows": 3,
-"stone": Color(0.36078432, 0.37254903, 0.4, 1),
-"style": &"town"
+"style": &"model"
 }
 
 [sub_resource type="Resource" id="Resource_mjxe6"]
@@ -101,11 +102,15 @@ kind = &"arcade"
 angle = 50.0
 mirrored = true
 params = {
-"banners": 4,
-"cap": &"flat",
-"height": 11.0,
-"style": &"truss",
+"banners": 0,
+"bay": 0.0,
+"height": 12.0,
+"kit": &"vault_set",
+"pavilion": 0,
+"style": &"kit",
+"tint": 0.0,
 "tower_height": 9.0,
+"tower_model": &"set_vault_tower",
 "towers": 5
 }
 
@@ -115,10 +120,17 @@ kind = &"arcade"
 angle = 11.0
 mirrored = true
 params = {
-"banners": 3,
+"banners": 0,
+"bay": 0.0,
 "height": 16.0,
+"kit": &"vault_set",
+"pavilion": 0,
 "span": 36.0,
-"style": &"truss"
+"style": &"kit",
+"tint": 0.0,
+"tower_height": 16.0,
+"tower_model": &"set_vault_tower",
+"towers": 3
 }
 
 [sub_resource type="Resource" id="Resource_ssaq4"]

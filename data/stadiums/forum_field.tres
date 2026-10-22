@@ -14,7 +14,8 @@ points = PackedVector3Array(-45, 101, 3.2, -20, 115, 3.2, 0, 122, 3.2, 20, 112, 
 script = ExtResource("2_57hhn")
 kind = &"centerpiece"
 params = {
-"frame": &"arch",
+"frame": &"model",
+"frame_model": &"set_forum_gate",
 "pillar_cap": &"brazier"
 }
 
@@ -50,10 +51,10 @@ script = ExtResource("2_57hhn")
 kind = &"landmarks"
 angle = -50.0
 params = {
-"flat": true,
 "height": 36.0,
+"model": &"set_forum_block",
 "rows": 2,
-"style": &"castle"
+"style": &"model"
 }
 
 [sub_resource type="Resource" id="Resource_ts7w3"]
@@ -62,12 +63,16 @@ kind = &"arcade"
 angle = 50.0
 mirrored = true
 params = {
-"banners": 3,
-"bay": 9.0,
+"banners": 0,
+"bay": 0.0,
 "height": 18.0,
-"kit": &"colosseum",
+"kit": &"forum_set",
+"pavilion": 0,
 "style": &"kit",
-"tiers": 3
+"tint": 0.0,
+"tower_height": 16.0,
+"tower_model": &"set_forum_tower",
+"towers": 3
 }
 
 [sub_resource type="Resource" id="Resource_qx4f8"]
@@ -76,15 +81,16 @@ kind = &"arcade"
 angle = 11.0
 mirrored = true
 params = {
-"banners": 2,
-"bay": 9.0,
-"cap": &"flat",
+"banners": 0,
+"bay": 0.0,
 "height": 16.0,
-"kit": &"colosseum",
+"kit": &"forum_set",
+"pavilion": 0,
 "span": 36.0,
 "style": &"kit",
-"tiers": 2,
+"tint": 0.0,
 "tower_height": 8.0,
+"tower_model": &"set_forum_tower",
 "towers": 3
 }
 

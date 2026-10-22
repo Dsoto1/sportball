@@ -420,3 +420,20 @@ func test_prop_rows_build() -> void:
 		var row: MultiMeshInstance3D = st.get_node("Props")
 		check(row.multimesh.instance_count >= 10, "a row of %ss (%d)" % [model, row.multimesh.instance_count])
 		st.free()
+
+
+func test_park_models_exist() -> void:
+	# Every sculpted model a park asks for (architecture-set sections,
+	# signature landmarks) is in the repository.
+	for park in content().parks:
+		for piece in park.pieces:
+			var wanted: Array[StringName] = []
+			if piece.kind == &"arcade" and String(piece.param("kit")).ends_with("_set"):
+				wanted.append(StringName("bay_%s" % piece.param("kit")))
+			for key in ["tower_model", "frame_model", "model"]:
+				if key == "model" and not piece.kind in [&"hero", &"landmarks"]:
+					continue
+				if piece.params.has(key) and StringName(piece.params[key]) != &"":
+					wanted.append(StringName(piece.params[key]))
+			for role in wanted:
+				check(ModelKit.has(role), "%s: %s model exists" % [park.id, role])

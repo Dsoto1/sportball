@@ -15,7 +15,8 @@ air_drag_scale = 1.1
 script = ExtResource("2_nkemg")
 kind = &"centerpiece"
 params = {
-"frame": &"arch"
+"frame": &"model",
+"frame_model": &"set_alpine_gate"
 }
 
 [sub_resource type="Resource" id="Resource_77lqm"]
@@ -40,9 +41,9 @@ kind = &"landmarks"
 angle = -50.0
 params = {
 "height": 42.0,
+"model": &"set_alpine_block",
 "rows": 3,
-"stone": Color(0.54901963, 0.5882353, 0.6509804, 1),
-"style": &"castle"
+"style": &"model"
 }
 
 [sub_resource type="Resource" id="Resource_aca4j"]
@@ -97,9 +98,16 @@ kind = &"arcade"
 angle = 50.0
 mirrored = true
 params = {
-"banners": 5,
-"height": 9.0,
-"style": &"timber"
+"banners": 0,
+"bay": 0.0,
+"height": 12.0,
+"kit": &"alpine_set",
+"pavilion": 0,
+"style": &"kit",
+"tint": 0.0,
+"tower_height": 16.0,
+"tower_model": &"set_alpine_tower",
+"towers": 3
 }
 
 [sub_resource type="Resource" id="Resource_acneu"]
@@ -108,14 +116,16 @@ kind = &"arcade"
 angle = 11.0
 mirrored = true
 params = {
-"banners": 3,
-"bay": 9.0,
-"cap": &"spire",
+"banners": 0,
+"bay": 0.0,
 "height": 14.0,
-"kit": &"gothic",
+"kit": &"alpine_set",
+"pavilion": 0,
 "span": 36.0,
 "style": &"kit",
+"tint": 0.0,
 "tower_height": 9.0,
+"tower_model": &"set_alpine_tower",
 "towers": 3
 }
 

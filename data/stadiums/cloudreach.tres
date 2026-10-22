@@ -15,7 +15,8 @@ air_drag_scale = 0.9
 script = ExtResource("2_m0rp2")
 kind = &"centerpiece"
 params = {
-"frame": &"gate",
+"frame": &"model",
+"frame_model": &"set_sky_gate",
 "pillar_cap": &"emblem"
 }
 
@@ -37,6 +38,18 @@ params = {
 
 [sub_resource type="Resource" id="Resource_euhsm"]
 script = ExtResource("2_m0rp2")
+kind = &"landmarks"
+angle = -50.0
+params = {
+"center_gap": 16.0,
+"height": 40.0,
+"model": &"set_sky_block",
+"rows": 2,
+"style": &"model"
+}
+
+[sub_resource type="Resource" id="Resource_p68y6"]
+script = ExtResource("2_m0rp2")
 kind = &"islands"
 angle = -180.0
 params = {
@@ -44,7 +57,7 @@ params = {
 "span": 360.0
 }
 
-[sub_resource type="Resource" id="Resource_p68y6"]
+[sub_resource type="Resource" id="Resource_nqtn2"]
 script = ExtResource("2_m0rp2")
 kind = &"flying_craft"
 params = {
@@ -52,36 +65,44 @@ params = {
 "style": &"blimp"
 }
 
-[sub_resource type="Resource" id="Resource_nqtn2"]
+[sub_resource type="Resource" id="Resource_xylns"]
 script = ExtResource("2_m0rp2")
 kind = &"arcade"
 angle = 50.0
 mirrored = true
 params = {
-"banners": 4,
-"cap": &"dome",
-"height": 11.0,
-"style": &"truss",
+"banners": 0,
+"bay": 0.0,
+"height": 12.0,
+"kit": &"sky_set",
+"pavilion": 0,
+"style": &"kit",
+"tint": 0.0,
 "tower_height": 9.0,
+"tower_model": &"set_sky_tower",
 "towers": 5
 }
 
-[sub_resource type="Resource" id="Resource_xylns"]
+[sub_resource type="Resource" id="Resource_14uv1"]
 script = ExtResource("2_m0rp2")
 kind = &"arcade"
 angle = 11.0
 mirrored = true
 params = {
-"banners": 3,
-"cap": &"dome",
+"banners": 0,
+"bay": 0.0,
 "height": 14.0,
+"kit": &"sky_set",
+"pavilion": 0,
 "span": 36.0,
-"style": &"glass",
+"style": &"kit",
+"tint": 0.0,
 "tower_height": 14.0,
+"tower_model": &"set_sky_tower",
 "towers": 3
 }
 
-[sub_resource type="Resource" id="Resource_14uv1"]
+[sub_resource type="Resource" id="Resource_noeo2"]
 script = ExtResource("2_m0rp2")
 kind = &"propellers"
 angle = 36.0
@@ -90,7 +111,7 @@ params = {
 "height": 16.0
 }
 
-[sub_resource type="Resource" id="Resource_noeo2"]
+[sub_resource type="Resource" id="Resource_53o1n"]
 script = ExtResource("2_m0rp2")
 kind = &"bunting"
 angle = 50.0
@@ -98,12 +119,12 @@ params = {
 "span": 260.0
 }
 
-[sub_resource type="Resource" id="Resource_53o1n"]
+[sub_resource type="Resource" id="Resource_vnwcq"]
 script = ExtResource("2_m0rp2")
 kind = &"lighthouse"
 angle = -42.0
 
-[sub_resource type="Resource" id="Resource_vnwcq"]
+[sub_resource type="Resource" id="Resource_eajvv"]
 script = ExtResource("2_m0rp2")
 kind = &"bridge"
 angle = -28.0
@@ -112,14 +133,14 @@ params = {
 "length": 120.0
 }
 
-[sub_resource type="Resource" id="Resource_eajvv"]
+[sub_resource type="Resource" id="Resource_xty5u"]
 script = ExtResource("2_m0rp2")
 kind = &"wall_art"
 params = {
 "motif": &"wings"
 }
 
-[sub_resource type="Resource" id="Resource_xty5u"]
+[sub_resource type="Resource" id="Resource_aie2x"]
 script = ExtResource("2_m0rp2")
 kind = &"planters"
 angle = -46.0
@@ -129,7 +150,7 @@ params = {
 "span": 92.0
 }
 
-[sub_resource type="Resource" id="Resource_aie2x"]
+[sub_resource type="Resource" id="Resource_4dwu6"]
 script = ExtResource("2_m0rp2")
 kind = &"props"
 angle = -46.0
@@ -166,4 +187,4 @@ facade_color = Color(0.6901961, 0.5411765, 0.30588236, 1)
 facade_surface = &"steel"
 structure_surface = &"steel"
 ground_surface = &"snow"
-pieces = Array[ExtResource("2_m0rp2")]([SubResource("Resource_l6vnc"), SubResource("Resource_3skfr"), SubResource("Resource_b52m4"), SubResource("Resource_7ifyp"), SubResource("Resource_euhsm"), SubResource("Resource_p68y6"), SubResource("Resource_nqtn2"), SubResource("Resource_xylns"), SubResource("Resource_14uv1"), SubResource("Resource_noeo2"), SubResource("Resource_53o1n"), SubResource("Resource_vnwcq"), SubResource("Resource_eajvv"), SubResource("Resource_xty5u"), SubResource("Resource_aie2x")])
+pieces = Array[ExtResource("2_m0rp2")]([SubResource("Resource_l6vnc"), SubResource("Resource_3skfr"), SubResource("Resource_b52m4"), SubResource("Resource_7ifyp"), SubResource("Resource_euhsm"), SubResource("Resource_p68y6"), SubResource("Resource_nqtn2"), SubResource("Resource_xylns"), SubResource("Resource_14uv1"), SubResource("Resource_noeo2"), SubResource("Resource_53o1n"), SubResource("Resource_vnwcq"), SubResource("Resource_eajvv"), SubResource("Resource_xty5u"), SubResource("Resource_aie2x"), SubResource("Resource_4dwu6")])

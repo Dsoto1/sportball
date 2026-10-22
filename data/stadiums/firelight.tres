@@ -15,7 +15,8 @@ air_drag_scale = 0.98
 script = ExtResource("2_i6hdv")
 kind = &"centerpiece"
 params = {
-"frame": &"gate",
+"frame": &"model",
+"frame_model": &"set_volcano_gate",
 "pillar_cap": &"brazier"
 }
 
@@ -34,10 +35,9 @@ kind = &"landmarks"
 angle = -50.0
 params = {
 "height": 40.0,
-"roof": Color(0.47843137, 0.12156863, 0.07058824, 1),
+"model": &"set_volcano_block",
 "rows": 2,
-"stone": Color(0.3529412, 0.27450982, 0.23529412, 1),
-"style": &"castle"
+"style": &"model"
 }
 
 [sub_resource type="Resource" id="Resource_6utd5"]
@@ -81,11 +81,15 @@ kind = &"arcade"
 angle = 50.0
 mirrored = true
 params = {
-"banners": 4,
-"cap": &"flat",
-"height": 11.0,
-"style": &"carved",
+"banners": 0,
+"bay": 0.0,
+"height": 12.0,
+"kit": &"volcano_set",
+"pavilion": 0,
+"style": &"kit",
+"tint": 0.0,
 "tower_height": 8.0,
+"tower_model": &"set_volcano_tower",
 "towers": 5
 }
 
@@ -95,12 +99,16 @@ kind = &"arcade"
 angle = 11.0
 mirrored = true
 params = {
-"banners": 3,
-"cap": &"flat",
+"banners": 0,
+"bay": 0.0,
 "height": 14.0,
+"kit": &"volcano_set",
+"pavilion": 0,
 "span": 36.0,
-"style": &"carved",
+"style": &"kit",
+"tint": 0.0,
 "tower_height": 12.0,
+"tower_model": &"set_volcano_tower",
 "towers": 3
 }
 

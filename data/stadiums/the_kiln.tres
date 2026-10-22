@@ -15,7 +15,8 @@ air_drag_scale = 0.82
 script = ExtResource("2_6juw2")
 kind = &"centerpiece"
 params = {
-"frame": &"gate"
+"frame": &"model",
+"frame_model": &"set_kiln_gate"
 }
 
 [sub_resource type="Resource" id="Resource_w7e58"]
@@ -41,8 +42,9 @@ angle = -50.0
 params = {
 "gap": 40.0,
 "height": 34.0,
+"model": &"set_kiln_block",
 "rows": 2,
-"style": &"industrial"
+"style": &"model"
 }
 
 [sub_resource type="Resource" id="Resource_dcbhf"]
@@ -93,11 +95,16 @@ kind = &"arcade"
 angle = 50.0
 mirrored = true
 params = {
-"banners": 6,
-"bay": 9.0,
-"height": 9.0,
-"kit": &"colosseum",
-"style": &"kit"
+"banners": 0,
+"bay": 0.0,
+"height": 12.0,
+"kit": &"kiln_set",
+"pavilion": 0,
+"style": &"kit",
+"tint": 0.0,
+"tower_height": 16.0,
+"tower_model": &"set_kiln_tower",
+"towers": 3
 }
 
 [sub_resource type="Resource" id="Resource_ku2ib"]
@@ -106,12 +113,16 @@ kind = &"arcade"
 angle = 11.0
 mirrored = true
 params = {
-"banners": 3,
-"cap": &"flat",
+"banners": 0,
+"bay": 0.0,
 "height": 6.0,
+"kit": &"kiln_set",
+"pavilion": 0,
 "span": 36.0,
-"style": &"arches",
+"style": &"kit",
+"tint": 0.0,
 "tower_height": 8.0,
+"tower_model": &"set_kiln_tower",
 "towers": 3
 }
 

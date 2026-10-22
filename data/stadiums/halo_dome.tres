@@ -15,6 +15,8 @@ script = ExtResource("2_un8dc")
 kind = &"centerpiece"
 params = {
 "crown": true,
+"frame": &"model",
+"frame_model": &"set_deco_gate",
 "pillar_cap": &"emblem"
 }
 
@@ -33,9 +35,21 @@ kind = &"skyline"
 
 [sub_resource type="Resource" id="Resource_iofs5"]
 script = ExtResource("2_un8dc")
-kind = &"halo"
+kind = &"landmarks"
+angle = -50.0
+params = {
+"center_gap": 16.0,
+"height": 40.0,
+"model": &"set_deco_block",
+"rows": 2,
+"style": &"model"
+}
 
 [sub_resource type="Resource" id="Resource_5ix5a"]
+script = ExtResource("2_un8dc")
+kind = &"halo"
+
+[sub_resource type="Resource" id="Resource_6b8ye"]
 script = ExtResource("2_un8dc")
 kind = &"trees"
 angle = 11.0
@@ -46,7 +60,7 @@ params = {
 "span": 6.0
 }
 
-[sub_resource type="Resource" id="Resource_6b8ye"]
+[sub_resource type="Resource" id="Resource_mt3jj"]
 script = ExtResource("2_un8dc")
 kind = &"trees"
 angle = 15.0
@@ -57,11 +71,11 @@ params = {
 "span": 35.0
 }
 
-[sub_resource type="Resource" id="Resource_mt3jj"]
+[sub_resource type="Resource" id="Resource_ejy07"]
 script = ExtResource("2_un8dc")
 kind = &"flying_craft"
 
-[sub_resource type="Resource" id="Resource_ejy07"]
+[sub_resource type="Resource" id="Resource_pjoj3"]
 script = ExtResource("2_un8dc")
 kind = &"water"
 params = {
@@ -71,33 +85,44 @@ params = {
 "width": 12.0
 }
 
-[sub_resource type="Resource" id="Resource_pjoj3"]
+[sub_resource type="Resource" id="Resource_yath7"]
 script = ExtResource("2_un8dc")
 kind = &"arcade"
 angle = 50.0
 mirrored = true
 params = {
-"banners": 4,
-"height": 11.0,
-"style": &"arches"
+"banners": 0,
+"bay": 0.0,
+"height": 12.0,
+"kit": &"deco_set",
+"pavilion": 0,
+"style": &"kit",
+"tint": 0.0,
+"tower_height": 16.0,
+"tower_model": &"set_deco_tower",
+"towers": 3
 }
 
-[sub_resource type="Resource" id="Resource_yath7"]
+[sub_resource type="Resource" id="Resource_dmp26"]
 script = ExtResource("2_un8dc")
 kind = &"arcade"
 angle = 11.0
 mirrored = true
 params = {
-"banners": 3,
-"cap": &"dome",
+"banners": 0,
+"bay": 0.0,
 "height": 16.0,
+"kit": &"deco_set",
+"pavilion": 0,
 "span": 36.0,
-"style": &"glass",
+"style": &"kit",
+"tint": 0.0,
 "tower_height": 14.0,
+"tower_model": &"set_deco_tower",
 "towers": 3
 }
 
-[sub_resource type="Resource" id="Resource_dmp26"]
+[sub_resource type="Resource" id="Resource_hpvue"]
 script = ExtResource("2_un8dc")
 kind = &"canopy"
 angle = 52.0
@@ -106,7 +131,7 @@ params = {
 "style": &"steel"
 }
 
-[sub_resource type="Resource" id="Resource_hpvue"]
+[sub_resource type="Resource" id="Resource_faqeu"]
 script = ExtResource("2_un8dc")
 kind = &"wall_art"
 params = {
@@ -114,7 +139,7 @@ params = {
 "motif": &"star"
 }
 
-[sub_resource type="Resource" id="Resource_faqeu"]
+[sub_resource type="Resource" id="Resource_oevcm"]
 script = ExtResource("2_un8dc")
 kind = &"planters"
 angle = -46.0
@@ -124,7 +149,7 @@ params = {
 "span": 92.0
 }
 
-[sub_resource type="Resource" id="Resource_oevcm"]
+[sub_resource type="Resource" id="Resource_2m2fl"]
 script = ExtResource("2_un8dc")
 kind = &"props"
 angle = -46.0
@@ -158,4 +183,4 @@ window_color = Color(1, 0.8235294, 0.47843137, 1)
 facade_color = Color(0.41568628, 0.3529412, 0.54901963, 1)
 facade_surface = &"marble"
 structure_surface = &"steel"
-pieces = Array[ExtResource("2_un8dc")]([SubResource("Resource_fwpx2"), SubResource("Resource_8s2kh"), SubResource("Resource_rkpyr"), SubResource("Resource_rkhve"), SubResource("Resource_iofs5"), SubResource("Resource_5ix5a"), SubResource("Resource_6b8ye"), SubResource("Resource_mt3jj"), SubResource("Resource_ejy07"), SubResource("Resource_pjoj3"), SubResource("Resource_yath7"), SubResource("Resource_dmp26"), SubResource("Resource_hpvue"), SubResource("Resource_faqeu"), SubResource("Resource_oevcm")])
+pieces = Array[ExtResource("2_un8dc")]([SubResource("Resource_fwpx2"), SubResource("Resource_8s2kh"), SubResource("Resource_rkpyr"), SubResource("Resource_rkhve"), SubResource("Resource_iofs5"), SubResource("Resource_5ix5a"), SubResource("Resource_6b8ye"), SubResource("Resource_mt3jj"), SubResource("Resource_ejy07"), SubResource("Resource_pjoj3"), SubResource("Resource_yath7"), SubResource("Resource_dmp26"), SubResource("Resource_hpvue"), SubResource("Resource_faqeu"), SubResource("Resource_oevcm"), SubResource("Resource_2m2fl")])

@@ -15,7 +15,8 @@ air_drag_scale = 1.02
 script = ExtResource("2_lnk5g")
 kind = &"centerpiece"
 params = {
-"frame": &"gate",
+"frame": &"model",
+"frame_model": &"set_temple_gate",
 "pillar_cap": &"lamp"
 }
 
@@ -46,8 +47,9 @@ kind = &"landmarks"
 angle = -50.0
 params = {
 "height": 46.0,
+"model": &"set_temple_block",
 "rows": 3,
-"style": &"pagoda"
+"style": &"model"
 }
 
 [sub_resource type="Resource" id="Resource_spi2t"]
@@ -78,13 +80,15 @@ kind = &"arcade"
 angle = 50.0
 mirrored = true
 params = {
-"banners": 5,
-"bay": 9.0,
-"cap": &"pagoda",
-"height": 10.0,
-"kit": &"temple",
+"banners": 0,
+"bay": 0.0,
+"height": 12.0,
+"kit": &"temple_set",
+"pavilion": 0,
 "style": &"kit",
+"tint": 0.0,
 "tower_height": 9.0,
+"tower_model": &"set_temple_tower",
 "towers": 5
 }
 
@@ -94,14 +98,16 @@ kind = &"arcade"
 angle = 11.0
 mirrored = true
 params = {
-"banners": 3,
-"bay": 9.0,
-"cap": &"pagoda",
+"banners": 0,
+"bay": 0.0,
 "height": 12.0,
-"kit": &"temple",
+"kit": &"temple_set",
+"pavilion": 0,
 "span": 36.0,
 "style": &"kit",
+"tint": 0.0,
 "tower_height": 14.0,
+"tower_model": &"set_temple_tower",
 "towers": 2
 }
 

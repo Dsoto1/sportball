@@ -15,7 +15,8 @@ air_drag_scale = 0.9
 script = ExtResource("2_2pjeu")
 kind = &"centerpiece"
 params = {
-"frame": &"gate",
+"frame": &"model",
+"frame_model": &"set_desert_gate",
 "pillar_cap": &"brazier"
 }
 
@@ -44,11 +45,10 @@ script = ExtResource("2_2pjeu")
 kind = &"landmarks"
 angle = -50.0
 params = {
-"flat": true,
 "height": 36.0,
+"model": &"set_desert_block",
 "rows": 2,
-"stone": Color(0.7882353, 0.6039216, 0.38431373, 1),
-"style": &"castle"
+"style": &"model"
 }
 
 [sub_resource type="Resource" id="Resource_g4iop"]
@@ -69,12 +69,16 @@ kind = &"arcade"
 angle = 50.0
 mirrored = true
 params = {
-"banners": 4,
-"bay": 9.0,
+"banners": 0,
+"bay": 0.0,
 "height": 12.0,
-"kit": &"colosseum",
+"kit": &"desert_set",
+"pavilion": 0,
 "style": &"kit",
-"tiers": 2
+"tint": 0.0,
+"tower_height": 16.0,
+"tower_model": &"set_desert_tower",
+"towers": 3
 }
 
 [sub_resource type="Resource" id="Resource_mitcy"]
@@ -92,12 +96,16 @@ kind = &"arcade"
 angle = 11.0
 mirrored = true
 params = {
-"banners": 3,
-"cap": &"dome",
+"banners": 0,
+"bay": 0.0,
 "height": 13.0,
+"kit": &"desert_set",
+"pavilion": 0,
 "span": 36.0,
-"style": &"carved",
+"style": &"kit",
+"tint": 0.0,
 "tower_height": 10.0,
+"tower_model": &"set_desert_tower",
 "towers": 3
 }
 
