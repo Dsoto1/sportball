@@ -32,6 +32,15 @@ const FIELD_CENTER := Vector3(0.0, 0.0, -45.0)
 const WATER := Color(0.06, 0.22, 0.36)
 ## How far out the bay reaches (meters from home).
 const WATER_EDGE := 420.0
+## How far the land runs: past the haze, so it meets the sky with no edge.
+const GROUND_RIM := 2600.0
+## The paved concourse round the back of the stands.
+const PLAZA_WIDTH := 22.0
+const GROUND_SHADER := preload("res://presentation/stadium/ground.gdshader")
+## City blocks (m, street to street) and street width: the ground's grid and
+## the skyline's lots share them.
+const CITY_BLOCK := 72.0
+const CITY_STREET := 12.0
 
 ## The park being built and its rules (for wall distances and heights).
 var def: StadiumDef
@@ -71,9 +80,12 @@ func build(p_tuning: BaseballTuning, p_def: StadiumDef, home: TeamDef, away: Tea
 	_build_backstop()
 	_build_markers(home)
 	_build_fascia(home)
+	# The city goes up last, on the lots the park's own pieces left free.
 	for piece in def.pieces:
-		if piece != null:
+		if piece != null and piece.kind != &"skyline":
 			StadiumModules.build(self, piece, home, away)
+	for piece in def.pieces_of(&"skyline"):
+		StadiumModules.build(self, piece, home, away)
 	# The park casts no shadows on the field: the sheets' fields are evenly
 	# lit, and low suns would rake the stands' shadows across the infield.
 	# Players keep theirs.
@@ -244,6 +256,8 @@ func _build_bowl() -> void:
 	facade.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var ground := SurfaceTool.new()
 	ground.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var plaza := SurfaceTool.new()
+	plaza.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var riser := def.structure_color.darkened(0.35)
 	var eye := Color(0.06, 0.1, 0.09)
 	var a := -180.0
@@ -283,12 +297,24 @@ func _build_bowl() -> void:
 		_quad(facade, point(b, back_b, 0.0), point(a, back_a, 0.0), point(a, back_a, top_a + 1.2), point(b, back_b, top_b + 1.2), Color.WHITE)
 		# Outside the park: the bay on the water side, ground everywhere else.
 		var outside := def.skyline_color.darkened(0.45) if def.ground_color.a == 0.0 else def.ground_color
-		var edge := back_a + 1.0
+		if is_city():
+			# Paved city lots, a little of the skyline's tone in the gray
+			# (vertex colors are used as they are, linear: this is mid-gray).
+			outside = Color(0.15, 0.145, 0.14).lerp(def.skyline_color.darkened(0.6), 0.2)
+		var edge_a := back_a + 1.0
+		var edge_b := back_b + 1.0
 		if is_water(mid):
-			_quad(st, point(a, edge, 0.14), point(a, WATER_EDGE, 0.14), point(b, WATER_EDGE, 0.14), point(b, back_b + 1.0, 0.14), WATER)
-			edge = WATER_EDGE
+			_quad(st, point(a, edge_a, 0.14), point(a, WATER_EDGE, 0.14), point(b, WATER_EDGE, 0.14), point(b, edge_b, 0.14), WATER)
+			edge_a = WATER_EDGE
+			edge_b = WATER_EDGE
+		else:
+			# The concourse: paving round the back of the stands, a step up
+			# from the land so the two never flicker.
+			_quad(plaza, point(a, edge_a, 0.12), point(a, edge_a + PLAZA_WIDTH, 0.12), point(b, edge_b + PLAZA_WIDTH, 0.12), point(b, edge_b, 0.12), Color.WHITE)
+			edge_a += PLAZA_WIDTH
+			edge_b += PLAZA_WIDTH
 		# Above the field's 320 m grass slab (top at -0.01), so the two never flicker.
-		_quad(ground, point(a, edge, 0.1), point(a, 950.0, 0.1), point(b, 950.0, 0.1), point(b, edge if edge == WATER_EDGE else back_b + 1.0, 0.1), outside)
+		_quad(ground, point(a, edge_a, 0.1), point(a, GROUND_RIM, 0.1), point(b, GROUND_RIM, 0.1), point(b, edge_b, 0.1), outside)
 		a = b
 	st.generate_normals()
 	var mi := MeshInstance3D.new()
@@ -302,16 +328,77 @@ func _build_bowl() -> void:
 	add_child(mi)
 	if StadiumSurfaces.KINDS.has(def.stand_surface):
 		mi.material_override = StadiumSurfaces.material(def.stand_surface, Color.WHITE, true)
-	for part: Array in [[facade, "Facade", def.facade_surface, def.facade_tint()], [ground, "Ground", def.ground_surface, Color.WHITE]]:
+	var paving: StringName = &"stone" if def.structure_surface == &"stone" else &"concrete"
+	for part: Array in [[facade, "Facade", def.facade_surface, def.facade_tint()], [plaza, "Plaza", paving, def.structure_color.lerp(Color(0.78, 0.76, 0.72), 0.6)]]:
 		var tool: SurfaceTool = part[0]
 		tool.generate_normals()
 		var piece := MeshInstance3D.new()
 		piece.name = part[1]
 		piece.mesh = tool.commit()
-		var surface_mat := StadiumSurfaces.material(part[2], part[3], part[1] == "Ground")
+		var surface_mat := StadiumSurfaces.material(part[2], part[3])
 		surface_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 		piece.material_override = surface_mat
 		add_child(piece)
+	ground.generate_normals()
+	var land := MeshInstance3D.new()
+	land.name = "Ground"
+	land.mesh = ground.commit()
+	land.material_override = ground_material()
+	add_child(land)
+
+
+## The land round the park (or, with `water`, open water in it): its
+## surface texture, a street grid in a city, and haze into the horizon.
+func ground_material(water: bool = false, water_color: Color = WATER, glow: float = 0.0) -> ShaderMaterial:
+	var m := ShaderMaterial.new()
+	m.shader = GROUND_SHADER
+	if StadiumSurfaces.KINDS.has(def.ground_surface):
+		var spec: Array = StadiumSurfaces.KINDS[def.ground_surface]
+		m.set_shader_parameter("detail", spec[0])
+		m.set_shader_parameter("detail_normal", spec[1])
+		m.set_shader_parameter("tile", float(spec[2]) * 1.5)
+		m.set_shader_parameter("has_detail", 1.0)
+	elif is_city():
+		var concrete: Array = StadiumSurfaces.KINDS[&"concrete"]
+		m.set_shader_parameter("detail", concrete[0])
+		m.set_shader_parameter("detail_normal", concrete[1])
+		m.set_shader_parameter("tile", 6.0)
+		m.set_shader_parameter("has_detail", 1.0)
+	m.set_shader_parameter("water", 1.0 if water else 0.0)
+	m.set_shader_parameter("water_color", water_color)
+	m.set_shader_parameter("water_glow", glow)
+	if is_city() and not water:
+		m.set_shader_parameter("streets", 1.0)
+		m.set_shader_parameter("block", CITY_BLOCK)
+		m.set_shader_parameter("street_width", CITY_STREET)
+		m.set_shader_parameter("grid_origin", Vector2(FIELD_CENTER.x, FIELD_CENTER.z))
+		m.set_shader_parameter("streets_from", city_from())
+		m.set_shader_parameter("asphalt", def.skyline_color.darkened(0.7).lerp(Color(0.15, 0.15, 0.16), 0.6))
+		m.set_shader_parameter("sidewalk", def.structure_color.lerp(Color(0.6, 0.59, 0.56), 0.7))
+		m.set_shader_parameter("lawn", Color(0.2, 0.31, 0.13).darkened(0.35 if def.night else 0.0))
+	m.set_shader_parameter("haze_color", horizon_color())
+	m.set_shader_parameter("center", Vector2(FIELD_CENTER.x, FIELD_CENTER.z))
+	return m
+
+
+## A city park: its skyline stands on a street grid (land without a surface
+## of its own reads as paved city).
+func is_city() -> bool:
+	return not def.pieces_of(&"skyline").is_empty() and def.ground_color.a == 0.0
+
+
+## Where the city's streets begin, m from the middle of the field: past the
+## park's own landmark ring.
+func city_from() -> float:
+	return 300.0
+
+
+## The sky's color at the horizon, which the land fades into.
+func horizon_color() -> Color:
+	if def.is_roofed():
+		return Color(0.05, 0.05, 0.07)
+	var look: Array = GrayboxField.SKIES.get(def.sky_kind(), GrayboxField.SKIES[&"day"])
+	return look[1]
 
 
 func _quad(st: SurfaceTool, p0: Vector3, p1: Vector3, p2: Vector3, p3: Vector3, color: Color) -> void:

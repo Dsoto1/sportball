@@ -143,18 +143,41 @@ static var _tinted := {}
 
 
 static func _tint_leaves(node: Node, tint: Color) -> void:
-	# A tinted copy of the mesh (not a per-surface override, which the
-	# renderer logs as a null material on some drivers).
 	for mi: MeshInstance3D in node.find_children("*", "MeshInstance3D", true, false):
-		var key := [mi.mesh, tint]
+		mi.mesh = tinted_leaves(mi.mesh, tint)
+
+
+## A copy of a mesh with its leaf surfaces in `tint`, cached per mesh and
+## tint (a tinted copy, not a per-surface override, which the renderer logs
+## as a null material on some drivers).
+static func tinted_leaves(mesh: Mesh, tint: Color) -> Mesh:
+	var key := [mesh, tint]
+	if not _tinted.has(key):
+		var copy: Mesh = mesh.duplicate()
+		for s in copy.get_surface_count():
+			var mat := copy.surface_get_material(s)
+			if mat != null and String(mat.resource_name).to_lower().contains("leaf"):
+				var m := StandardMaterial3D.new()
+				m.albedo_color = tint
+				m.roughness = 0.8
+				copy.surface_set_material(s, m)
+		_tinted[key] = copy
+	return _tinted[key]
+
+
+## Shows only the faces turned toward the camera on every mesh in `node`
+## (cached copies of its meshes, with back-face culling on): a model turned
+## round to fill in another's missing back must not show through the front.
+static func single_sided(node: Node) -> void:
+	for mi: MeshInstance3D in node.find_children("*", "MeshInstance3D", true, false):
+		var key := [mi.mesh, &"single_sided"]
 		if not _tinted.has(key):
 			var copy: Mesh = mi.mesh.duplicate()
 			for s in copy.get_surface_count():
 				var mat := copy.surface_get_material(s)
-				if mat != null and String(mat.resource_name).to_lower().contains("leaf"):
-					var m := StandardMaterial3D.new()
-					m.albedo_color = tint
-					m.roughness = 0.8
+				if mat is BaseMaterial3D:
+					var m: BaseMaterial3D = mat.duplicate()
+					m.cull_mode = BaseMaterial3D.CULL_BACK
 					copy.surface_set_material(s, m)
 			_tinted[key] = copy
 		mi.mesh = _tinted[key]

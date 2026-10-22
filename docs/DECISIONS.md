@@ -1448,3 +1448,30 @@ pants, shoes, skin and hair varied per seat. Excitement picks the poses;
 each fan's temperament decides who stays seated and who is first up, and a
 small per-fan lag makes the stands ripple on a home run. Still one
 MultiMesh draw per section, no new paid assets.
+
+## Drone-orbit audit: ground, city and board backs
+
+Circling every park from above showed parks sitting on a flat one-color
+plane that ended in a hard edge, a sparse scatter of towers, rivers cut off
+mid-plain and hollow scoreboard backs. Fixes, all in-house:
+
+- **Ground** (`ground.gdshader`): runs out to 2.6 km and fades into the
+  sky's horizon color, so land meets sky with no edge; large soft patches
+  break up the flat color; the park's surface texture where it has one.
+- **Concourse**: a paved plaza ring round the back of every stand.
+- **City parks** (skyline, no ground color of their own): a street grid
+  (asphalt, lane dashes, sidewalks) on 72 m blocks, parkland lawn with
+  tree clumps between the plaza and the streets, and the skyline built
+  lot by lot on the same blocks, squared to the streets: four low
+  buildings or a tower per near lot, plain lit-window towers farther out,
+  fading into the haze. Lots under water or under the park's own pieces
+  stay empty (the skyline is now built after every other piece). Near
+  buildings and trees are batched: about 20 draws for the whole city.
+- **Rivers** run on into the haze instead of stopping short.
+- **Scoreboard backs**: a clad back panel with the club's emblem and name
+  facing the city, steel legs and bracing to the concourse; a gatehouse
+  frame gets a second copy turned to face the city (the models keep only
+  the faces seen from home), single-sided so it never shows from the front.
+- The Kiln, the Icebox and Cloudreach drop the city (mountains, snow and
+  sky islands instead); Sakura Gate gets moss ground instead of a bare
+  maroon plain.

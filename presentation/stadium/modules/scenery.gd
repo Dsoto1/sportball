@@ -49,18 +49,19 @@ static func sphere(parent: Node, radius: float, color: Color, squash: float = 1.
 static func water_band(stadium: Stadium, piece: StadiumPiece, angle: float) -> Vector2:
 	var width := float(piece.param("width")) * piece.size
 	if StringName(piece.param("style")) == &"river":
+		# A straight band: it runs on into the haze at the land's rim.
 		var c := cos(deg_to_rad(angle - piece.angle))
-		if c < 0.35:
+		var near := float(piece.param("distance")) / maxf(c, 0.001)
+		if c <= 0.0 or near >= Stadium.GROUND_RIM:
 			return Vector2.ZERO
-		var near := float(piece.param("distance")) / c
 		var back := stadium.stand_top(angle).x + 4.0
-		return Vector2(maxf(near, back), minf((float(piece.param("distance")) + width) / c, 900.0))
+		return Vector2(maxf(near, back), minf((float(piece.param("distance")) + width) / c, Stadium.GROUND_RIM))
 	var span := float(piece.param("span"))
 	var rel := fposmod((angle - piece.angle) * signf(span if span != 0.0 else 1.0), 360.0)
 	if absf(span) < 360.0 and rel > absf(span):
 		return Vector2.ZERO
 	var start := stadium.stand_top(angle).x + float(piece.param("gap"))
-	return Vector2(start, minf(start + width, 900.0))
+	return Vector2(start, minf(start + width, Stadium.GROUND_RIM))
 
 
 ## A surface of revolution: `profile` is a list of Vector3(radius, height,

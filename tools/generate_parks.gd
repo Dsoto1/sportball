@@ -55,7 +55,7 @@ const PARKS := [
 		"skyline_color": Color("37465e"), "window_color": Color("ffe9b0"), "skyline_height": 0.9,
 	},
 	{
-		"lights": {"mast": &"lattice", "head": &"bank", "heads": 2, "lamp": Color("ffd9a0"), "paint": Color(Color("b5622e"), 0.6)}, "id": &"the_kiln", "sky": &"golden", "facade_color": Color("b25a3c"), "facade_surface": &"rock", "structure_surface": &"stone", "ground_surface": &"sand", "ground_color": Color("8f4a2c"), "decks": 2, "frame": &"model", "frame_model": &"set_kiln_gate", "display_name": "The Kiln",
+		"lights": {"mast": &"lattice", "head": &"bank", "heads": 2, "lamp": Color("ffd9a0"), "paint": Color(Color("b5622e"), 0.6)}, "standard": [&"centerpiece", &"slogan_board", &"light_towers"], "id": &"the_kiln", "sky": &"golden", "facade_color": Color("b25a3c"), "facade_surface": &"rock", "structure_surface": &"stone", "ground_surface": &"sand", "ground_color": Color("8f4a2c"), "decks": 2, "frame": &"model", "frame_model": &"set_kiln_gate", "display_name": "The Kiln",
 		"blurb": "Comets home · thin desert air carries the ball, so the outfield is a canyon; red mesas and a rocket beyond",
 		"shape": [[-45, 102.1, 4.27], [-22.5, 114.8, 4.27], [0, 121.9, 4.27], [22.5, 113.1, 4.27], [45, 97.5, 4.27]], "air": 0.82,
 		"seat_color": Color("a65a32"), "seat_color_alt": Color("8a4826"), "structure_color": Color("d9b98a"), "accent_color": Color("2ec4b6"),
@@ -66,7 +66,7 @@ const PARKS := [
 		"skyline_color": Color("b08a62"), "window_color": Color("fff0c0"), "skyline_height": 0.35,
 	},
 	{
-		"outfield_open": 30.0, "lights": {"mast": &"stone", "head": &"crown", "heads": 1, "lamp": Color("e0f4ff"), "head_size": 8.0, "tilt": 0.0}, "id": &"the_icebox", "facade_color": Color("8494a6"), "facade_surface": &"stone", "structure_surface": &"wood", "ground_surface": &"snow", "ground_color": Color("e4ebf2"), "decks": 2, "frame": &"model", "frame_model": &"set_alpine_gate", "display_name": "The Icebox",
+		"outfield_open": 30.0, "lights": {"mast": &"stone", "head": &"crown", "heads": 1, "lamp": Color("e0f4ff"), "head_size": 8.0, "tilt": 0.0}, "standard": [&"centerpiece", &"slogan_board", &"light_towers"], "id": &"the_icebox", "facade_color": Color("8494a6"), "facade_surface": &"stone", "structure_surface": &"wood", "ground_surface": &"snow", "ground_color": Color("e4ebf2"), "decks": 2, "frame": &"model", "frame_model": &"set_alpine_gate", "display_name": "The Icebox",
 		"blurb": "Yetis home · cold heavy air knocks fly balls down; ice falls and peaks beyond the wall",
 		"shape": [[-45, 102.1, 4.27], [-22.5, 114.8, 4.27], [0, 121.9, 4.27], [22.5, 112.6, 4.27], [45, 96.0, 4.27]], "air": 1.1,
 		"seat_color": Color("2d4a63"), "seat_color_alt": Color("223a4f"), "structure_color": Color("b8c4cc"), "accent_color": Color("9fe8ff"),
@@ -130,7 +130,7 @@ const PARKS := [
 		"skyline_color": Color("1e2433"), "window_color": Color("ffd59a"), "skyline_height": 1.3,
 	},
 	{
-		"lights": {"mast": &"stone", "head": &"crown", "heads": 1, "lamp": Color("ffb070"), "paint": Color(Color("8a2a20"), 0.6), "head_size": 8.0, "tilt": 0.0}, "id": &"sakura_gate", "pillar_cap": &"lamp", "sky": &"sunset", "facade_color": Color("7a2420"), "facade_surface": &"wood", "structure_surface": &"wood", "decks": 3, "frame": &"model", "frame_model": &"set_temple_gate", "display_name": "Sakura Gate Park",
+		"lights": {"mast": &"stone", "head": &"crown", "heads": 1, "lamp": Color("ffb070"), "paint": Color(Color("8a2a20"), 0.6), "head_size": 8.0, "tilt": 0.0}, "id": &"sakura_gate", "ground_color": Color(0.1, 0.15, 0.07), "pillar_cap": &"lamp", "sky": &"sunset", "facade_color": Color("7a2420"), "facade_surface": &"wood", "structure_surface": &"wood", "decks": 3, "frame": &"model", "frame_model": &"set_temple_gate", "display_name": "Sakura Gate Park",
 		"blurb": "Kitsune home · a mountain shrine under cherry blossoms: torii gates, pagodas and a great fox spirit",
 		"shape": [[-45, 96.9, 4.27], [-22.5, 112.9, 4.27], [0, 121.9, 4.27], [22.5, 117.3, 4.27], [45, 109.1, 4.27]], "air": 1.02,
 		"seat_color": Color("8a1c2a"), "seat_color_alt": Color("6e1622"), "structure_color": Color("4a2c22"), "accent_color": Color("d4a017"),
@@ -152,7 +152,7 @@ const PARKS := [
 		"skyline_color": Color("123a48"), "window_color": Color("9ff3ff"),
 	},
 	{
-		"lights": {"mast": &"deco", "head": &"halo", "heads": 1, "lamp": Color("fff0c8"), "tilt": 8.0}, "id": &"cloudreach", "pillar_cap": &"emblem", "ground_color": Color("eef2f8"), "ground_surface": &"snow", "facade_color": Color("b08a4e"), "facade_surface": &"steel", "structure_surface": &"steel", "decks": 3, "frame": &"model", "frame_model": &"set_sky_gate", "frame_width": 112.0, "display_name": "Cloudreach Stadium",
+		"lights": {"mast": &"deco", "head": &"halo", "heads": 1, "lamp": Color("fff0c8"), "tilt": 8.0}, "standard": [&"centerpiece", &"slogan_board", &"light_towers"], "id": &"cloudreach", "pillar_cap": &"emblem", "ground_color": Color("eef2f8"), "ground_surface": &"snow", "facade_color": Color("b08a4e"), "facade_surface": &"steel", "structure_surface": &"steel", "decks": 3, "frame": &"model", "frame_model": &"set_sky_gate", "frame_width": 112.0, "display_name": "Cloudreach Stadium",
 		"blurb": "Aviators home · a floating island high above the clouds: airships, skybridges and propeller towers",
 		"shape": [[-45, 102.1, 4.27], [-22.5, 116.7, 4.27], [0, 125.0, 4.27], [22.5, 118.9, 4.27], [45, 108.2, 4.27]], "air": 0.9,
 		"seat_color": Color("1f4f8f"), "seat_color_alt": Color("183f74"), "structure_color": Color("a8833e"), "accent_color": Color("d4a017"),

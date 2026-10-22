@@ -229,6 +229,7 @@ attendance = 0.9
 sky = &"sunset"
 sponsors = PackedStringArray("LANTERN TEA HOUSE", "PETAL RAMEN", "FOXFIRE FIREWORKS", "MOUNTAIN SPRING SODA")
 skyline_color = Color(0.22745098, 0.16470589, 0.22745098, 1)
+ground_color = Color(0.1, 0.15, 0.07, 1)
 window_color = Color(1, 0.76862746, 0.5411765, 1)
 facade_color = Color(0.47843137, 0.14117648, 0.1254902, 1)
 facade_surface = &"wood"

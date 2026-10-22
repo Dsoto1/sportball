@@ -55,11 +55,20 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 				gate.scale = Vector3.ONE * (w / maxf(box.size.x, 0.01))
 				gate.position = Vector3(-box.get_center().x, -box.position.y, -box.get_center().z) * gate.scale + Vector3(0, float(piece.param("frame_drop")), -3.0)
 				board.add_child(gate)
+				# The model keeps only the faces seen from home: a second one,
+				# turned to face the city, makes it whole from behind.
+				var rear := ModelKit.spawn(role, 1.0, RandomNumberGenerator.new())
+				rear.scale = gate.scale
+				rear.rotation.y = PI
+				ModelKit.single_sided(rear)
+				rear.position = Vector3(box.get_center().x * gate.scale.x, gate.position.y, box.get_center().z * gate.scale.z - 3.0)
+				board.add_child(rear)
 		_:
 			var legs := stadium.box(Vector3(30.0, 14.0, 1.0), frame_color, board, &"structure")
 			legs.position = Vector3(0, -15.0, -0.8)
 	var back := stadium.box(Vector3(36.0, 22.0, 1.4), frame_color, board, &"structure")
 	back.position = Vector3(0, 0, -0.8)
+	_back(stadium, board, center, k, home, frame_color)
 	var trim := stadium.box(Vector3(36.6, 0.6, 1.6), def.accent_color, board)
 	trim.position = Vector3(0, 11.2, -0.6)
 	trim.material_override = Stadium.glow(def.accent_color, 1.6)
@@ -115,6 +124,43 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 		board.add_child(emblem)
 	_pillars(stadium, board, piece, home)
 	stadium.add_board({"jumbo": jumbo})
+
+
+## The side the city sees: the board's back clad in the park's facade,
+## the club's emblem and name on it, and steel legs with cross-bracing
+## carrying it down to the concourse behind the stands.
+func _back(stadium: Stadium, board: Node3D, center: Vector3, k: float, home: TeamDef, frame_color: Color) -> void:
+	var def := stadium.def
+	var panel := stadium.box(Vector3(36.6, 22.6, 0.6), def.facade_tint(), board, &"facade")
+	panel.position = Vector3(0, 0, -1.8)
+	var band := stadium.box(Vector3(37.0, 1.2, 0.8), def.accent_color.darkened(0.15), board)
+	band.position = Vector3(0, -10.6, -1.8)
+	var mark := Emblem.build(home, 8.0, 0.6)
+	mark.position = Vector3(0, 4.0, -2.2)
+	mark.rotation.y = PI
+	board.add_child(mark)
+	var wordmark := home.team_name.to_upper()
+	var font_size := mini(420, int(30.0 / (maxf(wordmark.length(), 1.0) * 0.8 * 0.012)))
+	var word := stadium.label(wordmark, font_size, home.highlight_color, board)
+	word.position = Vector3(0, -5.5, -2.15)
+	word.rotation.y = PI
+	word.outline_size = 12
+	word.outline_modulate = home.dark_color
+	# Legs to the ground: the board hangs center.y m up (in board units).
+	var drop := center.y / k - 11.0
+	if drop <= 1.0:
+		return
+	for side: float in [-1.0, 1.0]:
+		var leg := stadium.box(Vector3(1.6, drop, 1.6), frame_color, board, &"steel")
+		leg.position = Vector3(side * 13.0, -11.0 - drop * 0.5, -3.2)
+	var rungs := int(drop / 9.0)
+	for r in rungs:
+		var ry := -11.0 - (r + 0.5) * drop / maxf(rungs, 1)
+		var girder := stadium.box(Vector3(26.0, 0.7, 0.7), frame_color, board, &"steel")
+		girder.position = Vector3(0, ry, -3.2)
+		var brace := stadium.box(Vector3(0.5, drop / maxf(rungs, 1) * 1.35, 0.5), frame_color, board, &"steel")
+		brace.position = Vector3(0, ry, -3.2)
+		brace.rotation.z = (0.75 if r % 2 == 0 else -0.75)
 
 
 ## Flanking pillars, as on every sheet: a tall pier either side of the
