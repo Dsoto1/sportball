@@ -37,6 +37,8 @@ var tuning: BaseballTuning
 ## Seeded from the park, so a park looks the same every visit.
 var rng := RandomNumberGenerator.new()
 var _crowd_mat: ShaderMaterial
+var _home: TeamDef
+var _away: TeamDef
 var _excitement := 0.0
 var _water: Array[StadiumPiece] = []
 var _names := {}
@@ -314,6 +316,20 @@ func _build_crowd(home: TeamDef, away: TeamDef) -> void:
 					seats.append(point(s + rng.randf_range(-0.1, 0.1) * step_deg, radius, row_height(a, p, k)))
 				s += step_deg
 		a += ANGLE_STEP
+	_home = home
+	_away = away
+	add_fans(seats, "Crowd")
+
+
+## Fans standing at these spots (one billboard each), dressed in the home,
+## away and neutral colors at the park's fan shares, all cheering together
+## with the main crowd. Used by the bowl and by modules that put fans on
+## balconies and terraces.
+func add_fans(seats: Array[Vector3], node_name: String = "Fans") -> void:
+	if seats.is_empty() or _home == null:
+		return
+	var home := _home
+	var away := _away
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
 	mm.use_colors = true
@@ -337,10 +353,11 @@ func _build_crowd(home: TeamDef, away: TeamDef) -> void:
 		mm.set_instance_color(i, shirt.lightened(rng.randf_range(-0.1, 0.1)))
 		mm.set_instance_custom_data(i, Color(rng.randf(), rng.randf(), 1.0 if rng.randf() < 0.55 else 0.0, rng.randf()))
 	var mmi := MultiMeshInstance3D.new()
-	mmi.name = "Crowd"
+	mmi.name = unique_name(node_name)
 	mmi.multimesh = mm
-	_crowd_mat = ShaderMaterial.new()
-	_crowd_mat.shader = CROWD_SHADER
+	if _crowd_mat == null:
+		_crowd_mat = ShaderMaterial.new()
+		_crowd_mat.shader = CROWD_SHADER
 	mmi.material_override = _crowd_mat
 	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mmi)

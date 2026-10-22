@@ -1286,3 +1286,15 @@ Reason: Owner request for another detail pass against the sheets. The balance ch
   - Castle kit rows, hand-built gothic bays and spire towers are gone. The knights, flags and wall art stay.
   - Meshy rendered the slate roofs icy pale blue. The new `tools/regrade_glb.py` darkens and desaturates that hue band in the textures, applied to the set and the cathedral.
 - **Next:** the owner judges the pilot before the other 17 parks get sets.
+
+## 2026-10-22 - Fans Up in the Outfield Architecture
+
+- The owner asked for spectators in more parts of the outfield stands, not just the seats.
+- **New `terraces` module:** standing balconies across the outfield facade and roof terraces along its top.
+  - Each level is a share of the facade height (`levels`, e.g. `[0.45, 1.0]`): a ledge with a low rail, up to 6 rows deep at a `density`.
+  - The ledges stand `out` m in front of the facade line, clear of deep sculpted bays. They follow the facade massing.
+  - The scoreboard gap stays clear.
+- **`Stadium.add_fans`:** the bowl's crowd builder, so any module can seat fans. Fans dress in the home, away and neutral colors at the park's fan shares, and share the crowd material so they cheer with the bowl.
+- **Placed at:**
+  - Citadel Park, Ledger Street and Warehouse Row: roof terraces.
+  - The Horseshoe, Forum Field and Amber Gate: a mid balcony plus the roof.

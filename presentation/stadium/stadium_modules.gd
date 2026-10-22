@@ -111,6 +111,13 @@ const CATALOG := {
 		"choices": {"model": [&"sakura_cliff", &"cathedral_spires", &"domed_bank"], "foot": [&"", &"round", &"blossom", &"cypress", &"pine", &"palm"]},
 		"script": preload("res://presentation/stadium/modules/hero_module.gd"),
 	},
+	&"terraces": {
+		"name": "Fan terraces", "category": &"stands", "unique": false, "placed": true,
+		"about": "Fans up in the outfield architecture: standing balconies across the facade and a roof terrace along its top, with ledges and railings, cheering with the crowd.",
+		"angle": 20.0, "angle_range": [-180.0, 180.0],
+		"params": {"span": [30.0, -360.0, 360.0], "levels": [[1.0]], "rows": [3, 1, 6], "density": [0.9, 0.1, 1.0], "center_gap": [12.0, 0.0, 40.0], "lift": [10.0, 2.0, 40.0], "out": [4.0, 0.0, 15.0]},
+		"script": preload("res://presentation/stadium/modules/terraces_module.gd"),
+	},
 	&"trees": {
 		"name": "Trees", "category": &"scenery", "unique": false, "placed": true,
 		"about": "A grove behind the stands across span degrees: palms, pines, cacti, round shade trees, cypresses or blossoming trees.",
