@@ -1512,3 +1512,17 @@ net above it), and the warning-track dirt in front of it as along the
 outfield. The stands start on top of the wall. The dugouts moved in to
 the photo-real spot: along the baselines between home and first/third
 (95 degrees off center), cut into the wall, parallel to the lines.
+
+## Grass: clean layers and a mowing style per park
+
+The infield dirt smeared into spokes from high cameras: the field's layers
+(grass, track, arc, dirt, infield grass, cutouts, chalk) were 1 cm apart
+and the camera's near plane was 5 cm, so the depth buffer could not keep
+them apart. The layers now step 3 cm (GrayboxField *_TOP constants) and
+the match camera's near plane is 0.25 m.
+
+Each park picks its mowing (StadiumDef.mowing: checker, diamond, stripes,
+diagonal, rings round home, sunburst from home, plain) and band width,
+drawn with soft edges as cut grass looks, plus its own grass and dirt
+tones where its sheet calls for it (desert clay at the Kiln and Amber
+Gate, dark volcanic dirt at Firelight). Turf keeps its 5-yard seams.

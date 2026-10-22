@@ -159,6 +159,7 @@ outfield_open = 30.0
 decks = 3
 away_fan_share = 0.2
 attendance = 0.9
+mowing_width = 11.0
 sponsors = PackedStringArray("RAMPART ROOFING", "SQUIRE SANDWICHES", "PORTCULLIS PARKING", "BASTION BANK")
 skyline_color = Color(0.2901961, 0.2901961, 0.34509805, 1)
 window_color = Color(1, 0.8352941, 0.6039216, 1)

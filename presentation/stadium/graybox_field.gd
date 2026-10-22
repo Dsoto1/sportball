@@ -11,6 +11,17 @@ const FOUL_POLE := Color(1.0, 0.8, 0.1)
 const CHALK := Color(0.95, 0.95, 0.9)
 const WALL := Color(0.16, 0.22, 0.38)
 const WALL_CAP := Color(0.98, 0.72, 0.15)
+## StadiumDef.mowing names, in the field shader's pattern order (from 1).
+const MOWING := ["checker", "diamond", "stripes", "diagonal", "rings", "sunburst", "plain"]
+## The field's layers, each well clear of the one under it (the camera's
+## depth buffer keeps 3+ cm apart clean from the stands): tops in m.
+const GRASS_TOP := 0.0
+const TRACK_TOP := 0.03
+const ARC_TOP := 0.04
+const DIRT_TOP := 0.06
+const INFIELD_GRASS_TOP := 0.09
+const CUTOUT_TOP := 0.12
+const CHALK_TOP := 0.15
 
 const SURFACE := preload("res://presentation/stadium/field_surface.gdshader")
 const GRASS_TEX := preload("res://assets/third_party/ambientcg/Grass004/Grass004_512_Color.jpg")
@@ -34,15 +45,24 @@ func build(tuning: BaseballTuning, park: StadiumDef = null) -> void:
 	var turf := park != null and park.turf
 	# Turf: a brighter, flatter green in crisp 5-yard seams instead of mowing.
 	var grass := TURF if turf else GRASS
-	_grass_mat = _surface(grass, GRASS_TEX, GRASS_NORMAL, 0.385, 2.5, 0.05 if turf else 0.075)
-	_grass_mat.set_shader_parameter("stripe_width", 4.57 if turf else 9.0)
+	if park != null and park.grass_color.a > 0.0 and not turf:
+		grass = park.grass_color
+	var dirt := park.dirt_color if park != null and park.dirt_color.a > 0.0 else DIRT
+	var pattern := MOWING.find(park.mowing if park != null else "checker") + 1
+	_grass_mat = _surface(grass, GRASS_TEX, GRASS_NORMAL, 0.385, 2.5, 0.05 if turf else 0.07)
+	_grass_mat.set_shader_parameter("stripe_width", 4.57 if turf else (park.mowing_width if park != null else 9.0))
+	_grass_mat.set_shader_parameter("pattern", 3 if turf else pattern)
 	_infield_grass_mat = _surface(grass.lightened(0.04), GRASS_TEX, GRASS_NORMAL, 0.385, 2.5, 0.05 if turf else 0.06)
+	# The infield: its own finer cut (a checker on most, the turf's seams on turf).
+	_infield_grass_mat.set_shader_parameter("stripe_width", 4.57 if turf else 3.0)
+	_infield_grass_mat.set_shader_parameter("pattern", 3 if turf else (0 if pattern == 7 else 1))
 	if turf:
 		for m in [_grass_mat, _infield_grass_mat]:
 			m.set_shader_parameter("detail_strength", 0.25)
-	_dirt_mat = _surface(DIRT, DIRT_TEX, DIRT_NORMAL, 0.556, 3.0, 0.0)
+	_dirt_mat = _surface(dirt, DIRT_TEX, DIRT_NORMAL, 0.556, 3.0, 0.0)
+	_dirt_mat.set_shader_parameter("pattern", 0)
 	_dirt_mat.set_shader_parameter("detail_strength", 0.45)
-	_add_box("Grass", Vector3(320, 0.1, 320), Vector3(0, -0.06, -110), GRASS).material_override = _grass_mat
+	_add_box("Grass", Vector3(320, 0.1, 320), Vector3(0, GRASS_TOP - 0.05, -110), GRASS).material_override = _grass_mat
 	_build_infield()
 	_build_foul_lines()
 	_build_fence()
@@ -51,18 +71,18 @@ func build(tuning: BaseballTuning, park: StadiumDef = null) -> void:
 
 func _build_infield() -> void:
 	var half := FieldLayout.BASE_DISTANCE / sqrt(2.0)
-	var dirt := _add_box("InfieldDirt", Vector3(FieldLayout.BASE_DISTANCE + 6, 0.04, FieldLayout.BASE_DISTANCE + 6), Vector3(0, -0.01, -half), DIRT)
+	var dirt := _add_box("InfieldDirt", Vector3(FieldLayout.BASE_DISTANCE + 6, 0.04, FieldLayout.BASE_DISTANCE + 6), Vector3(0, DIRT_TOP - 0.02, -half), DIRT)
 	dirt.rotation_degrees.y = 45.0
 	dirt.material_override = _dirt_mat
 	# The infield arc: dirt out past the bases, the way a real infield looks.
-	_add_disc("InfieldArc", 29.0, Vector3(0, -0.015, -18.4), _dirt_mat, 0.03)
-	var grass := _add_box("InfieldGrass", Vector3(FieldLayout.BASE_DISTANCE - 4, 0.05, FieldLayout.BASE_DISTANCE - 4), Vector3(0, 0.0, -half), GRASS.lightened(0.05))
+	_add_disc("InfieldArc", 29.0, Vector3(0, ARC_TOP - 0.015, -18.4), _dirt_mat, 0.03)
+	var grass := _add_box("InfieldGrass", Vector3(FieldLayout.BASE_DISTANCE - 4, 0.05, FieldLayout.BASE_DISTANCE - 4), Vector3(0, INFIELD_GRASS_TOP - 0.025, -half), GRASS.lightened(0.05))
 	grass.rotation_degrees.y = 45.0
 	grass.material_override = _infield_grass_mat
 	# Cutouts around home plate and each bag.
-	_add_disc("HomeCircle", 4.0, Vector3(0, 0.035, 0), _dirt_mat)
+	_add_disc("HomeCircle", 4.0, Vector3(0, CUTOUT_TOP - 0.01, 0), _dirt_mat)
 	for base in [FieldLayout.FIRST, FieldLayout.SECOND, FieldLayout.THIRD]:
-		_add_disc("BaseCircle%d" % base, 2.6, FieldLayout.base_position(base) + Vector3(0, 0.035, 0), _dirt_mat)
+		_add_disc("BaseCircle%d" % base, 2.6, FieldLayout.base_position(base) + Vector3(0, CUTOUT_TOP - 0.01, 0), _dirt_mat)
 	var mound := MeshInstance3D.new()
 	var cyl := CylinderMesh.new()
 	cyl.top_radius = 2.4
@@ -73,9 +93,9 @@ func _build_infield() -> void:
 	mound.position = Vector3(0, 0.05, -18.4)
 	mound.name = "Mound"
 	add_child(mound)
-	_add_box("HomePlate", Vector3(0.43, 0.06, 0.43), Vector3(0, 0.02, 0), CHALK)
+	_add_box("HomePlate", Vector3(0.43, 0.06, 0.43), Vector3(0, CHALK_TOP - 0.03, 0), CHALK)
 	for base in [FieldLayout.FIRST, FieldLayout.SECOND, FieldLayout.THIRD]:
-		var bag := _add_box("Base%d" % base, Vector3(0.6, 0.12, 0.6), FieldLayout.base_position(base) + Vector3(0, 0.05, 0), CHALK)
+		var bag := _add_box("Base%d" % base, Vector3(0.6, 0.12, 0.6), FieldLayout.base_position(base) + Vector3(0, CHALK_TOP + 0.0, 0), CHALK)
 		bag.rotation_degrees.y = 45.0
 
 
@@ -83,7 +103,7 @@ func _build_foul_lines() -> void:
 	for side in [-1.0, 1.0]:
 		var dir := FieldLayout.direction_for_spray(side * _tuning.foul_line_angle)
 		var length := FieldLayout.fence_distance(side * _tuning.foul_line_angle, _tuning)
-		var line := _add_box("FoulLine", Vector3(0.12, 0.03, length), dir * length * 0.5 + Vector3(0, 0.03, 0), CHALK)
+		var line := _add_box("FoulLine", Vector3(0.12, 0.03, length), dir * length * 0.5 + Vector3(0, CHALK_TOP - 0.015, 0), CHALK)
 		line.look_at_from_position(line.position, line.position + dir, Vector3.UP)
 		# Yellow, standing well above the wall, with a screen fin on the fair side.
 		var tall := FieldLayout.fence_height(side * _tuning.foul_line_angle, _tuning) + 13.0
@@ -168,7 +188,7 @@ func _build_fence() -> void:
 				seam.rotation = wall.rotation
 		# Warning track: a band of dirt in front of the wall.
 		var inward := -(mid.normalized()) * 2.2
-		var track := _add_box("WarningTrack", Vector3(length, 0.02, 4.4), mid + inward + Vector3(0, -0.005, 0), DIRT)
+		var track := _add_box("WarningTrack", Vector3(length, 0.02, 4.4), mid + inward + Vector3(0, TRACK_TOP - 0.01, 0), DIRT)
 		track.rotation = wall.rotation
 		track.material_override = _dirt_mat
 

@@ -675,7 +675,7 @@ func _build_backstop() -> void:
 			if a >= 44.0:
 				var t0 := smoothstep(45.0, 50.0, a)
 				var t1 := smoothstep(45.0, 50.0, b)
-				_quad(track, point(sa, ra - TRACK_WIDTH * t0, 0.012), point(sa, ra, 0.012), point(sb, rb, 0.012), point(sb, rb - TRACK_WIDTH * t1, 0.012), Color.WHITE)
+				_quad(track, point(sa, ra - TRACK_WIDTH * t0, GrayboxField.TRACK_TOP), point(sa, ra, GrayboxField.TRACK_TOP), point(sb, rb, GrayboxField.TRACK_TOP), point(sb, rb - TRACK_WIDTH * t1, GrayboxField.TRACK_TOP), Color.WHITE)
 			if absf(mid - DUGOUT_ANGLE) > dugout_half_angle() and not is_water(sa):
 				var ha := profile(sa).y - 0.3
 				var hb := profile(sb).y - 0.3

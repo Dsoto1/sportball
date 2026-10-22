@@ -143,6 +143,9 @@ func setup(p_tuning: BaseballTuning) -> void:
 	_field.build(tuning)
 	_camera = Camera3D.new()
 	_camera.fov = 55.0
+	# Never this close to anything; the depth buffer keeps the layered
+	# field (grass, dirt, chalk a few cm apart) clean out to the stands.
+	_camera.near = 0.25
 	add_child(_camera)
 	_camera.current = true
 	_snap_camera()

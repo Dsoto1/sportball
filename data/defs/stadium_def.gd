@@ -59,6 +59,16 @@ func sky_kind() -> StringName:
 	return &"night" if night else &"day"
 ## Artificial turf instead of grass (look only; its speed is in field_shape).
 @export var turf: bool = false
+## How the grass is mowed: plain, checker (squares along the baselines),
+## diamond (squares turned to the plate), stripes (bands across the line to
+## center), diagonal, rings (arcs round home) or sunburst (wedges out from
+## home). Turf ignores it (5-yard seams).
+@export_enum("checker", "diamond", "stripes", "diagonal", "rings", "sunburst", "plain") var mowing: String = "checker"
+## Mowed band width in m, and the grass and infield dirt colors (alpha 0:
+## the defaults).
+@export var mowing_width: float = 9.0
+@export var grass_color: Color = Color(0, 0, 0, 0)
+@export var dirt_color: Color = Color(0, 0, 0, 0)
 ## Fictional sponsors on the boards (original names only).
 @export var sponsors: PackedStringArray = []
 @export var skyline_color: Color = Color(0.25, 0.27, 0.42)

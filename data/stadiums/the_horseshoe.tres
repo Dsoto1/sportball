@@ -175,6 +175,7 @@ away_fan_share = 0.3
 attendance = 0.9
 night = true
 sky = &"dusk"
+mowing_width = 7.0
 sponsors = PackedStringArray("OLD TOWNE TROLLEY", "HORSESHOE HAMS", "MIDNIGHT MATINEE", "NICKEL ARCADE", "LAMPLIGHTER LAGER")
 skyline_color = Color(0.101960786, 0.12156863, 0.2, 1)
 window_color = Color(1, 0.8784314, 0.627451, 1)

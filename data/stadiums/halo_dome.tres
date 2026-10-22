@@ -185,6 +185,7 @@ decks = 3
 home_fan_share = 0.62
 attendance = 0.9
 sky = &"sunset"
+mowing = "sunburst"
 sponsors = PackedStringArray("SPOTLIGHT COLA", "NEON HEIGHTS TRANSIT", "MARQUEE MOTORS", "VELVET ROPE LOUNGE", "GLAM SLAM GUM", "CRT VISION", "HEADLINER HOTELS", "ENCORE AIRWAYS")
 skyline_color = Color(0.16862746, 0.16470589, 0.32156864, 1)
 window_color = Color(1, 0.8235294, 0.47843137, 1)
