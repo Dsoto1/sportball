@@ -52,6 +52,8 @@ var _field_focus := Vector3(0.0, 0.0, -42.0)
 ## to where it comes down (into the seats for a homer), then the trot.
 var _flight: BallTrajectory
 var _flight_hr := false
+## A foul ball's flight: into the seats or onto the foul ground.
+var _flight_foul := false
 var _flight_t := 0.0
 ## Hand back to the field camera at this play time (a catch or a bounce).
 var _flight_until := INF
@@ -188,6 +190,7 @@ func start_flight(traj: BallTrajectory, home_run: bool, until: float = INF, mome
 	_flight_cheered = false
 	_flight_shot = -1
 	_flight_land_t = INF
+	_flight_foul = false
 	if home_run:
 		# Where it comes down: the first seat row (or ground) under it.
 		var t := traj.end_time()
@@ -207,6 +210,32 @@ func start_flight(traj: BallTrajectory, home_run: bool, until: float = INF, mome
 	for ghost in _flight_tail:
 		ghost.visible = false
 	set_camera_mode(CameraMode.FLIGHT)
+
+
+## A foul ball off the bat: followed until it comes down in the stands (a
+## ripple through the crowd) or on the foul ground.
+func start_foul(traj: BallTrajectory) -> void:
+	start_flight(traj, false)
+	_flight_foul = true
+	_flight_until = INF
+	var t := 0.0
+	var stop := traj.end_time()
+	_flight_land_t = stop
+	_flight_land = traj.flight_position(stop)
+	while t < stop:
+		t += traj.step * 0.5
+		var p := traj.flight_position(t)
+		var floor_h := _stadium.surface_height(p) if _stadium != null else 0.0
+		if t > 0.3 and p.y <= floor_h:
+			_flight_land_t = t
+			_flight_land = Vector3(p.x, floor_h, p.z)
+			break
+	_ball.visible = true
+
+
+## When a foul ball's show is over (it landed a moment ago).
+func foul_done_at() -> float:
+	return _flight_land_t + 1.2
 
 
 func _build_flight_fx() -> void:
@@ -263,7 +292,7 @@ func _build_flight_fx() -> void:
 func step_flight(t: float) -> void:
 	_flight_t = t
 	# The comet tail, gone once the ball comes down.
-	var airborne := t < (_flight_land_t if _flight_hr else _flight.first_bounce_time)
+	var airborne := t < (_flight_land_t if (_flight_hr or _flight_foul) else _flight.first_bounce_time)
 	for i in _flight_tail.size():
 		var ghost := _flight_tail[i]
 		var at := t - (i + 1) * 0.035
@@ -280,6 +309,13 @@ func step_flight(t: float) -> void:
 			moment["distance"] = roundi(_flight.projected_distance() * 3.28084)
 			board_moment(&"home_run", moment)
 			home_run_landed.emit(roundi(_flight.projected_distance() * 3.28084))
+	elif _flight_foul:
+		_ball.position = flight_ball(t)
+		if t >= _flight_land_t and not _flight_cheered:
+			_flight_cheered = true
+			# In the seats: the fans there go up for a souvenir.
+			if _flight_land.y > 0.5:
+				cheer(0.4)
 	elif t >= _flight_until:
 		for ghost in _flight_tail:
 			ghost.visible = false
@@ -296,7 +332,7 @@ func _board_spot() -> Vector3:
 func flight_ball(t: float) -> Vector3:
 	if _flight == null:
 		return Vector3.ZERO
-	if _flight_hr and t >= _flight_land_t:
+	if (_flight_hr or _flight_foul) and t >= _flight_land_t:
 		return _flight_land + Vector3.UP * 0.12
 	return _flight.flight_position(t)
 
@@ -744,7 +780,7 @@ func _process(delta: float) -> void:
 func _flight_camera(delta: float, kick: float) -> void:
 	var t := _flight_t
 	var ball := flight_ball(t)
-	var aim := _flight_land if _flight_hr else _flight.landing_point
+	var aim := _flight_land if (_flight_hr or _flight_foul) else _flight.landing_point
 	var dir := Vector3(aim.x, 0.0, aim.z).normalized()
 	if dir.length() < 0.5:
 		dir = Vector3(0, 0, -1)
@@ -782,7 +818,14 @@ func _flight_camera(delta: float, kick: float) -> void:
 			goal = Vector3(26.0, 20.0, 16.0)
 			look = Vector3(-4.0, 0.0, -16.0)
 			fov = 50.0
-	var weight := 1.0 - exp(-delta * (2.5 if shot == 1 else 5.0))
+	if _flight_foul and t > 0.35:
+		# A foul: from beside the plate, high, panning after it into the
+		# seats (or back over the screen).
+		shot = 4
+		goal = Vector3(0, 0, 0) - dir * 6.0 + side * 9.0 + Vector3.UP * 7.0
+		look = ball.lerp(_flight_land, 0.35)
+		fov = 58.0
+	var weight := 1.0 - exp(-delta * (2.5 if shot == 1 or shot == 4 else 5.0))
 	if shot != _flight_shot:
 		# A cut, not a pan: each shot starts framed.
 		weight = 1.0

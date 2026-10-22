@@ -21,6 +21,12 @@ const ROW_RISE := 0.45
 ## Each deck above the first starts this much higher than the row below it
 ## would: its front is the fascia band that carries the club's wordmarks.
 const DECK_JUMP := 2.6
+## How far an upper deck reaches out over the one below (in the foul
+## stands; it fades out past the foul poles with the decks' split), and its
+## fascia's depth below the tread and parapet above it.
+const OVERHANG := 2.2
+const FASCIA_DROP := 0.9
+const PARAPET := 0.9
 const ANGLE_STEP := 1.0
 ## Inner edge of the stands (meters from home) by |spray angle| past the
 ## foul poles; inside the poles the bleachers start just behind the wall.
@@ -150,6 +156,18 @@ func _is_walkway(angle: float, k: int) -> bool:
 	return absf(angle) > 50.0 and is_deck_front(k + 1)
 
 
+## How far the decks overhang at a spray angle (0 where they don't split).
+func overhang(angle: float) -> float:
+	return OVERHANG * smoothstep(45.0, 60.0, absf(wrapf(angle, -180.0, 180.0)))
+
+
+## The front of deck row k (a deck front, k > 0) at a spray angle: the
+## radius of its fascia's face and the height of its tread. Bunting,
+## wordmarks and icicles hang here.
+func deck_front(angle: float, p: Vector3, k: int) -> Vector2:
+	return Vector2(p.x + k * ROW_DEPTH - overhang(angle), row_height(angle, p, k))
+
+
 func is_deck_front(k: int) -> bool:
 	return def.decks > 1 and k % rows_per_deck() == 0
 
@@ -267,6 +285,8 @@ func _build_bowl() -> void:
 	var eye := Color(0.06, 0.1, 0.09)
 	# Concrete treads (vertex colors are used as they are: this is mid-gray).
 	var tread := def.structure_color.lerp(Color(0.3, 0.3, 0.29), 0.6).darkened(0.25)
+	var concourse := def.structure_color.darkened(0.7)
+	var fascia := def.accent_color.lerp(def.structure_color, 0.25)
 	var a := -180.0
 	while a < 180.0:
 		var b := a + ANGLE_STEP
@@ -292,17 +312,34 @@ func _build_bowl() -> void:
 			if absf(mid) < BATTERS_EYE:
 				face = eye
 			elif k > 0 and is_deck_front(k):
-				face = def.accent_color.lerp(def.structure_color, 0.25)
+				# Under an overhanging deck: the concourse's back wall, in shade.
+				face = concourse if overhang(mid) > 0.05 else def.accent_color.lerp(def.structure_color, 0.25)
 			# The front wall opens onto the dugouts.
 			if k > 0 or absf(absf(mid) - DUGOUT_ANGLE) > dugout_half_angle():
 				_quad(st, point(a, ra, below_a), point(b, rb, below_b), point(b, rb, hb), point(a, ra, ha), face)
+			# An upper deck reaches out over the one below: its slab (the
+			# soffit under it in shade), the fascia across its front and a
+			# parapet on top.
+			var oa := overhang(a)
+			var ob := overhang(b)
+			if k > 0 and is_deck_front(k) and maxf(oa, ob) > 0.05:
+				var fa := ra - oa
+				var fb := rb - ob
+				_quad(st, point(a, fa, ha), point(b, fb, hb), point(b, rb, hb), point(a, ra, ha), tread)
+				_quad(st, point(b, fb, hb - FASCIA_DROP), point(a, fa, ha - FASCIA_DROP), point(a, ra, ha - FASCIA_DROP), point(b, rb, hb - FASCIA_DROP), concourse)
+				_quad(st, point(a, fa, ha - FASCIA_DROP), point(b, fb, hb - FASCIA_DROP), point(b, fb, hb + PARAPET), point(a, fa, ha + PARAPET), fascia)
+				_quad(st, point(a, fa, ha + PARAPET), point(b, fb, hb + PARAPET), point(b, fb + 0.3, hb + PARAPET), point(a, fa + 0.3, ha + PARAPET), fascia.darkened(0.3))
+				_quad(st, point(a, fa + 0.3, ha + PARAPET), point(b, fb + 0.3, hb + PARAPET), point(b, fb + 0.3, hb), point(a, fa + 0.3, ha), fascia.darkened(0.45))
 			# The tread is concrete; the seats are a row of chairs on it (a
 			# pan and a back), one per step of the sweep, a shade apart so
 			# they read as single seats. Fans sit just in front of them.
 			var seated := not _is_aisle(mid) and absf(mid) >= BATTERS_EYE and not _is_walkway(a, k)
 			_quad(st, point(a, ra, ha), point(b, rb, hb), point(b, rb + ROW_DEPTH, hb), point(a, ra + ROW_DEPTH, ha), tread if seated or absf(mid) >= BATTERS_EYE else seat)
 			if seated:
-				var chair := seat.darkened(0.12) if int(a) % 2 == 0 else seat
+				# Vertex colors are used as they are (linear): convert, so the
+				# chairs keep the park's own (dark) seat colors and never read
+				# as grass from above.
+				var chair := (seat.darkened(0.12) if int(a) % 2 == 0 else seat).srgb_to_linear()
 				for part: Vector4 in [Vector4(SEAT_FRONT, 0.0, SEAT_FRONT, SEAT_PAN), Vector4(SEAT_FRONT, SEAT_PAN, SEAT_BACK, SEAT_PAN), Vector4(SEAT_BACK, SEAT_PAN, SEAT_BACK, SEAT_TOP), Vector4(SEAT_BACK, SEAT_TOP, SEAT_BACK + 0.08, SEAT_TOP)]:
 					# Each part runs from (radius x, height y) to (z, w) off the tread's front edge.
 					_quad(st, point(a, ra + part.x, ha + part.y), point(b, rb + part.x, hb + part.y), point(b, rb + part.z, hb + part.w), point(a, ra + part.z, ha + part.w), chair if part.y < SEAT_TOP else chair.darkened(0.2))
@@ -466,9 +503,10 @@ func add_fans(seats: Array[Vector3], node_name: String = "Fans", club: TeamDef =
 	mm.use_colors = true
 	mm.use_custom_data = true
 	var quad := QuadMesh.new()
-	# The atlas cell: 2.4 m tall, 1.2 wide, feet 0.15 m above its bottom.
+	# The atlas cell: 2.4 m tall, 1.2 wide, a standing fan's feet 0.22 m
+	# above its bottom (baked from a little above).
 	quad.size = Vector2(1.2, 2.4)
-	quad.center_offset = Vector3(0.0, 1.05, 0.0)
+	quad.center_offset = Vector3(0.0, 0.98, 0.0)
 	mm.mesh = quad
 	mm.instance_count = seats.size()
 	var neutral := [Color(0.92, 0.92, 0.9), Color(0.35, 0.35, 0.38), Color(0.85, 0.2, 0.2), Color(0.95, 0.8, 0.2), Color(0.2, 0.6, 0.65), Color(0.15, 0.15, 0.18)]
@@ -691,10 +729,16 @@ func _build_fascia(home: TeamDef) -> void:
 					if k >= int(p.z):
 						continue
 					var height := (row_height(angle, p, k) + (0.0 if k == 0 else row_height(angle, p, k - 1))) * 0.5
+					var radius := p.x + k * ROW_DEPTH
+					if k > 0 and overhang(angle) > 0.05:
+						# On the overhanging deck's fascia.
+						var front := deck_front(angle, p, k)
+						radius = front.x
+						height = front.y
 					# Seen from the field, the third-base words run toward home.
 					var letter := label(text[i] if side > 0.0 else text[text.length() - 1 - i], 110, home.dark_color if d > 0 else Color.WHITE, root)
 					letter.pixel_size = pixel
-					letter.position = point(angle, p.x + k * ROW_DEPTH - 0.15, height)
+					letter.position = point(angle, radius - 0.15, height)
 					face_home(letter)
 					placed = true
 				if placed:

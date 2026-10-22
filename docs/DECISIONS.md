@@ -1475,3 +1475,28 @@ mid-plain and hollow scoreboard backs. Fixes, all in-house:
 - The Kiln, the Icebox and Cloudreach drop the city (mountains, snow and
   sky islands instead); Sakura Gate gets moss ground instead of a bare
   maroon plain.
+
+## Stands that hold up from the mound
+
+Checked first-person from the pitcher's mound (stadium_tour "mound": eight
+eye-level headings and a top-down) against each sheet's pitcher's-view,
+home-plate and baseline panels.
+
+- **Seats**: every tread is concrete with a row of chairs (pan and back)
+  in the park's seat colors (converted to linear, so they keep their dark
+  shade and never read as grass). Fans sit on the chairs; standing fans
+  step forward to the front of the tread.
+- **Seated fans**: the crowd atlas is baked from 22 degrees above (the
+  stands are always seen from above), and the seated pose is a real one:
+  hips at chair height, thighs level, feet forward.
+- **Dugouts**: sunk into the front of the foul stands, flush with their
+  slanting edge, a step down from the field under the first rows (which
+  lift over them); bench with the club's players, padded rail, the name on
+  the roof fascia. The foul-wall wordmarks skip the openings.
+- **Decks**: in the foul stands each upper deck overhangs the one below by
+  2.2 m: slab, fascia with the club's wordmarks and bunting, a parapet,
+  and the concourse in shade underneath.
+- **Foul balls** fly: off the bat as hit (a ticked foul gets a plausible
+  flight back over the screen or into the side seats), followed by a
+  camera beside the plate until it lands; fans where it lands react. The
+  look uses its own random generator, so seeded matches are unchanged.

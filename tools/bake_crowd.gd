@@ -18,13 +18,17 @@ var STAND := {
 	"hand_l": P(-0.28, 0.88, 0.06), "hand_r": P(0.28, 0.88, 0.06), "elbow_l": P(-1, -0.4, -0.3), "elbow_r": P(1, -0.4, -0.3),
 }
 var SIT := {
-	"drop": 0.42, "chest": Vector3(6, 0, 0),
-	"foot_l": P(-0.16, 0.1, 0.42), "foot_r": P(0.16, 0.1, 0.42), "knee_l": P(0, 0.4, 1), "knee_r": P(0, 0.4, 1),
+	# Seated: hips down at chair height, thighs level, shins down to feet
+	# set forward under the knees.
+	"drop": 0.58, "chest": Vector3(4, 0, 0),
+	"foot_l": P(-0.17, 0.1, 0.5), "foot_r": P(0.17, 0.1, 0.5), "knee_l": P(0, 0.2, 1), "knee_r": P(0, 0.2, 1),
 	"hand_l": P(-0.17, 0.62, 0.34), "hand_r": P(0.17, 0.62, 0.34), "elbow_l": P(-1, -0.5, 0), "elbow_r": P(1, -0.5, 0),
 }
 
 var _actor: ActorView
 var _cam: Camera3D
+## Degrees the bake looks down on the mannequin.
+const VIEW_DOWN := 22.0
 var _poses: Array = []
 var _frame := 0
 var _cell := 0
@@ -64,9 +68,11 @@ func _initialize() -> void:
 	_cam = Camera3D.new()
 	_cam.projection = Camera3D.PROJECTION_ORTHOGONAL
 	_cam.size = 2.4
-	_cam.position = Vector3(0, 1.05, 4.0)
+	# A little above, as the stands are seen (broadcast angles look down on
+	# them): seated fans' thighs then read as seated.
+	var eye := Vector3(0, 1.05, 0) + Vector3(0, sin(deg_to_rad(VIEW_DOWN)), cos(deg_to_rad(VIEW_DOWN))) * 4.0
+	_cam.transform = Transform3D(Basis.looking_at(Vector3(0, 1.05, 0) - eye), eye)
 	root.add_child(_cam)
-	_cam.look_at(Vector3(0, 1.05, 0))
 	_cam.current = true
 	# Each pose: four frames (a loop the crowd shader plays).
 	var clap_in := func(base: Dictionary, h: float, f: float) -> Dictionary: return _with(base, {"hand_l": P(-0.03, h, f), "hand_r": P(0.03, h + 0.02, f), "elbow_l": P(-1, -0.6, 0), "elbow_r": P(1, -0.6, 0)})

@@ -27,7 +27,8 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 		var top := stadium.stand_top(angle)
 		var spots: Array[Vector2] = [Vector2(top.x, top.y + 1.2)]
 		for k in fronts:
-			spots.append(Vector2(p.x + k * Stadium.ROW_DEPTH - 0.1, stadium.row_height(angle, p, k)))
+			var front := stadium.deck_front(angle, p, k)
+			spots.append(Vector2(front.x - 0.1, front.y + Stadium.PARAPET))
 		for spot in spots:
 			var lip := stadium.box(Vector3(1.6, 0.35, 0.8), Color.WHITE, root)
 			lip.position = stadium.point(angle, spot.x, spot.y + 0.1)

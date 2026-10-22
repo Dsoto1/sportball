@@ -1,6 +1,7 @@
 extends SceneTree
 ## Renders the long-ball camera for a home run in a park: frames through the
-## flight (rise, chase, wall, landing, trot) into one contact sheet. Needs a
+## flight (rise, chase, wall, landing, trot) into one contact sheet; a foul
+## spray angle follows a foul ball into the seats instead. Needs a
 ## display:
 ##   godot --path . --resolution 960x540 -s res://tools/flight_shots.gd -- /tmp/out.png [park_id] [ev_mps] [launch] [spray]
 var _frames := 0
@@ -51,9 +52,15 @@ func _process(_d: float) -> bool:
 		print("result ", BallTrajectory.Result.keys()[_traj.result], " wall ", roundi(_traj.distance() * 3.28), " ft projected ", roundi(_traj.projected_distance() * 3.28), " ft")
 		var club: TeamDef = _view._roster.teams[MatchState.HOME]
 		var hitter: PlayerDef = club.roster[0] if not club.roster.is_empty() else null
-		_view.start_flight(_traj, _traj.result == BallTrajectory.Result.HOME_RUN, INF, {"team": club, "name": hitter.display_name if hitter != null else "", "number": hitter.number if hitter != null else 0, "exit_velocity": roundi(hit[0] * 2.237), "launch": roundi(hit[1]), "runs": 1})
-		var land := _view._flight_land_t
-		_times = [0.2, 1.2, 2.4, maxf(_traj.end_time() - 0.5, 2.6), land - 0.3, land + 0.5, land + 2.0, land + 3.5]
+		if not FieldLayout.is_fair_angle(hit[2], _view.tuning):
+			# A foul ball: into the seats or back over the screen.
+			_view.start_foul(_traj)
+			var drop := _view._flight_land_t
+			_times = [0.15, 0.4, drop * 0.3, drop * 0.5, drop * 0.7, drop * 0.9, drop + 0.2, drop + 1.0]
+		else:
+			_view.start_flight(_traj, _traj.result == BallTrajectory.Result.HOME_RUN, INF, {"team": club, "name": hitter.display_name if hitter != null else "", "number": hitter.number if hitter != null else 0, "exit_velocity": roundi(hit[0] * 2.237), "launch": roundi(hit[1]), "runs": 1})
+			var land := _view._flight_land_t
+			_times = [0.2, 1.2, 2.4, maxf(_traj.end_time() - 0.5, 2.6), land - 0.3, land + 0.5, land + 2.0, land + 3.5]
 		_view.step_flight(0.0)
 		return false
 	if _frames < 20:

@@ -57,6 +57,11 @@ var _meter := 0.0
 var _pitch: PitchResult
 var _ai_swing: SwingIntent
 var _contact: ContactResult
+## A foul ball in the air during the call: when its show is over.
+var _foul_until := -1.0
+## Looks only (where a foul ball flies): its own generator, so the match's
+## seeded rolls never depend on it.
+var _look_rng := RandomNumberGenerator.new()
 var _bip: BallInPlay
 var _live: LiveFielding
 var _dive_requested := false
@@ -307,7 +312,12 @@ func _process(delta: float) -> void:
 		Phase.PITCH_FLIGHT:
 			_process_pitch_flight(delta)
 		Phase.CALL:
-			if _phase_time >= CALL_PAUSE:
+			if _foul_until > 0.0:
+				_view.step_flight(_phase_time)
+			if _phase_time >= maxf(CALL_PAUSE, _foul_until):
+				if _foul_until > 0.0:
+					_view.step_flight(INF)  # down: its trail cleared
+				_foul_until = -1.0
 				_enter_pre_pitch()
 		Phase.BALL_IN_PLAY:
 			_process_ball_in_play()
@@ -514,7 +524,9 @@ func _process_pitch_flight(_delta: float) -> void:
 				call_text = String(_outcome.kind).replace("_", " ").to_upper()
 		else:
 			call_text = _apply_call()
-			if _contact.outcome != ContactResult.Outcome.FOUL:
+			if _contact.outcome == ContactResult.Outcome.FOUL:
+				_fly_foul()
+			else:
 				_view.sfx.play(&"glove", 2.0 if _pitch.speed > 38.0 else 0.0)
 		if _contact.swing_type != SwingIntent.Type.NONE:
 			_show_contact_feedback(call_text)
@@ -525,6 +537,25 @@ func _process_pitch_flight(_delta: float) -> void:
 
 ## The moment the ball meets the bat (or doesn't): what kind of contact it
 ## was and why, the burst, and the crack.
+func _fly_foul() -> void:
+	# Off the bat as it was hit; a ticked one (no flight of its own) gets
+	# a plausible one: back over the screen, or high into the side seats.
+	var ev := _contact.exit_velocity
+	var launch := _contact.launch_angle
+	var spray := _contact.spray_angle
+	if ev < 5.0:
+		ev = _look_rng.randf_range(20.0, 34.0)
+		launch = _look_rng.randf_range(15.0, 70.0)
+		var side := signf(_contact.timing_norm) if _contact.timing_norm != 0.0 else (1.0 if _look_rng.randf() < 0.5 else -1.0)
+		spray = side * (_look_rng.randf_range(150.0, 178.0) if _look_rng.randf() < 0.35 else _look_rng.randf_range(55.0, 110.0))
+	elif FieldLayout.is_fair_angle(spray, tuning):
+		# Called foul off a weak swing: it hooks just foul.
+		spray = signf(spray if spray != 0.0 else 1.0) * _look_rng.randf_range(47.0, 70.0)
+	var traj := BallTrajectory.simulate(ev, launch, spray, tuning)
+	_view.start_foul(traj)
+	_foul_until = minf(_view.foul_done_at(), 4.5)
+
+
 func _show_contact_feedback(call_text: String) -> void:
 	var f := ContactFeedback.describe(_contact, tuning)
 	var head: String = f["headline"]

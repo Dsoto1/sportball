@@ -26,6 +26,8 @@ var _cheer := -1.0
 ## Mound mode: hide the players and ball (the camera stands where the
 ## pitcher does) so only the park is seen.
 var _bare := false
+## "nocrowd": the stands empty, to see the seats and structure.
+var _nocrowd := false
 
 
 func _initialize() -> void:
@@ -56,6 +58,8 @@ func _initialize() -> void:
 			var a := PI * 0.5 + TAU * k / 8.0
 			_shots.append([center + Vector3(cos(a) * 175.0, 75.0, sin(a) * 175.0), center + Vector3(0, -10, 0)])
 	for a: String in OS.get_cmdline_user_args():
+		if a == "nocrowd":
+			_nocrowd = true
 		if a.begins_with("cheer:"):
 			# Hold the crowd at this excitement (0 calm .. 1 a home run).
 			_cheer = a.substr(6).to_float()
@@ -83,6 +87,10 @@ func _process(_d: float) -> bool:
 		return false
 	if _cheer >= 0.0 and _view._stadium != null:
 		_view._stadium._excitement = _cheer
+	if _nocrowd and _view._stadium != null:
+		for c in _view._stadium.get_children():
+			if c is MultiMeshInstance3D and (c.name.begins_with("Crowd") or c.name.begins_with("Fans")):
+				c.visible = false
 	if _bare:
 		for c in _view.get_children():
 			if c is Node3D and not (c is Stadium or c is GrayboxField or c is Camera3D or c is DirectionalLight3D):

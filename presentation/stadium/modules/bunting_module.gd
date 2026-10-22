@@ -21,10 +21,11 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 		for k in int(p.z):
 			if k == 0 or not stadium.is_deck_front(k):
 				continue
-			var top := stadium.row_height(angle, p, k)
+			var front := stadium.deck_front(angle, p, k)
 			var fan := Node3D.new()
 			root.add_child(fan)
-			fan.position = stadium.point(angle, p.x + k * Stadium.ROW_DEPTH - 0.25, top - 0.15)
+			# From the parapet's top, over the fascia.
+			fan.position = stadium.point(angle, front.x - 0.25, front.y + Stadium.PARAPET - 0.1)
 			stadium.face_home(fan)
 			# Three bands of a half disc hanging from its flat top edge.
 			for band in 3:
