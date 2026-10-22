@@ -1579,3 +1579,19 @@ depth gets its own short wall.
 The Bankers' statues (statue figure "bull") are a Meshy bronze charging
 bull (MSH-076, 30 credits) on the pedestal, hooves on its top; the
 primitive bull stays as the fallback.
+
+## Ball size and who chases a hit
+
+The ball was drawn at 11 cm radius (a real one is 3.7 cm) and grown up to
+5x with camera distance, so far off it was over a meter across. It's now
+4.5 cm and grows only enough to stay about 0.3 degrees across on screen,
+at most 3.5x; the trail and shadow match.
+
+The whole team chased every hit: in live fielding every AI teammate ran
+its intercept route and then the ball, and in the AI-fielded view every
+fielder without a job drifted toward it. Now only the projected fielder
+chases (plus a second one on a ball between two of them, if he would
+arrive within 0.7 s of the first); the nearest other outfielder backs up a
+ball in the outfield; everyone else takes a few ready steps and holds, and
+infielders cover bases once the ball is secured. A ball left loose on the
+ground 1.5 s past its projected pickup sends the nearest teammate after it.

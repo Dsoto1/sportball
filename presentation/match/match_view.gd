@@ -82,6 +82,11 @@ const BUNT_GRIP := 0.3
 const BALL_SHADER := preload("res://presentation/props/baseball.gdshader")
 ## How fast the ball tumbles (radians per meter travelled), so its seams spin.
 const BALL_SPIN := 9.0
+const BALL_RADIUS := 0.045
+## The ball is drawn at least this many degrees across (readability), so it
+## grows with distance from the camera (up to BALL_MAX_SCALE).
+const BALL_MIN_DEGREES := 0.32
+const BALL_MAX_SCALE := 3.5
 ## Pitcher's follow-through after release (s), and the windup progress
 ## where his hands break and the ball leaves the glove.
 const FOLLOW_TIME := 0.45
@@ -149,11 +154,13 @@ func setup(p_tuning: BaseballTuning) -> void:
 	add_child(_camera)
 	_camera.current = true
 	_snap_camera()
-	_ball = _sphere(0.11, Color(1, 1, 1), true)
+	# Close to a real ball (3.7 cm radius); _update_shadow grows it with
+	# distance from the camera so it stays readable far off, never huge.
+	_ball = _sphere(BALL_RADIUS, Color(1, 1, 1), true)
 	var ball_mat := ShaderMaterial.new()
 	ball_mat.shader = BALL_SHADER
 	_ball.material_override = ball_mat
-	_ball_shadow = _disc(0.18, Color(0, 0, 0, 0.45))
+	_ball_shadow = _disc(0.07, Color(0, 0, 0, 0.45))
 	for id in tuning.fielder_ids:
 		var actor := ActorView.new()
 		add_child(actor)
@@ -247,7 +254,7 @@ func _build_flight_fx() -> void:
 	for i in 14:
 		var ghost := MeshInstance3D.new()
 		var s := SphereMesh.new()
-		s.radius = 0.16 * (1.0 - i / 16.0)
+		s.radius = 0.07 * (1.0 - i / 16.0)
 		s.height = s.radius * 2.0
 		s.radial_segments = 8
 		s.rings = 4
@@ -600,6 +607,7 @@ func show_play(bip: BallInPlay, t: float, play: LivePlay, outcome: PlayOutcome, 
 				holder = cutoff
 			_:
 				holder = covers.get(play.holder_cover, -1)
+	var backup := _backup_fielder(fielding)
 	for i in _fielders.size():
 		var start := FieldLayout.fielder_spot(i, tuning)
 		var actor := _fielders[i]
@@ -627,9 +635,16 @@ func show_play(bip: BallInPlay, t: float, play: LivePlay, outcome: PlayOutcome, 
 		elif covers.values().has(i):
 			actor.position = start.move_toward(FieldLayout.base_position(covers.find_key(i)), since * tuning.fielder_speed)
 			actor.face(_ball.position)
+		elif i == backup:
+			# The nearest other outfielder backs up the play, behind it.
+			var behind := Vector3(fielding.secure_point.x, 0.0, fielding.secure_point.z)
+			behind += Vector3(behind.x, 0.0, behind.z).normalized() * 9.0
+			actor.position = start.move_toward(behind, since * tuning.fielder_speed)
+			actor.face(_ball.position)
 		else:
+			# Not his ball: a few ready steps toward the play, then hold.
 			var drift := Vector3(_ball.position.x, 0.0, _ball.position.z)
-			actor.position = start.move_toward(drift, since * tuning.fielder_speed * 0.35)
+			actor.position = start.move_toward(drift, minf(since * tuning.fielder_speed * 0.5, 2.5))
 			actor.face(_ball.position)
 	if play != null:
 		for r in play.runners:
@@ -1044,7 +1059,7 @@ func _build_aim_and_flash() -> void:
 	_aim.add_child(_aim_head)
 	_aim.visible = false
 	for i in 8:
-		var ghost := _sphere(0.11, Color(1, 1, 1, 0.5), false)
+		var ghost := _sphere(BALL_RADIUS, Color(1, 1, 1, 0.5), false)
 		ghost.visible = false
 		_trail.append(ghost)
 	_flash = _sphere(1.0, Color(1, 1, 1, 0.8), false)
@@ -1091,6 +1106,25 @@ func _snap_camera() -> void:
 	var spot: Array = CAMERA_SPOTS[_camera_mode]
 	_camera.position = spot[0]
 	_camera.look_at(spot[1], Vector3.UP)
+
+
+## The outfielder who backs up a ball hit to the outfield: the nearest
+## other outfielder to where it's fielded (-1 for a ball in the infield).
+func _backup_fielder(fielding: FieldingResult) -> int:
+	var at := Vector3(fielding.secure_point.x, 0.0, fielding.secure_point.z)
+	if at.length() < 45.0:
+		return -1
+	var best := -1
+	var best_d := INF
+	for id: StringName in [&"lf", &"cf", &"rf"]:
+		var i := tuning.fielder_ids.find(id)
+		if i < 0 or i == fielding.fielder_index:
+			continue
+		var d := FieldLayout.fielder_spot(i, tuning).distance_to(at)
+		if d < best_d:
+			best = i
+			best_d = d
+	return best
 
 
 func _cutoff_fielder(target: int, fielding: FieldingResult) -> int:
@@ -1199,7 +1233,8 @@ func _update_shadow() -> void:
 	_ball_shadow.position = Vector3(_ball.position.x, 0.03, _ball.position.z)
 	# Readability: the ball grows with camera distance (presentation only).
 	if _camera != null:
-		var grow := clampf(_camera.position.distance_to(_ball.position) / 14.0, 1.0, 5.0)
+		var wanted := deg_to_rad(BALL_MIN_DEGREES) * _camera.position.distance_to(_ball.position) * 0.5 / BALL_RADIUS
+		var grow := clampf(wanted, 1.0, BALL_MAX_SCALE)
 		_ball.scale = Vector3.ONE * grow
 		_ball_shadow.scale = Vector3(grow, 1.0, grow)
 

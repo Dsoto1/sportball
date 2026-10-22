@@ -28,6 +28,20 @@ var auto_switches: int = 0
 
 var _targets: PackedVector3Array = PackedVector3Array()
 var _target_times: PackedFloat32Array = PackedFloat32Array()
+## Who goes for the ball: the fielder the projection picks and, on a ball
+## between two of them, the next one if he would get there almost as soon.
+## Everyone else takes a few ready steps and holds (the view sends the
+## infielders to cover bases once it's secured).
+var chasers := {}
+## A second chaser only if his projected arrival is within this of the best.
+const SECOND_CHASER_WINDOW := 0.7
+## How far a fielder not chasing drifts toward the play (m).
+const READY_STEPS := 2.5
+## Seconds past the first chaser's projected arrival before a loose ball on
+## the ground sends a teammate after it.
+const LOOSE_BALL_DELAY := 1.5
+var _backup_sent := false
+var _first_time := 0.0
 
 
 func _init(p_trajectory: BallTrajectory, p_fielders: Array[FielderState], p_projection: FieldingResult, p_tuning: BaseballTuning, p_controlled: int) -> void:
@@ -42,6 +56,16 @@ func _init(p_trajectory: BallTrajectory, p_fielders: Array[FielderState], p_proj
 		var point: Vector3 = candidate.get("point", trajectory.rest_point())
 		_targets.append(Vector3(point.x, 0.0, point.z))
 		_target_times.append(candidate.get("time", trajectory.end_time()))
+	var order := range(fielders.size())
+	order.sort_custom(func(x: int, y: int) -> bool: return _target_times[x] < _target_times[y])
+	var first: int = projection.fielder_index if projection.fielder_index >= 0 else (order[0] if not order.is_empty() else -1)
+	if first >= 0:
+		chasers[first] = true
+		_first_time = _target_times[first]
+	for i: int in order:
+		if i != first and first >= 0 and _target_times[i] < _target_times[first] + SECOND_CHASER_WINDOW:
+			chasers[i] = true
+			break
 
 
 func is_secured() -> bool:
@@ -55,6 +79,20 @@ func step(dt: float, move: Vector2 = Vector2.ZERO, dive: bool = false) -> void:
 	time += dt
 	var ball := trajectory.position_at(time)
 	var airborne := trajectory.is_airborne_at(time)
+	# A ball still loose on the ground a moment after it should have been
+	# fielded: the nearest teammate goes and gets it (a backup, never a
+	# stall).
+	if not airborne and not _backup_sent and time > _first_time + LOOSE_BALL_DELAY:
+		_backup_sent = true
+		var near := -1
+		var near_gap := INF
+		for i in fielders.size():
+			if i != controlled and not chasers.has(i) and _gap(positions[i], ball) < near_gap:
+				near = i
+				near_gap = _gap(positions[i], ball)
+		if near >= 0:
+			chasers[near] = true
+			_target_times[near] = 0.0
 	for i in fielders.size():
 		var f := fielders[i]
 		if i == controlled:
@@ -75,10 +113,14 @@ func step(dt: float, move: Vector2 = Vector2.ZERO, dive: bool = false) -> void:
 			if dir.length() > 1.0:
 				dir = dir.normalized()
 			positions[i] += dir * speed * dt
-		elif time > f.reaction:
+		elif time > f.reaction and chasers.has(i):
 			# Run the projected route; once that moment has passed, chase the ball.
 			var goal := _targets[i] if time < _target_times[i] else Vector3(ball.x, 0.0, ball.z)
 			positions[i] = positions[i].move_toward(goal, f.speed * dt)
+		elif time > f.reaction:
+			# Not his ball: a few ready steps toward the play, then hold.
+			var ready := f.start.move_toward(Vector3(ball.x, 0.0, ball.z), READY_STEPS)
+			positions[i] = positions[i].move_toward(ready, f.speed * 0.5 * dt)
 	if not airborne:
 		_auto_switch(ball)
 	if ball.y > tuning.catch_max_height:
