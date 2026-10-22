@@ -34,6 +34,13 @@ const SEAT_FRONT := 0.42
 const SEAT_PAN := 0.42
 const SEAT_BACK := 0.72
 const SEAT_TOP := 0.85
+## The dugouts: centered this far round from center field on each side
+## (first-base side home, third-base side visitors), DUGOUT_WIDTH m wide,
+## sunk into the front of the stands, whose first rows lift to
+## DUGOUT_ROOF m over them.
+const DUGOUT_ANGLE := 80.0
+const DUGOUT_WIDTH := 18.0
+const DUGOUT_ROOF := 2.9
 const FIELD_CENTER := Vector3(0.0, 0.0, -45.0)
 const WATER := Color(0.06, 0.22, 0.36)
 ## How far out the bay reaches (meters from home).
@@ -117,24 +124,16 @@ func _process(delta: float) -> void:
 func profile(angle: float) -> Vector3:
 	angle = wrapf(angle, -180.0, 180.0)
 	var a := absf(angle)
-	var inner := 0.0
-	if a <= 45.0:
-		inner = FieldLayout.fence_distance(angle, tuning) + 5.0
-	else:
-		# Start from this side's own corner, then close in behind home.
-		var corner := FieldLayout.fence_distance(signf(angle) * 45.0, tuning) + 5.0
-		for i in range(1, FOUL_EDGE.size()):
-			if a <= FOUL_EDGE[i][0]:
-				var t: float = (a - FOUL_EDGE[i - 1][0]) / (FOUL_EDGE[i][0] - FOUL_EDGE[i - 1][0])
-				var start: float = corner if i == 1 else FOUL_EDGE[i - 1][1]
-				inner = lerpf(start, FOUL_EDGE[i][1], t)
-				break
+	var inner := FieldLayout.fence_distance(angle, tuning) + 5.0 if a <= 45.0 else profile_inner(angle)
 	var foul := smoothstep(40.0, 60.0, a)
 	var first := lerpf(FieldLayout.fence_height(clampf(angle, -45.0, 45.0), tuning) + 0.6, 1.3, foul)
 	var outfield := float(def.outfield_rows)
 	if def.outfield_open > 0.0:
 		outfield *= smoothstep(def.outfield_open, def.outfield_open + 10.0, a)
 	var rows := roundf(lerpf(outfield, float(def.foul_rows), foul))
+	# Over the dugouts the stands start higher, easing in at the ends.
+	var dug := 1.0 - smoothstep(dugout_half_angle(), dugout_half_angle() + 4.0, absf(a - DUGOUT_ANGLE))
+	first = maxf(first, lerpf(first, DUGOUT_ROOF, dug))
 	if is_water(angle):
 		rows = minf(rows, 5.0)  # a low wall of seats along the water
 	return Vector3(inner, first, rows)
@@ -294,7 +293,9 @@ func _build_bowl() -> void:
 				face = eye
 			elif k > 0 and is_deck_front(k):
 				face = def.accent_color.lerp(def.structure_color, 0.25)
-			_quad(st, point(a, ra, below_a), point(b, rb, below_b), point(b, rb, hb), point(a, ra, ha), face)
+			# The front wall opens onto the dugouts.
+			if k > 0 or absf(absf(mid) - DUGOUT_ANGLE) > dugout_half_angle():
+				_quad(st, point(a, ra, below_a), point(b, rb, below_b), point(b, rb, hb), point(a, ra, ha), face)
 			# The tread is concrete; the seats are a row of chairs on it (a
 			# pan and a back), one per step of the sweep, a shade apart so
 			# they read as single seats. Fans sit just in front of them.
@@ -454,7 +455,8 @@ func _build_crowd(home: TeamDef, away: TeamDef) -> void:
 ## away and neutral colors at the park's fan shares, all cheering together
 ## with the main crowd. Used by the bowl and by modules that put fans on
 ## balconies and terraces.
-func add_fans(seats: Array[Vector3], node_name: String = "Fans") -> void:
+## With `club`, they are its players instead (its jerseys, sitting tight).
+func add_fans(seats: Array[Vector3], node_name: String = "Fans", club: TeamDef = null) -> void:
 	if seats.is_empty() or _home == null:
 		return
 	var home := _home
@@ -483,8 +485,12 @@ func add_fans(seats: Array[Vector3], node_name: String = "Fans") -> void:
 			shirt = away.primary_color if rng.randf() < 0.7 else away.secondary_color
 		else:
 			shirt = neutral[rng.randi_range(0, neutral.size() - 1)]
-		mm.set_instance_color(i, shirt.lightened(rng.randf_range(-0.1, 0.1)))
-		mm.set_instance_custom_data(i, Color(rng.randf(), rng.randf(), rng.randf(), rng.randf()))
+		var temper := rng.randf()
+		if club != null:
+			shirt = club.primary_color
+			temper = rng.randf_range(0.3, 0.6)
+		mm.set_instance_color(i, shirt.lightened(rng.randf_range(-0.1, 0.1)) if club == null else shirt)
+		mm.set_instance_custom_data(i, Color(rng.randf(), rng.randf(), temper, rng.randf()))
 	var mmi := MultiMeshInstance3D.new()
 	mmi.name = unique_name(node_name)
 	mmi.multimesh = mm
@@ -508,40 +514,90 @@ func _build_batters_eye() -> void:
 	eye.name = "BattersEye"
 
 
+## Half the dugout's opening in the stands' front wall, in degrees.
+func dugout_half_angle() -> float:
+	return rad_to_deg(asin(DUGOUT_WIDTH * 0.5 / profile_inner(DUGOUT_ANGLE)))
+
+
+## The foul stands' inner edge at a spray angle (past the foul poles):
+## from this side's own corner, closing in behind home.
+func profile_inner(angle: float) -> float:
+	var a := absf(wrapf(angle, -180.0, 180.0))
+	var corner := FieldLayout.fence_distance(signf(angle) * 45.0, tuning) + 5.0
+	for i in range(1, FOUL_EDGE.size()):
+		if a <= FOUL_EDGE[i][0]:
+			var t: float = (a - FOUL_EDGE[i - 1][0]) / (FOUL_EDGE[i][0] - FOUL_EDGE[i - 1][0])
+			var start: float = corner if i == 1 else FOUL_EDGE[i - 1][1]
+			return lerpf(start, FOUL_EDGE[i][1], t)
+	return FOUL_EDGE[-1][1]
+
+
 func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
 	# Home on the first-base side, visitors on third (the reference sheets):
-	# the same dugout twice, the home one in its club's colors with its
-	# wordmark and emblem, the visitors' marked VISITORS.
+	# sunk into the front of the stands under the first rows, a step down
+	# from the field, the club's name on the roof's fascia, its emblem on
+	# the back wall and the players on the bench. The visitors' fascia
+	# reads VISITORS.
 	for side: float in [-1.0, 1.0]:
 		var is_home := side > 0.0
 		var club := home if is_home else away
-		var angle := 82.0 * side
-		var radius := profile(angle).x - 4.5
-		var center := point(angle, radius, 0.0)
+		# Flush with the stands' front edge, which slants here (out toward
+		# the foul pole): along the chord across the opening.
+		var h := dugout_half_angle()
+		var p1 := point((DUGOUT_ANGLE - h) * side, profile_inner((DUGOUT_ANGLE - h) * side), 0.0)
+		var p2 := point((DUGOUT_ANGLE + h) * side, profile_inner((DUGOUT_ANGLE + h) * side), 0.0)
+		var front := (p1 + p2) * 0.5
+		var along := (p2 - p1).normalized()
+		var out := along.cross(Vector3.UP)
+		if out.dot(front) < 0.0:
+			out = -out
 		var dugout := Node3D.new()
 		dugout.name = "Dugout_%s" % club.abbreviation
 		add_child(dugout)
-		dugout.look_at_from_position(center, Vector3.ZERO, Vector3.UP)
-		var back := box(Vector3(14.0, 2.4, 0.4), def.structure_color.darkened(0.3), dugout, &"facade")
-		back.position = Vector3(0, 1.0, 1.6)
-		var bench := box(Vector3(13.0, 0.5, 1.0), club.secondary_color, dugout)
-		bench.position = Vector3(0, 0.25, 1.0)
-		var roof := box(Vector3(14.6, 0.35, 3.6), home.primary_color if is_home else home.dark_color, dugout)
-		roof.position = Vector3(0, 2.3, 0.2)
-		var plaque := box(Vector3(14.6, 0.9, 0.1), home.dark_color, dugout)
-		plaque.position = Vector3(0, 2.3, -1.98)
-		var glow_strip := box(Vector3(14.0, 0.08, 0.08), Color.WHITE, dugout)
-		glow_strip.position = Vector3(0, 2.05, -1.6)
-		glow_strip.material_override = glow(Color(1.0, 0.92, 0.75), 2.0)
-		var rail := box(Vector3(14.6, 0.12, 0.12), def.accent_color, dugout)
-		rail.position = Vector3(0, 1.1, -1.4)
-		var sign := label(home.team_name.to_upper() if is_home else "VISITORS", 64, home.highlight_color, dugout)
-		sign.position = Vector3(0, 2.3, -2.05)
+		# -Z faces the field; +Z runs back under the stands.
+		dugout.look_at_from_position(front, front - out, Vector3.UP)
+		var w := p1.distance_to(p2)
+		var inside := def.structure_color.darkened(0.55)
+		var floor_y := -0.6
+		var floor_slab := box(Vector3(w, 0.1, 4.2), inside.darkened(0.3), dugout, &"concrete")
+		floor_slab.position = Vector3(0, floor_y - 0.05, 1.5)
+		var back := box(Vector3(w, DUGOUT_ROOF - floor_y, 0.3), inside, dugout, &"facade")
+		back.position = Vector3(0, (DUGOUT_ROOF + floor_y) * 0.5, 3.6)
+		var ceiling := box(Vector3(w + 0.6, 0.3, 4.6), inside.darkened(0.3), dugout)
+		ceiling.position = Vector3(0, DUGOUT_ROOF - 0.15, 1.4)
+		for end: float in [-1.0, 1.0]:
+			var wall := box(Vector3(0.4, DUGOUT_ROOF - floor_y, 5.4), def.structure_color.darkened(0.2), dugout, &"facade")
+			wall.position = Vector3(end * (w * 0.5 + 0.2), (DUGOUT_ROOF + floor_y) * 0.5, 1.1)
+		# The lip at field level and the padded rail the players lean on.
+		var lip := box(Vector3(w, -floor_y, 0.3), inside, dugout)
+		lip.position = Vector3(0, floor_y * 0.5, -0.15)
+		var rail := box(Vector3(w, 0.16, 0.16), def.accent_color, dugout)
+		rail.position = Vector3(0, 1.05, -0.2)
+		for k in 7:
+			var post := box(Vector3(0.1, 1.05, 0.1), def.accent_color.darkened(0.3), dugout)
+			post.position = Vector3(-w * 0.5 + 0.5 + k * (w - 1.0) / 6.0, 0.52, -0.2)
+		var fascia := box(Vector3(w + 1.0, 0.8, 0.3), home.primary_color if is_home else home.dark_color, dugout)
+		fascia.position = Vector3(0, DUGOUT_ROOF - 0.3, -0.35)
+		var sign := label(home.team_name.to_upper() if is_home else "VISITORS", 84, home.highlight_color, dugout)
+		sign.position = Vector3(0, DUGOUT_ROOF - 0.3, -0.52)
 		sign.rotation.y = PI
-		var mark := Emblem.build(club, 1.4, 0.4)
-		mark.position = Vector3(0, 1.4, 1.38)
+		var lamp := box(Vector3(w, 0.08, 0.08), Color.WHITE, dugout)
+		lamp.position = Vector3(0, DUGOUT_ROOF - 0.35, 0.2)
+		lamp.material_override = glow(Color(1.0, 0.92, 0.75), 2.0)
+		var bench := box(Vector3(w - 1.0, 0.45, 0.6), club.secondary_color.darkened(0.2), dugout)
+		bench.position = Vector3(0, floor_y + 0.22, 3.1)
+		var mark := Emblem.build(club, 1.8, 0.4)
+		mark.position = Vector3(0, 1.4, 3.44)
 		mark.rotation.y = PI
 		dugout.add_child(mark)
+		# The bench: the players, in their club's jerseys.
+		var spots: Array[Vector3] = []
+		var x := -w * 0.5 + 1.0
+		while x < w * 0.5 - 1.0:
+			if rng.randf() < 0.7:
+				spots.append(dugout.transform * Vector3(x, floor_y, 2.85))
+			x += 0.85
+		add_fans(spots, "Bench_%s" % club.abbreviation, club)
 
 
 func _build_backstop() -> void:
@@ -623,6 +679,11 @@ func _build_fascia(home: TeamDef) -> void:
 				var span := rad_to_deg((text.length() * glyph) / maxf(profile(a * side).x, 10.0))
 				if a + span > 172.0:
 					break
+				# The low wall opens onto the dugout: no words across it.
+				var gap := dugout_half_angle() + 1.0
+				if d == 0 and a < DUGOUT_ANGLE + gap and a + span > DUGOUT_ANGLE - gap:
+					a = DUGOUT_ANGLE + gap
+					continue
 				var placed := false
 				for i in text.length():
 					var angle := (a + span * (i + 0.5) / text.length()) * side
