@@ -8,7 +8,7 @@
 script = ExtResource("1_4sje6")
 id = &"firelight"
 display_name = "Firelight Park"
-points = PackedVector3Array(-45, 101, 3, -22, 117, 3, 0, 126, 3, 24, 119, 3, 45, 110, 3)
+points = PackedVector3Array(-45, 100.6, 4.27, -22.5, 117.2, 4.27, 0, 126.5, 4.27, 22.5, 120.7, 4.27, 45, 110.3, 4.27)
 air_drag_scale = 0.98
 
 [sub_resource type="Resource" id="Resource_e7rjo"]
@@ -127,8 +127,9 @@ params = {
 script = ExtResource("2_i6hdv")
 kind = &"wall_art"
 params = {
-"glow": 1.5,
-"motif": &"flame"
+"glow": 1.2,
+"layout": [[-42.0, &"rocks", 1.0, Color(0.2901961, 0.22745098, 0.20392157, 1)], [-23.0, &"volcano", 1.0], [11.0, &"volcano", 1.1], [29.0, &"volcano", 0.8], [42.0, &"rocks", 1.0, Color(0.2901961, 0.22745098, 0.20392157, 1)]],
+"numbers": Color(0.9411765, 0.5411765, 0.1882353, 1)
 }
 
 [resource]
@@ -141,12 +142,11 @@ seat_color = Color(0.47843137, 0.16470589, 0.101960786, 1)
 seat_color_alt = Color(0.36862746, 0.1254902, 0.078431375, 1)
 structure_color = Color(0.41568628, 0.3529412, 0.3137255, 1)
 accent_color = Color(1, 0.41568628, 0, 1)
-outfield_wall_color = Color(0.13333334, 0.105882354, 0.09411765, 1)
+outfield_wall_color = Color(0.14117648, 0.101960786, 0.08627451, 1)
 wall_style = &"rock"
-wall_stripe = Color(1, 0.41568628, 0, 1)
-wall_stripe_glow = 2.0
 foul_rows = 25
 outfield_rows = 12
+outfield_open = 32.0
 decks = 3
 away_fan_share = 0.2
 attendance = 0.9

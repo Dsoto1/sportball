@@ -8,7 +8,7 @@
 script = ExtResource("1_6mqf6")
 id = &"sakura_gate"
 display_name = "Sakura Gate Park"
-points = PackedVector3Array(-45, 97, 3, -22, 112, 3, 0, 122, 3, 22, 118, 3, 45, 109, 3)
+points = PackedVector3Array(-45, 96.9, 4.27, -22.5, 112.9, 4.27, 0, 121.9, 4.27, 22.5, 117.3, 4.27, 45, 109.1, 4.27)
 air_drag_scale = 1.02
 
 [sub_resource type="Resource" id="Resource_s74iq"]
@@ -164,8 +164,9 @@ params = {
 script = ExtResource("2_lnk5g")
 kind = &"wall_art"
 params = {
-"every": 7.0,
-"motif": &"blossom"
+"glow": 0.0,
+"layout": [[-42.0, &"blossom", 1.0], [-30.0, &"blossom", 1.0], [-22.0, &"blossom", 0.8], [-11.0, &"torii", 1.0], [11.0, &"blossom", 1.0], [21.0, &"blossom", 0.8], [30.0, &"blossom", 1.0], [42.0, &"blossom", 1.0]],
+"numbers": Color(0.9098039, 0.7607843, 0.3529412, 1)
 }
 
 [sub_resource type="Resource" id="Resource_xjidy"]
@@ -208,11 +209,11 @@ seat_color = Color(0.5411765, 0.10980392, 0.16470589, 1)
 seat_color_alt = Color(0.43137255, 0.08627451, 0.13333334, 1)
 structure_color = Color(0.2901961, 0.17254902, 0.13333334, 1)
 accent_color = Color(0.83137256, 0.627451, 0.09019608, 1)
-outfield_wall_color = Color(0.13333334, 0.08235294, 0.08627451, 1)
-wall_style = &"wood"
-wall_stripe = Color(0.83137256, 0.627451, 0.09019608, 1)
+outfield_wall_color = Color(0.10980392, 0.07058824, 0.078431375, 1)
+wall_stripe = Color(0.78431374, 0.0627451, 0.18039216, 1)
 foul_rows = 24
 outfield_rows = 12
+outfield_open = 32.0
 decks = 3
 away_fan_share = 0.2
 attendance = 0.9

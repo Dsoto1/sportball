@@ -8,7 +8,7 @@
 script = ExtResource("1_8vd4l")
 id = &"warehouse_row"
 display_name = "Warehouse Row"
-points = PackedVector3Array(-45, 101, 2.4, -25, 111, 2.4, -8, 123, 2.4, 0, 122, 2.4, 14, 115, 2.4, 20, 112, 2.4, 21.5, 110, 7.6, 45, 97, 7.6)
+points = PackedVector3Array(-45, 94.5, 4.27, -22.5, 115.9, 4.27, 0, 128, 4.27, 22.5, 119, 4.27, 45, 103, 4.27)
 
 [sub_resource type="Resource" id="Resource_llfex"]
 script = ExtResource("2_3mioo")
@@ -176,8 +176,9 @@ params = {
 script = ExtResource("2_3mioo")
 kind = &"wall_art"
 params = {
-"every": 10.0,
-"motif": &"crossed"
+"glow": 0.0,
+"layout": [[-42.0, &"club", 1.2], [-26.0, &"sign", 1.25, "IRONBRIDGE FREIGHT CO"], [-14.0, &"sign", 1.1, "RIVERTON RAILWAY", Color(0.2901961, 0.5411765, 0.5882353, 1)], [9.0, &"clock", 1.25], [20.0, &"freight", 1.35], [31.0, &"sign", 1.25, "ALL ABOARD!", Color(0.9098039, 0.7607843, 0.3529412, 1)], [42.0, &"crossed", 1.2]],
+"numbers": Color(0.9098039, 0.72156864, 0.2901961, 1)
 }
 
 [sub_resource type="Resource" id="Resource_skvdn"]
@@ -199,10 +200,10 @@ seat_color = Color(0.5411765, 0.16470589, 0.16470589, 1)
 seat_color_alt = Color(0.43137255, 0.12941177, 0.12941177, 1)
 structure_color = Color(0.43137255, 0.22745098, 0.17254902, 1)
 accent_color = Color(0.83137256, 0.627451, 0.09019608, 1)
-outfield_wall_color = Color(0.12156863, 0.22745098, 0.23529412, 1)
-wall_stripe = Color(0.69803923, 0.13333334, 0.16862746, 1)
+outfield_wall_color = Color(0.12156863, 0.23921569, 0.2901961, 1)
 foul_rows = 24
 outfield_rows = 12
+outfield_open = 30.0
 decks = 2
 home_fan_share = 0.5
 away_fan_share = 0.3

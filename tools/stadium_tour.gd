@@ -3,7 +3,10 @@ extends SceneTree
 ## aerial, center field, behind home, the third-base stands), dressing the
 ## park for its own club when a park_id is given, and saves a screenshot of
 ## each. Needs a display:
-##   godot --path . --resolution 1280x720 -s res://tools/stadium_tour.gd -- /tmp/shots [park_id]
+##   godot --path . --resolution 1280x720 -s res://tools/stadium_tour.gd -- /tmp/shots [park_id] [orbit]
+## "orbit" flies a drone circle instead: eight shots from high over the
+## stands all the way round, looking down across the bowl, to check the
+## layout from every side.
 var _frames := 0
 var _out := ""
 var _view: MatchView
@@ -17,10 +20,25 @@ const SHOTS := [
 	[Vector3(0, 9, 8), Vector3(0, 5, -60)],
 	[Vector3(30, 6, -30), Vector3(-80, 10, 40)],
 ]
+var _shots: Array = SHOTS
+
+
 func _initialize() -> void:
 	_out = OS.get_cmdline_user_args()[0]
 	if OS.get_cmdline_user_args().size() > 1:
 		_park_id = StringName(OS.get_cmdline_user_args()[1])
+	if OS.get_cmdline_user_args().size() > 2 and OS.get_cmdline_user_args()[2].begins_with("cam:"):
+		# One shot from a given camera: cam:x,y,z,tx,ty,tz
+		var v := OS.get_cmdline_user_args()[2].substr(4).split_floats(",")
+		_shots = [[Vector3(v[0], v[1], v[2]), Vector3(v[3], v[4], v[5])]]
+	elif OS.get_cmdline_user_args().size() > 2 and OS.get_cmdline_user_args()[2] == "orbit":
+		# The drone: radius 175 m round the middle of the park, 75 m up,
+		# starting behind home and going clockwise seen from above.
+		var center := Vector3(0, 0, -55)
+		_shots = []
+		for k in 8:
+			var a := PI * 0.5 + TAU * k / 8.0
+			_shots.append([center + Vector3(cos(a) * 175.0, 75.0, sin(a) * 175.0), center + Vector3(0, -10, 0)])
 	root.add_child(load("res://app/main.tscn").instantiate())
 func _process(_d: float) -> bool:
 	_frames += 1
@@ -43,7 +61,7 @@ func _process(_d: float) -> bool:
 		return false
 	if _frames < 30:
 		return false
-	if _i >= SHOTS.size():
+	if _i >= _shots.size():
 		return true
 	var cam := _view.get_node("Camera3D") if _view.has_node("Camera3D") else null
 	for c in _view.get_children():
@@ -51,9 +69,9 @@ func _process(_d: float) -> bool:
 			cam = c
 	cam.set_process(false)
 	_view.set_process(false)
-	cam.position = SHOTS[_i][0]
-	cam.look_at(SHOTS[_i][1])
-	cam.fov = 55.0
+	cam.position = _shots[_i][0]
+	cam.look_at(_shots[_i][1])
+	cam.fov = 55.0 if _shots == SHOTS else 62.0
 	if _frames % 8 == 0:
 		root.get_texture().get_image().save_png(_out.path_join("%s_%d.png" % [_park_id if _park_id != &"" else &"tour", _i]))
 		_i += 1

@@ -8,7 +8,7 @@
 script = ExtResource("1_0dxv1")
 id = &"the_kiln"
 display_name = "The Kiln"
-points = PackedVector3Array(-45, 105, 4.3, -25, 119, 4.3, 0, 127, 4.3, 25, 119, 4.3, 45, 106, 4.3)
+points = PackedVector3Array(-45, 102.1, 4.27, -22.5, 114.8, 4.27, 0, 121.9, 4.27, 22.5, 113.1, 4.27, 45, 97.5, 4.27)
 air_drag_scale = 0.82
 
 [sub_resource type="Resource" id="Resource_tqy5q"]
@@ -130,7 +130,9 @@ params = {
 script = ExtResource("2_6juw2")
 kind = &"wall_art"
 params = {
-"motif": &"star"
+"glow": 0.0,
+"layout": [[-42.0, &"club", 1.0], [-21.0, &"mesa", 1.0, Color(0.78431374, 0.33333334, 0.12156863, 1)], [21.0, &"mesa", 1.0, Color(0.78431374, 0.33333334, 0.12156863, 1)], [42.0, &"club", 1.0]],
+"numbers": Color(0.9411765, 0.5411765, 0.1882353, 1)
 }
 
 [resource]
@@ -143,10 +145,10 @@ seat_color = Color(0.6509804, 0.3529412, 0.19607843, 1)
 seat_color_alt = Color(0.5411765, 0.28235295, 0.14901961, 1)
 structure_color = Color(0.8509804, 0.7254902, 0.5411765, 1)
 accent_color = Color(0.18039216, 0.76862746, 0.7137255, 1)
-outfield_wall_color = Color(0.18431373, 0.22352941, 0.21176471, 1)
-wall_style = &"rock"
+outfield_wall_color = Color(0.16470589, 0.13333334, 0.1254902, 1)
 foul_rows = 24
 outfield_rows = 18
+outfield_open = 30.0
 decks = 2
 home_fan_share = 0.45
 away_fan_share = 0.3

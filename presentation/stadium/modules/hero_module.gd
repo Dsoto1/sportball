@@ -28,18 +28,12 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	_ground(stadium, piece, holder, box.size * node.scale)
 
 
-## Settles the landmark into the park: a plinth in the park's stone under
-## its footprint, rocks and planting around its foot (the "foot" tree kind,
+## Settles the landmark into the park: rocks and planting around its foot (the "foot" tree kind,
 ## "" for none), so it rises out of the scene rather than floating on it.
 func _ground(stadium: Stadium, piece: StadiumPiece, holder: Node3D, size: Vector3) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(String(stadium.def.id) + str(piece.angle))
 	var stone := stadium.def.facade_tint().darkened(0.2)
-	var plinth_h := 3.0
-	var plinth := stadium.box(Vector3(size.x * 1.08, plinth_h, size.z * 1.08), stone, holder, stadium.def.facade_surface)
-	plinth.position.y = -plinth_h * 0.5 + 0.4
-	var cap := stadium.box(Vector3(size.x * 1.12, 0.6, size.z * 1.12), stone.lightened(0.15), holder, stadium.def.facade_surface)
-	cap.position.y = 0.4
 	var kind := StringName(piece.param("foot"))
 	if kind == &"":
 		return

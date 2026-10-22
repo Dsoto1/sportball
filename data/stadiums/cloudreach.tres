@@ -8,7 +8,7 @@
 script = ExtResource("1_pvb0w")
 id = &"cloudreach"
 display_name = "Cloudreach Stadium"
-points = PackedVector3Array(-45, 102, 3, -22, 116, 3, 0, 125, 3, 22, 118, 3, 45, 108, 3)
+points = PackedVector3Array(-45, 102.1, 4.27, -22.5, 116.7, 4.27, 0, 125, 4.27, 22.5, 118.9, 4.27, 45, 108.2, 4.27)
 air_drag_scale = 0.9
 
 [sub_resource type="Resource" id="Resource_l6vnc"]
@@ -120,7 +120,9 @@ angle = -42.0
 script = ExtResource("2_m0rp2")
 kind = &"wall_art"
 params = {
-"motif": &"wings"
+"glow": 0.0,
+"layout": [[-42.0, &"rocks", 1.0], [-24.0, &"rocks", 1.1], [-10.0, &"club", 0.8], [10.0, &"club", 0.8], [24.0, &"rocks", 1.1], [42.0, &"rocks", 1.0]],
+"numbers": Color(0.9098039, 0.7607843, 0.3529412, 1)
 }
 
 [sub_resource type="Resource" id="Resource_eajvv"]
@@ -143,10 +145,10 @@ seat_color = Color(0.12156863, 0.30980393, 0.56078434, 1)
 seat_color_alt = Color(0.09411765, 0.24705882, 0.45490196, 1)
 structure_color = Color(0.65882355, 0.5137255, 0.24313726, 1)
 accent_color = Color(0.83137256, 0.627451, 0.09019608, 1)
-outfield_wall_color = Color(0.05882353, 0.16470589, 0.3019608, 1)
-wall_stripe = Color(0.83137256, 0.627451, 0.09019608, 1)
+outfield_wall_color = Color(0.09019608, 0.22745098, 0.43137255, 1)
 foul_rows = 24
 outfield_rows = 10
+outfield_open = 32.0
 decks = 3
 home_fan_share = 0.55
 away_fan_share = 0.25

@@ -8,7 +8,7 @@
 script = ExtResource("1_q6lra")
 id = &"amber_gate"
 display_name = "Amber Gate Park"
-points = PackedVector3Array(-45, 94, 3, -22, 113, 3, 0, 130, 3, 24, 120, 3, 45, 107, 3)
+points = PackedVector3Array(-45, 93.9, 4.27, -22.5, 116.7, 4.27, 0, 129.5, 4.27, 22.5, 121.5, 4.27, 45, 107.3, 4.27)
 air_drag_scale = 0.9
 
 [sub_resource type="Resource" id="Resource_4oyrr"]
@@ -174,7 +174,9 @@ params = {
 script = ExtResource("2_2pjeu")
 kind = &"wall_art"
 params = {
-"motif": &"star"
+"glow": 0.0,
+"layout": [[-42.0, &"rocks", 1.0, Color(0.7882353, 0.6039216, 0.38431373, 1)], [-24.0, &"club", 1.0], [25.0, &"club", 1.0], [42.0, &"club", 1.0]],
+"numbers": Color(0.9411765, 0.8784314, 0.6901961, 1)
 }
 
 [sub_resource type="Resource" id="Resource_eepsg"]
@@ -209,11 +211,11 @@ seat_color = Color(0.54509807, 0.11764706, 0.1764706, 1)
 seat_color_alt = Color(0.4392157, 0.09411765, 0.14117648, 1)
 structure_color = Color(0.72156864, 0.5411765, 0.34509805, 1)
 accent_color = Color(0.83137256, 0.627451, 0.09019608, 1)
-outfield_wall_color = Color(0.36862746, 0.101960786, 0.14117648, 1)
+outfield_wall_color = Color(0.17254902, 0.16470589, 0.22745098, 1)
 wall_style = &"stone"
-wall_stripe = Color(0.83137256, 0.627451, 0.09019608, 1)
 foul_rows = 25
 outfield_rows = 12
+outfield_open = 32.0
 decks = 3
 away_fan_share = 0.2
 attendance = 0.88

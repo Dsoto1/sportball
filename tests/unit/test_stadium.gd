@@ -86,12 +86,18 @@ func test_every_park_builds_with_its_own_shape() -> void:
 	check_eq(seen.size(), content().parks.size(), "every park has its own layout")
 
 
-func test_signature_walls() -> void:
-	var ledger := content().park(&"ledger_street").field_shape
-	check(ledger.height_at(-30) > 10.0 and ledger.distance_at(-45) < 96.0, "the Leviathan is short and tall in left")
-	check(ledger.height_at(40) < 2.0, "and the right-field wall is knee-high")
-	var foundry := content().park(&"foundry_field").field_shape
-	check(foundry.height_at(30) > 10.0 and foundry.distance_at(45) < 92.0, "the Boilerplate in right")
+func test_walls_follow_the_sheets() -> void:
+	# The sheets: a continuous wall, the same standard height everywhere,
+	# poles and center at the distances painted on each park's wall.
+	for park in content().parks:
+		for angle in range(-45, 46, 5):
+			check(absf(park.field_shape.height_at(angle) - 4.27) < 0.01, "%s: the standard 14 ft wall at %d°" % [park.id, angle])
+	var sheet := {&"warehouse_row": [310, 420, 338], &"the_vault": [310, 420, 340], &"amber_gate": [308, 425, 352], &"sakura_gate": [318, 400, 358], &"the_horseshoe": [337, 400, 323]}
+	for id: StringName in sheet:
+		var shape := content().park(id).field_shape
+		var ft: Array = sheet[id]
+		for k in 3:
+			check_eq(roundi(shape.distance_at([-45.0, 0.0, 45.0][k]) * 3.2808), ft[k], "%s wall distance %d" % [id, k])
 	check(content().park(&"the_kiln").field_shape.air_drag_scale < 0.9, "thin air at the Kiln")
 
 

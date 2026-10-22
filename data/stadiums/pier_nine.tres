@@ -8,7 +8,7 @@
 script = ExtResource("1_5qd2e")
 id = &"pier_nine"
 display_name = "Pier 9 Ballyard"
-points = PackedVector3Array(-45, 101, 2.4, -20, 115, 2.4, 0, 123, 2.4, 20, 110, 2.4, 32, 101, 2.4, 45, 94, 2.4)
+points = PackedVector3Array(-45, 102.4, 4.27, -22.5, 114.9, 4.27, 0, 121.9, 4.27, 22.5, 112.9, 4.27, 45, 96.9, 4.27)
 air_drag_scale = 1.03
 
 [sub_resource type="Resource" id="Resource_4y8qj"]
@@ -152,8 +152,9 @@ params = {
 script = ExtResource("2_84kiu")
 kind = &"wall_art"
 params = {
-"every": 7.0,
-"motif": &"waves"
+"glow": 0.0,
+"layout": [[-42.0, &"club", 1.0], [-21.0, &"waves", 1.1], [21.0, &"waves", 1.1], [42.0, &"club", 1.0]],
+"numbers": Color(0.9490196, 0.8235294, 0.47843137, 1)
 }
 
 [resource]
@@ -166,10 +167,10 @@ seat_color = Color(0.11372549, 0.23137255, 0.36078432, 1)
 seat_color_alt = Color(0.08235294, 0.17254902, 0.27058825, 1)
 structure_color = Color(0.7882353, 0.76862746, 0.7137255, 1)
 accent_color = Color(1, 0.41960785, 0.2901961, 1)
-outfield_wall_color = Color(0.07450981, 0.1882353, 0.2784314, 1)
-wall_style = &"wood"
+outfield_wall_color = Color(0.09019608, 0.21568628, 0.36862746, 1)
 foul_rows = 24
 outfield_rows = 8
+outfield_open = 28.0
 decks = 2
 home_fan_share = 0.45
 away_fan_share = 0.35

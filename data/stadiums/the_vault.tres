@@ -8,7 +8,7 @@
 script = ExtResource("1_ts6r8")
 id = &"the_vault"
 display_name = "The Vault"
-points = PackedVector3Array(-45, 100, 3, -22, 114, 3, 0, 122, 3, 22, 114, 3, 45, 100, 3)
+points = PackedVector3Array(-45, 94.5, 4.27, -22.5, 115.9, 4.27, 0, 128, 4.27, 22.5, 119.2, 4.27, 45, 103.6, 4.27)
 air_drag_scale = 0.97
 surface_speed = 1.3
 
@@ -146,9 +146,9 @@ params = {
 script = ExtResource("2_b78mq")
 kind = &"wall_art"
 params = {
-"every": 10.0,
-"glow": 1.5,
-"motif": &"crossed"
+"glow": 0.0,
+"layout": [[-42.0, &"vault", 1.0], [-27.0, &"crossed", 0.7], [-7.0, &"banner_x", 1.0], [7.0, &"banner_x", 1.0], [27.0, &"crossed", 0.7], [42.0, &"club", 1.0]],
+"numbers": Color(0.9098039, 0.7607843, 0.3529412, 1)
 }
 
 [sub_resource type="Resource" id="Resource_lscrl"]
@@ -170,11 +170,10 @@ seat_color = Color(0.47843137, 0.101960786, 0.14901961, 1)
 seat_color_alt = Color(0.36862746, 0.078431375, 0.11372549, 1)
 structure_color = Color(0.2901961, 0.30980393, 0.3529412, 1)
 accent_color = Color(1, 0.1764706, 0.1764706, 1)
-outfield_wall_color = Color(0.101960786, 0.13333334, 0.1882353, 1)
+outfield_wall_color = Color(0.10980392, 0.13333334, 0.16862746, 1)
 wall_style = &"iron"
-wall_stripe = Color(1, 0.1764706, 0.1764706, 1)
-wall_stripe_glow = 2.0
 outfield_rows = 14
+outfield_open = 30.0
 decks = 3
 home_fan_share = 0.5
 away_fan_share = 0.25

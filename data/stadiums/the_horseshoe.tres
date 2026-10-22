@@ -8,7 +8,7 @@
 script = ExtResource("1_dd832")
 id = &"the_horseshoe"
 display_name = "The Horseshoe"
-points = PackedVector3Array(-45, 85, 4.9, -36, 97, 4.9, -26, 120, 3, -12, 139, 3, 0, 147, 3, 12, 139, 3, 26, 119, 3, 36, 94, 3.4, 45, 81, 3.4)
+points = PackedVector3Array(-45, 102.7, 4.27, -22.5, 115, 4.27, 0, 121.9, 4.27, 22.5, 113.5, 4.27, 45, 98.5, 4.27)
 
 [sub_resource type="Resource" id="Resource_tgobb"]
 script = ExtResource("2_olas1")
@@ -124,9 +124,9 @@ params = {
 script = ExtResource("2_olas1")
 kind = &"wall_art"
 params = {
-"every": 10.0,
-"glow": 0.6,
-"motif": &"star"
+"glow": 0.0,
+"layout": [[-42.0, &"lamp", 1.0], [-32.0, &"lamp", 1.0], [-21.0, &"club", 1.0], [21.0, &"club", 1.0], [32.0, &"lamp", 1.0], [42.0, &"lamp", 1.0]],
+"numbers": Color(0.9098039, 0.7607843, 0.3529412, 1)
 }
 
 [sub_resource type="Resource" id="Resource_tefms"]
@@ -158,9 +158,7 @@ seat_color = Color(0.08627451, 0.16078432, 0.2901961, 1)
 seat_color_alt = Color(0.0627451, 0.1254902, 0.22745098, 1)
 structure_color = Color(0.47843137, 0.3529412, 0.26666668, 1)
 accent_color = Color(0.9411765, 0.7529412, 0.29411766, 1)
-outfield_wall_color = Color(0.05882353, 0.14117648, 0.2509804, 1)
-wall_stripe = Color(0.9411765, 0.7529412, 0.29411766, 1)
-wall_stripe_glow = 0.8
+outfield_wall_color = Color(0.078431375, 0.14509805, 0.2901961, 1)
 foul_rows = 28
 outfield_rows = 20
 decks = 2

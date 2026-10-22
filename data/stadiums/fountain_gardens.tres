@@ -8,7 +8,7 @@
 script = ExtResource("1_4f6d0")
 id = &"fountain_gardens"
 display_name = "Fountain Gardens"
-points = PackedVector3Array(-45, 101, 3.7, -22, 118, 3.7, 0, 125, 3.7, 22, 118, 3.7, 45, 101, 3.7)
+points = PackedVector3Array(-45, 100, 4.27, -22.5, 114, 4.27, 0, 121.9, 4.27, 22.5, 112.9, 4.27, 45, 96.9, 4.27)
 
 [sub_resource type="Resource" id="Resource_k8u6i"]
 script = ExtResource("2_wib25")
@@ -159,8 +159,9 @@ params = {
 script = ExtResource("2_wib25")
 kind = &"wall_art"
 params = {
-"every": 7.0,
-"motif": &"blossom"
+"glow": 0.0,
+"layout": [[-42.0, &"blossom", 1.0], [-27.0, &"club", 1.0], [-13.0, &"fountain", 1.0], [-7.0, &"blossom", 0.7], [7.0, &"blossom", 0.7], [13.0, &"fountain", 1.0], [27.0, &"club", 1.0], [42.0, &"blossom", 1.0]],
+"numbers": Color(0.9098039, 0.7607843, 0.3529412, 1)
 }
 
 [sub_resource type="Resource" id="Resource_yye1n"]
@@ -208,11 +209,10 @@ seat_color = Color(0.11372549, 0.2901961, 0.20784314, 1)
 seat_color_alt = Color(0.08627451, 0.23529412, 0.16862746, 1)
 structure_color = Color(0.9098039, 0.8862745, 0.8156863, 1)
 accent_color = Color(0.83137256, 0.6862745, 0.21568628, 1)
-outfield_wall_color = Color(0.078431375, 0.3529412, 0.23137255, 1)
-wall_style = &"marble"
-wall_stripe = Color(0.83137256, 0.6862745, 0.21568628, 1)
+outfield_wall_color = Color(0.09411765, 0.2627451, 0.18431373, 1)
 foul_rows = 24
 outfield_rows = 5
+outfield_open = 32.0
 decks = 2
 home_fan_share = 0.5
 away_fan_share = 0.25

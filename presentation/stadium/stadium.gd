@@ -108,7 +108,10 @@ func profile(angle: float) -> Vector3:
 				break
 	var foul := smoothstep(40.0, 60.0, a)
 	var first := lerpf(FieldLayout.fence_height(clampf(angle, -45.0, 45.0), tuning) + 0.6, 1.3, foul)
-	var rows := roundf(lerpf(float(def.outfield_rows), float(def.foul_rows), foul))
+	var outfield := float(def.outfield_rows)
+	if def.outfield_open > 0.0:
+		outfield *= smoothstep(def.outfield_open, def.outfield_open + 10.0, a)
+	var rows := roundf(lerpf(outfield, float(def.foul_rows), foul))
 	if is_water(angle):
 		rows = minf(rows, 5.0)  # a low wall of seats along the water
 	return Vector3(inner, first, rows)
@@ -431,17 +434,31 @@ func _build_backstop() -> void:
 	add_child(mi)
 
 
-## The wall's dressing: distances in big numbers (left, center, right) and
-## the home club's emblem near each pole and in the alleys.
+## The wall's dressing: distances in big numbers (the foul-pole distances
+## near each pole, as on the sheets, and center field) and the home club's
+## emblem near each pole and in the alleys. A park whose wall art has a
+## sheet layout paints its own emblems, and may set the numbers' color.
 func _build_markers(home: TeamDef) -> void:
-	for angle: float in [-38.0, 0.0, 38.0]:
-		var d := FieldLayout.fence_distance(angle, tuning)
-		var h := FieldLayout.fence_height(angle, tuning)
-		var marker := label(str(roundi(d * 3.2808)), 200, def.accent_color)
+	var art := def.pieces_of(&"wall_art")
+	var laid_out := not art.is_empty() and not (art[0].param("layout") as Array).is_empty()
+	var color := def.accent_color
+	if not art.is_empty() and Color(art[0].param("numbers")).a > 0.0:
+		color = Color(art[0].param("numbers"))
+	for spot_angle: float in [-37.0, 0.0, 37.0]:
+		var at_pole := signf(spot_angle) * 45.0
+		var d := FieldLayout.fence_distance(at_pole, tuning)
+		var h := FieldLayout.fence_height(spot_angle, tuning)
+		var marker := label(str(roundi(d * 3.2808)), 200, color)
 		marker.pixel_size = 0.012 * clampf(h / 3.0, 0.5, 1.0)
-		var inward := wall_inward(angle)
-		var spot := point(angle, d, minf(h * 0.55, 2.2)) + inward * 0.4
+		marker.outline_size = 12
+		marker.outline_modulate = Color(0, 0, 0, 0.6)
+		var inward := wall_inward(spot_angle)
+		# Off the wall face by enough that the wall either side (which turns
+		# toward home at the center-field peak) never cuts into the digits.
+		var spot := point(spot_angle, FieldLayout.fence_distance(spot_angle, tuning), minf(h * 0.55, 2.2)) + inward * 0.75
 		marker.look_at_from_position(spot, spot - inward, Vector3.UP)
+	if laid_out:
+		return
 	for angle: float in [-43.0, -20.0, 20.0, 43.0]:
 		var h := FieldLayout.fence_height(angle, tuning)
 		if h < 1.2:

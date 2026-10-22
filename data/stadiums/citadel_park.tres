@@ -8,7 +8,7 @@
 script = ExtResource("1_2wl0p")
 id = &"citadel_park"
 display_name = "Citadel Park"
-points = PackedVector3Array(-45, 100, 3.4, -22, 115, 3.4, 0, 125, 3.4, 22, 118, 3.4, 45, 108, 3.4)
+points = PackedVector3Array(-45, 100, 4.27, -22.5, 116, 4.27, 0, 125, 4.27, 22.5, 118.9, 4.27, 45, 108.2, 4.27)
 air_drag_scale = 1.02
 
 [sub_resource type="Resource" id="Resource_r10jk"]
@@ -129,8 +129,9 @@ params = {
 script = ExtResource("2_j3t4y")
 kind = &"wall_art"
 params = {
-"every": 8.0,
-"motif": &"emblem"
+"glow": 0.0,
+"layout": [[-42.0, &"shield", 0.9, Color(0.6509804, 0.11764706, 0.1764706, 1)], [-32.0, &"shield", 0.9, Color(0.12156863, 0.28235295, 0.56078434, 1)], [-24.0, &"shield", 0.9, Color(0.6509804, 0.11764706, 0.1764706, 1)], [-15.0, &"shield", 0.9, Color(0.12156863, 0.28235295, 0.56078434, 1)], [-7.0, &"shield", 0.9, Color(0.6509804, 0.11764706, 0.1764706, 1)], [7.0, &"shield", 0.9, Color(0.12156863, 0.28235295, 0.56078434, 1)], [15.0, &"shield", 0.9, Color(0.6509804, 0.11764706, 0.1764706, 1)], [24.0, &"shield", 0.9, Color(0.12156863, 0.28235295, 0.56078434, 1)], [32.0, &"shield", 0.9, Color(0.6509804, 0.11764706, 0.1764706, 1)], [42.0, &"shield", 0.9, Color(0.12156863, 0.28235295, 0.56078434, 1)]],
+"numbers": Color(1, 1, 1, 1)
 }
 
 [resource]
@@ -145,8 +146,8 @@ structure_color = Color(0.43137255, 0.42352942, 0.44705883, 1)
 accent_color = Color(0.83137256, 0.6862745, 0.21568628, 1)
 outfield_wall_color = Color(0.105882354, 0.16470589, 0.30980393, 1)
 wall_style = &"stone"
-wall_stripe = Color(0.6509804, 0.11764706, 0.1764706, 1)
 outfield_rows = 12
+outfield_open = 30.0
 decks = 3
 away_fan_share = 0.2
 attendance = 0.9

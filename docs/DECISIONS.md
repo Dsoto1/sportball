@@ -1367,3 +1367,19 @@ Reason: Owner request for another detail pass against the sheets. The balance ch
   - Lantern rows at Ledger Street and the Vault, and urns at Cloudreach.
 - **Firelight:** the volcano now rises behind the left-field stands, as on the sheet, instead of hiding behind the fortress gate.
 - **Fan terraces** are now 4 rows deep at 95% density everywhere. Ledger Street's sits closer to its facade.
+
+## 2026-10-22 - Outfield Walls From the Sheets
+
+- **Why:** the owner pointed out that the walls decide how easy a home run is, and they must match each sheet. The Conductors' wall looked nothing like its sheet, and the Bankers' right-field wall was knee-high.
+- **Dimensions:** every sheet's "Outfield wall reference" strip gives the left-pole, center and right-pole distances, and its key points say "home runs go over the wall above the same height everywhere".
+  - Every park's `shape` is rebuilt from its sheet: those three distances, with the alleys interpolated.
+  - All walls are now one standard height, 14 ft (4.27 m), tall enough to carry the sheet art at the scale the sheets draw it.
+  - Gone: the old tricks (Ledger's 37 ft Leviathan and knee-high right field, Foundry's 34 ft Boilerplate, Warehouse Row's 25 ft right field, Reactor's center notch, the Horseshoe's 266 ft line). So are the wall-mounted line scores that only stood on the tall walls.
+  - Distance markers show each sheet's pole numbers near the poles and the center number in center.
+- **Art:** the wall-art module takes a sheet `layout`, left to right: `[angle, motif, scale, text or color]`.
+  - New motifs: club emblem, painted peaks, mesas, volcano and rocks, lamps, clock, signs with lettering, freight cars, vault door, crossed-key banners, torii, coral, fish, fountain and heraldic shields.
+  - Each park's wall color, number color and layout follow its strip. The Conductors' wall now carries the Ironbridge Freight Co and Riverton Railway signs, a clock, freight cars and "All Aboard!".
+- **Open outfield:** the sheets show no seats behind center field. The stands wrap from the infield to the poles, and the outfield is the park's backdrop. The new `outfield_open` setting (26-32° per park) fades the outfield bleachers out around center, so the sets and landmarks stand right behind the wall. The Horseshoe keeps its bleachers.
+- Heroes no longer stand on a stone plinth, which showed as a slab once the bleachers went.
+- A test checks the standard wall height and the sheet distances at the five parks with the most distinctive numbers.
+- The league balance is rerun after this, since every park's dimensions changed.

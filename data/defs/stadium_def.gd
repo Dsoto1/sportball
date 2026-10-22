@@ -32,6 +32,12 @@ extends Resource
 ## Rows of seats in the foul-territory stands and the outfield bleachers.
 @export var foul_rows: int = 26
 @export var outfield_rows: int = 16
+## Half the span of open outfield in degrees: no seats behind the wall
+## within this angle of center field, as on the sheets, where the stands
+## wrap from the infield round to the poles and the outfield is the
+## park's backdrop (architecture, gardens, water). 0 = bleachers pole to
+## pole.
+@export var outfield_open: float = 0.0
 ## Decks in the foul stands (1-3), each with a fascia band of wordmarks.
 @export_range(1, 3) var decks: int = 1
 ## Fans in home colors, away colors and anything else (shares sum to ~1).
