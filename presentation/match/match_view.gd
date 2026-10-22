@@ -12,9 +12,10 @@ const HOME_COLOR := Color(0.18, 0.42, 0.9)
 ## tracking: 27 in off the plate's inside edge and 28 in behind its front.
 const BATTER_SPOT := Vector3(-0.91, 0.0, 0.49)
 const CAMERA_SPOTS := {
-	# Telephoto from behind and right of the plate: batter on the left,
-	# pitcher and zone large and clear.
-	CameraMode.BAT: [Vector3(1.5, 3.4, 9.0), Vector3(0.0, 1.0, -9.0)],
+	# Low behind the plate, off the batter's back shoulder: he fills the left
+	# of the frame, the plate at the bottom, the zone and pitcher beyond.
+	# (The catcher steps out of this shot: he would stand between.)
+	CameraMode.BAT: [Vector3(0.75, 1.7, 4.4), Vector3(-0.45, 1.1, -18.0)],
 	# Over the pitcher's throwing shoulder, close and long-lens: he fills the
 	# lower left, the plate, batter and catcher sit right of center.
 	CameraMode.PITCH: [Vector3(-0.9, 2.35, -25.8), Vector3(0.35, 1.0, 0.0)],
@@ -178,7 +179,7 @@ func setup(p_tuning: BaseballTuning) -> void:
 	_build_debug()
 
 
-const CAMERA_FOV := {CameraMode.BAT: 34.0, CameraMode.PITCH: 23.0, CameraMode.FIELD: 55.0, CameraMode.FLIGHT: 50.0}
+const CAMERA_FOV := {CameraMode.BAT: 42.0, CameraMode.PITCH: 23.0, CameraMode.FIELD: 55.0, CameraMode.FLIGHT: 50.0}
 
 
 func set_camera_mode(mode: CameraMode) -> void:
@@ -187,10 +188,13 @@ func set_camera_mode(mode: CameraMode) -> void:
 	# At the plate and on the mound the HUD names everyone; floating tags
 	# would only cover the pitcher, batter and catcher through the long lens.
 	var tags := mode == CameraMode.FIELD or mode == CameraMode.FLIGHT
+	var catcher := tuning.fielder_ids.find(&"c")
 	for actor: ActorView in _runners.values():
 		actor.set_tag_visible(tags)
 	for actor in _fielders:
 		actor.set_tag_visible(tags)
+	if catcher >= 0 and catcher < _fielders.size():
+		_fielders[catcher].visible = mode != CameraMode.BAT
 
 
 ## Point the ball-in-play camera tracks.
@@ -785,9 +789,10 @@ func _process(delta: float) -> void:
 	var spot: Array = CAMERA_SPOTS[_camera_mode]
 	var weight := 1.0 - exp(-delta * 6.0)
 	var goal: Vector3 = spot[0]
+	var target: Vector3 = spot[1]
 	if _camera_mode == CameraMode.BAT and _bats_left:
 		goal.x = -goal.x  # look over the lefty's shoulder, not through him
-	var target: Vector3 = spot[1]
+		target.x = -target.x
 	if _camera_mode == CameraMode.FIELD:
 		# A rundown pulls the camera in tight on the runner and the ball.
 		var focus := _rundown_focus if _rundown_zoom else _field_focus

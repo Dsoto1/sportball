@@ -59,6 +59,14 @@ var _families: Array[PitchFamilyDef] = []
 var _selected := 0
 var _slide_step := false
 var _pitching := false
+# Batting.
+var _batting := false
+var _banner := {}
+var _hitter := {}
+var _swing_box: PanelContainer
+var _swing_text: RichTextLabel
+var _bat_options: RichTextLabel
+var _steal_hint: RichTextLabel
 
 
 func _ready() -> void:
@@ -79,6 +87,7 @@ func _ready() -> void:
 	_build_pitch_list()
 	_build_pitch_info()
 	_build_controls()
+	_build_batting()
 
 	_callout = _wide_label(64, Control.PRESET_TOP_WIDE, 250.0)
 	_detail = _wide_label(24, Control.PRESET_TOP_WIDE, 335.0)
@@ -317,6 +326,167 @@ func _build_controls() -> void:
 	_controls.add_child(_controls_text)
 
 
+## The batting set: the hitter's banner top center (season line, tonight's
+## hits, bases), his card on the left (ratings bars, his nickname as his
+## calling card), the pitcher's repertoire on the right as scouting (the
+## pitch list), the swing controls bottom right and options bottom left.
+func _build_batting() -> void:
+	var banner := Panel.new()
+	banner.add_theme_stylebox_override("panel", panel_style(PANEL, 8, Color(1, 1, 1, 0.25)))
+	banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	banner.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	banner.position = Vector2(-230, 118)
+	banner.size = Vector2(460, 118)
+	add_child(banner)
+	var badge := Badge.new()
+	badge.position = Vector2(10, 14)
+	badge.size = Vector2(90, 90)
+	banner.add_child(badge)
+	var title := _text(banner, Vector2(112, 8), 20, Color.WHITE, true)
+	title.size = Vector2(250, 30)
+	title.clip_text = true
+	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	var pos := _text(banner, Vector2(112, 40), 15, DIM)
+	var stats := []
+	for i in 3:
+		_text(banner, Vector2(112 + i * 62, 62), 12, DIM).text = ["AVG", "HR", "RBI"][i]
+		stats.append(_text(banner, Vector2(112 + i * 62, 76), 22, Color.WHITE, true))
+	var rule := ColorRect.new()
+	rule.color = Color(1, 1, 1, 0.2)
+	rule.position = Vector2(366, 10)
+	rule.size = Vector2(1, 98)
+	banner.add_child(rule)
+	_text(banner, Vector2(378, 8), 12, DIM).text = "TONIGHT"
+	var tonight := _text(banner, Vector2(380, 24), 24, Color.WHITE, true)
+	var bases := BaseDiamond.new()
+	bases.position = Vector2(378, 56)
+	bases.size = Vector2(66, 58)
+	banner.add_child(bases)
+	_banner = {"box": banner, "badge": badge, "title": title, "pos": pos, "stats": stats, "tonight": tonight, "bases": bases}
+
+	var card := _panel(Vector2(LEFT + 12, 470), Vector2(320, 228))
+	var cbadge := Badge.new()
+	cbadge.position = Vector2(10, 10)
+	cbadge.size = Vector2(70, 70)
+	card.add_child(cbadge)
+	var cname := _text(card, Vector2(90, 8), 20, Color.WHITE, true)
+	cname.size = Vector2(160, 28)
+	cname.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	cname.clip_text = true
+	var chand := _text(card, Vector2(270, 8), 20, Color.WHITE, true)
+	var cpos := _text(card, Vector2(90, 34), 15, DIM)
+	var cline := _text(card, Vector2(90, 54), 17)
+	var calling := _text(card, Vector2(14, 92), 17, Color(1.0, 0.85, 0.35))
+	var bars := []
+	for i in 3:
+		_text(card, Vector2(14, 122 + i * 32), 17).text = ["CONTACT", "POWER", "VISION"][i]
+		var bar := Bar.new()
+		bar.position = Vector2(118, 130 + i * 32)
+		bar.size = Vector2(140, 12)
+		bar.fill = [Color(0.35, 0.85, 0.35), Color(1.0, 0.8, 0.25), Color(0.35, 0.6, 1.0)][i]
+		card.add_child(bar)
+		var num := _text(card, Vector2(270, 122 + i * 32), 17)
+		bars.append([bar, num])
+	_hitter = {"box": card, "badge": cbadge, "name": cname, "hand": chand, "pos": cpos, "line": cline, "calling": calling, "bars": bars}
+
+	_swing_box = PanelContainer.new()
+	_swing_box.add_theme_stylebox_override("panel", panel_style())
+	_swing_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_swing_box.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	_swing_box.position = Vector2(-372, -196)
+	_swing_box.size = Vector2(348, 172)
+	add_child(_swing_box)
+	_swing_text = RichTextLabel.new()
+	_swing_text.bbcode_enabled = true
+	_swing_text.fit_content = true
+	_swing_text.scroll_active = false
+	_swing_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_swing_text.add_theme_font_size_override("normal_font_size", 17)
+	_swing_box.add_child(_swing_text)
+	_bat_options = RichTextLabel.new()
+	_bat_options.bbcode_enabled = true
+	_bat_options.fit_content = true
+	_bat_options.scroll_active = false
+	_bat_options.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_bat_options.add_theme_font_size_override("normal_font_size", 19)
+	_bat_options.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+	_bat_options.position = Vector2(LEFT + 6, -130)
+	_bat_options.size = Vector2(460, 120)
+	add_child(_bat_options)
+	_steal_hint = RichTextLabel.new()
+	_steal_hint.bbcode_enabled = true
+	_steal_hint.fit_content = true
+	_steal_hint.scroll_active = false
+	_steal_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_steal_hint.add_theme_font_size_override("normal_font_size", 18)
+	_steal_hint.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	_steal_hint.position = Vector2(-150, 200)
+	_steal_hint.size = Vector2(140, 40)
+	add_child(_steal_hint)
+
+
+func show_batting(visible_now: bool, families: Array[PitchFamilyDef] = []) -> void:
+	_batting = visible_now
+	for node: CanvasItem in [_banner["box"], _hitter["box"], _swing_box, _bat_options, _steal_hint]:
+		node.visible = visible_now
+	_batter_card["panel"].visible = not visible_now
+	if visible_now:
+		_families = families
+		_selected = -1
+		_pitch_list.visible = true
+		_prompt.visible = false
+		_refresh_pitches()
+		_refresh_batting()
+	elif not _pitching:
+		_pitch_list.visible = false
+		_prompt.visible = true
+
+
+func _refresh_batting() -> void:
+	if _state == null or _roster == null:
+		return
+	var b := _roster.player(_state.current_batter())
+	if b == null:
+		return
+	var team := _roster.teams[_state.batting_team()]
+	var season := SeasonLine.for_player(b)
+	var today := GameLines.batter(_state, b.id)
+	var position: StringName = &"DH"
+	var defense: Dictionary = _state.defense[_state.batting_team()]
+	for pos: StringName in defense:
+		if defense[pos] == b.id:
+			position = StringName(String(pos).to_upper())
+	(_banner["badge"] as Badge).set_letter(str(b.number), team)
+	_banner["title"].text = "#%d  %s" % [b.number, b.display_name.to_upper()]
+	_banner["pos"].text = String(position)
+	var vals := [SeasonLine.avg_text(season["avg"]), str(season["hr"]), str(season["rbi"])]
+	for i in 3:
+		(_banner["stats"][i] as Label).text = vals[i]
+	_banner["tonight"].text = "%d-%d" % [today["h"], today["ab"]]
+	(_banner["bases"] as BaseDiamond).set_bases(_state.bases)
+	(_hitter["badge"] as Badge).set_letter(String(position), team)
+	_hitter["name"].text = "#%d %s" % [b.number, b.display_name.get_slice(" ", b.display_name.get_slice_count(" ") - 1).to_upper()]
+	_hitter["hand"].text = String(b.bats)
+	_hitter["pos"].text = String(position)
+	_hitter["line"].text = "%s  ·  %d HR  ·  %d RBI" % [vals[0], season["hr"], season["rbi"]]
+	_hitter["calling"].text = ("★  \"%s\"" % b.nickname) if b.nickname != "" else ""
+	var ratings := [b.contact, b.power, b.eye]
+	for i in 3:
+		var pair: Array = _hitter["bars"][i]
+		(pair[0] as Bar).value = ratings[i] / 100.0
+		(pair[0] as Bar).queue_redraw()
+		(pair[1] as Label).text = str(ratings[i])
+	var pad := gamepad
+	_swing_text.text = "[b]SWING[/b]\n%s  CONTACT\n%s  POWER\n%s  BUNT\n%s  AIM · LIFT · CHOP" % [
+		PromptIcons.icons(&"swing_contact", pad, 28), PromptIcons.icons(&"swing_power", pad, 28),
+		PromptIcons.icons(&"swing_bunt", pad, 28), PromptIcons.icons(&"move", pad, 28)]
+	_bat_options.text = "%s  PINCH HIT\n%s %s  STEAL / CALL IT OFF" % [
+		PromptIcons.icons(&"open_subs", pad, 28), PromptIcons.icons(&"runner_advance", pad, 28), PromptIcons.icons(&"runner_retreat", pad, 28)]
+	var on_base := _state.bases.any(func(r: StringName) -> bool: return r != &"")
+	_steal_hint.visible = on_base
+	_steal_hint.text = "STEAL %s" % PromptIcons.icons(&"runner_advance", pad, 26)
+
+
 # --- State ----------------------------------------------------------------------
 
 func set_roster(roster: MatchRoster) -> void:
@@ -350,6 +520,8 @@ func show_state(state: MatchState, user_team: int) -> void:
 	_show_cards(state)
 	if _pitching:
 		_refresh_pitches()
+	if _batting:
+		_refresh_batting()
 
 
 func _show_cards(state: MatchState) -> void:
@@ -388,10 +560,12 @@ func show_pitching(visible_now: bool, families: Array[PitchFamilyDef] = [], sele
 	_families = families
 	_selected = selected
 	_slide_step = slide_step
-	for node: CanvasItem in [_pitch_list, _pitch_info["box"], _controls, _options, _meter]:
+	for node: CanvasItem in [_pitch_info["box"], _controls, _options, _meter]:
 		node.visible = visible_now
-	# The panels carry the pitching controls; the prompt line stays for the rest.
-	_prompt.visible = not visible_now
+	_pitch_list.visible = visible_now or _batting
+	# The panels carry the pitching and batting controls; the prompt line
+	# stays for the rest.
+	_prompt.visible = not visible_now and not _batting
 	if visible_now:
 		_refresh_pitches()
 
@@ -403,6 +577,14 @@ func _refresh_pitches() -> void:
 		pitcher = _roster.player(_state.pitcher(_state.fielding_team()))
 		thrown = _state.pitches_thrown(pitcher.id) if pitcher != null else 0
 	var mods := Ratings.pitcher_mods(pitcher, thrown, tuning) if pitcher != null and tuning != null else {"speed": 1.0, "scatter": 1.0, "break": 1.0}
+	# Pitching: the list is yours down the left. Batting: it is the pitcher's,
+	# down the right, as scouting.
+	if _batting:
+		_pitch_list.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+		_pitch_list.position = Vector2(size.x - 24 - 310, 400)
+	else:
+		_pitch_list.set_anchors_preset(Control.PRESET_TOP_LEFT)
+		_pitch_list.position = Vector2(LEFT + 12, 370)
 	for i in _pitch_rows.size():
 		var row: Dictionary = _pitch_rows[i]
 		var panel: PanelContainer = row["row"]
@@ -413,12 +595,12 @@ func _refresh_pitches() -> void:
 		var on := i == _selected
 		panel.add_theme_stylebox_override("panel", panel_style(SELECT if on else Color(0.04, 0.05, 0.08, 0.72), 6, SELECT_EDGE if on else PANEL_EDGE))
 		panel.custom_minimum_size.x = 320.0 if on else 300.0
-		(row["key"] as RichTextLabel).text = PromptIcons.icons(StringName("pitch_slot_%d" % (i + 1)), false, 44) if not gamepad else ""
+		(row["key"] as RichTextLabel).text = PromptIcons.icons(StringName("pitch_slot_%d" % (i + 1)), false, 44) if not gamepad and not _batting else ""
 		(row["name"] as Label).text = f.display_name
 		(row["speed"] as Label).text = "%d MPH" % roundi(f.speed * float(mods["speed"]) * MPH)
 		(row["ball"] as BallIcon).tint = f.tell_color
 		(row["ball"] as BallIcon).queue_redraw()
-	if _selected < _families.size():
+	if _selected >= 0 and _selected < _families.size():
 		var f := _families[_selected]
 		_pitch_info["title"].text = f.display_name.to_upper()
 		_pitch_info["velo"].text = "%d MPH" % roundi(f.speed * float(mods["speed"]) * MPH)
@@ -431,6 +613,8 @@ func _refresh_pitches() -> void:
 		_pitch_info["bar"].queue_redraw()
 		(_pitch_info["ball"] as BallIcon).tint = f.tell_color
 		_pitch_info["ball"].queue_redraw()
+	if _batting:
+		return
 	var pad := gamepad
 	_controls_text.text = "[b]PITCH[/b]\n%s  AIM\n%s  THROW\n%s  PITCH" % [
 		PromptIcons.icons(&"move", pad, 28), PromptIcons.icons(&"pitch_primary", pad, 28),
@@ -512,8 +696,10 @@ func set_gamepad(value: bool) -> void:
 		return
 	gamepad = value
 	show_prompt(_prompt_text)
-	if _pitching:
+	if _pitching or _batting:
 		_refresh_pitches()
+	if _batting:
+		_refresh_batting()
 
 
 func _process(delta: float) -> void:

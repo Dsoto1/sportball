@@ -1621,3 +1621,18 @@ branding:
   (its face buttons are taken: A starts the meter).
 - GameLines reads today's lines from MatchState events, which now carry
   the pitcher on plate appearances, outs and runs.
+
+## Batting view after the owner's second reference
+
+- Camera: low behind the batter's back shoulder (mirrored for lefties),
+  42 degree FOV: he stands large on the left, the plate at the bottom,
+  the zone and the pitcher beyond. The catcher steps out of this shot (he
+  would stand between the camera and the plate).
+- HUD while the user bats (pitch set-up and flight): the hitter's banner
+  top center (number, name, position, season AVG HR RBI, tonight's hits in
+  at-bats, the bases); his card on the left (contact, power, vision bars,
+  his nickname as his calling card); the pitcher's repertoire down the
+  right as scouting (mph for this pitcher now); swing controls bottom
+  right; pinch hit and steal options bottom left; a steal hint under the
+  mini field when anyone is on. The small batter card under the scorebug
+  gives way to the banner.

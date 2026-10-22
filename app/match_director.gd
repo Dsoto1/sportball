@@ -1157,6 +1157,13 @@ func _tick_clock(delta: float) -> void:
 func _set_phase(phase: Phase) -> void:
 	_phase = phase
 	_phase_time = 0.0
+	# The batting panels (the hitter's card, the pitcher's scouting list, the
+	# swing controls) stay up from the pitch's set-up until the ball is hit.
+	var batting := state != null and user_is_batting() and phase in [Phase.PRE_PITCH, Phase.PITCH_FLIGHT]
+	var scouting: Array[PitchFamilyDef] = []
+	if batting:
+		scouting = _repertoire()
+	_hud.show_batting(batting, scouting)
 
 
 func _log(entry: Dictionary) -> void:
