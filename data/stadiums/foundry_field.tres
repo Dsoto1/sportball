@@ -70,7 +70,9 @@ script = ExtResource("2_07v1h")
 kind = &"waterfalls"
 angle = -12.0
 params = {
-"height": 20.0
+"height": 20.0,
+"style": &"molten",
+"width": 6.0
 }
 
 [sub_resource type="Resource" id="Resource_7a83r"]

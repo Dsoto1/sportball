@@ -51,8 +51,8 @@ kind = &"waterfalls"
 angle = 10.0
 mirrored = true
 params = {
-"frozen": true,
 "height": 34.0,
+"style": &"ice",
 "width": 16.0
 }
 

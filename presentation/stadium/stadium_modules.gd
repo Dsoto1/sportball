@@ -89,9 +89,10 @@ const CATALOG := {
 	},
 	&"waterfalls": {
 		"name": "Waterfall", "category": &"scenery", "unique": false, "placed": true,
-		"about": "A waterfall behind the outfield stands spilling into a pool. Mirror it to flank the centerpiece.",
+		"about": "A waterfall behind the outfield stands spilling into a pool: water, ice or molten. Mirror it to flank the centerpiece.",
 		"angle": 12.0, "angle_range": [-60.0, 60.0],
-		"params": {"height": [26.0, 10.0, 45.0], "width": [10.0, 4.0, 24.0], "frozen": [false]},
+		"params": {"height": [26.0, 10.0, 45.0], "width": [10.0, 4.0, 24.0], "frozen": [false], "style": [&"water"]},
+		"choices": {"style": [&"water", &"ice", &"molten"]},
 		"script": preload("res://presentation/stadium/modules/waterfalls_module.gd"),
 	},
 	&"trees": {
@@ -262,7 +263,7 @@ const CATALOG := {
 		"name": "Wall Art", "category": &"boards", "unique": false, "placed": false,
 		"about": "Motifs painted along the outfield wall between the numbers and emblems: waves, snowflakes, zigzag bolts, blossoms, gears, stars, crossed bars or the club emblem.",
 		"angle": 0.0, "angle_range": [0.0, 0.0],
-		"params": {"motif": [&"emblem"], "every": [8.0, 4.0, 20.0], "glow": [0.0, 0.0, 3.0]},
+		"params": {"motif": [&"emblem"], "every": [8.0, 4.0, 20.0], "glow": [0.0, 0.0, 3.0], "frame": [true]},
 		"choices": {"motif": [&"emblem", &"waves", &"snowflake", &"zigzag", &"blossom", &"gear", &"star", &"crossed", &"wings", &"flame", &"trident"]},
 		"script": preload("res://presentation/stadium/modules/wall_art_module.gd"),
 	},

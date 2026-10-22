@@ -23,12 +23,14 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 				clear = false
 		var h := FieldLayout.fence_height(a, stadium.tuning)
 		if clear and h >= 1.4:
-			var size := minf(h * 0.8, 2.8) * piece.size
+			var size := minf(h * 0.7, 2.6) * piece.size
 			var mark := Node3D.new()
 			root.add_child(mark)
 			var inward := stadium.wall_inward(a)
 			var spot := stadium.point(a, FieldLayout.fence_distance(a, stadium.tuning), minf(h * 0.5, 2.0)) + inward * 0.3
 			mark.look_at_from_position(spot, spot - inward, Vector3.UP)
+			if bool(piece.param("frame")):
+				_frame(mark, motif, size, home, glow)
 			_draw(mark, motif, size, home, glow)
 		a += every
 
@@ -92,6 +94,25 @@ static func _draw(root: Node3D, motif: StringName, size: float, home: TeamDef, g
 		_:
 			var mark := Emblem.build(home, size, 0.3)
 			root.add_child(mark)
+
+
+## A thin border in the club's highlight color around a motif, so each
+## one reads as its own padded wall panel, as on the sheets.
+static func _frame(root: Node3D, motif: StringName, size: float, home: TeamDef, glow: float) -> void:
+	var r := size * 0.5
+	var half_w := r * (2.5 if motif in [&"waves", &"zigzag"] else 1.35)
+	var half_h := r * 1.2
+	var line := r * 0.12
+	var color := home.highlight_color
+	var g := glow * 0.5
+	_bar(root, Vector2(0, half_h), half_w * 2.0 + line, line, 0.0, color, g)
+	_bar(root, Vector2(0, -half_h), half_w * 2.0 + line, line, 0.0, color, g)
+	_bar(root, Vector2(-half_w, 0), half_h * 2.0, line, PI * 0.5, color, g)
+	_bar(root, Vector2(half_w, 0), half_h * 2.0, line, PI * 0.5, color, g)
+	# Corner studs.
+	for x: float in [-half_w, half_w]:
+		for y: float in [-half_h, half_h]:
+			Emblem._layer(root, Emblem._poly(_circle(Vector2(x, y), line * 1.3, 10)), color, g, 0.005)
 
 
 static func _bar(root: Node3D, center: Vector2, length: float, width: float, angle: float, color: Color, glow: float) -> void:

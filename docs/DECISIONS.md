@@ -1155,3 +1155,24 @@ Reason: Owner request to compare each park with its sheet and add missing detail
   - Lantern clusters ring the stands at 15 parks.
   - Urns stand on the terraces at the Halo Dome, Ledger Street, Fountain Gardens, Cloudreach, Forum Field and Amber Gate.
   - Colonnades of ornate columns stand at Fountain Gardens, Deepwater and Forum Field.
+
+## 2026-10-22 - Detail Pass: Waterfalls, Wall Panels, Bunting; 18-Club Balance
+
+- **Waterfalls:**
+  - Water now falls in streams over the rock instead of reading as pale slabs.
+    - A new `waterfall.gdshader` scrolls white streaks down a blue body, with foam at the lip and the splash.
+    - It draws on quads, so the streaks run top to bottom.
+    - Wide falls split into two streams around a rock spur.
+  - Boulders (Kenney rocks, recolored to the cliff) break up the top and sides.
+  - Vines hang off the lip.
+  - New `style` setting: `water`, `ice` (still, blue over gray-blue rock; replaces `frozen`, which still works) or `molten` (a glowing orange pour with warm light and smoke).
+  - Foundry Field's fall is now molten, since its sheet shows forges, not water.
+- **Wall art:** each motif sits in its own framed panel (a border in the club's highlight color with corner studs), like the padded wall panels on the sheets. The `frame` setting is on by default.
+- **Bunting** on the side decks at Pier 9, Cloudreach and Amber Gate (club colors there), as their sheets show.
+- **Balance:** the 18-club league run (136 games a club) had Kitsune at .331 and Aviators and Vulcans at .603.
+  - Kitsune gets more power and glove, since their park's 318 ft left field rewarded opponents' power, plus a better staff.
+  - Aviators and Vulcans lose a little power and velocity.
+  - Sentinels and Yetis get a little more bat.
+  - The rerun puts every club between .441 and .574.
+
+Reason: Owner request for another detail pass against the sheets. The balance check was pending since the 18-club expansion.

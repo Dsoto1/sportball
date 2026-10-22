@@ -12,11 +12,11 @@ nickname = "Foxfire"
 number = 1
 positions = Array[StringName]([&"cf", &"lf"])
 contact = 76
-power = 34
+power = 46
 eye = 65
-speed = 92
+speed = 90
 arm = 67
-glove = 77
+glove = 83
 
 [sub_resource type="Resource" id="Resource_0oye8"]
 script = ExtResource("1_pjoh5")
@@ -27,11 +27,11 @@ number = 3
 bats = &"L"
 positions = Array[StringName]([&"ss", &"2b"])
 contact = 75
-power = 40
+power = 52
 eye = 65
-speed = 76
+speed = 74
 arm = 66
-glove = 73
+glove = 79
 
 [sub_resource type="Resource" id="Resource_vgc0r"]
 script = ExtResource("1_pjoh5")
@@ -42,11 +42,11 @@ number = 8
 bats = &"L"
 positions = Array[StringName]([&"rf", &"lf"])
 contact = 73
-power = 59
+power = 71
 eye = 61
-speed = 69
+speed = 67
 arm = 77
-glove = 57
+glove = 63
 
 [sub_resource type="Resource" id="Resource_hhmbm"]
 script = ExtResource("1_pjoh5")
@@ -56,11 +56,11 @@ nickname = "Torii"
 number = 25
 positions = Array[StringName]([&"1b"])
 contact = 71
-power = 77
+power = 89
 eye = 61
-speed = 44
+speed = 42
 arm = 48
-glove = 55
+glove = 61
 
 [sub_resource type="Resource" id="Resource_4qwsd"]
 script = ExtResource("1_pjoh5")
@@ -70,11 +70,10 @@ nickname = "Moonlit"
 number = 10
 positions = Array[StringName]([&"3b", &"1b"])
 contact = 72
-power = 59
+power = 71
 eye = 61
-speed = 52
 arm = 68
-glove = 61
+glove = 67
 
 [sub_resource type="Resource" id="Resource_sgfj2"]
 script = ExtResource("1_pjoh5")
@@ -86,11 +85,11 @@ bats = &"L"
 throws = &"L"
 positions = Array[StringName]([&"1b", &"lf"])
 contact = 75
-power = 62
+power = 74
 eye = 63
-speed = 43
+speed = 41
 arm = 52
-glove = 41
+glove = 47
 
 [sub_resource type="Resource" id="Resource_2yaml"]
 script = ExtResource("1_pjoh5")
@@ -102,11 +101,11 @@ bats = &"L"
 throws = &"L"
 positions = Array[StringName]([&"lf", &"rf"])
 contact = 77
-power = 48
+power = 60
 eye = 55
-speed = 67
+speed = 65
 arm = 63
-glove = 58
+glove = 64
 
 [sub_resource type="Resource" id="Resource_mb1fe"]
 script = ExtResource("1_pjoh5")
@@ -116,11 +115,11 @@ nickname = "Spirit"
 number = 4
 positions = Array[StringName]([&"2b", &"ss"])
 contact = 75
-power = 43
+power = 55
 eye = 67
-speed = 76
+speed = 74
 arm = 60
-glove = 73
+glove = 79
 
 [sub_resource type="Resource" id="Resource_kag8c"]
 script = ExtResource("1_pjoh5")
@@ -131,11 +130,11 @@ number = 26
 bats = &"L"
 positions = Array[StringName]([&"c"])
 contact = 63
-power = 41
+power = 53
 eye = 56
-speed = 38
+speed = 36
 arm = 65
-glove = 59
+glove = 65
 
 [sub_resource type="Resource" id="Resource_4l56g"]
 script = ExtResource("1_pjoh5")
@@ -145,11 +144,11 @@ nickname = "Origami"
 number = 14
 positions = Array[StringName]([&"2b", &"3b", &"ss"])
 contact = 74
-power = 29
+power = 41
 eye = 65
-speed = 73
+speed = 71
 arm = 60
-glove = 70
+glove = 76
 
 [sub_resource type="Resource" id="Resource_2vb2i"]
 script = ExtResource("1_pjoh5")
@@ -161,11 +160,11 @@ bats = &"L"
 throws = &"L"
 positions = Array[StringName]([&"lf", &"cf", &"rf"])
 contact = 73
-power = 33
+power = 45
 eye = 64
-speed = 83
+speed = 81
 arm = 61
-glove = 68
+glove = 74
 
 [sub_resource type="Resource" id="Resource_tmohh"]
 script = ExtResource("1_pjoh5")
@@ -175,11 +174,11 @@ nickname = "Trickster"
 number = 23
 positions = Array[StringName]([&"c", &"1b"])
 contact = 65
-power = 42
+power = 54
 eye = 51
-speed = 33
+speed = 31
 arm = 60
-glove = 54
+glove = 60
 
 [sub_resource type="Resource" id="Resource_t5o86"]
 script = ExtResource("1_pjoh5")
@@ -195,9 +194,9 @@ power = 15
 eye = 20
 speed = 40
 arm = 70
-velocity = 57
-control = 65
-stuff = 72
+velocity = 63
+control = 71
+stuff = 76
 stamina = 75
 pitches = Array[StringName]([&"changeup", &"curveball", &"sinker", &"junkball"])
 
@@ -213,9 +212,9 @@ power = 15
 eye = 20
 speed = 40
 arm = 70
-velocity = 58
-control = 64
-stuff = 73
+velocity = 64
+control = 70
+stuff = 77
 stamina = 40
 pitches = Array[StringName]([&"cutter", &"changeup", &"curveball"])
 
@@ -233,9 +232,9 @@ power = 15
 eye = 20
 speed = 40
 arm = 70
-velocity = 54
-control = 64
-stuff = 69
+velocity = 60
+control = 70
+stuff = 73
 stamina = 38
 pitches = Array[StringName]([&"sinker", &"curveball", &"changeup"])
 
@@ -251,9 +250,9 @@ power = 15
 eye = 20
 speed = 40
 arm = 70
-velocity = 59
-control = 61
-stuff = 76
+velocity = 65
+control = 67
+stuff = 80
 stamina = 36
 pitches = Array[StringName]([&"slider", &"changeup", &"junkball"])
 
@@ -269,9 +268,9 @@ power = 15
 eye = 20
 speed = 40
 arm = 70
-velocity = 72
-control = 68
-stuff = 70
+velocity = 78
+control = 74
+stuff = 74
 stamina = 28
 pitches = Array[StringName]([&"cutter", &"curveball", &"splitter"])
 
