@@ -1350,3 +1350,4 @@ Reason: Owner request for another detail pass against the sheets. The balance ch
   - A new test checks that every model a park names exists.
 - **Pipeline:** the generation prompts, processing script and park converter used for the roll-out are recorded with the session scratch tools. Each section goes through weld, cull_back, weld, simplify, then repack_glb at 2048 px.
 - **Repository size:** the 75 Meshy models take about 420 MB as GLB, plus about 155 MB of textures Godot extracts on import, all in Git LFS.
+- **Scoreboard gate fit:** where a gatehouse's crest covered the board's team name, the gate is scaled wider so its opening clears the board: 112 m at Halo Dome, Deepwater, Cloudreach and Forum Field, and 160 m at Firelight. The Halo Dome drops its floating ring, since the deco gate carries its own crown.

@@ -12,7 +12,7 @@ extends SceneTree
 
 const PARKS := [
 	{
-		"id": &"halo_dome", "pillar_cap": &"emblem", "crown": true, "sky": &"sunset", "facade_color": Color("6a5a8c"), "facade_surface": &"marble", "structure_surface": &"steel", "decks": 3, "frame": &"model", "frame_model": &"set_deco_gate", "frame_width": 112.0, "display_name": "The Halo Dome",
+		"id": &"halo_dome", "pillar_cap": &"emblem", "sky": &"sunset", "facade_color": Color("6a5a8c"), "facade_surface": &"marble", "structure_surface": &"steel", "decks": 3, "frame": &"model", "frame_model": &"set_deco_gate", "frame_width": 112.0, "display_name": "The Halo Dome",
 		"blurb": "Glitterati home · symmetrical, padded glass-and-gold wall",
 		"shape": [[-45, 96, 3.4], [-30, 104, 3.4], [-15, 112, 3.4], [0, 116, 4.2], [15, 112, 3.4], [30, 104, 3.4], [45, 96, 3.4]], "air": 1.0,
 		"seat_color": Color("3d2466"), "seat_color_alt": Color("2c1a4d"), "structure_color": Color("8f8aa3"), "accent_color": Color("ffc94a"),
@@ -163,7 +163,7 @@ const PARKS := [
 		"skyline_color": Color("6c8fb8"), "window_color": Color("fff0c0"),
 	},
 	{
-		"id": &"forum_field", "pillar_cap": &"brazier", "facade_color": Color("d6bf92"), "facade_surface": &"stone", "structure_surface": &"marble", "decks": 3, "frame": &"model", "frame_model": &"set_forum_gate", "display_name": "Forum Field",
+		"id": &"forum_field", "pillar_cap": &"brazier", "facade_color": Color("d6bf92"), "facade_surface": &"stone", "structure_surface": &"marble", "decks": 3, "frame": &"model", "frame_model": &"set_forum_gate", "frame_width": 112.0, "display_name": "Forum Field",
 		"blurb": "Legion home · a sandstone colosseum: tiered arches, braziers, statues and red banners",
 		"shape": [[-45, 101, 3.2], [-20, 115, 3.2], [0, 122, 3.2], [20, 112, 3.2], [45, 97, 3.2]], "air": 1.0,
 		"seat_color": Color("8b1e1e"), "seat_color_alt": Color("701818"), "structure_color": Color("c9b48a"), "accent_color": Color("daa520"),
@@ -174,7 +174,7 @@ const PARKS := [
 		"skyline_color": Color("8a6a4a"), "window_color": Color("ffe1a8"),
 	},
 	{
-		"id": &"firelight", "pillar_cap": &"brazier", "sky": &"sunset", "ground_color": Color("3a2a24"), "ground_surface": &"rock", "facade_color": Color("5a4038"), "facade_surface": &"rock", "structure_surface": &"stone", "decks": 3, "frame": &"model", "frame_model": &"set_volcano_gate", "display_name": "Firelight Park",
+		"id": &"firelight", "pillar_cap": &"brazier", "sky": &"sunset", "ground_color": Color("3a2a24"), "ground_surface": &"rock", "facade_color": Color("5a4038"), "facade_surface": &"rock", "structure_surface": &"stone", "decks": 3, "frame": &"model", "frame_model": &"set_volcano_gate", "frame_width": 160.0, "display_name": "Firelight Park",
 		"blurb": "Vulcans home · an island fortress under a live volcano: lava-lit cliffs, aqueducts and the sea",
 		"shape": [[-45, 101, 3.0], [-22, 117, 3.0], [0, 126, 3.0], [24, 119, 3.0], [45, 110, 3.0]], "air": 0.98,
 		"seat_color": Color("7a2a1a"), "seat_color_alt": Color("5e2014"), "structure_color": Color("6a5a50"), "accent_color": Color("ff6a00"),

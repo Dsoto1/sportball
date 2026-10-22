@@ -14,7 +14,6 @@ points = PackedVector3Array(-45, 96, 3.4, -30, 104, 3.4, -15, 112, 3.4, 0, 116, 
 script = ExtResource("2_un8dc")
 kind = &"centerpiece"
 params = {
-"crown": true,
 "frame": &"model",
 "frame_model": &"set_deco_gate",
 "frame_width": 112.0,

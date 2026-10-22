@@ -16,6 +16,7 @@ kind = &"centerpiece"
 params = {
 "frame": &"model",
 "frame_model": &"set_forum_gate",
+"frame_width": 112.0,
 "pillar_cap": &"brazier"
 }
 

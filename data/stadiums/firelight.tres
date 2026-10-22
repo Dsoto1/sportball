@@ -17,6 +17,7 @@ kind = &"centerpiece"
 params = {
 "frame": &"model",
 "frame_model": &"set_volcano_gate",
+"frame_width": 160.0,
 "pillar_cap": &"brazier"
 }
 
