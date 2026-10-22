@@ -28,6 +28,13 @@ angle = 34.0
 [sub_resource type="Resource" id="Resource_t1ilx"]
 script = ExtResource("2_b78mq")
 kind = &"light_towers"
+params = {
+"head": &"bank",
+"heads": 1,
+"lamp": Color(1, 0.9019608, 0.78431374, 1),
+"mast": &"deco",
+"paint": Color(0.22745098, 0.24705882, 0.28235295, 0.6)
+}
 
 [sub_resource type="Resource" id="Resource_pt7r0"]
 script = ExtResource("2_b78mq")

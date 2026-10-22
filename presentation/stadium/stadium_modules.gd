@@ -36,9 +36,10 @@ const CATALOG := {
 	},
 	&"light_towers": {
 		"name": "Light Towers", "category": &"structure", "unique": true, "placed": false,
-		"about": "Floodlight towers around the bowl and a pair flanking the centerpiece; brighter under the lights.",
+		"about": "Floodlight towers around the bowl and a pair flanking the centerpiece; brighter under the lights. Mix any mast with any lamp head, paint them and color the light.",
 		"angle": 0.0, "angle_range": [0.0, 0.0],
-		"params": {"height": [46.0, 25.0, 70.0], "flank": [16.0, 0.0, 40.0]},
+		"params": {"height": [46.0, 25.0, 70.0], "flank": [16.0, 0.0, 40.0], "mast": [&"lattice"], "head": [&"bank"], "heads": [1, 1, 3], "head_size": [10.0, 4.0, 20.0], "tilt": [12.0, -10.0, 40.0], "paint": [Color(0, 0, 0, 0)], "lamp": [Color(1.0, 0.97, 0.85)]},
+		"choices": {"mast": [&"lattice", &"deco", &"stone", &"built"], "head": [&"bank", &"halo", &"crown", &"built"]},
 		"excludes": [&"dome"],
 		"script": preload("res://presentation/stadium/modules/light_towers_module.gd"),
 	},

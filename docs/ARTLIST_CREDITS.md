@@ -127,3 +127,14 @@ The owner approved the architecture-set roll-out to the other 17 parks on 2026-1
 | 2026-10-22 | amber_gate tower (desert set) | preview + refine | 30 | | 01a163b1-a3e0-764a-8cfb-771d062ac2e5 |
 | 2026-10-22 | amber_gate block (desert set) | preview + refine | 30 | | 01a163b1-f1ab-748e-b0ed-d0c5f7445ba3 |
 | 2026-10-22 | amber_gate gate (desert set) | preview + refine | 30 | 870 | 01a163b1-5215-73d5-86f5-0a859cb36f91 |
+
+The owner approved 6 modular light-tower pieces on 2026-10-22 (option 1: Artlist now, all 6), knowing it draws on the other games' share this month.
+
+| Date | Item | Model | Credits | Month total | Asset |
+|---|---|---|---|---|---|
+| 2026-10-22 | Light mast: steel lattice | Hyper3D Rodin v2.5 Fast | 300 | 5,400 / 4,125 | AI-018 (gen 01a1646d-7626-7ae0-9756-bc0e38c2d9d0) |
+| 2026-10-22 | Light mast: art deco pylon | Hyper3D Rodin v2.5 Fast | 300 | 5,700 / 4,125 | AI-019 (gen 01a1646d-7925-7a7b-b776-1a631af1d399) |
+| 2026-10-22 | Light mast: stone tower | Hyper3D Rodin v2.5 Fast | 300 | 6,000 / 4,125 | AI-020 (gen 01a1646d-7b5e-7b31-984b-1adf9f9dafd8) |
+| 2026-10-22 | Light head: floodlight bank | Hyper3D Rodin v2.5 Fast | 300 | 6,300 / 4,125 | AI-021 (gen 01a1646d-7e6f-72ac-a51f-fc4e7d193c29) |
+| 2026-10-22 | Light head: halo lamp ring | Hyper3D Rodin v2.5 Fast | 300 | 6,600 / 4,125 | AI-022 (gen 01a1646d-823b-7404-a452-4489e6f9cdc3) |
+| 2026-10-22 | Light head: crown lantern | Hyper3D Rodin v2.5 Fast | 300 | 6,900 / 4,125 | AI-023 (gen 01a1646d-85f0-7fbc-b0bf-76dc8bfef6ac) |

@@ -1383,3 +1383,20 @@ Reason: Owner request for another detail pass against the sheets. The balance ch
 - Heroes no longer stand on a stone plinth, which showed as a slab once the bleachers went.
 - A test checks the standard wall height and the sheet distances at the five parks with the most distinctive numbers.
 - The league balance is rerun after this, since every park's dimensions changed.
+
+## 2026-10-22 - Modular Light Towers
+
+- The owner asked for standard stadium lighting variations from Artlist, modular enough to theme per park. Six Artlist models were made (1,800 credits, approved over the cap), logged as AI-018 to AI-023:
+  - **Masts:** steel lattice, art deco pylon, stone tower.
+  - **Lamp heads:** floodlight bank, halo ring of round lamps, crown lantern.
+- **`light_towers` settings:**
+  - `mast` and `head` mix freely: 9 combinations, plus the old built pole and bank.
+  - `heads`: 1-3 side by side.
+  - `head_size` and `tilt`.
+  - `paint`: recolors the metal toward a color, keeping the model's shading.
+  - `lamp`: the light color.
+- The glowing lamp faces are drawn in code over each head's own lamps (a 3×4 grid, a ring of 20, or a lantern core), so the light color and day/night brightness are themed per park.
+- **Per park (`lights` in the generator):**
+  - Lattice and floodlight banks: Foundry, Pier 9, the Kiln and Warehouse Row (twin heads); Reactor gets halo rings in green light.
+  - Deco pylons: the Halo Dome, Deepwater and Cloudreach (halo rings); Ledger Street and the Vault (banks); the Horseshoe (twin gaslight lanterns).
+  - Stone towers with crown lanterns: the Icebox, Fountain Gardens, Sakura Gate (paper-lantern orange), Forum Field, Firelight, Citadel Park and Amber Gate.

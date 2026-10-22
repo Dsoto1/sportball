@@ -12,6 +12,9 @@ const ART := "res://assets/generated/artlist/stadium/"
 ## Signature landmarks generated with Meshy (text-to-3D, simplified to
 ## about 60-100k triangles with gltf-transform; see docs/ARTLIST_CREDITS.md).
 const MESHY := "res://assets/generated/meshy/stadium/"
+## Modular light towers (Artlist, Hyper3D Rodin): masts and lamp heads that
+## mix and match; see the light_towers module.
+const LIGHTS := "res://assets/generated/artlist/lights/"
 
 const SETS := {
 	&"palm": [NATURE + "tree_palmDetailedTall.glb", NATURE + "tree_palmTall.glb", NATURE + "tree_palmBend.glb"],
@@ -40,6 +43,12 @@ const SETS := {
 	&"lantern_cluster": [ART + "lantern_cluster.glb"],
 	&"column": [ART + "column.glb"],
 	&"planter_urn": [ART + "planter_urn.glb"],
+	&"mast_lattice": [LIGHTS + "mast_lattice.glb"],
+	&"mast_deco": [LIGHTS + "mast_deco.glb"],
+	&"mast_stone": [LIGHTS + "mast_stone.glb"],
+	&"head_bank": [LIGHTS + "head_bank.glb"],
+	&"head_halo": [LIGHTS + "head_halo.glb"],
+	&"head_crown": [LIGHTS + "head_crown.glb"],
 	&"sakura_cliff": [MESHY + "sakura_cliff.glb"],
 	&"cathedral_spires": [MESHY + "cathedral_spires.glb"],
 	&"domed_bank": [MESHY + "domed_bank.glb"],
