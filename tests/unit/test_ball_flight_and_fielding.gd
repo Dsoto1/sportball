@@ -158,3 +158,14 @@ func test_thin_air_carries() -> void:
 	var d0 := BallTrajectory.simulate(42.0, 28.0, 0.0, sea).distance()
 	var d1 := BallTrajectory.simulate(42.0, 28.0, 0.0, thin).distance()
 	check(d1 > d0 + 4.0, "carries farther in thin air (%.1f vs %.1f)" % [d1, d0])
+
+
+func test_home_run_flies_on_past_the_wall() -> void:
+	var traj := BallTrajectory.simulate(50.0, 28.0, 0.0, tuning())
+	check_eq(traj.result, BallTrajectory.Result.HOME_RUN, "a 112 mph, 28° drive leaves the park")
+	check(not traj.tail_points.is_empty(), "its flight carries on past the wall")
+	check(traj.projected_distance() > traj.distance() + 5.0, "projected distance (%d ft) beyond the wall (%d ft)" % [roundi(traj.projected_distance() * 3.28), roundi(traj.distance() * 3.28)])
+	var later := traj.flight_position(traj.end_time() + 0.5)
+	check(Vector2(later.x, later.z).length() > traj.distance(), "and keeps going over the stands")
+	var short := BallTrajectory.simulate(30.0, 25.0, 0.0, tuning())
+	check(short.tail_points.is_empty(), "anything else stops where it stops")

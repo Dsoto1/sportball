@@ -57,7 +57,7 @@ func test_scoreboard_follows_the_game() -> void:
 	var roster := MatchRoster.new(content().team(&"gearheads"), content().team(&"glitterati"))
 	s.apply_pitch_call(MatchState.PitchCall.BALL)
 	st.update_scoreboard(s, roster)
-	var card: Dictionary = st._boards[0]["card"]
+	var card: Dictionary = (st._boards[0]["jumbo"] as Jumbotron)._labels
 	check(card["name"].text.contains("CALLOWAY"), "the centerpiece shows the batter")
 	check(card["avg"].text.begins_with("."), "and his average (%s)" % card["avg"].text)
 	var board: Dictionary = st._boards.filter(func(b: Dictionary) -> bool: return b.has("cells"))[0]
@@ -295,12 +295,19 @@ func test_centerpiece_shows_the_batters_card() -> void:
 	var s := MatchState.from_teams(content().team(&"gearheads"), content().team(&"glitterati"), content().rules)
 	var roster := MatchRoster.new(content().team(&"gearheads"), content().team(&"glitterati"))
 	st.update_scoreboard(s, roster)
-	var card: Dictionary = st._boards[0]["card"]
+	var jumbo: Jumbotron = st._boards[0]["jumbo"]
+	var card: Dictionary = jumbo._labels
 	var p := roster.player(s.current_batter())
 	var line := SeasonLine.for_player(p)
 	check_eq(card["number"].text, "#%d" % p.number, "his number")
 	check_eq(card["hr"].text, str(line["hr"]), "his home runs")
-	check(card["position"].text.length() in [1, 2], "his position (%s)" % card["position"].text)
+	check(card["position"].text.contains("BATS"), "his position (%s)" % card["position"].text)
+	check_eq(card["away_score"].text, "0", "the score across the top")
+	# A home run takes the board over with its Statcast line.
+	jumbo.play_moment(&"home_run", {"team": roster.teams[0], "name": "Test", "number": 9, "distance": 431, "exit_velocity": 109, "launch": 26, "runs": 4})
+	check_eq(card["title"].text, "GRAND SLAM!", "four runs is a grand slam")
+	check_eq(card["s1"].text, "431 FT", "the distance on the board")
+	check(jumbo._moment.visible and not jumbo._board.visible, "the celebration has the board")
 	check(line["avg"] > 0.15 and line["avg"] < 0.37, "a believable average")
 	st.free()
 

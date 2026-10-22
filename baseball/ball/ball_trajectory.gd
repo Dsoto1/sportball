@@ -22,6 +22,11 @@ var fence_time: float = INF
 
 var _fence_point: Vector3
 var _fence_velocity: Vector3
+## A home run's flight on past the wall to field level (presentation and
+## the "projected distance" the board shows; nothing in the rules reads it).
+var tail_times: PackedFloat32Array = PackedFloat32Array()
+var tail_points: PackedVector3Array = PackedVector3Array()
+var _hr_velocity: Vector3
 
 
 static func simulate(exit_velocity: float, launch_angle: float, spray_angle: float, tuning: BaseballTuning) -> BallTrajectory:
@@ -77,7 +82,39 @@ static func simulate(exit_velocity: float, launch_angle: float, spray_angle: flo
 		traj._append(t, p)
 	if traj.first_bounce_time == INF and traj.result != Result.HOME_RUN:
 		traj.landing_point = traj.points[traj.points.size() - 1]
+	if traj.result == Result.HOME_RUN:
+		# Carry on over the stands, same air, down to field level.
+		var hv := traj._hr_velocity
+		var hp := traj.points[traj.points.size() - 1]
+		var ht := traj.times[traj.times.size() - 1]
+		while hp.y > 0.0 and ht < max_time + 6.0:
+			ht += traj.step
+			hv += (Vector3(0.0, -tuning.gravity, 0.0) - hv * (drag * hv.length())) * traj.step
+			hp += hv * traj.step
+			traj.tail_times.append(ht)
+			traj.tail_points.append(hp)
 	return traj
+
+
+## Statcast-style projected distance of a home run (m): where it would have
+## come down at field level. The wall distance for anything else.
+func projected_distance() -> float:
+	if tail_points.is_empty():
+		return distance()
+	var last := tail_points[tail_points.size() - 1]
+	return Vector2(last.x, last.z).length()
+
+
+## Where the ball is at `t`, following a home run on past the wall.
+func flight_position(t: float) -> Vector3:
+	if tail_points.is_empty() or t <= end_time():
+		return position_at(t)
+	var u := (t - end_time()) / step
+	var i := int(u)
+	if i >= tail_points.size() - 1:
+		return tail_points[tail_points.size() - 1]
+	var a := tail_points[i - 1] if i > 0 else rest_point()
+	return a.lerp(tail_points[i], u - i)
 
 
 ## Extra time a fielder needs to pick the ball up at `t`: a ball off the
@@ -140,6 +177,7 @@ func _check_fence(p: Vector3, v: Vector3, tuning: BaseballTuning) -> bool:
 	if p.y > FieldLayout.fence_height(spray, tuning) and first_bounce_time == INF:
 		result = Result.HOME_RUN
 		landing_point = p
+		_hr_velocity = v
 		return true
 	hit_fence = true
 	var n := Vector3(flat.x / r, 0.0, flat.y / r)

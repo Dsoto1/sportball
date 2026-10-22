@@ -63,8 +63,22 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	var trim := stadium.box(Vector3(36.6, 0.6, 1.6), def.accent_color, board)
 	trim.position = Vector3(0, 11.2, -0.6)
 	trim.material_override = Stadium.glow(def.accent_color, 1.6)
-	var screen := stadium.box(Vector3(34.0, 20.0, 0.2), home.dark_color, board)
-	screen.position = Vector3(0, 0, 0.0)
+	# The video board: its own off-screen display, drawn on the screen.
+	var jumbo := Jumbotron.new()
+	jumbo.name = "Jumbotron"
+	board.add_child(jumbo)
+	jumbo.setup(home, _away_for(stadium, home))
+	var screen := MeshInstance3D.new()
+	var quad := QuadMesh.new()
+	quad.size = Vector2(34.0, 20.0)
+	screen.mesh = quad
+	var screen_mat := StandardMaterial3D.new()
+	screen_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	screen_mat.albedo_texture = jumbo.get_texture()
+	screen_mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+	screen.material_override = screen_mat
+	screen.position = Vector3(0, 0, 0.12)
+	board.add_child(screen)
 	if bool(piece.param("crown")):
 		# A glowing ring floating over the board (the Halo Dome's crown).
 		var ring := MeshInstance3D.new()
@@ -93,34 +107,14 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 			h.position = Vector3(0, 16.0, 0.4) + Vector3(-sin(h.rotation.z), cos(h.rotation.z), 0) * hand[0] * 0.5
 		for side: float in [-1.0, 1.0]:
 			var mark := Emblem.build(home, 4.0, 0.6)
-			mark.position = Vector3(side * 13.5, 7.0, 0.2)
+			mark.position = Vector3(side * 13.5, 14.0, 0.2)
 			board.add_child(mark)
 	else:
 		var emblem := Emblem.build(home, 9.0, 0.6)
 		emblem.position = Vector3(0, 15.5, 0.2)
 		board.add_child(emblem)
-	var name := stadium.label(home.team_name.to_upper(), 300, home.sign_color(), board)
-	name.position = Vector3(0, 7.0, 0.2)
-	var city := stadium.label(home.city.to_upper(), 120, home.highlight_color, board)
-	city.position = Vector3(0, 3.6, 0.2)
 	_pillars(stadium, board, piece, home)
-	# The batter's card: a portrait panel in his club's colors, then his line.
-	var portrait := stadium.box(Vector3(8.0, 9.0, 0.1), home.primary_color, board)
-	portrait.position = Vector3(-11.5, -4.5, 0.15)
-	var card := {}
-	card["number"] = stadium.label("", 260, Color.WHITE, board)
-	card["number"].position = Vector3(-11.5, -4.5, 0.3)
-	card["name"] = stadium.label("", 140, Color.WHITE, board)
-	card["name"].position = Vector3(3.0, -1.6, 0.2)
-	card["position"] = stadium.label("", 110, home.highlight_color, board)
-	card["position"].position = Vector3(3.0, -3.8, 0.2)
-	for i in 3:
-		var x := -2.5 + i * 6.0
-		var head := stadium.label(["AVG", "HR", "RBI"][i], 80, home.support_color.lightened(0.3), board)
-		head.position = Vector3(x, -6.2, 0.2)
-		card[["avg", "hr", "rbi"][i]] = stadium.label("", 130, Color.WHITE, board)
-		card[["avg", "hr", "rbi"][i]].position = Vector3(x, -8.4, 0.2)
-	stadium.add_board({"card": card})
+	stadium.add_board({"jumbo": jumbo})
 
 
 ## Flanking pillars, as on every sheet: a tall pier either side of the
@@ -166,3 +160,9 @@ func _pillars(stadium: Stadium, board: Node3D, piece: StadiumPiece, home: TeamDe
 				lamp.material_override = lit
 				var hood := Scenery.cylinder(board, 1.3, 0.1, 1.0, Color(0.12, 0.12, 0.13), 8)
 				hood.position = Vector3(x, 19.5, -1.0)
+
+
+## The club visiting today, for the board's header (the stadium is built
+## for a pairing; the home club's own park otherwise shows it twice).
+static func _away_for(stadium: Stadium, home: TeamDef) -> TeamDef:
+	return stadium.away_team if stadium.away_team != null else home

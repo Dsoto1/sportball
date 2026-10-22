@@ -39,6 +39,8 @@ var rng := RandomNumberGenerator.new()
 var _crowd_mat: ShaderMaterial
 var _home: TeamDef
 var _away: TeamDef
+## The visiting club the park is dressed against (the video board).
+var away_team: TeamDef
 var _excitement := 0.0
 var _water: Array[StadiumPiece] = []
 var _names := {}
@@ -48,6 +50,7 @@ var _board_key := ""
 
 
 func build(p_tuning: BaseballTuning, p_def: StadiumDef, home: TeamDef, away: TeamDef) -> void:
+	away_team = away
 	tuning = p_tuning
 	def = p_def
 	rng.seed = hash(def.id)
@@ -208,6 +211,22 @@ func is_water(angle: float) -> bool:
 
 func _is_aisle(angle: float) -> bool:
 	return fmod(absf(angle) + 0.5, AISLE_EVERY) < 1.0
+
+
+## The height of whatever a falling ball would land on at a point: the
+## tread of the row of seats there, the top of the back wall, or the
+## ground (0) beyond the stands and inside the field.
+func surface_height(at: Vector3) -> float:
+	var angle := FieldLayout.spray_angle_of(at)
+	var radius := Vector2(at.x, at.z).length()
+	var p := profile(angle)
+	var rows := int(p.z)
+	if radius < p.x or rows <= 0:
+		return 0.0
+	var k := int((radius - p.x) / ROW_DEPTH)
+	if k >= rows:
+		return 0.0 if radius > p.x + rows * ROW_DEPTH + 1.0 else row_height(angle, p, rows - 1) + 1.2
+	return row_height(angle, p, k)
 
 
 func point(angle: float, radius: float, height: float) -> Vector3:
@@ -555,6 +574,13 @@ func board_face(board: Node3D, home: TeamDef, away: TeamDef, number_color: Color
 	return {"cells": cells, "lamps": lamps, "batter": batter}
 
 
+## Takes the video board over for a celebration (see Jumbotron.play_moment).
+func board_moment(kind: StringName, data: Dictionary = {}) -> void:
+	for board in _boards:
+		if board.has("jumbo"):
+			(board["jumbo"] as Jumbotron).play_moment(kind, data)
+
+
 ## Updates the board from the match (cheap when nothing changed).
 func update_scoreboard(state: MatchState, roster: MatchRoster) -> void:
 	if _boards.is_empty():
@@ -567,6 +593,8 @@ func update_scoreboard(state: MatchState, roster: MatchRoster) -> void:
 	var first := maxi(state.inning - 8, 1)  # extra innings scroll the window
 	var lit := {"B": state.balls, "S": state.strikes, "O": state.outs}
 	for board in _boards:
+		if board.has("jumbo"):
+			(board["jumbo"] as Jumbotron).show_state(state, roster)
 		if board.has("card"):
 			_fill_card(board["card"], p, state)
 		if not board.has("cells"):

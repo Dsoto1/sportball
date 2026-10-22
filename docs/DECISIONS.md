@@ -1409,3 +1409,29 @@ Reason: Owner request for another detail pass against the sheets. The balance ch
   - Sentinels: a little more power.
   - Scorpions: less contact, power and stuff.
 - **Rerun:** 17 clubs fall between .441 and .551. The Glitterati sit at .596, a little high. Their roster is hand-authored, so they're left as they are pending another run.
+
+## 2026-10-22 - Long-Ball Camera and Video Board
+
+- **Long-ball camera (`MatchView.start_flight`):** a new FLIGHT camera mode.
+  - **Shot 0:** from behind and above the plate as the ball leaves the bat.
+  - **Shot 1:** trailing it out over the field, leading it a little.
+  - **Home runs:**
+    - **Shot 2:** a cut to short of the wall, off to one side, framing where it comes down and the video board.
+    - Held while the crowd goes up.
+    - **Shot 3:** the trot, from high behind first base.
+  - Deep flies the AI is chasing get shots 0-1 until the catch or bounce, then hand back to the field camera. A human fielder keeps the field camera to make the play.
+  - The ball draws a comet tail in flight, and a gold-and-white burst pops where a homer lands.
+  - The director holds a home run 6.5 s past the wall so the sequence plays out.
+- **Home-run flight past the wall:** `BallTrajectory` now continues a homer's flight beyond the fence to field level (`tail_points`, `flight_position`, `projected_distance`). This is presentation and board data only; the rules still end the play at the wall. The view drops the ball into the first seat row or ground under it (`Stadium.surface_height`).
+- **Video board (`Jumbotron`):** an off-screen 2D display (1280×720 SubViewport) on the centerpiece's screen, replacing the 3D-label batter card.
+  - **Scoreboard:**
+    - Header: both clubs and the score in their colors, with the inning.
+    - Batter card: in the batting club's colors, with number, name, position and bats, plus AVG/HR/RBI tiles.
+    - Footer: ball/strike/out lamps, and the pitcher with his pitch count.
+  - **Celebrations (`play_moment`):**
+    - HOME RUN, or GRAND SLAM with four runs: turning burst rays, confetti and a white flash. The gold title springs in, then the batter and the Statcast tiles slide up: distance (projected ft), exit velocity and launch angle.
+    - A strikeout shows a big K.
+  - The view fires the home-run takeover the moment the ball lands.
+- **Tools:**
+  - `tools/flight_shots.gd` renders a home run's camera sequence for a park.
+  - `tools/board_shots.gd` renders the board flat.

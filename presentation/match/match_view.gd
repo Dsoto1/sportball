@@ -4,7 +4,7 @@ extends Node3D
 ## resolver output (PitchResult, BallTrajectory, FieldingResult, RunnerPlan,
 ## PlayOutcome); nothing in this node decides a baseball outcome.
 
-enum CameraMode { BAT, PITCH, FIELD }
+enum CameraMode { BAT, PITCH, FIELD, FLIGHT }
 
 const AWAY_COLOR := Color(0.85, 0.22, 0.2)
 const HOME_COLOR := Color(0.18, 0.42, 0.9)
@@ -48,6 +48,26 @@ var _pitch_marker: MeshInstance3D
 var _control_ring: MeshInstance3D
 var _landing_hint: MeshInstance3D
 var _field_focus := Vector3(0.0, 0.0, -42.0)
+## The long-ball camera: a deep fly or a home run, followed from the bat
+## to where it comes down (into the seats for a homer), then the trot.
+var _flight: BallTrajectory
+var _flight_hr := false
+var _flight_t := 0.0
+## Hand back to the field camera at this play time (a catch or a bounce).
+var _flight_until := INF
+## Where and when a homer comes down (seats or ground), presentation time.
+var _flight_land_t := INF
+var _flight_land := Vector3.ZERO
+var _flight_cheered := false
+var _flight_shot := -1
+## What the video board celebrates when a homer lands.
+var _flight_moment := {}
+## The long ball's comet tail (recent positions) and the burst where a
+## homer lands.
+var _flight_tail: Array[MeshInstance3D] = []
+var _flight_burst: CPUParticles3D
+## Fired when a home run lands in the stands (the board's cue).
+signal home_run_landed(distance_ft: int)
 ## Seconds a swing takes to come through the zone and follow through.
 ## The swing from the press: the barrel reaches the ball
 ## BattingStyles.CONTACT_AT into it (60 ms), the rest is follow-through.
@@ -140,7 +160,7 @@ func setup(p_tuning: BaseballTuning) -> void:
 	_build_debug()
 
 
-const CAMERA_FOV := {CameraMode.BAT: 34.0, CameraMode.PITCH: 50.0, CameraMode.FIELD: 55.0}
+const CAMERA_FOV := {CameraMode.BAT: 34.0, CameraMode.PITCH: 50.0, CameraMode.FIELD: 55.0, CameraMode.FLIGHT: 50.0}
 
 
 func set_camera_mode(mode: CameraMode) -> void:
@@ -155,6 +175,132 @@ func set_camera_mode(mode: CameraMode) -> void:
 
 
 ## Point the ball-in-play camera tracks.
+## Follows a long ball with the flight camera: from behind the plate as it
+## leaves the bat, chasing it out over the field, and for a home run a cut
+## to the wall to watch it drop into the crowd, then the trot from up high.
+## A non-homer hands back to the field camera at `until` (catch, bounce).
+func start_flight(traj: BallTrajectory, home_run: bool, until: float = INF, moment: Dictionary = {}) -> void:
+	_flight = traj
+	_flight_moment = moment
+	_flight_hr = home_run
+	_flight_t = 0.0
+	_flight_until = until
+	_flight_cheered = false
+	_flight_shot = -1
+	_flight_land_t = INF
+	if home_run:
+		# Where it comes down: the first seat row (or ground) under it.
+		var t := traj.end_time()
+		var stop := traj.end_time() + traj.tail_points.size() * traj.step
+		while t < stop:
+			t += traj.step * 0.5
+			var p := traj.flight_position(t)
+			var floor_h := _stadium.surface_height(p) if _stadium != null else 0.0
+			if p.y <= floor_h:
+				_flight_land_t = t
+				_flight_land = Vector3(p.x, floor_h, p.z)
+				break
+		if _flight_land_t == INF:
+			_flight_land_t = stop
+			_flight_land = traj.flight_position(stop)
+	_build_flight_fx()
+	for ghost in _flight_tail:
+		ghost.visible = false
+	set_camera_mode(CameraMode.FLIGHT)
+
+
+func _build_flight_fx() -> void:
+	if not _flight_tail.is_empty():
+		return
+	for i in 14:
+		var ghost := MeshInstance3D.new()
+		var s := SphereMesh.new()
+		s.radius = 0.16 * (1.0 - i / 16.0)
+		s.height = s.radius * 2.0
+		s.radial_segments = 8
+		s.rings = 4
+		ghost.mesh = s
+		var m := StandardMaterial3D.new()
+		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+		m.albedo_color = Color(1.0, 0.95, 0.8, 0.55 * (1.0 - i / 14.0))
+		ghost.material_override = m
+		ghost.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		ghost.visible = false
+		add_child(ghost)
+		_flight_tail.append(ghost)
+	_flight_burst = CPUParticles3D.new()
+	_flight_burst.emitting = false
+	_flight_burst.one_shot = true
+	_flight_burst.amount = 60
+	_flight_burst.lifetime = 1.6
+	_flight_burst.explosiveness = 0.95
+	_flight_burst.direction = Vector3.UP
+	_flight_burst.spread = 70.0
+	_flight_burst.initial_velocity_min = 4.0
+	_flight_burst.initial_velocity_max = 9.0
+	_flight_burst.gravity = Vector3(0, -6, 0)
+	_flight_burst.scale_amount_min = 0.15
+	_flight_burst.scale_amount_max = 0.35
+	var bit := BoxMesh.new()
+	bit.size = Vector3(0.6, 0.6, 0.08)
+	_flight_burst.mesh = bit
+	var bm := StandardMaterial3D.new()
+	bm.vertex_color_use_as_albedo = true
+	bm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_flight_burst.material_override = bm
+	var ramp := Gradient.new()
+	ramp.set_color(0, Color(1.0, 0.85, 0.3))
+	ramp.set_color(1, Color(1.0, 1.0, 1.0))
+	_flight_burst.color_initial_ramp = ramp
+	add_child(_flight_burst)
+
+
+## Advances the long-ball camera to play time `t`: the ball (a homer flies
+## on into the seats), the crowd going up as it lands, and the hand-back to
+## the field camera for anything else.
+func step_flight(t: float) -> void:
+	_flight_t = t
+	# The comet tail, gone once the ball comes down.
+	var airborne := t < (_flight_land_t if _flight_hr else _flight.first_bounce_time)
+	for i in _flight_tail.size():
+		var ghost := _flight_tail[i]
+		var at := t - (i + 1) * 0.035
+		ghost.visible = airborne and at > 0.05
+		ghost.position = flight_ball(at)
+	if _flight_hr:
+		_ball.position = flight_ball(t)
+		if t >= _flight_land_t and not _flight_cheered:
+			_flight_cheered = true
+			_flight_burst.position = _flight_land + Vector3.UP * 0.5
+			_flight_burst.restart()
+			cheer(1.0)
+			var moment := _flight_moment.duplicate()
+			moment["distance"] = roundi(_flight.projected_distance() * 3.28084)
+			board_moment(&"home_run", moment)
+			home_run_landed.emit(roundi(_flight.projected_distance() * 3.28084))
+	elif t >= _flight_until:
+		for ghost in _flight_tail:
+			ghost.visible = false
+		set_camera_mode(CameraMode.FIELD)
+
+
+## The middle of the park's video board (straightaway center if none).
+func _board_spot() -> Vector3:
+	var board: Node3D = _stadium.find_child("Centerpiece", false, false) if _stadium != null else null
+	return board.global_position if board != null else Vector3(0, 25, -130)
+
+
+## Where the ball is drawn on a flight: a homer stops in the seats.
+func flight_ball(t: float) -> Vector3:
+	if _flight == null:
+		return Vector3.ZERO
+	if _flight_hr and t >= _flight_land_t:
+		return _flight_land + Vector3.UP * 0.12
+	return _flight.flight_position(t)
+
+
 func set_field_focus(point: Vector3) -> void:
 	_field_focus = point
 
@@ -395,6 +541,8 @@ func show_play(bip: BallInPlay, t: float, play: LivePlay, outcome: PlayOutcome, 
 	var fielding := bip.fielding
 	var secured := play != null and play.ball != LivePlay.Ball.LOOSE
 	_ball.position = play.ball_position() if play != null else bip.trajectory.position_at(t)
+	if _camera_mode == CameraMode.FLIGHT and _flight == bip.trajectory:
+		step_flight(t)
 	_update_shadow()
 	_control_ring.visible = live != null and not live.is_secured() and live.controlled >= 0
 	# Gameplay aid for the human fielder: where a fly ball will come down.
@@ -559,6 +707,9 @@ func _process(delta: float) -> void:
 	_update_bat()
 	_update_windup(delta)
 	_spin_ball()
+	if _camera_mode == CameraMode.FLIGHT and _flight != null:
+		_flight_camera(delta, kick)
+		return
 	var spot: Array = CAMERA_SPOTS[_camera_mode]
 	var weight := 1.0 - exp(-delta * 6.0)
 	var goal: Vector3 = spot[0]
@@ -583,6 +734,65 @@ func _process(delta: float) -> void:
 	var wanted := (target - _camera.position).normalized()
 	var look := forward.slerp(wanted, weight)
 	_camera.look_at(_camera.position + look, Vector3.UP)
+
+
+## The long-ball shots. 0 rise: from behind and above the plate as it leaves
+## the bat. 1 chase: trailing it out over the field, leading it a little.
+## For a homer, 2 the wall: a cut to the warning track to watch it sail
+## over the wall into the crowd, held while they celebrate; 3 the trot: up
+## high behind first base looking over the diamond.
+func _flight_camera(delta: float, kick: float) -> void:
+	var t := _flight_t
+	var ball := flight_ball(t)
+	var aim := _flight_land if _flight_hr else _flight.landing_point
+	var dir := Vector3(aim.x, 0.0, aim.z).normalized()
+	if dir.length() < 0.5:
+		dir = Vector3(0, 0, -1)
+	var side := dir.cross(Vector3.UP).normalized()
+	var shot := 0
+	var wall_cut := (_flight.fence_time if _flight.fence_time != INF else _flight.end_time()) - 0.9
+	if t > 0.45:
+		shot = 1
+	if _flight_hr and t > wall_cut:
+		shot = 2
+	if _flight_hr and t > _flight_land_t + 2.2:
+		shot = 3
+	var goal: Vector3
+	var look: Vector3
+	var fov := 50.0
+	match shot:
+		0:
+			goal = Vector3(0, 0, 0) - dir * 9.0 + Vector3.UP * 5.0 + side * 1.5
+			look = ball
+			fov = 46.0
+		1:
+			var flat := Vector3(ball.x, 0.0, ball.z)
+			goal = flat - dir * 26.0 + side * 6.0 + Vector3.UP * (ball.y * 0.55 + 7.0)
+			look = ball + dir * 10.0
+			fov = 52.0
+		2:
+			# From short of the wall and off to one side, looking up past it
+			# to where the ball comes down, the big screen in the frame.
+			var wall := dir * FieldLayout.fence_distance(FieldLayout.spray_angle_of(dir), tuning)
+			var falling := (ball if t < _flight_land_t else _flight_land).lerp(_flight_land, 0.5)
+			goal = wall - dir * 58.0 + side * 10.0 + Vector3.UP * 4.0
+			look = falling.lerp(_board_spot(), 0.45) + Vector3.UP * 2.0
+			fov = 56.0
+		3:
+			goal = Vector3(26.0, 20.0, 16.0)
+			look = Vector3(-4.0, 0.0, -16.0)
+			fov = 50.0
+	var weight := 1.0 - exp(-delta * (2.5 if shot == 1 else 5.0))
+	if shot != _flight_shot:
+		# A cut, not a pan: each shot starts framed.
+		weight = 1.0
+		_flight_shot = shot
+		_camera.fov = fov
+	_camera.fov = lerpf(_camera.fov, fov - 5.0 * kick, 1.0 - exp(-delta * 4.0))
+	_camera.position = _camera.position.lerp(goal, weight)
+	var forward := -_camera.global_transform.basis.z
+	var wanted := (look - _camera.position).normalized()
+	_camera.look_at(_camera.position + (wanted if weight >= 1.0 else forward.slerp(wanted, 1.0 - exp(-delta * 8.0))), Vector3.UP)
 
 
 ## Tumbles the ball about the axis across its travel, so its seams spin in
@@ -889,6 +1099,12 @@ func set_park(p_tuning: BaseballTuning, park: StadiumDef) -> void:
 
 
 ## The crowd reacts to a moment (0..1): the roar and the fans jumping.
+## Takes the park's video board over for a celebration.
+func board_moment(kind: StringName, data: Dictionary = {}) -> void:
+	if _stadium != null:
+		_stadium.board_moment(kind, data)
+
+
 func cheer(level: float) -> void:
 	sfx.cheer(level)
 	if _stadium != null:

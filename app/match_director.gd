@@ -15,6 +15,9 @@ const WINDUP_TIME := 0.7
 const HIT_STOP := {ContactFeedback.Tier.SOLID: 0.05, ContactFeedback.Tier.SWEET: 0.11}
 const CALL_PAUSE := 0.8
 ## Crowd reaction (0..1) to how a plate appearance ended.
+## Extra seconds a home run plays out after it clears the wall: the landing,
+## the crowd and the trot camera.
+const HOME_RUN_SHOW := 6.5
 const CROWD := {&"strikeout": 0.3, &"single": 0.45, &"double": 0.65, &"triple": 0.8, &"home_run": 1.0,
 	&"inside_the_park_home_run": 1.0, &"double_play": 0.6, &"triple_play": 0.9}
 const PLAY_SETTLE_PAUSE := 0.9
@@ -578,7 +581,13 @@ func _start_ball_in_play() -> void:
 	_live = null
 	_dive_requested = false
 	if _bip.is_home_run():
-		_play_done_at = _bip.home_run_settle_time()
+		var hitter := roster.player(_bip.batter_id)
+		var moment := {"team": roster.teams[state.batting_team()], "name": hitter.display_name if hitter != null else "", "number": hitter.number if hitter != null else 0,
+			"exit_velocity": roundi(_contact.exit_velocity * ContactFeedback.MPH), "launch": roundi(_contact.launch_angle),
+			"runs": 1 + _bip.bases_before.filter(func(r: StringName) -> bool: return r != &"").size()}
+		_view.start_flight(_bip.trajectory, true, INF, moment)
+		# Long enough to watch it land, the crowd go up, and the trot.
+		_play_done_at = maxf(_bip.home_run_settle_time(), _bip.trajectory.end_time() + HOME_RUN_SHOW)
 		_finish_play(RunnerResolver.home_run(_bip.bases_before, _bip.batter_id))
 	else:
 		var human_fields := not user_is_batting() and _bip.fielding.has_fielder()
@@ -587,6 +596,14 @@ func _start_ball_in_play() -> void:
 			_live = LiveFielding.new(_bip.trajectory, _bip.fielders, _bip.fielding, tuning, _bip.fielding.fielder_index)
 			_live.assist = tuning.rookie_assist
 		_play = _bip.start_live(not human_fields, rng)
+		# A deep fly the AI is chasing gets the long-ball camera until it
+		# comes down; a human fielder keeps the field camera to play it.
+		var traj := _bip.trajectory
+		if not human_fields and not _bip.is_runner_play() and traj.apex_height > 14.0 and traj.distance() > 70.0:
+			var until := traj.first_bounce_time
+			if _bip.fielding.has_fielder() and _bip.fielding.secure_time < until:
+				until = _bip.fielding.secure_time
+			_view.start_flight(traj, false, minf(until, traj.end_time()) + 0.3)
 		_play.human_defense = not user_is_batting()
 		for base: int in _steals:
 			_play.set_running_start(base, _steal_head(base, _pitch.travel_time))
@@ -764,6 +781,7 @@ func _drain_events() -> void:
 				_view.cheer(CROWD.get(event.data["result"], 0.0))
 				if event.data["result"] == &"strikeout":
 					_hud.show_callout("STRUCK OUT", _timing_detail())
+					_view.board_moment(&"strikeout", {"team": roster.teams[state.fielding_team()]})
 				elif event.data["result"] == &"walk":
 					_hud.show_callout("WALK")
 			DomainEvent.RUN_SCORED:
