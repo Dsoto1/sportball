@@ -14,7 +14,7 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 		var angle := rng.randf_range(-70.0, 70.0)
 		var craft := Node3D.new()
 		root.add_child(craft)
-		craft.position = stadium.point(angle, rng.randf_range(170.0, 320.0), rng.randf_range(60.0, 110.0))
+		craft.position = stadium.point(angle, rng.randf_range(160.0, 260.0), rng.randf_range(38.0, 70.0))
 		craft.rotation.y = rng.randf() * TAU
 		craft.scale = Vector3.ONE * piece.size
 		if blimp:

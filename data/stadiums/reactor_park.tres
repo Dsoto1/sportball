@@ -14,31 +14,27 @@ points = PackedVector3Array(-45, 98, 3, -28, 108, 3, -12, 121, 3, -9, 130, 6.5, 
 script = ExtResource("2_smn81")
 kind = &"centerpiece"
 params = {
-"frame": &"gate"
+"frame": &"gate",
+"pillar_cap": &"emblem"
 }
 
 [sub_resource type="Resource" id="Resource_mr6iu"]
 script = ExtResource("2_smn81")
-kind = &"scoreboard"
-angle = -34.0
-
-[sub_resource type="Resource" id="Resource_lexrw"]
-script = ExtResource("2_smn81")
 kind = &"slogan_board"
 angle = 34.0
 
-[sub_resource type="Resource" id="Resource_ubcck"]
+[sub_resource type="Resource" id="Resource_lexrw"]
 script = ExtResource("2_smn81")
 kind = &"light_towers"
 
-[sub_resource type="Resource" id="Resource_pc4ek"]
+[sub_resource type="Resource" id="Resource_ubcck"]
 script = ExtResource("2_smn81")
 kind = &"skyline"
 params = {
 "height": 0.9
 }
 
-[sub_resource type="Resource" id="Resource_6tw7a"]
+[sub_resource type="Resource" id="Resource_pc4ek"]
 script = ExtResource("2_smn81")
 kind = &"smokestacks"
 angle = -24.0
@@ -50,7 +46,7 @@ params = {
 "tint": 0.6
 }
 
-[sub_resource type="Resource" id="Resource_rqh0y"]
+[sub_resource type="Resource" id="Resource_6tw7a"]
 script = ExtResource("2_smn81")
 kind = &"smokestacks"
 angle = 24.0
@@ -62,7 +58,7 @@ params = {
 "tint": 0.6
 }
 
-[sub_resource type="Resource" id="Resource_5b7v7"]
+[sub_resource type="Resource" id="Resource_rqh0y"]
 script = ExtResource("2_smn81")
 kind = &"smokestacks"
 angle = 46.0
@@ -72,7 +68,7 @@ params = {
 "span": 14.0
 }
 
-[sub_resource type="Resource" id="Resource_3c86f"]
+[sub_resource type="Resource" id="Resource_5b7v7"]
 script = ExtResource("2_smn81")
 kind = &"pipes"
 angle = -48.0
@@ -80,7 +76,7 @@ params = {
 "span": 96.0
 }
 
-[sub_resource type="Resource" id="Resource_rbxcs"]
+[sub_resource type="Resource" id="Resource_3c86f"]
 script = ExtResource("2_smn81")
 kind = &"water"
 angle = 25.0
@@ -89,7 +85,7 @@ params = {
 "width": 55.0
 }
 
-[sub_resource type="Resource" id="Resource_jt861"]
+[sub_resource type="Resource" id="Resource_rbxcs"]
 script = ExtResource("2_smn81")
 kind = &"arcade"
 angle = 50.0
@@ -100,7 +96,7 @@ params = {
 "style": &"truss"
 }
 
-[sub_resource type="Resource" id="Resource_rdo3b"]
+[sub_resource type="Resource" id="Resource_jt861"]
 script = ExtResource("2_smn81")
 kind = &"arcade"
 angle = 11.0
@@ -112,7 +108,7 @@ params = {
 "style": &"truss"
 }
 
-[sub_resource type="Resource" id="Resource_gt3op"]
+[sub_resource type="Resource" id="Resource_rdo3b"]
 script = ExtResource("2_smn81")
 kind = &"canopy"
 angle = 52.0
@@ -121,7 +117,7 @@ params = {
 "style": &"steel"
 }
 
-[sub_resource type="Resource" id="Resource_bf2r3"]
+[sub_resource type="Resource" id="Resource_gt3op"]
 script = ExtResource("2_smn81")
 kind = &"wall_art"
 params = {
@@ -129,7 +125,7 @@ params = {
 "motif": &"zigzag"
 }
 
-[sub_resource type="Resource" id="Resource_tqrb3"]
+[sub_resource type="Resource" id="Resource_bf2r3"]
 script = ExtResource("2_smn81")
 kind = &"pipes"
 angle = 12.0
@@ -137,6 +133,14 @@ mirrored = true
 params = {
 "runs": 3,
 "span": 34.0
+}
+
+[sub_resource type="Resource" id="Resource_tqrb3"]
+script = ExtResource("2_smn81")
+kind = &"string_lights"
+angle = -150.0
+params = {
+"color": Color(0.49019608, 1, 0.6901961, 1)
 }
 
 [resource]

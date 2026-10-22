@@ -15,7 +15,8 @@ air_drag_scale = 0.98
 script = ExtResource("2_i6hdv")
 kind = &"centerpiece"
 params = {
-"frame": &"gate"
+"frame": &"gate",
+"pillar_cap": &"brazier"
 }
 
 [sub_resource type="Resource" id="Resource_i0mm2"]
@@ -137,6 +138,14 @@ params = {
 "motif": &"flame"
 }
 
+[sub_resource type="Resource" id="Resource_hknc5"]
+script = ExtResource("2_i6hdv")
+kind = &"string_lights"
+angle = -150.0
+params = {
+"color": Color(1, 0.5411765, 0.22745098, 1)
+}
+
 [resource]
 script = ExtResource("3_agqh5")
 id = &"firelight"
@@ -165,4 +174,4 @@ facade_color = Color(0.3529412, 0.2509804, 0.21960784, 1)
 facade_surface = &"rock"
 structure_surface = &"stone"
 ground_surface = &"rock"
-pieces = Array[ExtResource("2_i6hdv")]([SubResource("Resource_e7rjo"), SubResource("Resource_i0mm2"), SubResource("Resource_mj2kq"), SubResource("Resource_3f7vq"), SubResource("Resource_6utd5"), SubResource("Resource_mak6g"), SubResource("Resource_u72hd"), SubResource("Resource_ab22m"), SubResource("Resource_utrqo"), SubResource("Resource_3o3vf"), SubResource("Resource_sn4q8"), SubResource("Resource_q57wx"), SubResource("Resource_ihh0h"), SubResource("Resource_csl2m")])
+pieces = Array[ExtResource("2_i6hdv")]([SubResource("Resource_e7rjo"), SubResource("Resource_i0mm2"), SubResource("Resource_mj2kq"), SubResource("Resource_3f7vq"), SubResource("Resource_6utd5"), SubResource("Resource_mak6g"), SubResource("Resource_u72hd"), SubResource("Resource_ab22m"), SubResource("Resource_utrqo"), SubResource("Resource_3o3vf"), SubResource("Resource_sn4q8"), SubResource("Resource_q57wx"), SubResource("Resource_ihh0h"), SubResource("Resource_csl2m"), SubResource("Resource_hknc5")])

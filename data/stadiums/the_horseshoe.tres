@@ -19,26 +19,21 @@ params = {
 
 [sub_resource type="Resource" id="Resource_o5o6h"]
 script = ExtResource("2_olas1")
-kind = &"scoreboard"
-angle = -34.0
-
-[sub_resource type="Resource" id="Resource_b4fev"]
-script = ExtResource("2_olas1")
 kind = &"slogan_board"
 angle = 34.0
 
-[sub_resource type="Resource" id="Resource_2quui"]
+[sub_resource type="Resource" id="Resource_b4fev"]
 script = ExtResource("2_olas1")
 kind = &"light_towers"
 
-[sub_resource type="Resource" id="Resource_26mby"]
+[sub_resource type="Resource" id="Resource_2quui"]
 script = ExtResource("2_olas1")
 kind = &"skyline"
 params = {
 "height": 1.2
 }
 
-[sub_resource type="Resource" id="Resource_gnd8x"]
+[sub_resource type="Resource" id="Resource_26mby"]
 script = ExtResource("2_olas1")
 kind = &"viaduct"
 angle = 14.0
@@ -47,7 +42,7 @@ params = {
 "span": 40.0
 }
 
-[sub_resource type="Resource" id="Resource_1t2v1"]
+[sub_resource type="Resource" id="Resource_gnd8x"]
 script = ExtResource("2_olas1")
 kind = &"lamps"
 angle = -150.0
@@ -56,7 +51,7 @@ params = {
 "span": 300.0
 }
 
-[sub_resource type="Resource" id="Resource_ugxod"]
+[sub_resource type="Resource" id="Resource_1t2v1"]
 script = ExtResource("2_olas1")
 kind = &"bunting"
 angle = 50.0
@@ -64,7 +59,7 @@ params = {
 "span": 260.0
 }
 
-[sub_resource type="Resource" id="Resource_oqwa8"]
+[sub_resource type="Resource" id="Resource_ugxod"]
 script = ExtResource("2_olas1")
 kind = &"arcade"
 angle = 50.0
@@ -80,7 +75,7 @@ params = {
 "towers": 6
 }
 
-[sub_resource type="Resource" id="Resource_x303p"]
+[sub_resource type="Resource" id="Resource_oqwa8"]
 script = ExtResource("2_olas1")
 kind = &"arcade"
 angle = 11.0
@@ -92,13 +87,22 @@ params = {
 "style": &"arches"
 }
 
-[sub_resource type="Resource" id="Resource_y7kvt"]
+[sub_resource type="Resource" id="Resource_x303p"]
 script = ExtResource("2_olas1")
 kind = &"wall_art"
 params = {
 "every": 10.0,
 "glow": 0.6,
 "motif": &"star"
+}
+
+[sub_resource type="Resource" id="Resource_y7kvt"]
+script = ExtResource("2_olas1")
+kind = &"string_lights"
+angle = -150.0
+params = {
+"color": Color(1, 0.8352941, 0.6039216, 1),
+"every": 4.0
 }
 
 [resource]

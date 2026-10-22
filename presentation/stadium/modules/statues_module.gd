@@ -13,7 +13,7 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	var spot := stadium.point(piece.angle, top.x - 1.0, top.y + 0.6)
 	root.look_at_from_position(spot, Vector3(0, spot.y, -45.0), Vector3.UP)
 	# Monumental: readable from home plate across the park.
-	root.scale = Vector3.ONE * piece.size * 2.2
+	root.scale = Vector3.ONE * piece.size * 2.2 * float(piece.param("scale"))
 	var pedestal := stadium.box(Vector3(5.0, 2.4, 3.0), stadium.def.structure_color.lightened(0.15), root, &"marble")
 	pedestal.position.y = 1.2
 	var figure := StringName(piece.param("figure"))

@@ -15,7 +15,8 @@ air_drag_scale = 1.06
 script = ExtResource("2_i0spf")
 kind = &"centerpiece"
 params = {
-"frame": &"arch"
+"frame": &"arch",
+"pillar_cap": &"emblem"
 }
 
 [sub_resource type="Resource" id="Resource_cbmm1"]
@@ -84,7 +85,8 @@ script = ExtResource("2_i0spf")
 kind = &"statue"
 angle = 24.0
 params = {
-"figure": &"titan"
+"figure": &"titan",
+"scale": 1.5
 }
 
 [sub_resource type="Resource" id="Resource_5gvei"]
@@ -125,6 +127,25 @@ params = {
 "motif": &"trident"
 }
 
+[sub_resource type="Resource" id="Resource_5d5yf"]
+script = ExtResource("2_i0spf")
+kind = &"planters"
+angle = -46.0
+params = {
+"density": 1.6,
+"flower": Color(1, 0.5411765, 0.41568628, 1),
+"green": Color(0.16470589, 0.5411765, 0.47843137, 1),
+"span": 92.0
+}
+
+[sub_resource type="Resource" id="Resource_u5qq5"]
+script = ExtResource("2_i0spf")
+kind = &"string_lights"
+angle = -150.0
+params = {
+"color": Color(0.62352943, 0.9529412, 1, 1)
+}
+
 [resource]
 script = ExtResource("3_g7bjb")
 id = &"deepwater"
@@ -150,4 +171,4 @@ window_color = Color(0.62352943, 0.9529412, 1, 1)
 facade_color = Color(0.43529412, 0.56078434, 0.5411765, 1)
 facade_surface = &"stone"
 structure_surface = &"stone"
-pieces = Array[ExtResource("2_i0spf")]([SubResource("Resource_ishok"), SubResource("Resource_cbmm1"), SubResource("Resource_7vq3x"), SubResource("Resource_k8dg8"), SubResource("Resource_r6hhh"), SubResource("Resource_skpg2"), SubResource("Resource_f41hn"), SubResource("Resource_2nvy3"), SubResource("Resource_5gvei"), SubResource("Resource_8r6tk"), SubResource("Resource_qowj7"), SubResource("Resource_p58t1")])
+pieces = Array[ExtResource("2_i0spf")]([SubResource("Resource_ishok"), SubResource("Resource_cbmm1"), SubResource("Resource_7vq3x"), SubResource("Resource_k8dg8"), SubResource("Resource_r6hhh"), SubResource("Resource_skpg2"), SubResource("Resource_f41hn"), SubResource("Resource_2nvy3"), SubResource("Resource_5gvei"), SubResource("Resource_8r6tk"), SubResource("Resource_qowj7"), SubResource("Resource_p58t1"), SubResource("Resource_5d5yf"), SubResource("Resource_u5qq5")])

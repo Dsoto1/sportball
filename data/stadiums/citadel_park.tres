@@ -15,31 +15,27 @@ air_drag_scale = 1.02
 script = ExtResource("2_j3t4y")
 kind = &"centerpiece"
 params = {
-"frame": &"arch"
+"frame": &"arch",
+"pillar_cap": &"emblem"
 }
 
 [sub_resource type="Resource" id="Resource_ia03i"]
 script = ExtResource("2_j3t4y")
-kind = &"scoreboard"
-angle = -34.0
-
-[sub_resource type="Resource" id="Resource_61igp"]
-script = ExtResource("2_j3t4y")
 kind = &"slogan_board"
 angle = 34.0
 
-[sub_resource type="Resource" id="Resource_ncnwa"]
+[sub_resource type="Resource" id="Resource_61igp"]
 script = ExtResource("2_j3t4y")
 kind = &"light_towers"
 
-[sub_resource type="Resource" id="Resource_0qmui"]
+[sub_resource type="Resource" id="Resource_ncnwa"]
 script = ExtResource("2_j3t4y")
 kind = &"skyline"
 params = {
 "height": 0.7
 }
 
-[sub_resource type="Resource" id="Resource_qg3hj"]
+[sub_resource type="Resource" id="Resource_0qmui"]
 script = ExtResource("2_j3t4y")
 kind = &"arcade"
 angle = 50.0
@@ -55,7 +51,7 @@ params = {
 "towers": 4
 }
 
-[sub_resource type="Resource" id="Resource_xj6r1"]
+[sub_resource type="Resource" id="Resource_qg3hj"]
 script = ExtResource("2_j3t4y")
 kind = &"arcade"
 angle = 11.0
@@ -72,7 +68,7 @@ params = {
 "towers": 2
 }
 
-[sub_resource type="Resource" id="Resource_d0nb8"]
+[sub_resource type="Resource" id="Resource_xj6r1"]
 script = ExtResource("2_j3t4y")
 kind = &"statue"
 angle = 15.0
@@ -81,7 +77,7 @@ params = {
 "figure": &"knight"
 }
 
-[sub_resource type="Resource" id="Resource_5ij81"]
+[sub_resource type="Resource" id="Resource_d0nb8"]
 script = ExtResource("2_j3t4y")
 kind = &"cathedral"
 angle = -6.0
@@ -89,16 +85,7 @@ params = {
 "distance": 150.0
 }
 
-[sub_resource type="Resource" id="Resource_2lqch"]
-script = ExtResource("2_j3t4y")
-kind = &"bridge"
-angle = -32.0
-params = {
-"distance": 40.0,
-"length": 120.0
-}
-
-[sub_resource type="Resource" id="Resource_0f0xv"]
+[sub_resource type="Resource" id="Resource_5ij81"]
 script = ExtResource("2_j3t4y")
 kind = &"flags"
 angle = -55.0
@@ -107,12 +94,20 @@ params = {
 "span": 110.0
 }
 
-[sub_resource type="Resource" id="Resource_6gp50"]
+[sub_resource type="Resource" id="Resource_2lqch"]
 script = ExtResource("2_j3t4y")
 kind = &"wall_art"
 params = {
 "every": 8.0,
 "motif": &"emblem"
+}
+
+[sub_resource type="Resource" id="Resource_0f0xv"]
+script = ExtResource("2_j3t4y")
+kind = &"string_lights"
+angle = -150.0
+params = {
+"color": Color(1, 0.8352941, 0.6039216, 1)
 }
 
 [resource]
@@ -138,4 +133,4 @@ window_color = Color(1, 0.8352941, 0.6039216, 1)
 facade_color = Color(0.54901963, 0.5411765, 0.5568628, 1)
 facade_surface = &"stone"
 structure_surface = &"stone"
-pieces = Array[ExtResource("2_j3t4y")]([SubResource("Resource_r10jk"), SubResource("Resource_ia03i"), SubResource("Resource_61igp"), SubResource("Resource_ncnwa"), SubResource("Resource_0qmui"), SubResource("Resource_qg3hj"), SubResource("Resource_xj6r1"), SubResource("Resource_d0nb8"), SubResource("Resource_5ij81"), SubResource("Resource_2lqch"), SubResource("Resource_0f0xv"), SubResource("Resource_6gp50")])
+pieces = Array[ExtResource("2_j3t4y")]([SubResource("Resource_r10jk"), SubResource("Resource_ia03i"), SubResource("Resource_61igp"), SubResource("Resource_ncnwa"), SubResource("Resource_0qmui"), SubResource("Resource_qg3hj"), SubResource("Resource_xj6r1"), SubResource("Resource_d0nb8"), SubResource("Resource_5ij81"), SubResource("Resource_2lqch"), SubResource("Resource_0f0xv")])

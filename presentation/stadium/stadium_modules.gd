@@ -16,8 +16,8 @@ const CATALOG := {
 		"name": "Centerpiece", "category": &"boards", "unique": true, "placed": false,
 		"about": "The board in straightaway center: club name under its emblem and the batter's card. Framed as a board, gate or arch.",
 		"angle": 0.0, "angle_range": [0.0, 0.0],
-		"params": {"height": [17.0, 12.0, 28.0], "frame": [&"board"], "clock": [false], "crown": [false]},
-		"choices": {"frame": [&"board", &"gate", &"arch"]},
+		"params": {"height": [17.0, 12.0, 28.0], "frame": [&"board"], "clock": [false], "crown": [false], "pillar_cap": [&"lamp"]},
+		"choices": {"frame": [&"board", &"gate", &"arch"], "pillar_cap": [&"lamp", &"brazier", &"emblem", &"none"]},
 		"script": preload("res://presentation/stadium/modules/centerpiece_module.gd"),
 	},
 	&"slogan_board": {
@@ -151,7 +151,7 @@ const CATALOG := {
 		"name": "Statue", "category": &"landmark", "unique": false, "placed": true,
 		"about": "A bronze statue on a pedestal atop the outfield stands: a charging bull or a figure.",
 		"angle": -25.0, "angle_range": [-60.0, 60.0],
-		"params": {"figure": [&"bull"]},
+		"params": {"figure": [&"bull"], "scale": [1.0, 0.3, 3.0]},
 		"choices": {"figure": [&"bull", &"figure", &"fox", &"titan", &"knight", &"scorpion"]},
 		"script": preload("res://presentation/stadium/modules/statues_module.gd"),
 	},
@@ -301,6 +301,20 @@ const CATALOG := {
 		"params": {"distance": [90.0, 20.0, 400.0]},
 		"script": preload("res://presentation/stadium/modules/cathedral_module.gd"),
 	},
+	&"string_lights": {
+		"name": "String Lights", "category": &"structure", "unique": false, "placed": true,
+		"about": "Warm bulbs strung along the top of the stands and facades across span degrees, sagging between posts.",
+		"angle": -150.0, "angle_range": [-180.0, 180.0],
+		"params": {"span": [300.0, -360.0, 360.0], "every": [6.0, 2.0, 30.0], "sag": [1.2, 0.0, 6.0], "lift": [1.5, -10.0, 20.0], "color": [Color(1.0, 0.82, 0.5)]},
+		"script": preload("res://presentation/stadium/modules/string_lights_module.gd"),
+	},
+	&"planters": {
+		"name": "Planters", "category": &"scenery", "unique": false, "placed": true,
+		"about": "Shrubs and flowers along the top of the stands across span degrees.",
+		"angle": -45.0, "angle_range": [-180.0, 180.0],
+		"params": {"span": [90.0, -360.0, 360.0], "density": [1.5, 0.2, 6.0], "flower": [Color(0.95, 0.5, 0.7)], "green": [Color(0.22, 0.5, 0.22)]},
+		"script": preload("res://presentation/stadium/modules/planters_module.gd"),
+	},
 	&"dome": {
 		"name": "Dome", "category": &"structure", "unique": true, "placed": false,
 		"about": "A sealed roof over the whole park: catwalk rings, light banks, a glowing crown. Indoor light.",
@@ -312,7 +326,8 @@ const CATALOG := {
 }
 
 ## Every park gets these unless its designer takes them out.
-const STANDARD := [&"centerpiece", &"scoreboard", &"slogan_board", &"light_towers", &"skyline"]
+## (The line-score board is opt-in: the sheets keep left field for banners.)
+const STANDARD := [&"centerpiece", &"slogan_board", &"light_towers", &"skyline"]
 
 
 static func kinds() -> Array:
@@ -381,7 +396,7 @@ static func validate(def: StadiumDef) -> PackedStringArray:
 				problems.append("%s has no setting '%s'" % [spec["name"], key])
 			elif not choices.is_empty() and not StringName(str(piece.params[key])) in choices:
 				problems.append("%s %s must be one of %s" % [spec["name"], key, choices])
-			elif range_spec.size() == 3 and (float(piece.params[key]) < float(range_spec[1]) or float(piece.params[key]) > float(range_spec[2])):
+			elif range_spec.size() == 3 and typeof(piece.params[key]) in [TYPE_INT, TYPE_FLOAT] and (float(piece.params[key]) < float(range_spec[1]) or float(piece.params[key]) > float(range_spec[2])):
 				problems.append("%s %s %s is outside %s..%s" % [spec["name"], key, piece.params[key], range_spec[1], range_spec[2]])
 		if piece.kind == &"wall_scoreboard" and def.field_shape != null and def.field_shape.height_at(piece.angle) < 6.0:
 			problems.append("Wall Scoreboard at %.0f° needs a wall 6 m or taller (%.1f m)" % [piece.angle, def.field_shape.height_at(piece.angle)])

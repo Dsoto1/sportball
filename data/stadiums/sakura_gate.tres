@@ -15,7 +15,8 @@ air_drag_scale = 1.02
 script = ExtResource("2_lnk5g")
 kind = &"centerpiece"
 params = {
-"frame": &"gate"
+"frame": &"gate",
+"pillar_cap": &"lamp"
 }
 
 [sub_resource type="Resource" id="Resource_2qcw0"]
@@ -105,7 +106,8 @@ script = ExtResource("2_lnk5g")
 kind = &"statue"
 angle = 31.0
 params = {
-"figure": &"fox"
+"figure": &"fox",
+"scale": 1.3
 }
 
 [sub_resource type="Resource" id="Resource_3gmcm"]
@@ -145,6 +147,26 @@ params = {
 "motif": &"blossom"
 }
 
+[sub_resource type="Resource" id="Resource_3skcn"]
+script = ExtResource("2_lnk5g")
+kind = &"planters"
+angle = -46.0
+params = {
+"density": 2.0,
+"flower": Color(0.96862745, 0.7137255, 0.8117647, 1),
+"green": Color(0.9098039, 0.6392157, 0.7490196, 1),
+"span": 92.0
+}
+
+[sub_resource type="Resource" id="Resource_xjidy"]
+script = ExtResource("2_lnk5g")
+kind = &"string_lights"
+angle = -150.0
+params = {
+"color": Color(1, 0.6039216, 0.3529412, 1),
+"every": 5.0
+}
+
 [resource]
 script = ExtResource("3_ypbrp")
 id = &"sakura_gate"
@@ -170,4 +192,4 @@ window_color = Color(1, 0.76862746, 0.5411765, 1)
 facade_color = Color(0.47843137, 0.14117648, 0.1254902, 1)
 facade_surface = &"wood"
 structure_surface = &"wood"
-pieces = Array[ExtResource("2_lnk5g")]([SubResource("Resource_s74iq"), SubResource("Resource_2qcw0"), SubResource("Resource_hr4ow"), SubResource("Resource_xqta4"), SubResource("Resource_twnlk"), SubResource("Resource_spi2t"), SubResource("Resource_wek3x"), SubResource("Resource_tfrrr"), SubResource("Resource_b2ggk"), SubResource("Resource_1a3r5"), SubResource("Resource_3gmcm"), SubResource("Resource_vhmi4"), SubResource("Resource_7jbfp"), SubResource("Resource_1vbk2")])
+pieces = Array[ExtResource("2_lnk5g")]([SubResource("Resource_s74iq"), SubResource("Resource_2qcw0"), SubResource("Resource_hr4ow"), SubResource("Resource_xqta4"), SubResource("Resource_twnlk"), SubResource("Resource_spi2t"), SubResource("Resource_wek3x"), SubResource("Resource_tfrrr"), SubResource("Resource_b2ggk"), SubResource("Resource_1a3r5"), SubResource("Resource_3gmcm"), SubResource("Resource_vhmi4"), SubResource("Resource_7jbfp"), SubResource("Resource_1vbk2"), SubResource("Resource_3skcn"), SubResource("Resource_xjidy")])

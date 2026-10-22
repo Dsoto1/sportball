@@ -10,7 +10,9 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	root.name = stadium.unique_name("Viaduct")
 	stadium.add_child(root)
 	var span := float(piece.param("span"))
-	var height := float(piece.param("height")) * piece.size
+	# Deck height above the tallest thing in front (stands, facade), so the
+	# train runs in view over the outfield.
+	var height := float(piece.param("height")) * piece.size + stadium.skyline_top(piece.angle + float(piece.param("span")) * 0.5).y * 0.85
 	var setback := float(piece.param("distance"))
 	var steps := maxi(2, int(absf(span) / 4.0))
 	var brick := def.structure_color.lerp(Color(0.55, 0.3, 0.22), 0.6)

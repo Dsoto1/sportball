@@ -59,8 +59,8 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 		# A glowing ring floating over the board (the Halo Dome's crown).
 		var ring := MeshInstance3D.new()
 		var torus := TorusMesh.new()
-		torus.inner_radius = 12.5
-		torus.outer_radius = 13.6
+		torus.inner_radius = 12.0
+		torus.outer_radius = 14.2
 		torus.rings = 64
 		torus.ring_segments = 10
 		ring.mesh = torus
@@ -93,6 +93,7 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	name.position = Vector3(0, 7.0, 0.2)
 	var city := stadium.label(home.city.to_upper(), 120, home.highlight_color, board)
 	city.position = Vector3(0, 3.6, 0.2)
+	_pillars(stadium, board, piece, home)
 	# The batter's card: a portrait panel in his club's colors, then his line.
 	var portrait := stadium.box(Vector3(8.0, 9.0, 0.1), home.primary_color, board)
 	portrait.position = Vector3(-11.5, -4.5, 0.15)
@@ -110,3 +111,48 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 		card[["avg", "hr", "rbi"][i]] = stadium.label("", 130, Color.WHITE, board)
 		card[["avg", "hr", "rbi"][i]].position = Vector3(x, -8.4, 0.2)
 	stadium.add_board({"card": card})
+
+
+## Flanking pillars, as on every sheet: a tall pier either side of the
+## board hung with a long club banner (emblem on it), capped with a lamp,
+## a flaming brazier or the emblem ("pillar_cap"; "none" for no pillars).
+func _pillars(stadium: Stadium, board: Node3D, piece: StadiumPiece, home: TeamDef) -> void:
+	var cap := StringName(piece.param("pillar_cap"))
+	if cap == &"none":
+		return
+	var def := stadium.def
+	var lit := Stadium.glow(def.window_color, 2.5 if def.night else 1.2)
+	for side: float in [-1.0, 1.0]:
+		var x := side * 24.0
+		var pier := stadium.box(Vector3(4.0, 40.0, 3.4), def.facade_tint(), board, &"facade")
+		pier.position = Vector3(x, -6.0, -1.0)
+		var cornice := stadium.box(Vector3(4.8, 1.0, 4.0), def.facade_tint().lightened(0.2), board, &"facade")
+		cornice.position = Vector3(x, 14.5, -1.0)
+		var banner := stadium.box(Vector3(3.2, 18.0, 0.15), home.primary_color, board)
+		banner.position = Vector3(x, 1.0, 0.8)
+		var hem := stadium.box(Vector3(3.3, 0.6, 0.2), home.secondary_color, board)
+		hem.position = Vector3(x, -8.0, 0.85)
+		var top_hem := stadium.box(Vector3(3.6, 0.5, 0.2), def.accent_color, board)
+		top_hem.position = Vector3(x, 10.1, 0.85)
+		var mark := Emblem.build(home, 2.8, 0.4)
+		mark.position = Vector3(x, 4.5, 0.95)
+		board.add_child(mark)
+		match cap:
+			&"brazier":
+				var bowl := Scenery.cylinder(board, 2.2, 1.0, 1.6, Color(0.3, 0.22, 0.15), 10)
+				bowl.position = Vector3(x, 15.8, -1.0)
+				var flame := Scenery.cylinder(board, 1.6, 0.0, 4.5, Color.ORANGE, 8)
+				flame.position = Vector3(x, 18.6, -1.0)
+				flame.material_override = Stadium.glow(Color(1.0, 0.55, 0.15), 4.0)
+			&"emblem":
+				var crest := Emblem.build(home, 4.5, 0.6)
+				crest.position = Vector3(x, 17.5, -0.6)
+				board.add_child(crest)
+			_:
+				var post := Scenery.cylinder(board, 0.25, 0.25, 2.0, Color(0.12, 0.12, 0.13), 8)
+				post.position = Vector3(x, 16.0, -1.0)
+				var lamp := stadium.box(Vector3(1.6, 2.0, 1.6), def.window_color, board)
+				lamp.position = Vector3(x, 18.0, -1.0)
+				lamp.material_override = lit
+				var hood := Scenery.cylinder(board, 1.3, 0.1, 1.0, Color(0.12, 0.12, 0.13), 8)
+				hood.position = Vector3(x, 19.5, -1.0)

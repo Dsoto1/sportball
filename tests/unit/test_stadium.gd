@@ -20,7 +20,7 @@ func test_stadium_builds_bowl_crowd_and_landmarks() -> void:
 	var st := _build()
 	var crowd := st.get_node("Crowd") as MultiMeshInstance3D
 	check(crowd.multimesh.instance_count > 5000, "a big crowd (%d)" % crowd.multimesh.instance_count)
-	for node in ["SeatingBowl", "Scoreboard", "Halo", "BattersEye", "Backstop"]:
+	for node in ["SeatingBowl", "Centerpiece", "Halo", "BattersEye", "Backstop"]:
 		check(st.has_node(node), "has %s" % node)
 	st.free()
 
@@ -46,7 +46,13 @@ func test_stands_stay_out_of_play() -> void:
 
 
 func test_scoreboard_follows_the_game() -> void:
-	var st := _build()
+	# The line-score board is opt-in now; put one in a park with a centerpiece.
+	var park: StadiumDef = content().park(&"halo_dome").duplicate()
+	park.pieces = []
+	park.add_piece(&"centerpiece")
+	park.add_piece(&"scoreboard")
+	var st := Stadium.new()
+	st.build(content().tuning_for(park), park, content().team(&"glitterati"), content().team(&"gearheads"))
 	var s := MatchState.from_teams(content().team(&"gearheads"), content().team(&"glitterati"), content().rules)
 	var roster := MatchRoster.new(content().team(&"gearheads"), content().team(&"glitterati"))
 	s.apply_pitch_call(MatchState.PitchCall.BALL)

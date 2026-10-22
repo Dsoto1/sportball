@@ -17,45 +17,40 @@ kind = &"centerpiece"
 
 [sub_resource type="Resource" id="Resource_o48xx"]
 script = ExtResource("2_84kiu")
-kind = &"scoreboard"
-angle = -34.0
-
-[sub_resource type="Resource" id="Resource_tvncl"]
-script = ExtResource("2_84kiu")
 kind = &"slogan_board"
 angle = 34.0
 
-[sub_resource type="Resource" id="Resource_nhb2p"]
+[sub_resource type="Resource" id="Resource_tvncl"]
 script = ExtResource("2_84kiu")
 kind = &"light_towers"
 
-[sub_resource type="Resource" id="Resource_suy3x"]
+[sub_resource type="Resource" id="Resource_nhb2p"]
 script = ExtResource("2_84kiu")
 kind = &"skyline"
 params = {
 "height": 0.9
 }
 
-[sub_resource type="Resource" id="Resource_end53"]
+[sub_resource type="Resource" id="Resource_suy3x"]
 script = ExtResource("2_84kiu")
 kind = &"bay"
 angle = 40.0
 
-[sub_resource type="Resource" id="Resource_lu46p"]
+[sub_resource type="Resource" id="Resource_end53"]
 script = ExtResource("2_84kiu")
 kind = &"lighthouse"
 angle = 16.0
 
-[sub_resource type="Resource" id="Resource_pb5o3"]
+[sub_resource type="Resource" id="Resource_lu46p"]
 script = ExtResource("2_84kiu")
 kind = &"sailboats"
-angle = 26.0
+angle = 8.0
 params = {
-"count": 6,
+"count": 7,
 "span": 34.0
 }
 
-[sub_resource type="Resource" id="Resource_wx1yk"]
+[sub_resource type="Resource" id="Resource_pb5o3"]
 script = ExtResource("2_84kiu")
 kind = &"cranes"
 angle = -30.0
@@ -63,7 +58,7 @@ params = {
 "count": 1
 }
 
-[sub_resource type="Resource" id="Resource_lfhjr"]
+[sub_resource type="Resource" id="Resource_wx1yk"]
 script = ExtResource("2_84kiu")
 kind = &"flags"
 angle = -55.0
@@ -72,7 +67,7 @@ params = {
 "span": 110.0
 }
 
-[sub_resource type="Resource" id="Resource_2qnuu"]
+[sub_resource type="Resource" id="Resource_lfhjr"]
 script = ExtResource("2_84kiu")
 kind = &"water"
 angle = 62.0
@@ -83,7 +78,7 @@ params = {
 "width": 400.0
 }
 
-[sub_resource type="Resource" id="Resource_731lj"]
+[sub_resource type="Resource" id="Resource_2qnuu"]
 script = ExtResource("2_84kiu")
 kind = &"arcade"
 angle = 50.0
@@ -94,7 +89,7 @@ params = {
 "style": &"timber"
 }
 
-[sub_resource type="Resource" id="Resource_3pp6k"]
+[sub_resource type="Resource" id="Resource_731lj"]
 script = ExtResource("2_84kiu")
 kind = &"arcade"
 angle = 11.0
@@ -106,7 +101,7 @@ params = {
 "style": &"timber"
 }
 
-[sub_resource type="Resource" id="Resource_o77yj"]
+[sub_resource type="Resource" id="Resource_3pp6k"]
 script = ExtResource("2_84kiu")
 kind = &"canopy"
 angle = 52.0
@@ -115,7 +110,7 @@ params = {
 "style": &"timber"
 }
 
-[sub_resource type="Resource" id="Resource_0r8xy"]
+[sub_resource type="Resource" id="Resource_o77yj"]
 script = ExtResource("2_84kiu")
 kind = &"wall_art"
 params = {
@@ -123,13 +118,22 @@ params = {
 "motif": &"waves"
 }
 
-[sub_resource type="Resource" id="Resource_hma52"]
+[sub_resource type="Resource" id="Resource_0r8xy"]
 script = ExtResource("2_84kiu")
 kind = &"lamps"
 angle = -150.0
 params = {
 "count": 36,
 "span": 300.0
+}
+
+[sub_resource type="Resource" id="Resource_hma52"]
+script = ExtResource("2_84kiu")
+kind = &"string_lights"
+angle = -150.0
+params = {
+"color": Color(1, 0.9411765, 0.7529412, 1),
+"sag": 2.0
 }
 
 [resource]

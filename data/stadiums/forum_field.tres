@@ -14,31 +14,27 @@ points = PackedVector3Array(-45, 101, 3.2, -20, 115, 3.2, 0, 122, 3.2, 20, 112, 
 script = ExtResource("2_57hhn")
 kind = &"centerpiece"
 params = {
-"frame": &"arch"
+"frame": &"arch",
+"pillar_cap": &"brazier"
 }
 
 [sub_resource type="Resource" id="Resource_sdusm"]
 script = ExtResource("2_57hhn")
-kind = &"scoreboard"
-angle = -34.0
-
-[sub_resource type="Resource" id="Resource_l7em3"]
-script = ExtResource("2_57hhn")
 kind = &"slogan_board"
 angle = 34.0
 
-[sub_resource type="Resource" id="Resource_ore7e"]
+[sub_resource type="Resource" id="Resource_l7em3"]
 script = ExtResource("2_57hhn")
 kind = &"light_towers"
 
-[sub_resource type="Resource" id="Resource_yo6yi"]
+[sub_resource type="Resource" id="Resource_ore7e"]
 script = ExtResource("2_57hhn")
 kind = &"skyline"
 params = {
 "height": 0.6
 }
 
-[sub_resource type="Resource" id="Resource_3h0k8"]
+[sub_resource type="Resource" id="Resource_yo6yi"]
 script = ExtResource("2_57hhn")
 kind = &"arcade"
 angle = 50.0
@@ -52,7 +48,7 @@ params = {
 "tiers": 3
 }
 
-[sub_resource type="Resource" id="Resource_ts7w3"]
+[sub_resource type="Resource" id="Resource_3h0k8"]
 script = ExtResource("2_57hhn")
 kind = &"arcade"
 angle = 11.0
@@ -70,7 +66,7 @@ params = {
 "towers": 3
 }
 
-[sub_resource type="Resource" id="Resource_qx4f8"]
+[sub_resource type="Resource" id="Resource_ts7w3"]
 script = ExtResource("2_57hhn")
 kind = &"statue"
 angle = 17.0
@@ -79,7 +75,7 @@ params = {
 "figure": &"knight"
 }
 
-[sub_resource type="Resource" id="Resource_kaonq"]
+[sub_resource type="Resource" id="Resource_qx4f8"]
 script = ExtResource("2_57hhn")
 kind = &"waterfalls"
 angle = 7.0
@@ -88,7 +84,7 @@ params = {
 "height": 18.0
 }
 
-[sub_resource type="Resource" id="Resource_w8j6t"]
+[sub_resource type="Resource" id="Resource_kaonq"]
 script = ExtResource("2_57hhn")
 kind = &"trees"
 angle = 30.0
@@ -99,7 +95,7 @@ params = {
 "span": 15.0
 }
 
-[sub_resource type="Resource" id="Resource_y2yj7"]
+[sub_resource type="Resource" id="Resource_w8j6t"]
 script = ExtResource("2_57hhn")
 kind = &"lamps"
 angle = -150.0
@@ -109,7 +105,7 @@ params = {
 "style": &"brazier"
 }
 
-[sub_resource type="Resource" id="Resource_calg2"]
+[sub_resource type="Resource" id="Resource_y2yj7"]
 script = ExtResource("2_57hhn")
 kind = &"flags"
 angle = -55.0
@@ -118,12 +114,30 @@ params = {
 "span": 110.0
 }
 
-[sub_resource type="Resource" id="Resource_5xwdd"]
+[sub_resource type="Resource" id="Resource_calg2"]
 script = ExtResource("2_57hhn")
 kind = &"wall_art"
 params = {
 "every": 9.0,
 "motif": &"emblem"
+}
+
+[sub_resource type="Resource" id="Resource_5xwdd"]
+script = ExtResource("2_57hhn")
+kind = &"planters"
+angle = -46.0
+params = {
+"density": 1.4,
+"flower": Color(0.7529412, 0.22352941, 0.16862746, 1),
+"span": 92.0
+}
+
+[sub_resource type="Resource" id="Resource_jlfwj"]
+script = ExtResource("2_57hhn")
+kind = &"string_lights"
+angle = -150.0
+params = {
+"color": Color(1, 0.7529412, 0.4392157, 1)
 }
 
 [resource]
@@ -150,4 +164,4 @@ window_color = Color(1, 0.88235295, 0.65882355, 1)
 facade_color = Color(0.8392157, 0.7490196, 0.57254905, 1)
 facade_surface = &"stone"
 structure_surface = &"marble"
-pieces = Array[ExtResource("2_57hhn")]([SubResource("Resource_2rkht"), SubResource("Resource_sdusm"), SubResource("Resource_l7em3"), SubResource("Resource_ore7e"), SubResource("Resource_yo6yi"), SubResource("Resource_3h0k8"), SubResource("Resource_ts7w3"), SubResource("Resource_qx4f8"), SubResource("Resource_kaonq"), SubResource("Resource_w8j6t"), SubResource("Resource_y2yj7"), SubResource("Resource_calg2"), SubResource("Resource_5xwdd")])
+pieces = Array[ExtResource("2_57hhn")]([SubResource("Resource_2rkht"), SubResource("Resource_sdusm"), SubResource("Resource_l7em3"), SubResource("Resource_ore7e"), SubResource("Resource_yo6yi"), SubResource("Resource_3h0k8"), SubResource("Resource_ts7w3"), SubResource("Resource_qx4f8"), SubResource("Resource_kaonq"), SubResource("Resource_w8j6t"), SubResource("Resource_y2yj7"), SubResource("Resource_calg2"), SubResource("Resource_5xwdd"), SubResource("Resource_jlfwj")])
