@@ -25,3 +25,43 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	holder.rotation.y += deg_to_rad(float(piece.param("turn")))
 	node.position = Vector3(-box.get_center().x, -box.position.y, -box.get_center().z) * node.scale
 	holder.add_child(node)
+	_ground(stadium, piece, holder, box.size * node.scale)
+
+
+## Settles the landmark into the park: a plinth in the park's stone under
+## its footprint, rocks and planting around its foot (the "foot" tree kind,
+## "" for none), so it rises out of the scene rather than floating on it.
+func _ground(stadium: Stadium, piece: StadiumPiece, holder: Node3D, size: Vector3) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(String(stadium.def.id) + str(piece.angle))
+	var stone := stadium.def.facade_tint().darkened(0.2)
+	var plinth_h := 3.0
+	var plinth := stadium.box(Vector3(size.x * 1.08, plinth_h, size.z * 1.08), stone, holder, stadium.def.facade_surface)
+	plinth.position.y = -plinth_h * 0.5 + 0.4
+	var cap := stadium.box(Vector3(size.x * 1.12, 0.6, size.z * 1.12), stone.lightened(0.15), holder, stadium.def.facade_surface)
+	cap.position.y = 0.4
+	var kind := StringName(piece.param("foot"))
+	if kind == &"":
+		return
+	var leaf: Color = {&"blossom": Color(0.97, 0.68, 0.82)}.get(kind, Color(0, 0, 0, 0))
+	var rock := StadiumSurfaces.material(&"rock", stone.lerp(Color(0.45, 0.43, 0.4), 0.5), false, 0.4)
+	# Around the front and sides of the footprint, thinning toward the back.
+	var count := int(piece.param("foot_count"))
+	for i in count:
+		var t := float(i) / maxf(count - 1, 1)
+		var ang := lerpf(-PI * 0.85, PI * 0.85, t) + rng.randf_range(-0.1, 0.1)
+		var spot := Vector3(sin(ang) * size.x * 0.58, 0.4, cos(ang) * size.z * 0.58)
+		if i % 3 == 0:
+			var r := Scenery.sphere(holder, rng.randf_range(1.6, 3.2), Color.WHITE, 0.6)
+			r.material_override = rock
+			r.position = spot
+			r.rotation.y = rng.randf() * TAU
+		else:
+			var tree := ModelKit.spawn(kind, rng.randf_range(0.14, 0.24) * size.y, rng, leaf)
+			tree.position = spot
+			tree.rotation.y = rng.randf() * TAU
+			holder.add_child(tree)
+		if i % 2 == 0:
+			var bush := ModelKit.spawn(&"bush", rng.randf_range(2.0, 3.5), rng)
+			bush.position = spot + Vector3(rng.randf_range(-2.0, 2.0), 0, rng.randf_range(1.0, 3.0))
+			holder.add_child(bush)

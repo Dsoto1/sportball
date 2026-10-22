@@ -1260,3 +1260,15 @@ Reason: Owner request for another detail pass against the sheets. The balance ch
   - Citadel Park: the cathedral rises behind the scoreboard, replacing the hand-built `cathedral` piece. The castle landmark rows leave it a wider center gap.
   - Ledger Street: the bank stands right of the board.
 - **Next:** the owner decides whether to make the other 11 parks' landmarks.
+
+## 2026-10-22 - Integrating the Signature Landmarks
+
+- The owner found the Meshy landmarks looked odd beside the plain, flat-colored backdrop buildings.
+- **Surface detail on kit buildings:** the `kit_palette` shader now lays world-mapped ambientCG detail and normal maps over the remapped colors.
+  - Walls use a per-style surface, or the piece's `surface` setting. Defaults are brick for town, concrete for industrial, wood for pagoda and stone otherwise.
+  - Metal uses steel plates.
+  - Detail fades with each row's haze, and shading was toned down so the cream swatches don't glare.
+- **Clear zone:** the front two landmark rows leave a `clear` zone (degrees) around each hero, so the hero isn't crowded by low-poly blocks.
+- **Plinth:** each hero stands on a plinth in the park's facade stone, so it sits on the stands instead of floating.
+- **Foot planting:** this is an option, off by default. Kenney's low-poly trees beside the sculpted models looked like toys.
+- **Still open:** the hero models are far more detailed than everything else. The proper fix is matching detail in the surroundings.

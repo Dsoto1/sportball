@@ -38,6 +38,7 @@ script = ExtResource("2_mb518")
 kind = &"hero"
 angle = 30.0
 params = {
+"clear": 13.0,
 "distance": 24.0,
 "height": 58.0,
 "model": &"domed_bank",

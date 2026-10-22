@@ -26,6 +26,7 @@ var _colors := {}
 var _haze := 0.0
 var _flat := false
 var _style := &""
+var _wall_surface := &"stone"
 
 
 func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef) -> void:
@@ -35,6 +36,10 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	var def := stadium.def
 	var style := StringName(piece.param("style"))
 	_style = style
+	# The wall surface: the piece's "surface", else one that suits the style.
+	_wall_surface = StringName(piece.param("surface"))
+	if not StadiumSurfaces.KINDS.has(_wall_surface):
+		_wall_surface = {&"town": &"brick", &"industrial": &"concrete", &"pagoda": &"wood"}.get(style, &"stone")
 	_flat = bool(piece.param("flat"))
 	var stone := def.facade_tint() if def.facade_color.a > 0.0 else def.structure_color
 	_colors = {
@@ -70,8 +75,9 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 			var width: float = made[1]
 			var step := rad_to_deg(width * 1.05 / radius)
 			a += step * 0.5 * dir
-			# The front row leaves the center gap for the scoreboard.
-			if row == 0 and absf(wrapf(a, -180.0, 180.0)) < float(piece.param("center_gap")):
+			# The front row leaves the center gap for the scoreboard, and the
+			# front two rows leave room around any signature landmark.
+			if (row == 0 and absf(wrapf(a, -180.0, 180.0)) < float(piece.param("center_gap"))) or (row < 2 and _near_hero(stadium, a)):
 				node.free()
 				a += step * 0.5 * dir
 				continue
@@ -80,6 +86,16 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 			node.rotation.y += _rng.randf_range(-0.12, 0.12)
 			root.add_child(node)
 			a += (step * 0.5 + _rng.randf_range(0.2, 1.6)) * dir
+
+
+## Within a signature landmark's clear zone (its "clear" degrees).
+static func _near_hero(stadium: Stadium, angle: float) -> bool:
+	for hero in stadium.def.pieces_of(&"hero"):
+		var angles := [hero.angle, -hero.angle] if hero.mirrored else [hero.angle]
+		for h: float in angles:
+			if absf(wrapf(angle - h, -180.0, 180.0)) < float(hero.param("clear")):
+				return true
+	return false
 
 
 ## One landmark of the style about h meters tall: [node, footprint width].
@@ -315,6 +331,16 @@ func _material(tex: Texture2D) -> ShaderMaterial:
 		m.set_shader_parameter(key, _colors[key])
 	m.set_shader_parameter("window_glow", 1.4 if _stadium.def.night else 0.0)
 	m.set_shader_parameter("blue_is_window", _style == &"town")
+	# Surface detail fades out with the haze: crisp up front, soft far back.
+	var wall: Array = StadiumSurfaces.KINDS[_wall_surface]
+	var steel: Array = StadiumSurfaces.KINDS[&"steel"]
+	m.set_shader_parameter("wall_detail", wall[0])
+	m.set_shader_parameter("wall_normal", wall[1])
+	m.set_shader_parameter("wall_tile", float(wall[2]))
+	m.set_shader_parameter("metal_detail", steel[0])
+	m.set_shader_parameter("metal_normal", steel[1])
+	m.set_shader_parameter("metal_tile", float(steel[2]))
+	m.set_shader_parameter("detail", 0.85 * (1.0 - _haze * 1.6))
 	m.set_shader_parameter("haze_color", _colors["haze"])
 	m.set_shader_parameter("haze", _haze)
 	_mats[tex] = m

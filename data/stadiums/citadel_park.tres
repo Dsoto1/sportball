@@ -39,6 +39,7 @@ params = {
 script = ExtResource("2_j3t4y")
 kind = &"hero"
 params = {
+"clear": 0.0,
 "distance": 170.0,
 "height": 190.0,
 "model": &"cathedral_spires"

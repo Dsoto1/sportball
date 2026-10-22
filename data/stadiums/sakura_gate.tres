@@ -33,6 +33,7 @@ script = ExtResource("2_lnk5g")
 kind = &"hero"
 angle = -27.0
 params = {
+"clear": 14.0,
 "distance": 22.0,
 "height": 72.0,
 "model": &"sakura_cliff",
