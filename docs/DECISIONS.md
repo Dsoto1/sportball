@@ -1526,3 +1526,15 @@ diagonal, rings round home, sunburst from home, plain) and band width,
 drawn with soft edges as cut grass looks, plus its own grass and dirt
 tones where its sheet calls for it (desert clay at the Kiln and Amber
 Gate, dark volcanic dirt at Firelight). Turf keeps its 5-yard seams.
+
+## The grandstand behind home plate
+
+From the mound the stands behind home were one low bowl with the park's
+architecture far behind. The sheets' pitcher's views show a tall, stacked
+grandstand there. Between the dugouts (full from 135 degrees off center,
+easing in from 112) the stands now carry 12 more rows (a deck more), each
+deck lifted 2.6 m more for a glazed suite level on the back wall under the
+overhang (lit from inside, brighter at night, mullions every few degrees),
+and a roof cantilevered 16 m over the top rows on columns, its front
+edge trimmed in the park's accent. Everything built on the stands' top
+(facades, terraces, the crowd) follows the taller profile.

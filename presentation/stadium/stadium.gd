@@ -53,6 +53,15 @@ const DUGOUT_ROOF := 2.9
 const FIELD_WALL := 2.0
 const BACKSTOP_WALL := 3.0
 const TRACK_WIDTH := 4.4
+## The grandstand behind home plate (between the dugouts, full by
+## GRAND_FULL degrees off center): GRAND_ROWS more rows (a deck more), each
+## deck lifted SUITE_LIFT m more for a glazed suite level under it, and a
+## roof over the top.
+const GRAND_FROM := 112.0
+const GRAND_FULL := 135.0
+const GRAND_ROWS := 12
+const SUITE_LIFT := 2.6
+const GRAND_ROOF_DEPTH := 16.0
 const FIELD_CENTER := Vector3(0.0, 0.0, -45.0)
 const WATER := Color(0.06, 0.22, 0.36)
 ## How far out the bay reaches (meters from home).
@@ -103,6 +112,7 @@ func build(p_tuning: BaseballTuning, p_def: StadiumDef, home: TeamDef, away: Tea
 	_build_batters_eye()
 	_build_dugouts(home, away)
 	_build_backstop()
+	_build_grandstand()
 	_build_markers(home)
 	_build_fascia(home)
 	# The city goes up last, on the lots the park's own pieces left free.
@@ -142,7 +152,7 @@ func profile(angle: float) -> Vector3:
 	var outfield := float(def.outfield_rows)
 	if def.outfield_open > 0.0:
 		outfield *= smoothstep(def.outfield_open, def.outfield_open + 10.0, a)
-	var rows := roundf(lerpf(outfield, float(def.foul_rows), foul))
+	var rows := roundf(lerpf(outfield, float(def.foul_rows), foul) + GRAND_ROWS * grandstand(angle))
 	# Over the dugouts the stands start higher, easing in at the ends.
 	var dug := 1.0 - smoothstep(dugout_half_angle(), dugout_half_angle() + 4.0, absf(a - DUGOUT_ANGLE))
 	first = maxf(first, lerpf(first, DUGOUT_ROOF, dug))
@@ -183,7 +193,7 @@ func is_deck_front(k: int) -> bool:
 ## the jump fades in past the foul poles so the bowl stays closed.
 func row_height(angle: float, p: Vector3, k: int) -> float:
 	var deck := floori(float(k) / rows_per_deck()) if def.decks > 1 else 0
-	return p.y + k * ROW_RISE + deck * DECK_JUMP * smoothstep(45.0, 60.0, absf(angle))
+	return p.y + k * ROW_RISE + deck * (DECK_JUMP + SUITE_LIFT * grandstand(angle)) * smoothstep(45.0, 60.0, absf(angle))
 
 
 ## The back and top of the stands at a spray angle: (radius, height of the
@@ -556,6 +566,100 @@ func _build_batters_eye() -> void:
 	var eye := box(Vector3(2.0 * BATTERS_EYE * PI / 180.0 * top.x, 6.0, 1.0), Color(0.06, 0.1, 0.09))
 	eye.position = point(0.0, top.x, top.y + 3.0 + ROW_RISE)
 	eye.name = "BattersEye"
+
+
+## How much of the home-plate grandstand stands at a spray angle (0..1).
+func grandstand(angle: float) -> float:
+	return smoothstep(GRAND_FROM, GRAND_FULL, absf(wrapf(angle, -180.0, 180.0)))
+
+
+## The grandstand's suites: a glazed band (lit from inside) on the back
+## wall under each overhanging deck, with mullions every few degrees, and its roof: a deck
+## cantilevered over the top rows on columns from the back of the stands,
+## its front edge trimmed in the park's accent.
+func _build_grandstand() -> void:
+	var glass := SurfaceTool.new()
+	glass.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var frame := SurfaceTool.new()
+	frame.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var mullion := def.structure_color.darkened(0.5).srgb_to_linear()
+	# A pale soffit under the roof (lit by the field below, as real ones read).
+	var roof_color := def.structure_color.lerp(Color(0.85, 0.84, 0.8), 0.55).srgb_to_linear()
+	var trim := def.accent_color.srgb_to_linear()
+	var roofed := not def.is_roofed()
+	var a := GRAND_FROM
+	while a < 180.0 - 0.01:
+		var b := a + 1.0
+		for side: float in [-1.0, 1.0]:
+			# Always in increasing spray angle, so both sides face the same way.
+			var sa := a * side if side > 0.0 else -b
+			var sb := b * side if side > 0.0 else -a
+			var ga := grandstand(sa)
+			var gb := grandstand(sb)
+			if maxf(ga, gb) < 0.3:
+				continue
+			var pa := profile(sa)
+			var pb := profile(sb)
+			for k in int(minf(pa.z, pb.z)):
+				if k == 0 or not is_deck_front(k):
+					continue
+				var ra := pa.x + k * ROW_DEPTH - 0.06
+				var rb := pb.x + k * ROW_DEPTH - 0.06
+				var lo_a := row_height(sa, pa, k - 1) + 0.25
+				var lo_b := row_height(sb, pb, k - 1) + 0.25
+				var hi_a := row_height(sa, pa, k) - FASCIA_DROP - 0.15
+				var hi_b := row_height(sb, pb, k) - FASCIA_DROP - 0.15
+				if hi_a - lo_a < 1.0:
+					continue
+				_quad(glass, point(sa, ra, lo_a), point(sb, rb, lo_b), point(sb, rb, hi_b), point(sa, ra, hi_a), Color.WHITE)
+				# A mullion at each step, a sill under the glass.
+				if int(a) % 3 == 0:
+					_quad(frame, point(sa, ra - 0.04, lo_a), point(sa, ra - 0.04, hi_a), point(sa + 0.15, ra - 0.04, hi_a), point(sa + 0.15, ra - 0.04, lo_a), mullion)
+				_quad(frame, point(sa, ra - 0.05, lo_a - 0.2), point(sb, rb - 0.05, lo_b - 0.2), point(sb, rb - 0.05, lo_b), point(sa, ra - 0.05, lo_a), mullion)
+			# The roof over the top rows.
+			if roofed:
+				var ta := stand_top(sa)
+				var tb := stand_top(sb)
+				var ya := ta.y + 6.5
+				var yb := tb.y + 6.5
+				var da := GRAND_ROOF_DEPTH * ga
+				var db := GRAND_ROOF_DEPTH * gb
+				if maxf(da, db) > 1.0:
+					var back_a := point(sa, ta.x + 0.5, ya)
+					var back_b := point(sb, tb.x + 0.5, yb)
+					var front_a := point(sa, ta.x - da, ya + da * 0.12)
+					var front_b := point(sb, tb.x - db, yb + db * 0.12)
+					_quad(frame, back_a, back_b, front_b, front_a, roof_color)
+					_quad(frame, front_a, front_b, front_b + Vector3.UP * 0.9, front_a + Vector3.UP * 0.9, trim)
+					_quad(frame, back_a + Vector3.UP * 0.9, back_b + Vector3.UP * 0.9, front_b + Vector3.UP * 0.9, front_a + Vector3.UP * 0.9, roof_color.darkened(0.2))
+					# Columns from the back of the stands every few degrees.
+					if int(a) % 6 == 0:
+						var foot := point(sa, ta.x + 0.3, ta.y)
+						var across := (point(sa + 0.5, ta.x, 0.0) - point(sa - 0.5, ta.x, 0.0)).normalized() * 0.3
+						var outward := point(sa, 1.0, 0.0).normalized() * 0.3
+						var top := Vector3(foot.x, ya, foot.z)
+						_quad(frame, foot - across, foot + across, top + across, top - across, mullion)
+						_quad(frame, foot - across - outward, foot - across, top - across, top - across - outward, mullion)
+		a = b
+	for part: Array in [[glass, "Suites"], [frame, "GrandstandFrame"]]:
+		var tool: SurfaceTool = part[0]
+		tool.generate_normals()
+		var mi := MeshInstance3D.new()
+		mi.name = part[1]
+		mi.mesh = tool.commit()
+		if part[1] == "Suites":
+			var m := glow(def.window_color.lerp(Color(0.55, 0.7, 0.85), 0.6), 1.4 if def.night else 0.6)
+			m.albedo_color = Color(0.2, 0.3, 0.42)
+			m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			m.cull_mode = BaseMaterial3D.CULL_DISABLED
+			mi.material_override = m
+		else:
+			var m := StandardMaterial3D.new()
+			m.vertex_color_use_as_albedo = true
+			m.roughness = 0.7
+			m.cull_mode = BaseMaterial3D.CULL_DISABLED
+			mi.material_override = m
+		add_child(mi)
 
 
 ## The foul-territory wall's height at a spray angle: taller behind home.
