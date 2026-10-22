@@ -1,6 +1,6 @@
 extends StadiumModule
 ## Statues on pedestals atop the outfield stands, facing the field: a
-## bronze bull, a figure, a white fox spirit, a sea king with a trident, a
+## bronze bull, a figure, a marble swan, a white fox spirit, a sea king with a trident, a
 ## knight, or a sandstone scorpion. "size" scales them.
 
 
@@ -36,11 +36,51 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 			_knight(stadium, root, Color(0.55, 0.57, 0.6), home)
 		&"scorpion":
 			_scorpion(root, Color(0.82, 0.62, 0.32))
+		&"swan":
+			_swan(root, Color(0.96, 0.95, 0.92))
 		_:
-			var body := Scenery.cylinder(root, 0.8, 0.6, 4.0, bronze, 10)
-			body.position.y = 4.4
-			var head := Scenery.sphere(root, 0.55, bronze)
-			head.position.y = 6.9
+			_figure(root, bronze)
+
+
+## A marble swan with raised wings and an arched neck (Swans).
+func _swan(root: Node3D, white: Color) -> void:
+	var body := Scenery.sphere(root, 1.5, white, 0.75)
+	body.scale = Vector3(1.0, 1.0, 1.6)
+	body.position = Vector3(0, 3.6, 0.3)
+	# The neck: a chain of shrinking spheres curving up and forward.
+	for i in 7:
+		var t := i / 6.0
+		var seg := Scenery.sphere(root, lerpf(0.55, 0.32, t), white)
+		seg.position = Vector3(0, 4.0 + sin(t * PI * 0.9) * 2.6 + t * 1.2, -1.6 - sin(t * PI) * 0.9 + t * 0.7)
+	var head := Scenery.sphere(root, 0.45, white)
+	head.scale = Vector3(1.0, 0.9, 1.4)
+	head.position = Vector3(0, 7.9, -1.2)
+	var beak := Scenery.cylinder(root, 0.18, 0.04, 0.8, Color(0.95, 0.55, 0.15), 6)
+	beak.rotation.x = -PI * 0.6
+	beak.position = Vector3(0, 7.75, -1.85)
+	for side: float in [-1.0, 1.0]:
+		# Raised wings: fanned feather slabs.
+		for f in 4:
+			var feather := Scenery.sphere(root, 1.0, white, 0.2)
+			feather.scale = Vector3(0.5, 1.0, 2.2 - f * 0.35)
+			feather.rotation = Vector3(0.2, 0.0, side * (0.5 + f * 0.25))
+			feather.position = Vector3(side * (1.0 + f * 0.35), 4.6 + f * 0.6, 0.8 + f * 0.15)
+
+
+## A robed marble figure holding an urn aloft.
+func _figure(root: Node3D, color: Color) -> void:
+	var robe := Scenery.cylinder(root, 1.1, 0.55, 3.6, color, 10)
+	robe.position.y = 4.2
+	var torso := Scenery.cylinder(root, 0.55, 0.5, 1.4, color, 10)
+	torso.position.y = 6.7
+	var head := Scenery.sphere(root, 0.45, color)
+	head.position.y = 7.9
+	for side: float in [-1.0, 1.0]:
+		var arm := Scenery.cylinder(root, 0.16, 0.14, 1.7, color, 6)
+		arm.position = Vector3(side * 0.55, 7.8, 0)
+		arm.rotation.z = -side * 0.35
+	var urn := Scenery.sphere(root, 0.5, color, 0.8)
+	urn.position.y = 9.0
 
 
 func _bull(root: Node3D, bronze: Color) -> void:

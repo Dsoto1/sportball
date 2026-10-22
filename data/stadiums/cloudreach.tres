@@ -105,14 +105,6 @@ angle = -42.0
 
 [sub_resource type="Resource" id="Resource_vnwcq"]
 script = ExtResource("2_m0rp2")
-kind = &"waterfalls"
-angle = -16.0
-params = {
-"height": 24.0
-}
-
-[sub_resource type="Resource" id="Resource_eajvv"]
-script = ExtResource("2_m0rp2")
 kind = &"bridge"
 angle = -28.0
 params = {
@@ -120,14 +112,14 @@ params = {
 "length": 120.0
 }
 
-[sub_resource type="Resource" id="Resource_xty5u"]
+[sub_resource type="Resource" id="Resource_eajvv"]
 script = ExtResource("2_m0rp2")
 kind = &"wall_art"
 params = {
 "motif": &"wings"
 }
 
-[sub_resource type="Resource" id="Resource_aie2x"]
+[sub_resource type="Resource" id="Resource_xty5u"]
 script = ExtResource("2_m0rp2")
 kind = &"string_lights"
 angle = -150.0
@@ -135,7 +127,7 @@ params = {
 "color": Color(1, 0.9411765, 0.7529412, 1)
 }
 
-[sub_resource type="Resource" id="Resource_4dwu6"]
+[sub_resource type="Resource" id="Resource_aie2x"]
 script = ExtResource("2_m0rp2")
 kind = &"planters"
 angle = -46.0
@@ -145,7 +137,7 @@ params = {
 "span": 92.0
 }
 
-[sub_resource type="Resource" id="Resource_hlsjp"]
+[sub_resource type="Resource" id="Resource_4dwu6"]
 script = ExtResource("2_m0rp2")
 kind = &"props"
 angle = -150.0
@@ -155,7 +147,7 @@ params = {
 "model": &"lantern"
 }
 
-[sub_resource type="Resource" id="Resource_dv7wc"]
+[sub_resource type="Resource" id="Resource_hlsjp"]
 script = ExtResource("2_m0rp2")
 kind = &"props"
 angle = -46.0
@@ -192,4 +184,4 @@ facade_color = Color(0.6901961, 0.5411765, 0.30588236, 1)
 facade_surface = &"steel"
 structure_surface = &"steel"
 ground_surface = &"snow"
-pieces = Array[ExtResource("2_m0rp2")]([SubResource("Resource_l6vnc"), SubResource("Resource_3skfr"), SubResource("Resource_b52m4"), SubResource("Resource_7ifyp"), SubResource("Resource_euhsm"), SubResource("Resource_p68y6"), SubResource("Resource_nqtn2"), SubResource("Resource_xylns"), SubResource("Resource_14uv1"), SubResource("Resource_noeo2"), SubResource("Resource_53o1n"), SubResource("Resource_vnwcq"), SubResource("Resource_eajvv"), SubResource("Resource_xty5u"), SubResource("Resource_aie2x"), SubResource("Resource_4dwu6"), SubResource("Resource_hlsjp"), SubResource("Resource_dv7wc")])
+pieces = Array[ExtResource("2_m0rp2")]([SubResource("Resource_l6vnc"), SubResource("Resource_3skfr"), SubResource("Resource_b52m4"), SubResource("Resource_7ifyp"), SubResource("Resource_euhsm"), SubResource("Resource_p68y6"), SubResource("Resource_nqtn2"), SubResource("Resource_xylns"), SubResource("Resource_14uv1"), SubResource("Resource_noeo2"), SubResource("Resource_53o1n"), SubResource("Resource_vnwcq"), SubResource("Resource_eajvv"), SubResource("Resource_xty5u"), SubResource("Resource_aie2x"), SubResource("Resource_4dwu6"), SubResource("Resource_hlsjp")])

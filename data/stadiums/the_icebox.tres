@@ -47,13 +47,13 @@ params = {
 
 [sub_resource type="Resource" id="Resource_aca4j"]
 script = ExtResource("2_nkemg")
-kind = &"waterfalls"
+kind = &"trees"
 angle = 10.0
 mirrored = true
 params = {
-"height": 34.0,
-"style": &"ice",
-"width": 16.0
+"count": 6,
+"kind": &"pine",
+"span": 10.0
 }
 
 [sub_resource type="Resource" id="Resource_qrntj"]

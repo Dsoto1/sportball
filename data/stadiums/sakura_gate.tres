@@ -116,7 +116,9 @@ kind = &"waterfalls"
 angle = 7.0
 mirrored = true
 params = {
-"height": 26.0
+"height": 20.0,
+"tree": &"blossom",
+"width": 14.0
 }
 
 [sub_resource type="Resource" id="Resource_vhmi4"]

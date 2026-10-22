@@ -4,6 +4,9 @@ extends StadiumModule
 ## off the edge into the clouds.
 
 
+static var _water: ShaderMaterial
+
+
 func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash("islands" + stadium.def.id + str(piece.angle))
@@ -11,6 +14,11 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	root.name = stadium.unique_name("Islands")
 	stadium.add_child(root)
 	var count := int(piece.param("count"))
+	if _water == null:
+		_water = ShaderMaterial.new()
+		_water.shader = preload("res://presentation/stadium/waterfall.gdshader")
+		_water.set_shader_parameter("streaks", 14.0)
+		_water.set_shader_parameter("glow", 0.35)
 	for i in count:
 		var angle := piece.angle + float(piece.param("span")) * (i + rng.randf_range(0.2, 0.8)) / count
 		var size := rng.randf_range(10.0, 26.0) * piece.size
@@ -32,6 +40,8 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 			var cap := Scenery.cylinder(isle, size * 0.22, 0.0, size * 0.35, home.primary_color, 8)
 			cap.position = Vector3(size * 0.3, size * 1.07, -size * 0.2)
 		if i % 3 == 0:
-			var fall := stadium.box(Vector3(size * 0.25, size * 1.6, 0.4), Color(0.85, 0.95, 1.0), isle)
-			fall.position = Vector3(0, -size * 0.75, size * 0.85)
-			fall.material_override = Stadium.glow(Color(0.8, 0.93, 1.0), 0.4)
+			# A ribbon of streaming water off the rim, fanning out as it falls.
+			var fall := Scenery.cylinder(isle, size * 0.22, size * 0.1, size * 1.8, Color.WHITE, 10)
+			fall.position = Vector3(0, -size * 0.85, size * 0.85)
+			fall.material_override = _water
+			fall.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

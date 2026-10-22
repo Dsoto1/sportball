@@ -99,11 +99,13 @@ params = {
 
 [sub_resource type="Resource" id="Resource_v5dpj"]
 script = ExtResource("2_2pjeu")
-kind = &"waterfalls"
-angle = 5.0
+kind = &"trees"
+angle = 6.0
 mirrored = true
 params = {
-"height": 20.0
+"count": 3,
+"kind": &"palm",
+"span": 6.0
 }
 
 [sub_resource type="Resource" id="Resource_xyap0"]

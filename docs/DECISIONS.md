@@ -1176,3 +1176,25 @@ Reason: Owner request to compare each park with its sheet and add missing detail
   - The rerun puts every club between .441 and .574.
 
 Reason: Owner request for another detail pass against the sheets. The balance check was pending since the 18-club expansion.
+
+## 2026-10-22 - Fewer, Better Waterfalls
+
+- **Fewer:** the owner found the waterfalls bland and overused (10 parks), and asked for 2-3 at most.
+  - Big waterfalls now stand only at Fountain Gardens and Sakura Gate, where water is central to the sheet.
+  - Cloudreach keeps the thin streams off its floating islands. They now use the flowing water shader.
+  - Elsewhere the falls give way to scenery from each park's own sheet:
+    - Halo Dome and Amber Gate: palms.
+    - The Icebox: pines.
+    - Forum Field: cypresses.
+    - Foundry Field: a pair of smokestacks.
+    - Deepwater, Cloudreach and Firelight: nothing, so their aquarium, islands and volcano lead.
+- **Better:** the module was rebuilt with two looks.
+  - **Gorge** (`water`, also `ice` and `molten`):
+    - Walls of faceted boulders, mossy, with trees on the rim (`tree` setting; Sakura's are pink blossoms) and bushes and vines.
+    - Streams wander down uneven ledges, sometimes splitting in two, and pour over each lip.
+    - Each lands in churning foam and mist, and the last in a plunge pool ringed with rocks.
+  - **Terrace** (Fountain Gardens):
+    - Stepped marble basins that widen toward the field, each with a balustrade and spilling a sheet into the next.
+    - Flower boxes, and a back wall with pilasters, ball finials, arched niches and climbing vines.
+  - The catalog notes waterfalls are meant to be used sparingly.
+- **Swan statue:** the generic "figure" statue was a bare peg. Fountain Gardens now has marble swans with raised wings and arched necks, and the figure is a robed statue holding an urn.

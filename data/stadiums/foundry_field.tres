@@ -67,12 +67,13 @@ params = {
 
 [sub_resource type="Resource" id="Resource_vvbo7"]
 script = ExtResource("2_07v1h")
-kind = &"waterfalls"
-angle = -12.0
+kind = &"smokestacks"
+angle = 13.0
+mirrored = true
 params = {
-"height": 20.0,
-"style": &"molten",
-"width": 6.0
+"count": 2,
+"height": 38.0,
+"span": 6.0
 }
 
 [sub_resource type="Resource" id="Resource_7a83r"]

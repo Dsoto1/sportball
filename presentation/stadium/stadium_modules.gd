@@ -89,10 +89,10 @@ const CATALOG := {
 	},
 	&"waterfalls": {
 		"name": "Waterfall", "category": &"scenery", "unique": false, "placed": true,
-		"about": "A waterfall behind the outfield stands spilling into a pool: water, ice or molten. Mirror it to flank the centerpiece.",
+		"about": "A waterfall behind the outfield stands: a natural rock gorge (water, ice or molten) or formal marble terrace basins. Mirror it to flank the centerpiece. Use sparingly: a signature of the parks whose sheets center on water.",
 		"angle": 12.0, "angle_range": [-60.0, 60.0],
-		"params": {"height": [26.0, 10.0, 45.0], "width": [10.0, 4.0, 24.0], "frozen": [false], "style": [&"water"]},
-		"choices": {"style": [&"water", &"ice", &"molten"]},
+		"params": {"height": [26.0, 10.0, 45.0], "width": [10.0, 4.0, 24.0], "frozen": [false], "style": [&"water"], "greenery": [Color(0.24, 0.5, 0.24)], "tree": [&"round"]},
+		"choices": {"style": [&"water", &"terrace", &"ice", &"molten"], "tree": [&"round", &"blossom", &"pine", &"palm", &"cypress"]},
 		"script": preload("res://presentation/stadium/modules/waterfalls_module.gd"),
 	},
 	&"trees": {
@@ -153,7 +153,7 @@ const CATALOG := {
 		"about": "A bronze statue on a pedestal atop the outfield stands: a charging bull or a figure.",
 		"angle": -25.0, "angle_range": [-60.0, 60.0],
 		"params": {"figure": [&"bull"], "scale": [1.0, 0.3, 3.0]},
-		"choices": {"figure": [&"bull", &"figure", &"fox", &"titan", &"knight", &"scorpion"]},
+		"choices": {"figure": [&"bull", &"figure", &"swan", &"fox", &"titan", &"knight", &"scorpion"]},
 		"script": preload("res://presentation/stadium/modules/statues_module.gd"),
 	},
 	&"bridge": {
