@@ -16,8 +16,8 @@ const CATALOG := {
 		"name": "Centerpiece", "category": &"boards", "unique": true, "placed": false,
 		"about": "The board in straightaway center: club name under its emblem and the batter's card. Framed as a board, gate or arch.",
 		"angle": 0.0, "angle_range": [0.0, 0.0],
-		"params": {"height": [17.0, 12.0, 28.0], "frame": [&"board"], "clock": [false], "crown": [false], "pillar_cap": [&"lamp"]},
-		"choices": {"frame": [&"board", &"gate", &"arch"], "pillar_cap": [&"lamp", &"brazier", &"emblem", &"none"]},
+		"params": {"height": [17.0, 12.0, 28.0], "frame": [&"board"], "clock": [false], "crown": [false], "pillar_cap": [&"lamp"], "frame_model": [&""], "frame_width": [80.0, 30.0, 160.0], "frame_drop": [-30.0, -80.0, 20.0]},
+		"choices": {"frame": [&"board", &"gate", &"arch", &"model"], "pillar_cap": [&"lamp", &"brazier", &"emblem", &"none"]},
 		"script": preload("res://presentation/stadium/modules/centerpiece_module.gd"),
 	},
 	&"slogan_board": {
@@ -99,8 +99,8 @@ const CATALOG := {
 		"name": "Landmarks", "category": &"scenery", "unique": false, "placed": true,
 		"about": "Tall landmarks behind the outfield stands in up to three rows of depth, taller and hazier with distance: castle towers, industrial halls and gantries, townhouse blocks, harbor towers or pagodas, from free Kenney kits recolored to the park.",
 		"angle": -50.0, "angle_range": [-180.0, 180.0],
-		"params": {"style": [&"castle"], "span": [100.0, -360.0, 360.0], "rows": [2.0, 1.0, 3.0], "height": [38.0, 15.0, 90.0], "gap": [12.0, 0.0, 120.0], "center_gap": [12.0, 0.0, 40.0], "flat": [false], "stone": [Color(0, 0, 0, 0)], "roof": [Color(0, 0, 0, 0)], "surface": [&""]},
-		"choices": {"style": [&"castle", &"industrial", &"town", &"harbor", &"pagoda"]},
+		"params": {"style": [&"castle"], "span": [100.0, -360.0, 360.0], "rows": [2.0, 1.0, 3.0], "height": [38.0, 15.0, 90.0], "gap": [12.0, 0.0, 120.0], "center_gap": [12.0, 0.0, 40.0], "flat": [false], "stone": [Color(0, 0, 0, 0)], "roof": [Color(0, 0, 0, 0)], "surface": [&""], "model": [&""]},
+		"choices": {"style": [&"castle", &"industrial", &"town", &"harbor", &"pagoda", &"model"]},
 		"script": preload("res://presentation/stadium/modules/landmarks_module.gd"),
 	},
 	&"hero": {
@@ -263,8 +263,8 @@ const CATALOG := {
 		"name": "Arcade Facade", "category": &"structure", "unique": false, "placed": true,
 		"about": "The upper facade on the back of the stands across span degrees: arches, windows, open steel or timber frames, a colonnade, a glass curtain wall or battlements, with columns, a cornice, club banners and optional towers (spire, dome, pagoda or crenellated caps). Openings glow at night.",
 		"angle": 50.0, "angle_range": [-180.0, 180.0],
-		"params": {"style": [&"arches"], "span": [130.0, -360.0, 360.0], "height": [9.0, 4.0, 30.0], "bay": [7.0, 3.0, 16.0], "banners": [4, 0, 20], "towers": [0, 0, 20], "tower_height": [8.0, 2.0, 40.0], "cap": [&"spire"], "tiers": [1, 1, 4], "kit": [&"colosseum"], "tint": [0.6, 0.0, 1.0], "pavilion": [5, 0, 20], "massing": [0.22, 0.0, 0.6], "block": [4, 1, 20]},
-		"choices": {"style": [&"arches", &"windows", &"truss", &"timber", &"colonnade", &"glass", &"battlements", &"eaves", &"carved", &"kit"], "cap": [&"spire", &"dome", &"pagoda", &"flat"], "kit": [&"colosseum", &"gothic", &"temple", &"victorian"]},
+		"params": {"style": [&"arches"], "span": [130.0, -360.0, 360.0], "height": [9.0, 4.0, 30.0], "bay": [7.0, 3.0, 16.0], "banners": [4, 0, 20], "towers": [0, 0, 20], "tower_height": [8.0, 2.0, 40.0], "cap": [&"spire"], "tiers": [1, 1, 4], "kit": [&"colosseum"], "tint": [0.6, 0.0, 1.0], "pavilion": [5, 0, 20], "massing": [0.22, 0.0, 0.6], "block": [4, 1, 20], "tower_model": [&""]},
+		"choices": {"style": [&"arches", &"windows", &"truss", &"timber", &"colonnade", &"glass", &"battlements", &"eaves", &"carved", &"kit"], "cap": [&"spire", &"dome", &"pagoda", &"flat"], "kit": [&"colosseum", &"gothic", &"temple", &"victorian", &"gothic_set"]},
 		"script": preload("res://presentation/stadium/modules/arcade_module.gd"),
 	},
 	&"canopy": {

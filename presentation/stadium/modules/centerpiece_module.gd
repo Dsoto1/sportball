@@ -45,6 +45,16 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 			crown.position = Vector3(0, 11.0, -1.6)
 			crown.material_override = stadium.surface_mat(&"facade", def.structure_color)
 			board.add_child(crown)
+		&"model":
+			# The park's architecture-set gatehouse framing the board.
+			var role := StringName(piece.param("frame_model"))
+			if ModelKit.has(role):
+				var gate := ModelKit.spawn(role, 1.0, RandomNumberGenerator.new())
+				var box := ModelKit._aabb(gate)
+				var w := float(piece.param("frame_width"))
+				gate.scale = Vector3.ONE * (w / maxf(box.size.x, 0.01))
+				gate.position = Vector3(-box.get_center().x, -box.position.y, -box.get_center().z) * gate.scale + Vector3(0, float(piece.param("frame_drop")), -3.0)
+				board.add_child(gate)
 		_:
 			var legs := stadium.box(Vector3(30.0, 14.0, 1.0), frame_color, board, &"structure")
 			legs.position = Vector3(0, -15.0, -0.8)

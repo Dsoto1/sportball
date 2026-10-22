@@ -45,3 +45,12 @@ The owner approved a test batch of 3 signature landmarks on 2026-10-22, each cap
 | 2026-10-22 | Ledger Street domed bank (text-to-3D) | preview + refine | 30 | 3,030 | 01a1633d-7a84-73a8-90a5-26d7eafd4010 |
 
 Downloaded once assets.meshy.ai was allowed. Each was simplified from 3-5M triangles to 60-100k and logged as MSH-001 to MSH-003.
+
+The owner approved the Citadel architecture-set pilot on 2026-10-22: 4 sections at 30 credits each.
+
+| Date | Item | Mode | Credits | Balance after | Task |
+|---|---|---|---|---|---|
+| 2026-10-22 | Gothic stand bay | preview + refine | 30 | | 01a16366-cbdf-716b-bcfa-a2db4225bad3 |
+| 2026-10-22 | Gothic tower | preview + refine | 30 | | 01a16366-7e07-71fa-8918-535b63d5e4cd |
+| 2026-10-22 | Gothic backdrop block | preview + refine | 30 | | 01a16366-7c23-74b5-b3a7-07b11ccdda38 |
+| 2026-10-22 | Gothic scoreboard gatehouse | preview + refine | 30 | 2,910 | 01a16366-7cb7-77ba-98c8-e45e1532977e |

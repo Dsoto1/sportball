@@ -15,7 +15,8 @@ air_drag_scale = 1.02
 script = ExtResource("2_j3t4y")
 kind = &"centerpiece"
 params = {
-"frame": &"arch",
+"frame": &"model",
+"frame_model": &"set_gothic_gate",
 "pillar_cap": &"emblem"
 }
 
@@ -51,10 +52,10 @@ kind = &"landmarks"
 angle = -50.0
 params = {
 "center_gap": 18.0,
-"height": 42.0,
-"roof": Color(0.12156863, 0.28235295, 0.56078434, 1),
+"height": 40.0,
+"model": &"set_gothic_block",
 "rows": 3,
-"style": &"castle"
+"style": &"model"
 }
 
 [sub_resource type="Resource" id="Resource_xj6r1"]
@@ -63,14 +64,16 @@ kind = &"arcade"
 angle = 50.0
 mirrored = true
 params = {
-"banners": 3,
-"bay": 9.0,
-"cap": &"spire",
+"banners": 0,
+"bay": 14.0,
 "height": 12.0,
-"kit": &"gothic",
+"kit": &"gothic_set",
+"pavilion": 0,
 "style": &"kit",
-"tower_height": 10.0,
-"towers": 4
+"tint": 0.0,
+"tower_height": 16.0,
+"tower_model": &"set_gothic_tower",
+"towers": 3
 }
 
 [sub_resource type="Resource" id="Resource_d0nb8"]
@@ -79,14 +82,16 @@ kind = &"arcade"
 angle = 11.0
 mirrored = true
 params = {
-"banners": 2,
-"bay": 9.0,
-"cap": &"spire",
-"height": 16.0,
-"kit": &"gothic",
+"banners": 0,
+"bay": 16.0,
+"height": 14.0,
+"kit": &"gothic_set",
+"pavilion": 0,
 "span": 36.0,
 "style": &"kit",
-"tower_height": 16.0,
+"tint": 0.0,
+"tower_height": 20.0,
+"tower_model": &"set_gothic_tower",
 "towers": 2
 }
 

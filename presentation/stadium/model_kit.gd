@@ -43,6 +43,12 @@ const SETS := {
 	&"sakura_cliff": [MESHY + "sakura_cliff.glb"],
 	&"cathedral_spires": [MESHY + "cathedral_spires.glb"],
 	&"domed_bank": [MESHY + "domed_bank.glb"],
+	# Architecture sets: one style per park, in sections (stand bay, tower,
+	# backdrop block, scoreboard gate) so the whole park reads as one build.
+	&"bay_gothic_set": [MESHY + "gothic_bay.glb"],
+	&"set_gothic_tower": [MESHY + "gothic_tower.glb"],
+	&"set_gothic_block": [MESHY + "gothic_block.glb"],
+	&"set_gothic_gate": [MESHY + "gothic_gate.glb"],
 	&"block": [CITY + "low-detail-building-a.glb", CITY + "low-detail-building-b.glb", CITY + "low-detail-building-c.glb", CITY + "low-detail-building-d.glb", CITY + "low-detail-building-wide-a.glb"],
 }
 

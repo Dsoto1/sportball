@@ -25,12 +25,14 @@ var _mats := {}
 var _colors := {}
 var _haze := 0.0
 var _flat := false
+var _piece: StadiumPiece
 var _style := &""
 var _wall_surface := &"stone"
 
 
 func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef) -> void:
 	_stadium = stadium
+	_piece = piece
 	_rng = RandomNumberGenerator.new()
 	_rng.seed = hash(String(stadium.def.id) + str(piece.angle) + str(piece.param("style")))
 	var def := stadium.def
@@ -101,6 +103,8 @@ static func _near_hero(stadium: Stadium, angle: float) -> bool:
 ## One landmark of the style about h meters tall: [node, footprint width].
 func _make(style: StringName, h: float) -> Array:
 	match style:
+		&"model":
+			return _model(h)
 		&"castle":
 			return _castle(h)
 		&"industrial":
@@ -111,6 +115,33 @@ func _make(style: StringName, h: float) -> Array:
 			return _pagoda(h)
 		_:
 			return _town(h)
+
+
+## The park's architecture-set backdrop block ("model"), stood on its
+## base, varied in height and turned a little; far rows fade toward the
+## horizon color like the kit styles.
+func _model(h: float) -> Array:
+	var b := Node3D.new()
+	var role := StringName(_piece.param("model"))
+	if not ModelKit.has(role):
+		return [b, 10.0]
+	var m := ModelKit.spawn(role, h, _rng)
+	var box := ModelKit._aabb(m)
+	m.position = Vector3(-box.get_center().x, -box.position.y, -box.get_center().z) * m.scale
+	if _rng.randf() < 0.5:
+		m.scale.x *= -1.0
+		m.position.x *= -1.0
+	b.add_child(m)
+	if _haze > 0.0:
+		for mi: MeshInstance3D in m.find_children("*", "MeshInstance3D", true, false):
+			var src := mi.mesh.surface_get_material(0) as StandardMaterial3D
+			if src != null:
+				if not _mats.has(src):
+					var hazed: StandardMaterial3D = src.duplicate()
+					hazed.albedo_color = Color.WHITE.lerp(_colors["haze"], _haze * 1.4)
+					_mats[src] = hazed
+				mi.material_override = _mats[src]
+	return [b, maxf(box.size.x, box.size.z) * m.scale.y]
 
 
 func _castle(h: float) -> Array:

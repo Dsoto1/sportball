@@ -1272,3 +1272,17 @@ Reason: Owner request for another detail pass against the sheets. The balance ch
 - **Plinth:** each hero stands on a plinth in the park's facade stone, so it sits on the stands instead of floating.
 - **Foot planting:** this is an option, off by default. Kenney's low-poly trees beside the sculpted models looked like toys.
 - **Still open:** the hero models are far more detailed than everything else. The proper fix is matching detail in the surroundings.
+
+## 2026-10-22 - Architecture Sets (Citadel Park Pilot)
+
+- **Why:** the owner wants each park to feel built at one time, in sections, not assembled from parts. Until now a park mixed hand-built facades, Kenney blocks, Artlist bays and one sculpted landmark.
+- **The set:** one style per park in four sections, generated with the same style wording.
+  - **Stand bay:** repeated around the bowl by the arcade `kit` style (`kit: gothic_set`).
+  - **Tower:** stands over bay joints (the new arcade `tower_model`).
+  - **Backdrop block:** fills the landmark rows (the new landmarks style `model`, with mirroring, height variety and row haze).
+  - **Scoreboard gatehouse:** frames the board (the new centerpiece frame `model`, with `frame_model`, `frame_width` and `frame_drop`).
+  - The park's signature landmark is made in the same style.
+- **Citadel Park pilot:** 4 gothic sections (120 Meshy credits; 2,910 left) beside the cathedral.
+  - Castle kit rows, hand-built gothic bays and spire towers are gone. The knights, flags and wall art stay.
+  - Meshy rendered the slate roofs icy pale blue. The new `tools/regrade_glb.py` darkens and desaturates that hue band in the textures, applied to the set and the cathedral.
+- **Next:** the owner judges the pilot before the other 17 parks get sets.

@@ -307,6 +307,18 @@ func _tower(stadium: Stadium, root: Node3D, piece: StadiumPiece, e: Vector3, hei
 	# Alternate towers stand taller, so a run of them reads as a skyline.
 	var lift := 1.0 + 0.35 * float(index % 2) + 0.15 * float(index % 3 == 2)
 	var cap := StringName(piece.param("cap"))
+	var tower_model := StringName(piece.param("tower_model"))
+	if tower_model != &"" and ModelKit.has(tower_model):
+		# The park's architecture-set tower, standing over the bay joint.
+		var t := ModelKit.spawn(tower_model, (height + float(piece.param("tower_height")) * piece.size) * lift, RandomNumberGenerator.new())
+		var box := ModelKit._aabb(t)
+		var holder := Node3D.new()
+		root.add_child(holder)
+		holder.position = stadium.point(e.x, e.y + 1.0, e.z)
+		stadium.face_home(holder)
+		t.position = Vector3(-box.get_center().x, -box.position.y, -box.get_center().z) * t.scale
+		holder.add_child(t)
+		return
 	if cap == &"pagoda":
 		# A sculpted five-tier pagoda standing through the facade.
 		var pagoda := ModelKit.spawn(&"pagoda", (height + float(piece.param("tower_height")) * piece.size) * lift + 6.0, RandomNumberGenerator.new())

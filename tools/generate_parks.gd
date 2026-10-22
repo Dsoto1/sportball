@@ -185,13 +185,13 @@ const PARKS := [
 		"skyline_color": Color("3a2a2a"), "window_color": Color("ffb35c"),
 	},
 	{
-		"id": &"citadel_park", "pillar_cap": &"emblem", "facade_color": Color("8c8a8e"), "facade_surface": &"stone", "structure_surface": &"stone", "decks": 3, "frame": &"arch", "display_name": "Citadel Park",
+		"id": &"citadel_park", "pillar_cap": &"emblem", "facade_color": Color("8c8a8e"), "facade_surface": &"stone", "structure_surface": &"stone", "decks": 3, "frame": &"model", "frame_model": &"set_gothic_gate", "display_name": "Citadel Park",
 		"blurb": "Sentinels home · a fortified citadel: battlements, knight guardians and a cathedral skyline",
 		"shape": [[-45, 100, 3.4], [-22, 115, 3.4], [0, 125, 3.4], [22, 118, 3.4], [45, 108, 3.4]], "air": 1.02,
 		"seat_color": Color("1f3a6f"), "seat_color_alt": Color("192f5a"), "structure_color": Color("6e6c72"), "accent_color": Color("d4af37"),
 		"outfield_wall_color": Color("1b2a4f"), "wall_style": &"stone", "wall_stripe": Color("a61e2d"), "home_fan_share": 0.6, "away_fan_share": 0.2, "attendance": 0.9,
 		"foul_rows": 26, "outfield_rows": 12, "skyline_height": 0.7,
-		"pieces": [[&"hero", 0.0, {"model": &"cathedral_spires", "height": 190.0, "distance": 170.0, "clear": 0.0}], [&"landmarks", -50.0, {"style": &"castle", "rows": 3, "height": 42.0, "roof": Color("1f488f"), "center_gap": 18.0}], [&"arcade", 50.0, {"style": &"kit", "kit": &"gothic", "bay": 9.0, "height": 12.0, "banners": 3, "towers": 4, "tower_height": 10.0, "cap": &"spire"}, true], [&"arcade", 11.0, {"style": &"kit", "kit": &"gothic", "bay": 9.0, "height": 16.0, "span": 36.0, "banners": 2, "towers": 2, "tower_height": 16.0, "cap": &"spire"}, true], [&"statue", 15.0, {"figure": &"knight"}, true], [&"flags", -55.0, {"span": 110.0, "count": 16}], [&"wall_art", 0.0, {"motif": &"emblem", "every": 8.0}]],
+		"pieces": [[&"hero", 0.0, {"model": &"cathedral_spires", "height": 190.0, "distance": 170.0, "clear": 0.0}], [&"landmarks", -50.0, {"style": &"model", "model": &"set_gothic_block", "rows": 3, "height": 40.0, "center_gap": 18.0}], [&"arcade", 50.0, {"style": &"kit", "kit": &"gothic_set", "bay": 14.0, "height": 12.0, "banners": 0, "towers": 3, "tower_height": 16.0, "tower_model": &"set_gothic_tower", "tint": 0.0, "pavilion": 0}, true], [&"arcade", 11.0, {"style": &"kit", "kit": &"gothic_set", "bay": 16.0, "height": 14.0, "span": 36.0, "banners": 0, "towers": 2, "tower_height": 20.0, "tower_model": &"set_gothic_tower", "tint": 0.0, "pavilion": 0}, true], [&"statue", 15.0, {"figure": &"knight"}, true], [&"flags", -55.0, {"span": 110.0, "count": 16}], [&"wall_art", 0.0, {"motif": &"emblem", "every": 8.0}]],
 		"sponsors": ["RAMPART ROOFING", "SQUIRE SANDWICHES", "PORTCULLIS PARKING", "BASTION BANK"],
 		"skyline_color": Color("4a4a58"), "window_color": Color("ffd59a"),
 	},
@@ -236,6 +236,8 @@ func _init() -> void:
 				params["crown"] = true
 			if kind == &"centerpiece" and spec.has("pillar_cap"):
 				params["pillar_cap"] = spec["pillar_cap"]
+			if kind == &"centerpiece" and spec.has("frame_model"):
+				params["frame_model"] = spec["frame_model"]
 			park.add_piece(kind, NAN, params)
 		for p in spec.get("pieces", []):
 			park.add_piece(p[0], p[1] if p.size() > 1 else NAN, p[2] if p.size() > 2 else {}, p[3] if p.size() > 3 else false)
@@ -243,7 +245,7 @@ func _init() -> void:
 		if not problems.is_empty():
 			push_error("%s: %s" % [park.id, ", ".join(problems)])
 		for key in spec:
-			if key in ["shape", "air", "surface", "pieces", "standard", "skyline_height", "frame", "clock", "crown", "pillar_cap"]:
+			if key in ["shape", "air", "surface", "pieces", "standard", "skyline_height", "frame", "clock", "crown", "pillar_cap", "frame_model"]:
 				continue
 			var value: Variant = spec[key]
 			park.set(key, PackedStringArray(value) if key == "sponsors" else value)
