@@ -142,6 +142,7 @@ seat_color_alt = Color(0.17254902, 0.101960786, 0.3019608, 1)
 structure_color = Color(0.56078434, 0.5411765, 0.6392157, 1)
 accent_color = Color(1, 0.7882353, 0.2901961, 1)
 outfield_wall_color = Color(0.16470589, 0.10980392, 0.30980393, 1)
+wall_style = &"neon"
 decks = 3
 home_fan_share = 0.62
 attendance = 0.9

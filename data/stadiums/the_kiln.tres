@@ -143,6 +143,7 @@ seat_color_alt = Color(0.5411765, 0.28235295, 0.14901961, 1)
 structure_color = Color(0.8509804, 0.7254902, 0.5411765, 1)
 accent_color = Color(0.18039216, 0.76862746, 0.7137255, 1)
 outfield_wall_color = Color(0.18431373, 0.22352941, 0.21176471, 1)
+wall_style = &"rock"
 foul_rows = 24
 outfield_rows = 18
 decks = 2

@@ -1,0 +1,169 @@
+[gd_resource type="Resource" script_class="StadiumDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/field_shape.gd" id="1_6mqf6"]
+[ext_resource type="Script" path="res://data/defs/stadium_piece.gd" id="2_lnk5g"]
+[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="3_ypbrp"]
+
+[sub_resource type="Resource" id="Resource_mt0ns"]
+script = ExtResource("1_6mqf6")
+id = &"sakura_gate"
+display_name = "Sakura Gate Park"
+points = PackedVector3Array(-45, 97, 3, -22, 112, 3, 0, 122, 3, 22, 118, 3, 45, 109, 3)
+air_drag_scale = 1.02
+
+[sub_resource type="Resource" id="Resource_s74iq"]
+script = ExtResource("2_lnk5g")
+kind = &"centerpiece"
+params = {
+"frame": &"gate"
+}
+
+[sub_resource type="Resource" id="Resource_2qcw0"]
+script = ExtResource("2_lnk5g")
+kind = &"slogan_board"
+angle = 34.0
+
+[sub_resource type="Resource" id="Resource_hr4ow"]
+script = ExtResource("2_lnk5g")
+kind = &"light_towers"
+
+[sub_resource type="Resource" id="Resource_xqta4"]
+script = ExtResource("2_lnk5g")
+kind = &"mountains"
+angle = -8.0
+params = {
+"count": 1,
+"distance": 620.0,
+"height": 210.0,
+"span": 16.0
+}
+
+[sub_resource type="Resource" id="Resource_twnlk"]
+script = ExtResource("2_lnk5g")
+kind = &"mountains"
+angle = -70.0
+params = {
+"count": 8,
+"distance": 560.0,
+"height": 110.0,
+"span": 140.0
+}
+
+[sub_resource type="Resource" id="Resource_spi2t"]
+script = ExtResource("2_lnk5g")
+kind = &"arcade"
+angle = 50.0
+mirrored = true
+params = {
+"banners": 5,
+"cap": &"pagoda",
+"height": 10.0,
+"style": &"eaves",
+"tower_height": 9.0,
+"towers": 5
+}
+
+[sub_resource type="Resource" id="Resource_wek3x"]
+script = ExtResource("2_lnk5g")
+kind = &"arcade"
+angle = 11.0
+mirrored = true
+params = {
+"banners": 3,
+"cap": &"pagoda",
+"height": 12.0,
+"span": 36.0,
+"style": &"eaves",
+"tower_height": 14.0,
+"towers": 2
+}
+
+[sub_resource type="Resource" id="Resource_tfrrr"]
+script = ExtResource("2_lnk5g")
+kind = &"torii"
+angle = 24.0
+params = {
+"distance": 30.0,
+"height": 22.0
+}
+
+[sub_resource type="Resource" id="Resource_b2ggk"]
+script = ExtResource("2_lnk5g")
+kind = &"torii"
+angle = -26.0
+params = {
+"distance": 4.0,
+"height": 14.0
+}
+
+[sub_resource type="Resource" id="Resource_1a3r5"]
+script = ExtResource("2_lnk5g")
+kind = &"statue"
+angle = 31.0
+params = {
+"figure": &"fox"
+}
+
+[sub_resource type="Resource" id="Resource_3gmcm"]
+script = ExtResource("2_lnk5g")
+kind = &"waterfalls"
+angle = 7.0
+mirrored = true
+params = {
+"height": 26.0
+}
+
+[sub_resource type="Resource" id="Resource_vhmi4"]
+script = ExtResource("2_lnk5g")
+kind = &"trees"
+angle = 14.0
+mirrored = true
+params = {
+"count": 12,
+"kind": &"blossom",
+"span": 40.0
+}
+
+[sub_resource type="Resource" id="Resource_7jbfp"]
+script = ExtResource("2_lnk5g")
+kind = &"lamps"
+angle = -150.0
+params = {
+"count": 40,
+"span": 300.0
+}
+
+[sub_resource type="Resource" id="Resource_1vbk2"]
+script = ExtResource("2_lnk5g")
+kind = &"wall_art"
+params = {
+"every": 7.0,
+"motif": &"blossom"
+}
+
+[resource]
+script = ExtResource("3_ypbrp")
+id = &"sakura_gate"
+display_name = "Sakura Gate Park"
+blurb = "Kitsune home · a mountain shrine under cherry blossoms: torii gates, pagodas and a great fox spirit"
+field_shape = SubResource("Resource_mt0ns")
+seat_color = Color(0.5411765, 0.10980392, 0.16470589, 1)
+seat_color_alt = Color(0.43137255, 0.08627451, 0.13333334, 1)
+structure_color = Color(0.2901961, 0.17254902, 0.13333334, 1)
+accent_color = Color(0.83137256, 0.627451, 0.09019608, 1)
+outfield_wall_color = Color(0.13333334, 0.08235294, 0.08627451, 1)
+wall_style = &"wood"
+wall_stripe = Color(0.83137256, 0.627451, 0.09019608, 1)
+foul_rows = 24
+outfield_rows = 12
+decks = 3
+away_fan_share = 0.2
+attendance = 0.9
+sky = &"sunset"
+sponsors = PackedStringArray("LANTERN TEA HOUSE", "PETAL RAMEN", "FOXFIRE FIREWORKS", "MOUNTAIN SPRING SODA")
+skyline_color = Color(0.22745098, 0.16470589, 0.22745098, 1)
+window_color = Color(1, 0.76862746, 0.5411765, 1)
+facade_color = Color(0.47843137, 0.14117648, 0.1254902, 1)
+facade_surface = &"wood"
+structure_surface = &"wood"
+pieces = Array[ExtResource("2_lnk5g")]([SubResource("Resource_s74iq"), SubResource("Resource_2qcw0"), SubResource("Resource_hr4ow"), SubResource("Resource_xqta4"), SubResource("Resource_twnlk"), SubResource("Resource_spi2t"), SubResource("Resource_wek3x"), SubResource("Resource_tfrrr"), SubResource("Resource_b2ggk"), SubResource("Resource_1a3r5"), SubResource("Resource_3gmcm"), SubResource("Resource_vhmi4"), SubResource("Resource_7jbfp"), SubResource("Resource_1vbk2")])

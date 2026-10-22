@@ -1,0 +1,303 @@
+[gd_resource type="Resource" script_class="TeamDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/player_def.gd" id="1_1ri24"]
+[ext_resource type="Script" path="res://data/defs/team_def.gd" id="2_d6w43"]
+[ext_resource type="Resource" path="res://data/stadiums/deepwater.tres" id="3_jjbjf"]
+
+[sub_resource type="Resource" id="Resource_qej2c"]
+script = ExtResource("1_1ri24")
+id = &"trk_saltonstall"
+display_name = "Ada Saltonstall"
+nickname = "Tentacle"
+number = 1
+positions = Array[StringName]([&"cf", &"lf"])
+contact = 67
+power = 43
+eye = 63
+speed = 81
+arm = 72
+glove = 71
+
+[sub_resource type="Resource" id="Resource_f810x"]
+script = ExtResource("1_1ri24")
+id = &"trk_haverford"
+display_name = "Nell Haverford"
+nickname = "Riptide"
+number = 3
+bats = &"L"
+positions = Array[StringName]([&"ss", &"2b"])
+contact = 65
+power = 52
+eye = 59
+speed = 68
+arm = 78
+glove = 81
+
+[sub_resource type="Resource" id="Resource_wh0qk"]
+script = ExtResource("1_1ri24")
+id = &"trk_rockwell"
+display_name = "Benny Rockwell"
+nickname = "Abyss"
+number = 8
+positions = Array[StringName]([&"rf", &"lf"])
+contact = 66
+power = 66
+eye = 61
+speed = 56
+arm = 84
+glove = 71
+
+[sub_resource type="Resource" id="Resource_q2qfw"]
+script = ExtResource("1_1ri24")
+id = &"trk_brannigan"
+display_name = "Pearl Brannigan"
+nickname = "Ink"
+number = 25
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"1b"])
+contact = 56
+power = 78
+eye = 51
+speed = 36
+arm = 67
+glove = 63
+
+[sub_resource type="Resource" id="Resource_ewwij"]
+script = ExtResource("1_1ri24")
+id = &"trk_redfern"
+display_name = "Cass Redfern"
+nickname = "Leviathan"
+number = 10
+bats = &"L"
+positions = Array[StringName]([&"3b", &"1b"])
+contact = 53
+power = 63
+eye = 49
+speed = 47
+arm = 85
+glove = 72
+
+[sub_resource type="Resource" id="Resource_2e2am"]
+script = ExtResource("1_1ri24")
+id = &"trk_zapata"
+display_name = "Remi Zapata"
+nickname = "Trench"
+number = 31
+positions = Array[StringName]([&"1b", &"lf"])
+contact = 52
+power = 69
+eye = 53
+speed = 41
+arm = 60
+glove = 44
+
+[sub_resource type="Resource" id="Resource_ncxnp"]
+script = ExtResource("1_1ri24")
+id = &"trk_radcliffe"
+display_name = "Dot Radcliffe"
+nickname = "Undertow"
+number = 16
+positions = Array[StringName]([&"lf", &"rf"])
+contact = 56
+power = 60
+eye = 56
+speed = 59
+arm = 71
+glove = 66
+
+[sub_resource type="Resource" id="Resource_2qedv"]
+script = ExtResource("1_1ri24")
+id = &"trk_wojcik"
+display_name = "Sal Wójcik"
+nickname = "Coral"
+number = 4
+positions = Array[StringName]([&"2b", &"ss"])
+contact = 65
+power = 47
+eye = 55
+speed = 60
+arm = 77
+glove = 73
+
+[sub_resource type="Resource" id="Resource_2jurx"]
+script = ExtResource("1_1ri24")
+id = &"trk_pettibone"
+display_name = "Etta Pettibone"
+nickname = "Barnacle"
+number = 26
+positions = Array[StringName]([&"c"])
+contact = 48
+eye = 48
+speed = 27
+arm = 75
+glove = 64
+
+[sub_resource type="Resource" id="Resource_1alpf"]
+script = ExtResource("1_1ri24")
+id = &"trk_uchenna"
+display_name = "Theo Uchenna"
+nickname = "Sonar"
+number = 14
+bats = &"L"
+positions = Array[StringName]([&"2b", &"3b", &"ss"])
+contact = 65
+power = 47
+eye = 54
+speed = 60
+arm = 67
+glove = 73
+
+[sub_resource type="Resource" id="Resource_j0xex"]
+script = ExtResource("1_1ri24")
+id = &"trk_ormsby"
+display_name = "Greta Ormsby"
+nickname = "Depth Charge"
+number = 20
+bats = &"L"
+positions = Array[StringName]([&"lf", &"cf", &"rf"])
+contact = 56
+power = 46
+eye = 56
+speed = 65
+arm = 71
+glove = 66
+
+[sub_resource type="Resource" id="Resource_qmhdh"]
+script = ExtResource("1_1ri24")
+id = &"trk_szabo"
+display_name = "Walt Szabo"
+nickname = "Maelstrom"
+number = 23
+bats = &"L"
+positions = Array[StringName]([&"c", &"1b"])
+contact = 45
+eye = 48
+speed = 21
+arm = 75
+glove = 58
+
+[sub_resource type="Resource" id="Resource_f6uaf"]
+script = ExtResource("1_1ri24")
+id = &"trk_northcott"
+display_name = "Inez Northcott"
+nickname = "Siren"
+number = 34
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 63
+control = 57
+stuff = 64
+stamina = 75
+pitches = Array[StringName]([&"fastball", &"slider", &"splitter", &"curveball"])
+
+[sub_resource type="Resource" id="Resource_l6r73"]
+script = ExtResource("1_1ri24")
+id = &"trk_quintero"
+display_name = "Yates Quintero"
+nickname = "Anchor"
+number = 42
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 67
+control = 59
+stuff = 57
+stamina = 40
+pitches = Array[StringName]([&"fastball", &"slider"])
+
+[sub_resource type="Resource" id="Resource_pd1f2"]
+script = ExtResource("1_1ri24")
+id = &"trk_mulberry"
+display_name = "Kit Mulberry"
+nickname = "Whirlpool"
+number = 48
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 62
+control = 58
+stuff = 63
+stamina = 38
+pitches = Array[StringName]([&"fastball", &"cutter", &"splitter"])
+
+[sub_resource type="Resource" id="Resource_exy8u"]
+script = ExtResource("1_1ri24")
+id = &"trk_okonkwo"
+display_name = "Fern Okonkwo"
+nickname = "Pressure"
+number = 52
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 71
+control = 59
+stuff = 63
+stamina = 36
+pitches = Array[StringName]([&"fastball", &"curveball", &"slider"])
+
+[sub_resource type="Resource" id="Resource_q7vo3"]
+script = ExtResource("1_1ri24")
+id = &"trk_merriweather"
+display_name = "Mabel Merriweather"
+nickname = "Kraken"
+number = 61
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 80
+control = 62
+stuff = 64
+stamina = 28
+pitches = Array[StringName]([&"fastball", &"splitter"])
+
+[resource]
+script = ExtResource("2_d6w43")
+id = &"krakens"
+city = "Tidal Reign"
+team_name = "Krakens"
+abbreviation = "TRK"
+primary_color = Color(0.043137256, 0.23921569, 0.32941177, 1)
+secondary_color = Color(0.18039216, 0.73333335, 0.73333335, 1)
+accent_color = Color(0.9098039, 0.3647059, 0.2901961, 1)
+support_color = Color(0.83137256, 0.6862745, 0.21568628, 1)
+dark_color = Color(0.023529412, 0.1254902, 0.17254902, 1)
+highlight_color = Color(0.9490196, 0.98039216, 1, 1)
+slogan = "Rule the Deep"
+emblem_shape = &"trident"
+mascot = "Inky, a grinning kraken in a captain's hat"
+stadium = "Deepwater Park"
+stadium_def = ExtResource("3_jjbjf")
+identity = "Pressure from the deep. Cannon arms in every corner, a bullpen of flamethrowers and hitters who drag the ball to the gaps. Nothing gets out of Deepwater alive."
+rival = &"gulls"
+roster = Array[ExtResource("1_1ri24")]([SubResource("Resource_qej2c"), SubResource("Resource_f810x"), SubResource("Resource_wh0qk"), SubResource("Resource_q2qfw"), SubResource("Resource_ewwij"), SubResource("Resource_2e2am"), SubResource("Resource_ncxnp"), SubResource("Resource_2qedv"), SubResource("Resource_2jurx"), SubResource("Resource_1alpf"), SubResource("Resource_j0xex"), SubResource("Resource_qmhdh"), SubResource("Resource_f6uaf"), SubResource("Resource_l6r73"), SubResource("Resource_pd1f2"), SubResource("Resource_exy8u"), SubResource("Resource_q7vo3")])
+batting_order = Array[StringName]([&"trk_saltonstall", &"trk_haverford", &"trk_rockwell", &"trk_brannigan", &"trk_redfern", &"trk_zapata", &"trk_radcliffe", &"trk_wojcik", &"trk_pettibone"])
+lineup_positions = Array[StringName]([&"cf", &"ss", &"rf", &"1b", &"3b", &"dh", &"lf", &"2b", &"c"])
+starting_pitcher = &"trk_northcott"
+bullpen = Array[StringName]([&"trk_quintero", &"trk_mulberry", &"trk_okonkwo", &"trk_merriweather"])
+swing_aggression = 1.05
+chase_scale = 1.05
+power_swing_rate = 0.42
+runner_aggression = -0.05
+edge_bias_scale = 0.95
+bullpen_hook = 0.65
+steal_rate = 0.7
+bunt_rate = 0.4

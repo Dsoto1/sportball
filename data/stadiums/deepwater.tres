@@ -1,0 +1,153 @@
+[gd_resource type="Resource" script_class="StadiumDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/field_shape.gd" id="1_521qe"]
+[ext_resource type="Script" path="res://data/defs/stadium_piece.gd" id="2_i0spf"]
+[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="3_g7bjb"]
+
+[sub_resource type="Resource" id="Resource_f4vkt"]
+script = ExtResource("1_521qe")
+id = &"deepwater"
+display_name = "Deepwater Park"
+points = PackedVector3Array(-45, 98, 3, -20, 114, 3, 0, 123, 3, 22, 110, 3, 45, 102, 3)
+air_drag_scale = 1.06
+
+[sub_resource type="Resource" id="Resource_ishok"]
+script = ExtResource("2_i0spf")
+kind = &"centerpiece"
+params = {
+"frame": &"arch"
+}
+
+[sub_resource type="Resource" id="Resource_cbmm1"]
+script = ExtResource("2_i0spf")
+kind = &"slogan_board"
+angle = 34.0
+
+[sub_resource type="Resource" id="Resource_7vq3x"]
+script = ExtResource("2_i0spf")
+kind = &"light_towers"
+
+[sub_resource type="Resource" id="Resource_k8dg8"]
+script = ExtResource("2_i0spf")
+kind = &"water"
+params = {
+"gap": 4.0,
+"glow": 0.3,
+"style": &"moat",
+"width": 500.0
+}
+
+[sub_resource type="Resource" id="Resource_r6hhh"]
+script = ExtResource("2_i0spf")
+kind = &"arcade"
+angle = 50.0
+mirrored = true
+params = {
+"banners": 4,
+"cap": &"dome",
+"height": 14.0,
+"style": &"arches",
+"tiers": 2,
+"tower_height": 8.0,
+"towers": 5
+}
+
+[sub_resource type="Resource" id="Resource_skpg2"]
+script = ExtResource("2_i0spf")
+kind = &"arcade"
+angle = 11.0
+mirrored = true
+params = {
+"banners": 3,
+"cap": &"dome",
+"height": 16.0,
+"span": 36.0,
+"style": &"arches",
+"tiers": 2,
+"tower_height": 10.0,
+"towers": 3
+}
+
+[sub_resource type="Resource" id="Resource_f41hn"]
+script = ExtResource("2_i0spf")
+kind = &"aquarium"
+angle = 14.0
+mirrored = true
+params = {
+"fish": 40,
+"height": 22.0,
+"span": 30.0
+}
+
+[sub_resource type="Resource" id="Resource_2nvy3"]
+script = ExtResource("2_i0spf")
+kind = &"statue"
+angle = 24.0
+params = {
+"figure": &"titan"
+}
+
+[sub_resource type="Resource" id="Resource_5gvei"]
+script = ExtResource("2_i0spf")
+kind = &"waterfalls"
+angle = -12.0
+params = {
+"height": 22.0
+}
+
+[sub_resource type="Resource" id="Resource_8r6tk"]
+script = ExtResource("2_i0spf")
+kind = &"viaduct"
+angle = -40.0
+params = {
+"height": 22.0,
+"span": 26.0,
+"train": false
+}
+
+[sub_resource type="Resource" id="Resource_qowj7"]
+script = ExtResource("2_i0spf")
+kind = &"trees"
+angle = 16.0
+mirrored = true
+params = {
+"count": 10,
+"kind": &"coral",
+"span": 30.0
+}
+
+[sub_resource type="Resource" id="Resource_p58t1"]
+script = ExtResource("2_i0spf")
+kind = &"wall_art"
+params = {
+"every": 8.0,
+"glow": 0.6,
+"motif": &"trident"
+}
+
+[resource]
+script = ExtResource("3_g7bjb")
+id = &"deepwater"
+display_name = "Deepwater Park"
+blurb = "Krakens home · a sunken ruin under the sea: glass tanks, aqueducts and the sea king"
+field_shape = SubResource("Resource_f4vkt")
+seat_color = Color(0.07058824, 0.24705882, 0.33333334, 1)
+seat_color_alt = Color(0.050980393, 0.19607843, 0.27058825, 1)
+structure_color = Color(0.37254903, 0.49803922, 0.49803922, 1)
+accent_color = Color(0.18039216, 0.73333335, 0.73333335, 1)
+outfield_wall_color = Color(0.043137256, 0.23921569, 0.32941177, 1)
+wall_style = &"glass"
+wall_stripe = Color(0.83137256, 0.6862745, 0.21568628, 1)
+outfield_rows = 10
+decks = 3
+home_fan_share = 0.55
+away_fan_share = 0.25
+sky = &"underwater"
+sponsors = PackedStringArray("ABYSS AQUARIUM", "KELP COLA", "DEEP DIVE GEAR", "PEARL DIVER BANK")
+skyline_color = Color(0.07058824, 0.22745098, 0.28235295, 1)
+ground_color = Color(0.05490196, 0.23137255, 0.2901961, 1)
+window_color = Color(0.62352943, 0.9529412, 1, 1)
+facade_color = Color(0.43529412, 0.56078434, 0.5411765, 1)
+facade_surface = &"stone"
+structure_surface = &"stone"
+pieces = Array[ExtResource("2_i0spf")]([SubResource("Resource_ishok"), SubResource("Resource_cbmm1"), SubResource("Resource_7vq3x"), SubResource("Resource_k8dg8"), SubResource("Resource_r6hhh"), SubResource("Resource_skpg2"), SubResource("Resource_f41hn"), SubResource("Resource_2nvy3"), SubResource("Resource_5gvei"), SubResource("Resource_8r6tk"), SubResource("Resource_qowj7"), SubResource("Resource_p58t1")])

@@ -5,7 +5,7 @@ class_name Emblem
 ## finished logo drops in without code. Used on boards, walls, dugouts and
 ## banners.
 
-const SHAPES := [&"disc", &"shield", &"gear", &"halo", &"diamond", &"laurel", &"star", &"atom"]
+const SHAPES := [&"disc", &"shield", &"gear", &"halo", &"diamond", &"laurel", &"star", &"atom", &"blossom", &"trident", &"wings", &"flame"]
 const FONT := preload("res://assets/third_party/fonts/bungee/Bungee-Regular.ttf")
 
 
@@ -42,6 +42,41 @@ static func build(team: TeamDef, size: float = 1.0, glow: float = 0.3) -> Node3D
 				_layer(root, turned, team.primary_color, glow * 2.0, lift * i)
 			_layer(root, _poly(_circle(r * 0.26, 24)), team.highlight_color, glow, lift * 4.0)
 			_layer(root, _ring(_circle(r * 0.26, 24), _circle(r * 0.22, 24)), team.secondary_color, glow, lift * 5.0)
+		&"blossom":
+			# Five petals on a dark disc, a gold heart.
+			_layer(root, _poly(_circle(r, 40)), team.dark_color, glow, 0.0)
+			for k in 5:
+				var a := PI * 0.5 + TAU * k / 5.0
+				_layer(root, _poly(_leaf(Vector2(cos(a), sin(a)) * r * 0.42, r * 0.4, r * 0.28, a)), team.primary_color, glow, lift)
+			_layer(root, _poly(_circle(r * 0.2, 20)), team.accent_color, glow * 1.5, lift * 2.0)
+		&"trident":
+			_layer(root, _poly(_circle(r, 40)), team.primary_color, glow, 0.0)
+			_layer(root, _ring(_circle(r, 40), _circle(r * 0.9, 40)), team.accent_color, glow, lift)
+			var gold := team.support_color
+			_layer(root, _poly(_rect(Vector2(0, -r * 0.15), r * 0.12, r * 1.3)), gold, glow, lift * 2.0)
+			_layer(root, _poly(_rect(Vector2(0, r * 0.2), r * 0.9, r * 0.1)), gold, glow, lift * 2.0)
+			for x in [-0.42, 0.0, 0.42]:
+				_layer(root, _poly(_rect(Vector2(x * r, r * 0.38), r * 0.1, r * 0.4)), gold, glow, lift * 2.0)
+				_layer(root, _poly(PackedVector2Array([Vector2(x * r - r * 0.11, r * 0.58), Vector2(x * r + r * 0.11, r * 0.58), Vector2(x * r, r * 0.8)])), gold, glow, lift * 2.0)
+		&"wings":
+			for side: float in [-1.0, 1.0]:
+				for f in 4:
+					var y := r * (0.25 - f * 0.17)
+					var len := r * (0.95 - f * 0.12)
+					var pts := PackedVector2Array([Vector2(side * r * 0.12, y), Vector2(side * len, y + r * 0.12), Vector2(side * len * 0.92, y - r * 0.05), Vector2(side * r * 0.12, y - r * 0.12)])
+					_layer(root, _poly(_ccw(pts)), team.secondary_color if f % 2 == 0 else team.primary_color, glow, lift)
+			_layer(root, _poly(_circle(r * 0.3, 28)), team.dark_color, glow, lift * 2.0)
+			_layer(root, _ring(_circle(r * 0.3, 28), _circle(r * 0.24, 28)), team.secondary_color, glow * 1.5, lift * 3.0)
+		&"flame":
+			# A teardrop flame, tip up, in three nested layers.
+			var drop := PackedVector2Array()
+			for i in 36:
+				var t := TAU * i / 36.0
+				drop.append(Vector2(sin(t) * pow(absf(sin(t * 0.5)), 1.1) * r * 0.85, cos(t) * r * 0.95))
+			drop = _ccw(drop)
+			_layer(root, _poly(drop), team.secondary_color, glow, 0.0)
+			_layer(root, _poly(_scaled(drop, 0.74)), team.primary_color, glow * 1.6, lift)
+			_layer(root, _poly(_scaled(drop, 0.42)), team.highlight_color, glow * 2.0, lift * 2.0)
 		&"laurel":
 			_layer(root, _poly(_circle(r * 0.62, 40)), team.primary_color, glow, 0.0)
 			_layer(root, _ring(_circle(r * 0.62, 40), _circle(r * 0.56, 40)), team.secondary_color, glow, lift)
@@ -109,6 +144,10 @@ static func _ellipse(rx: float, ry: float, n: int) -> PackedVector2Array:
 		var a := TAU * i / n
 		pts.append(Vector2(cos(a) * rx, sin(a) * ry))
 	return pts
+
+
+static func _rect(c: Vector2, w: float, h: float) -> PackedVector2Array:
+	return PackedVector2Array([c + Vector2(-w, -h) * 0.5, c + Vector2(w, -h) * 0.5, c + Vector2(w, h) * 0.5, c + Vector2(-w, h) * 0.5])
 
 
 static func _star(outer: float, inner: float, points: int) -> PackedVector2Array:

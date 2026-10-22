@@ -155,6 +155,7 @@ structure_color = Color(0.5411765, 0.49019608, 0.4392157, 1)
 accent_color = Color(1, 0.5411765, 0.16470589, 1)
 outfield_wall_color = Color(0.18039216, 0.16470589, 0.16470589, 1)
 wall_style = &"iron"
+wall_stripe = Color(0.7764706, 0.3254902, 0.101960786, 1)
 foul_rows = 20
 outfield_rows = 12
 decks = 2

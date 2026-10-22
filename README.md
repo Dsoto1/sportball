@@ -174,8 +174,15 @@ the table in `tools/generate_input_map.gd` and run
 | Ironbridge Conductors | Warehouse Row | left-handed line drives |
 | Cascade City Swans | Fountain Gardens | pitching and defense |
 | Vaultborough Safecrackers | The Vault | turf speed, slaps, steals |
+| Silver Blossom Kitsune | Sakura Gate Park | slap contact, speed, illusionist arms |
+| Tidal Reign Krakens | Deepwater Park | cannon arms, heat, gap power |
+| Skyward Aviators | Cloudreach Stadium | fly-ball power, outfield speed |
+| Sandstone Legion | Forum Field | discipline, sinkers, defense |
+| Emberpeak Vulcans | Firelight Park | eruption power, fireballers |
+| Ironspire Sentinels | Citadel Park | the fortress: gloves, arms, control |
+| Crimson Dunes Scorpions | Amber Gate Park | patient contact, steals, breaking balls |
 
-Rosters for the nine new clubs come from `tools/generate_teams.gd` (a lineup
+Rosters for the sixteen generated clubs come from `tools/generate_teams.gd` (a lineup
 template shifted by each club's style, steady per-player variation,
 original names). `tools/league_report.gd` plays a round robin; over 240
 games each the clubs land between .425 and .562.

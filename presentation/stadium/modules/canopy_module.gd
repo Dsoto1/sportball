@@ -5,12 +5,13 @@ extends StadiumModule
 ## front edge and struts back to the stands, in steel or timber.
 
 
-func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef) -> void:
+func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef) -> void:
 	var def := stadium.def
 	var depth := float(piece.param("depth")) * piece.size
 	var rise := float(piece.param("height"))
 	var span := float(piece.param("span"))
 	var timber := StringName(piece.param("style")) == &"timber"
+	var cloth := StringName(piece.param("style")) == &"cloth"
 	var steps := maxi(2, int(absf(span) / 2.0))
 	var roof := SurfaceTool.new()
 	roof.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -34,6 +35,22 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	root.name = stadium.unique_name("Canopy")
 	stadium.add_child(root)
 	var mat: StandardMaterial3D = stadium.surface_mat(&"wood" if timber else &"steel", def.structure_color.darkened(0.3) if not timber else Color(0.45, 0.32, 0.22)).duplicate()
+	if cloth:
+		# Striped market awning in the home club's colors.
+		mat = StandardMaterial3D.new()
+		mat.albedo_color = home.primary_color
+		var stripes := GradientTexture2D.new()
+		var g := Gradient.new()
+		g.set_color(0, home.highlight_color)
+		g.set_color(1, Color.WHITE)
+		g.interpolation_mode = Gradient.GRADIENT_INTERPOLATE_CONSTANT
+		stripes.gradient = g
+		stripes.width = 8
+		stripes.height = 1
+		mat.albedo_texture = stripes
+		mat.uv1_triplanar = true
+		mat.uv1_world_triplanar = true
+		mat.uv1_scale = Vector3.ONE * 0.25
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 	_commit(root, roof, mat)
 	_commit(root, trim, Stadium.glow(def.accent_color, 1.2 if def.night else 0.4))

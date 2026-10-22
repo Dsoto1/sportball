@@ -106,10 +106,28 @@ func _build_fence() -> void:
 			wall_mat = _surface(wall_color, GRASS_TEX, GRASS_NORMAL, 0.385, 1.2, 0.0)
 			wall_mat.set_shader_parameter("detail_strength", 1.3)
 			wall_mat.set_shader_parameter("vertical_uv", true)
-		&"brick", &"stone":
+		&"brick", &"stone", &"wood", &"rock", &"marble":
 			wall_mat = StadiumSurfaces.material(style, wall_color, false, 0.6)
 		&"iron":
 			wall_mat = StadiumSurfaces.material(&"steel", wall_color, false, 0.7)
+		&"ice":
+			wall_mat = StadiumSurfaces.material(&"marble", wall_color.lerp(Color(0.8, 0.92, 1.0), 0.5), false, 0.8)
+		&"glass":
+			var glass := StandardMaterial3D.new()
+			glass.albedo_color = Color(wall_color.lerp(Color(0.2, 0.7, 0.8), 0.5), 0.6)
+			glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			glass.emission_enabled = true
+			glass.emission = wall_color.lerp(Color(0.2, 0.7, 0.8), 0.6)
+			glass.emission_energy_multiplier = 0.7
+			glass.roughness = 0.05
+			wall_mat = glass
+	var cap_mat: Material = _mat(cap_color)
+	if style == &"neon":
+		cap_mat = Stadium.glow(cap_color, 2.2)
+	var stripe := _park.wall_stripe if _park != null else Color(0, 0, 0, 0)
+	var stripe_mat: Material = null
+	if stripe.a > 0.0:
+		stripe_mat = Stadium.glow(stripe, _park.wall_stripe_glow) if _park.wall_stripe_glow > 0.0 else _mat(stripe)
 	for i in segments:
 		var a0 := lerpf(-angle, angle, float(i) / segments)
 		var a1 := lerpf(-angle, angle, float(i + 1) / segments)
@@ -123,6 +141,26 @@ func _build_fence() -> void:
 		wall.material_override = wall_mat
 		var cap := _add_box("WallCap", Vector3(length, 0.25, 0.6), mid + Vector3(0, h, 0), cap_color)
 		cap.rotation = wall.rotation
+		cap.material_override = cap_mat
+		if stripe_mat != null:
+			var band := _add_box("WallStripe", Vector3(length, minf(0.3, h * 0.1), 0.54), mid + Vector3(0, h * 0.68, 0), stripe)
+			band.rotation = wall.rotation
+			band.material_override = stripe_mat
+		if style in [&"padded", &"neon"] and i % 2 == 0:
+			# Pad seams.
+			var seam := _add_box("PadSeam", Vector3(0.08, h * 0.96, 0.54), p0 + Vector3(0, h * 0.5, 0), wall_color.darkened(0.35))
+			seam.rotation = wall.rotation
+		if style == &"ice":
+			for k in 3:
+				var icicle := MeshInstance3D.new()
+				var cone := CylinderMesh.new()
+				cone.top_radius = 0.12
+				cone.bottom_radius = 0.0
+				cone.height = 0.5 + 0.4 * ((i + k) % 3)
+				icicle.mesh = cone
+				icicle.material_override = Stadium.glow(Color(0.85, 0.95, 1.0), 0.3)
+				icicle.position = p0.lerp(p1, (k + 0.5) / 3.0) + Vector3(0, h - cone.height * 0.5, 0) - mid.normalized() * 0.3
+				add_child(icicle)
 		if style == &"iron":
 			# Riveted plate seams.
 			for band in [0.35, 0.7]:
@@ -147,6 +185,7 @@ const SKIES := {
 	&"golden": [Color(0.3, 0.46, 0.78), Color(1.0, 0.76, 0.5), Color(1.0, 0.86, 0.66), -34.0, 25.0, 1.2, 0.45],
 	&"sunset": [Color(0.32, 0.24, 0.55), Color(1.0, 0.58, 0.4), Color(1.0, 0.78, 0.6), -26.0, 15.0, 1.1, 0.5],
 	&"dusk": [Color(0.1, 0.1, 0.3), Color(0.95, 0.5, 0.45), Color(1.0, 0.7, 0.55), -12.0, 10.0, 0.35, 0.45],
+	&"underwater": [Color(0.02, 0.18, 0.3), Color(0.1, 0.55, 0.62), Color(0.7, 0.95, 1.0), -70.0, 20.0, 0.9, 0.6],
 	&"night": [Color(0.01, 0.015, 0.05), Color(0.09, 0.1, 0.2), Color(1.0, 0.96, 0.88), -72.0, 15.0, 0.0, 0.4],
 }
 

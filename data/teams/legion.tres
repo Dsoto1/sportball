@@ -1,0 +1,305 @@
+[gd_resource type="Resource" script_class="TeamDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/player_def.gd" id="1_ujdc6"]
+[ext_resource type="Script" path="res://data/defs/team_def.gd" id="2_kvpel"]
+[ext_resource type="Resource" path="res://data/stadiums/forum_field.tres" id="3_5wyvn"]
+
+[sub_resource type="Resource" id="Resource_nwsk4"]
+script = ExtResource("1_ujdc6")
+id = &"sdl_gallagher"
+display_name = "Mack Gallagher"
+nickname = "Centurion"
+number = 1
+positions = Array[StringName]([&"cf", &"lf"])
+contact = 77
+power = 38
+eye = 67
+speed = 78
+arm = 65
+glove = 83
+
+[sub_resource type="Resource" id="Resource_y6nt8"]
+script = ExtResource("1_ujdc6")
+id = &"sdl_wickersham"
+display_name = "Mina Wickersham"
+nickname = "Gladius"
+number = 3
+positions = Array[StringName]([&"ss", &"2b"])
+contact = 73
+power = 48
+eye = 70
+speed = 66
+arm = 67
+glove = 83
+
+[sub_resource type="Resource" id="Resource_54xak"]
+script = ExtResource("1_ujdc6")
+id = &"sdl_fennimore"
+display_name = "Ansel Fennimore"
+nickname = "Phalanx"
+number = 8
+positions = Array[StringName]([&"rf", &"lf"])
+contact = 64
+power = 63
+eye = 69
+speed = 55
+arm = 70
+glove = 63
+
+[sub_resource type="Resource" id="Resource_2jar5"]
+script = ExtResource("1_ujdc6")
+id = &"sdl_westbrook"
+display_name = "Opal Westbrook"
+nickname = "Laurel"
+number = 25
+positions = Array[StringName]([&"1b"])
+contact = 60
+power = 82
+eye = 64
+speed = 31
+arm = 47
+glove = 62
+
+[sub_resource type="Resource" id="Resource_pten4"]
+script = ExtResource("1_ujdc6")
+id = &"sdl_fairbanks"
+display_name = "Boone Fairbanks"
+nickname = "Chariot"
+number = 10
+positions = Array[StringName]([&"3b", &"1b"])
+contact = 59
+power = 60
+eye = 60
+speed = 46
+arm = 74
+glove = 75
+
+[sub_resource type="Resource" id="Resource_ntwfk"]
+script = ExtResource("1_ujdc6")
+id = &"sdl_wainwright"
+display_name = "Quill Wainwright"
+nickname = "Aqueduct"
+number = 31
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"1b", &"lf"])
+contact = 58
+power = 63
+eye = 57
+speed = 37
+arm = 53
+glove = 55
+
+[sub_resource type="Resource" id="Resource_705ry"]
+script = ExtResource("1_ujdc6")
+id = &"sdl_eastwick"
+display_name = "Clem Eastwick"
+nickname = "Spartan"
+number = 16
+bats = &"L"
+positions = Array[StringName]([&"lf", &"rf"])
+contact = 66
+power = 56
+eye = 61
+speed = 57
+arm = 65
+glove = 68
+
+[sub_resource type="Resource" id="Resource_es0dj"]
+script = ExtResource("1_ujdc6")
+id = &"sdl_valentine"
+display_name = "Rollo Valentine"
+nickname = "Tribune"
+number = 4
+positions = Array[StringName]([&"2b", &"ss"])
+contact = 65
+power = 40
+eye = 66
+speed = 55
+arm = 55
+glove = 72
+
+[sub_resource type="Resource" id="Resource_y8dnh"]
+script = ExtResource("1_ujdc6")
+id = &"sdl_delacroix"
+display_name = "Elsie Delacroix"
+nickname = "Colossus"
+number = 26
+bats = &"L"
+positions = Array[StringName]([&"c"])
+contact = 54
+power = 51
+eye = 58
+speed = 30
+arm = 63
+glove = 71
+
+[sub_resource type="Resource" id="Resource_3bhgo"]
+script = ExtResource("1_ujdc6")
+id = &"sdl_treadwell"
+display_name = "Tad Treadwell"
+nickname = "Arena"
+number = 14
+positions = Array[StringName]([&"2b", &"3b", &"ss"])
+contact = 63
+power = 37
+eye = 71
+speed = 52
+arm = 62
+glove = 69
+
+[sub_resource type="Resource" id="Resource_5c6p0"]
+script = ExtResource("1_ujdc6")
+id = &"sdl_cobblestone"
+display_name = "Flo Cobblestone"
+nickname = "Ironclad"
+number = 20
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"lf", &"cf", &"rf"])
+contact = 62
+power = 44
+eye = 69
+speed = 65
+arm = 62
+glove = 70
+
+[sub_resource type="Resource" id="Resource_1xhue"]
+script = ExtResource("1_ujdc6")
+id = &"sdl_thistlewood"
+display_name = "Vern Thistlewood"
+nickname = "Senator"
+number = 23
+bats = &"L"
+positions = Array[StringName]([&"c", &"1b"])
+contact = 59
+eye = 60
+speed = 23
+arm = 65
+glove = 64
+
+[sub_resource type="Resource" id="Resource_20o56"]
+script = ExtResource("1_ujdc6")
+id = &"sdl_carraway"
+display_name = "Hattie Carraway"
+nickname = "Forum"
+number = 34
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 65
+control = 77
+stuff = 63
+stamina = 75
+pitches = Array[StringName]([&"sinker", &"changeup", &"slider", &"curveball"])
+
+[sub_resource type="Resource" id="Resource_daaas"]
+script = ExtResource("1_ujdc6")
+id = &"sdl_sutter"
+display_name = "Wes Sutter"
+nickname = "Shield Wall"
+number = 42
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 61
+control = 71
+stuff = 59
+stamina = 40
+pitches = Array[StringName]([&"sinker", &"slider", &"changeup"])
+
+[sub_resource type="Resource" id="Resource_vbxwj"]
+script = ExtResource("1_ujdc6")
+id = &"sdl_blackwood"
+display_name = "Jo Blackwood"
+nickname = "Javelin"
+number = 48
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 57
+control = 71
+stuff = 55
+stamina = 38
+pitches = Array[StringName]([&"sinker", &"cutter", &"curveball"])
+
+[sub_resource type="Resource" id="Resource_xc630"]
+script = ExtResource("1_ujdc6")
+id = &"sdl_stillwater"
+display_name = "Zora Stillwater"
+nickname = "Triumph"
+number = 52
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 60
+control = 66
+stuff = 71
+stamina = 36
+pitches = Array[StringName]([&"sinker", &"splitter", &"slider"])
+
+[sub_resource type="Resource" id="Resource_54odm"]
+script = ExtResource("1_ujdc6")
+id = &"sdl_barlow"
+display_name = "Lottie Barlow"
+nickname = "Imperator"
+number = 61
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 68
+control = 68
+stuff = 71
+stamina = 28
+pitches = Array[StringName]([&"sinker", &"cutter"])
+
+[resource]
+script = ExtResource("2_kvpel")
+id = &"legion"
+city = "Sandstone"
+team_name = "Legion"
+abbreviation = "SDL"
+primary_color = Color(0.54509807, 0.11764706, 0.11764706, 1)
+secondary_color = Color(0.85490197, 0.64705884, 0.1254902, 1)
+accent_color = Color(0.8627451, 0.7882353, 0.6313726, 1)
+support_color = Color(0.5411765, 0.47843137, 0.4, 1)
+dark_color = Color(0.22745098, 0.18431373, 0.15686275, 1)
+highlight_color = Color(0.9607843, 0.9529412, 0.9137255, 1)
+slogan = "Glory Stands"
+emblem_shape = &"laurel"
+emblem_glyph = "SL"
+mascot = "Maximus, a bronze-helmeted centurion"
+stadium = "Forum Field"
+stadium_def = ExtResource("3_5wyvn")
+identity = "Disciplined ranks of the colosseum. They take pitches, march runners station to station and defend like a shield wall. Sinkers, ground balls and glory."
+rival = &"sentinels"
+roster = Array[ExtResource("1_ujdc6")]([SubResource("Resource_nwsk4"), SubResource("Resource_y6nt8"), SubResource("Resource_54xak"), SubResource("Resource_2jar5"), SubResource("Resource_pten4"), SubResource("Resource_ntwfk"), SubResource("Resource_705ry"), SubResource("Resource_es0dj"), SubResource("Resource_y8dnh"), SubResource("Resource_3bhgo"), SubResource("Resource_5c6p0"), SubResource("Resource_1xhue"), SubResource("Resource_20o56"), SubResource("Resource_daaas"), SubResource("Resource_vbxwj"), SubResource("Resource_xc630"), SubResource("Resource_54odm")])
+batting_order = Array[StringName]([&"sdl_gallagher", &"sdl_wickersham", &"sdl_fennimore", &"sdl_westbrook", &"sdl_fairbanks", &"sdl_wainwright", &"sdl_eastwick", &"sdl_valentine", &"sdl_delacroix"])
+lineup_positions = Array[StringName]([&"cf", &"ss", &"rf", &"1b", &"3b", &"dh", &"lf", &"2b", &"c"])
+starting_pitcher = &"sdl_carraway"
+bullpen = Array[StringName]([&"sdl_sutter", &"sdl_blackwood", &"sdl_stillwater", &"sdl_barlow"])
+swing_aggression = 0.85
+chase_scale = 0.7
+power_swing_rate = 0.34
+runner_aggression = -0.1
+edge_bias_scale = 1.1
+bullpen_hook = 0.55
+steal_rate = 0.7
+bunt_rate = 0.9

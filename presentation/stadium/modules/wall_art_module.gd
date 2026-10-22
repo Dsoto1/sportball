@@ -75,6 +75,17 @@ static func _draw(root: Node3D, motif: StringName, size: float, home: TeamDef, g
 			Emblem._layer(root, Emblem._ring(gear, _scaled(_circle(Vector2.ZERO, r * 0.45, 40), 1.0)), main, glow, 0.0)
 		&"star":
 			Emblem._layer(root, Emblem._poly(Emblem._star(r, r * 0.42, 5)), main, glow, 0.0)
+		&"wings":
+			for side: float in [-1.0, 1.0]:
+				for f in 3:
+					_bar(root, Vector2(side * r * (0.55 + f * 0.25), r * (0.2 - f * 0.2)), r * 1.1, r * 0.14, side * 0.25, main if f == 0 else second, glow)
+		&"flame":
+			Emblem._layer(root, Emblem._poly(Emblem._ccw(PackedVector2Array([Vector2(-r * 0.6, -r), Vector2(r * 0.6, -r), Vector2(r * 0.45, 0), Vector2(r * 0.15, r), Vector2(0, r * 0.2), Vector2(-r * 0.25, r * 0.7), Vector2(-r * 0.5, 0)]))), home.accent_color, maxf(glow, 0.8), 0.0)
+		&"trident":
+			_bar(root, Vector2(0, -r * 0.2), r * 1.6, r * 0.12, PI * 0.5, main, glow)
+			_bar(root, Vector2(0, r * 0.35), r * 1.0, r * 0.12, 0.0, main, glow)
+			for x in [-0.45, 0.0, 0.45]:
+				_bar(root, Vector2(x * r, r * 0.65), r * 0.6, r * 0.12, PI * 0.5, main, glow)
 		&"crossed":
 			_bar(root, Vector2.ZERO, r * 2.2, r * 0.22, PI / 4.0, main, glow)
 			_bar(root, Vector2.ZERO, r * 2.2, r * 0.22, -PI / 4.0, main, glow)

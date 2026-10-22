@@ -1,0 +1,304 @@
+[gd_resource type="Resource" script_class="TeamDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/player_def.gd" id="1_qt1l2"]
+[ext_resource type="Script" path="res://data/defs/team_def.gd" id="2_d4pq5"]
+[ext_resource type="Resource" path="res://data/stadiums/amber_gate.tres" id="3_fsqbq"]
+
+[sub_resource type="Resource" id="Resource_pchcl"]
+script = ExtResource("1_qt1l2")
+id = &"cds_hadley"
+display_name = "Fern Hadley"
+nickname = "Stinger"
+number = 1
+positions = Array[StringName]([&"cf", &"lf"])
+contact = 79
+power = 36
+eye = 63
+speed = 92
+arm = 58
+glove = 77
+
+[sub_resource type="Resource" id="Resource_ry3ap"]
+script = ExtResource("1_qt1l2")
+id = &"cds_woodruff"
+display_name = "Mabel Woodruff"
+nickname = "Mirage"
+number = 3
+positions = Array[StringName]([&"ss", &"2b"])
+contact = 74
+power = 44
+eye = 62
+speed = 78
+arm = 67
+glove = 75
+
+[sub_resource type="Resource" id="Resource_uxdn6"]
+script = ExtResource("1_qt1l2")
+id = &"cds_goodnight"
+display_name = "Abe Goodnight"
+nickname = "Oasis"
+number = 8
+positions = Array[StringName]([&"rf", &"lf"])
+contact = 75
+power = 65
+eye = 61
+speed = 62
+arm = 70
+glove = 61
+
+[sub_resource type="Resource" id="Resource_xl2dh"]
+script = ExtResource("1_qt1l2")
+id = &"cds_wildfire"
+display_name = "Nate Wildfire"
+nickname = "Sandstorm"
+number = 25
+positions = Array[StringName]([&"1b"])
+contact = 64
+power = 78
+eye = 61
+speed = 43
+arm = 52
+glove = 54
+
+[sub_resource type="Resource" id="Resource_uf6ht"]
+script = ExtResource("1_qt1l2")
+id = &"cds_fitzwater"
+display_name = "Bea Fitzwater"
+nickname = "Venom"
+number = 10
+bats = &"L"
+positions = Array[StringName]([&"3b", &"1b"])
+contact = 62
+power = 62
+eye = 58
+speed = 53
+arm = 69
+glove = 62
+
+[sub_resource type="Resource" id="Resource_kpxmw"]
+script = ExtResource("1_qt1l2")
+id = &"cds_whitlock"
+display_name = "Orrin Whitlock"
+nickname = "Dune"
+number = 31
+positions = Array[StringName]([&"1b", &"lf"])
+contact = 63
+power = 65
+speed = 44
+arm = 54
+glove = 42
+
+[sub_resource type="Resource" id="Resource_cal0b"]
+script = ExtResource("1_qt1l2")
+id = &"cds_farrow"
+display_name = "Cal Farrow"
+nickname = "Caravan"
+number = 16
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"lf", &"rf"])
+contact = 71
+power = 45
+eye = 52
+speed = 73
+arm = 64
+glove = 64
+
+[sub_resource type="Resource" id="Resource_3ke7o"]
+script = ExtResource("1_qt1l2")
+id = &"cds_waverly"
+display_name = "Rafe Waverly"
+nickname = "Pincer"
+number = 4
+bats = &"L"
+positions = Array[StringName]([&"2b", &"ss"])
+contact = 74
+power = 38
+eye = 60
+speed = 69
+arm = 57
+glove = 66
+
+[sub_resource type="Resource" id="Resource_0tc1e"]
+script = ExtResource("1_qt1l2")
+id = &"cds_ellery"
+display_name = "Dash Ellery"
+nickname = "Sirocco"
+number = 26
+bats = &"L"
+positions = Array[StringName]([&"c"])
+contact = 64
+power = 40
+eye = 48
+speed = 46
+arm = 72
+glove = 67
+
+[sub_resource type="Resource" id="Resource_eomqr"]
+script = ExtResource("1_qt1l2")
+id = &"cds_vanderpool"
+display_name = "Ruby Vanderpool"
+nickname = "Scimitar"
+number = 14
+positions = Array[StringName]([&"2b", &"3b", &"ss"])
+contact = 70
+power = 39
+eye = 53
+speed = 70
+arm = 63
+glove = 67
+
+[sub_resource type="Resource" id="Resource_li127"]
+script = ExtResource("1_qt1l2")
+id = &"cds_dunmore"
+display_name = "Emmett Dunmore"
+nickname = "Nomad"
+number = 20
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"lf", &"cf", &"rf"])
+contact = 66
+power = 42
+eye = 58
+speed = 79
+arm = 59
+glove = 64
+
+[sub_resource type="Resource" id="Resource_ybxjc"]
+script = ExtResource("1_qt1l2")
+id = &"cds_underhill"
+display_name = "Tess Underhill"
+nickname = "Bazaar"
+number = 23
+bats = &"L"
+positions = Array[StringName]([&"c", &"1b"])
+contact = 53
+power = 51
+eye = 45
+speed = 40
+arm = 69
+glove = 61
+
+[sub_resource type="Resource" id="Resource_2j4ib"]
+script = ExtResource("1_qt1l2")
+id = &"cds_crumley"
+display_name = "Gil Crumley"
+nickname = "Sunburn"
+number = 34
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 61
+control = 69
+stuff = 67
+stamina = 75
+pitches = Array[StringName]([&"changeup", &"curveball", &"sinker", &"junkball"])
+
+[sub_resource type="Resource" id="Resource_abl4p"]
+script = ExtResource("1_qt1l2")
+id = &"cds_tolliver"
+display_name = "Vida Tolliver"
+nickname = "Viper"
+number = 42
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 61
+control = 67
+stuff = 67
+stamina = 40
+pitches = Array[StringName]([&"cutter", &"changeup", &"curveball"])
+
+[sub_resource type="Resource" id="Resource_maf8b"]
+script = ExtResource("1_qt1l2")
+id = &"cds_chandler"
+display_name = "Iggy Chandler"
+nickname = "Quicksand"
+number = 48
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 56
+control = 66
+stuff = 62
+stamina = 38
+pitches = Array[StringName]([&"sinker", &"curveball", &"changeup"])
+
+[sub_resource type="Resource" id="Resource_7u6wk"]
+script = ExtResource("1_qt1l2")
+id = &"cds_tamberlane"
+display_name = "Winnie Tamberlane"
+nickname = "Desert Rose"
+number = 52
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 53
+control = 55
+stuff = 72
+stamina = 36
+pitches = Array[StringName]([&"slider", &"changeup", &"junkball"])
+
+[sub_resource type="Resource" id="Resource_h6vrw"]
+script = ExtResource("1_qt1l2")
+id = &"cds_bramble"
+display_name = "Kip Bramble"
+nickname = "Last Sting"
+number = 61
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 63
+control = 59
+stuff = 74
+stamina = 28
+pitches = Array[StringName]([&"cutter", &"curveball", &"splitter"])
+
+[resource]
+script = ExtResource("2_d4pq5")
+id = &"scorpions"
+city = "Crimson Dunes"
+team_name = "Scorpions"
+abbreviation = "CDS"
+primary_color = Color(0.54509807, 0.11764706, 0.1764706, 1)
+secondary_color = Color(0.83137256, 0.627451, 0.09019608, 1)
+accent_color = Color(0.8509804, 0.76862746, 0.6039216, 1)
+support_color = Color(0.47843137, 0.30588236, 0.18039216, 1)
+dark_color = Color(0.105882354, 0.105882354, 0.105882354, 1)
+highlight_color = Color(0.99215686, 0.95686275, 0.9019608, 1)
+slogan = "Strike from the Sands"
+emblem_shape = &"diamond"
+emblem_glyph = "CD"
+mascot = "Sting, a scorpion in a fez"
+stadium = "Amber Gate Park"
+stadium_def = ExtResource("3_fsqbq")
+identity = "Desert ambush artists. Patient at the plate, venomous with two strikes, and quick to sting on the bases. Their crafty staff lives on breaking balls that bite late."
+rival = &"comets"
+roster = Array[ExtResource("1_qt1l2")]([SubResource("Resource_pchcl"), SubResource("Resource_ry3ap"), SubResource("Resource_uxdn6"), SubResource("Resource_xl2dh"), SubResource("Resource_uf6ht"), SubResource("Resource_kpxmw"), SubResource("Resource_cal0b"), SubResource("Resource_3ke7o"), SubResource("Resource_0tc1e"), SubResource("Resource_eomqr"), SubResource("Resource_li127"), SubResource("Resource_ybxjc"), SubResource("Resource_2j4ib"), SubResource("Resource_abl4p"), SubResource("Resource_maf8b"), SubResource("Resource_7u6wk"), SubResource("Resource_h6vrw")])
+batting_order = Array[StringName]([&"cds_hadley", &"cds_woodruff", &"cds_goodnight", &"cds_wildfire", &"cds_fitzwater", &"cds_whitlock", &"cds_farrow", &"cds_waverly", &"cds_ellery"])
+lineup_positions = Array[StringName]([&"cf", &"ss", &"rf", &"1b", &"3b", &"dh", &"lf", &"2b", &"c"])
+starting_pitcher = &"cds_crumley"
+bullpen = Array[StringName]([&"cds_tolliver", &"cds_chandler", &"cds_tamberlane", &"cds_bramble"])
+swing_aggression = 0.95
+chase_scale = 0.85
+power_swing_rate = 0.32
+runner_aggression = 0.25
+edge_bias_scale = 1.05
+steal_rate = 1.8

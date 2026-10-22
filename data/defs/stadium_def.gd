@@ -20,8 +20,15 @@ extends Resource
 ## Neon accent: the halo, lamp trim, scoreboard frame.
 @export var accent_color: Color = Color(1.0, 0.8, 0.3)
 @export var outfield_wall_color: Color = Color(0.16, 0.22, 0.38)
-## &"padded", &"iron", &"ivy", &"brick" or &"stone": how the outfield wall is dressed.
+## How the outfield wall is dressed: &"padded" (panels with seams),
+## &"iron", &"ivy", &"brick", &"stone", &"wood", &"rock", &"marble", &"ice"
+## (frosted, icicles on the cap), &"glass" (a lit aquarium wall) or &"neon"
+## (padded with a glowing cap).
 @export var wall_style: StringName = &"padded"
+## A band along the wall at two-thirds height (transparent for none) and
+## how much it glows (0 = painted, 1+ = neon).
+@export var wall_stripe: Color = Color(0, 0, 0, 0)
+@export var wall_stripe_glow: float = 0.0
 ## Rows of seats in the foul-territory stands and the outfield bleachers.
 @export var foul_rows: int = 26
 @export var outfield_rows: int = 16
@@ -35,8 +42,8 @@ extends Resource
 ## Played under the lights: floodlights, lit windows, glowing landmarks.
 @export var night: bool = false
 ## The sky and sun, from the park's sheet: &"day", &"golden" (late
-## afternoon), &"sunset", &"dusk" (lights on, last light in the sky) or
-## &"night"; empty follows `night`.
+## afternoon), &"sunset", &"dusk" (lights on, last light in the sky),
+## &"night" or &"underwater" (a teal ocean dome); empty follows `night`.
 @export var sky: StringName = &""
 
 

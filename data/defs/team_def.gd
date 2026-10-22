@@ -22,7 +22,7 @@ extends Resource
 @export_group("Emblem")
 ## The club's mark, used on boards, walls, dugouts and banners: a badge
 ## shape (&"disc", &"shield", &"gear", &"halo", &"diamond", &"laurel",
-## &"star", &"atom") with a glyph on it (a letter or two, or "*" for a star).
+## &"star", &"atom", &"blossom", &"trident", &"wings", &"flame") with a glyph on it (a letter or two, or "*" for a star).
 ## A texture, when set, replaces the drawn mark (a finished logo).
 @export var emblem_shape: StringName = &"disc"
 @export var emblem_glyph: String = ""

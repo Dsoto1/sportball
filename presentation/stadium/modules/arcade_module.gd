@@ -10,7 +10,12 @@ extends StadiumModule
 ##            classical parks);
 ##   glass:   a lit glass curtain wall with mullions (modern, sky cities);
 ##   battlements: a stone wall with arrow slits and crenellations on top
-##            (citadels, castles).
+##            (citadels, castles);
+##   eaves:   red posts and pale panels under sweeping tiled eaves with
+##            hanging lanterns (shrines, pagodas);
+##   carved:  a rock face with arched cave openings, as if cut from a
+##            cliff (canyons, volcanoes).
+## Arches stack in "tiers" rows (2-3 for a colosseum or an aqueduct).
 ## Every "towers" bays a tower rises "tower_height" m above the facade,
 ## capped with a spire, dome, tiered pagoda roof or crenellations ("cap").
 ## The openings glow warm at night. Every "banners" bays a column carries
@@ -24,9 +29,10 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	var bay := float(piece.param("bay"))
 	var span := float(piece.param("span"))
 	var open_frame := style in [&"truss", &"timber"]
+	var wall_color := Color(0.95, 0.92, 0.85) if style == &"eaves" else def.facade_tint()
 	var no_wall := open_frame or style == &"colonnade"
 	var frame_surface: StringName = &"wood" if style == &"timber" else (&"steel" if style == &"truss" else &"structure")
-	var frame_color := def.structure_color.darkened(0.15) if not open_frame else (Color(0.42, 0.3, 0.2) if style == &"timber" else def.structure_color.darkened(0.35))
+	var frame_color := Color(0.72, 0.15, 0.12) if style == &"eaves" else def.structure_color.darkened(0.15) if not open_frame else (Color(0.42, 0.3, 0.2) if style == &"timber" else def.structure_color.darkened(0.35))
 	var wall := SurfaceTool.new()
 	wall.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var frame := SurfaceTool.new()
@@ -37,6 +43,11 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	var glass := SurfaceTool.new()
 	glass.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var merlon_spots: Array = []
+	var roofs := SurfaceTool.new()
+	roofs.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var rock := SurfaceTool.new()
+	rock.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var lantern_spots: Array[Vector3] = []
 	var tower_spots: Array[Vector3] = []
 	var every_tower := int(piece.param("towers"))
 	# Bay edges: each carries its own back-of-stands radius and base height,
@@ -64,6 +75,23 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 			_quad(glass, p.call(0.0, 0.0), p.call(1.0, 0.0), p.call(1.0, height), p.call(0.0, height))
 			_quad(frame, p.call(0.0, height * 0.5 - 0.15, 0.3), p.call(1.0, height * 0.5 - 0.15, 0.3), p.call(1.0, height * 0.5 + 0.15, 0.3), p.call(0.0, height * 0.5 + 0.15, 0.3))
 			_quad(frame, p.call(0.48, 0.0, 0.3), p.call(0.52, 0.0, 0.3), p.call(0.52, height, 0.3), p.call(0.48, height, 0.3))
+		elif style == &"eaves":
+			_quad(wall, p.call(0.0, 0.0), p.call(1.0, 0.0), p.call(1.0, height * 0.82), p.call(0.0, height * 0.82))
+			for c in [0.3, 0.7]:
+				_quad(holes, p.call(c - 0.12, height * 0.2, 0.35), p.call(c + 0.12, height * 0.2, 0.35), p.call(c + 0.12, height * 0.65, 0.35), p.call(c - 0.12, height * 0.65, 0.35))
+			# Tiled eave: sloping out over the bay, its ends lifted.
+			_quad(roofs, p.call(0.0, height * 0.82, -0.2), p.call(1.0, height * 0.82, -0.2), p.call(1.0, height * 0.82 - 1.0, 2.2), p.call(0.0, height * 0.82 - 1.0, 2.2))
+			_quad(roofs, p.call(0.0, height + 0.6, 0.6), p.call(1.0, height + 0.6, 0.6), p.call(1.0, height * 0.82, -0.6), p.call(0.0, height * 0.82, -0.6))
+			lantern_spots.append(stadium.point(lerpf(e0.x, e1.x, 0.5), lerpf(e0.y, e1.y, 0.5) - 1.8, lerpf(e0.z, e1.z, 0.5) + height * 0.62))
+		elif style == &"carved":
+			_quad(rock, p.call(0.0, 0.0), p.call(1.0, 0.0), p.call(1.0, height), p.call(0.0, height))
+			var chord := 0.3
+			var spring := height * 0.45
+			_quad(holes, p.call(0.5 - chord, 0.0, 0.35), p.call(0.5 + chord, 0.0, 0.35), p.call(0.5 + chord, spring, 0.35), p.call(0.5 - chord, spring, 0.35))
+			for k in 10:
+				var t0 := PI * k / 10.0
+				var t1 := PI * (k + 1) / 10.0
+				_tri(holes, p.call(0.5, spring, 0.35), p.call(0.5 + cos(t0) * chord, spring + sin(t0) * chord * bay, 0.35), p.call(0.5 + cos(t1) * chord, spring + sin(t1) * chord * bay, 0.35))
 		elif style == &"battlements":
 			_quad(wall, p.call(0.0, 0.0), p.call(1.0, 0.0), p.call(1.0, height), p.call(0.0, height))
 			for c in [0.33, 0.67]:
@@ -73,15 +101,21 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 			_quad(wall, p.call(0.0, 0.0), p.call(1.0, 0.0), p.call(1.0, height), p.call(0.0, height))
 			# Openings: arched (rectangle + half disc) or two rows of windows.
 			if style == &"arches":
-				var w := 0.5 - col
-				var spring := height * 0.55
-				_quad(holes, p.call(0.5 - w * 0.6, 0.0, 0.35), p.call(0.5 + w * 0.6, 0.0, 0.35), p.call(0.5 + w * 0.6, spring, 0.35), p.call(0.5 - w * 0.6, spring, 0.35))
-				var chord := w * 0.6
-				var rise := chord * bay
-				for k in 10:
-					var t0 := PI * k / 10.0
-					var t1 := PI * (k + 1) / 10.0
-					_tri(holes, p.call(0.5, spring, 0.35), p.call(0.5 + cos(t0) * chord, spring + sin(t0) * rise, 0.35), p.call(0.5 + cos(t1) * chord, spring + sin(t1) * rise, 0.35))
+				var tiers := int(piece.param("tiers"))
+				var tier_h := height / tiers
+				for tier in tiers:
+					var y0 := tier * tier_h
+					var w := 0.5 - col
+					var chord := w * 0.6
+					var rise := minf(chord * bay, tier_h * 0.4)
+					var spring := y0 + tier_h * 0.85 - rise
+					_quad(holes, p.call(0.5 - chord, y0 + tier_h * 0.08, 0.35), p.call(0.5 + chord, y0 + tier_h * 0.08, 0.35), p.call(0.5 + chord, spring, 0.35), p.call(0.5 - chord, spring, 0.35))
+					for k in 10:
+						var t0 := PI * k / 10.0
+						var t1 := PI * (k + 1) / 10.0
+						_tri(holes, p.call(0.5, spring, 0.35), p.call(0.5 + cos(t0) * chord, spring + sin(t0) * rise, 0.35), p.call(0.5 + cos(t1) * chord, spring + sin(t1) * rise, 0.35))
+					if tier > 0:
+						_quad(frame, p.call(0.0, y0 - 0.25, 0.5), p.call(1.0, y0 - 0.25, 0.5), p.call(1.0, y0 + 0.25, 0.5), p.call(0.0, y0 + 0.25, 0.5))
 			else:
 				for row in 2:
 					var y0 := height * (0.12 + row * 0.44)
@@ -111,7 +145,7 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	var root := Node3D.new()
 	root.name = stadium.unique_name("Arcade")
 	stadium.add_child(root)
-	_commit(root, wall, _double_sided(stadium.surface_mat(&"facade", def.facade_tint())))
+	_commit(root, wall, _double_sided(stadium.surface_mat(&"facade" if style != &"eaves" else &"wood", wall_color)))
 	_commit(root, frame, _double_sided(stadium.surface_mat(frame_surface, frame_color)))
 	var lit := StandardMaterial3D.new()
 	lit.albedo_color = Color(0.08, 0.07, 0.07)
@@ -130,6 +164,13 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	pane.emission_energy_multiplier = 0.9 if def.night else 0.12
 	pane.cull_mode = BaseMaterial3D.CULL_DISABLED
 	_commit(root, glass, pane)
+	_commit(root, roofs, _double_sided(stadium.surface_mat(&"steel", Color(0.16, 0.15, 0.17))))
+	_commit(root, rock, _double_sided(StadiumSurfaces.material(&"rock", def.facade_tint(), false, 1.5)))
+	var paper := Stadium.glow(Color(1.0, 0.55, 0.3), 2.2 if def.night else 1.0)
+	for at in lantern_spots:
+		var lantern := Scenery.sphere(root, 0.55, Color.ORANGE, 1.3)
+		lantern.position = at
+		lantern.material_override = paper
 	# Crenellations: two merlons per bay along the top.
 	for pair: Array in merlon_spots:
 		var a0: Vector3 = pair[0]
@@ -169,7 +210,7 @@ func _tower(stadium: Stadium, root: Node3D, piece: StadiumPiece, e: Vector3, hei
 	var window := stadium.box(Vector3(tw * 0.3, tw * 0.6, 0.1), def.window_color, tower)
 	window.position = Vector3(0, tall - tw * 0.9, tw * 0.5 + 0.05)
 	window.material_override = Stadium.glow(def.window_color, 1.6 if def.night else 0.3)
-	var roof := home.primary_color.darkened(0.2)
+	var roof := home.primary_color.darkened(0.2) if StringName(piece.param("cap")) != &"pagoda" else Color(0.14, 0.13, 0.15)
 	match StringName(piece.param("cap")):
 		&"spire":
 			var spire := Scenery.cylinder(tower, tw * 0.75, 0.0, tw * 1.8, roof, 8)

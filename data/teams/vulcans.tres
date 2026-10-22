@@ -1,0 +1,304 @@
+[gd_resource type="Resource" script_class="TeamDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/player_def.gd" id="1_to0wd"]
+[ext_resource type="Script" path="res://data/defs/team_def.gd" id="2_kwnjs"]
+[ext_resource type="Resource" path="res://data/stadiums/firelight.tres" id="3_ahcch"]
+
+[sub_resource type="Resource" id="Resource_ak4s2"]
+script = ExtResource("1_to0wd")
+id = &"epv_sinclair"
+display_name = "Juno Sinclair"
+nickname = "Magma"
+number = 1
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"cf", &"lf"])
+contact = 67
+power = 49
+eye = 54
+speed = 83
+arm = 66
+glove = 76
+
+[sub_resource type="Resource" id="Resource_tvxvr"]
+script = ExtResource("1_to0wd")
+id = &"epv_ashgrove"
+display_name = "Merritt Ashgrove"
+nickname = "Eruption"
+number = 3
+positions = Array[StringName]([&"ss", &"2b"])
+contact = 64
+power = 59
+eye = 56
+speed = 71
+arm = 67
+glove = 76
+
+[sub_resource type="Resource" id="Resource_jktu3"]
+script = ExtResource("1_to0wd")
+id = &"epv_sayers"
+display_name = "Alder Sayers"
+nickname = "Cinder"
+number = 8
+positions = Array[StringName]([&"rf", &"lf"])
+contact = 59
+power = 78
+eye = 49
+speed = 53
+arm = 75
+glove = 60
+
+[sub_resource type="Resource" id="Resource_mvsq1"]
+script = ExtResource("1_to0wd")
+id = &"epv_montclair"
+display_name = "Odie Montclair"
+nickname = "Obsidian"
+number = 25
+positions = Array[StringName]([&"1b"])
+contact = 53
+power = 89
+eye = 48
+speed = 32
+arm = 56
+glove = 51
+
+[sub_resource type="Resource" id="Resource_yl62q"]
+script = ExtResource("1_to0wd")
+id = &"epv_rosewood"
+display_name = "Birdie Rosewood"
+nickname = "Lava Flow"
+number = 10
+positions = Array[StringName]([&"3b", &"1b"])
+contact = 57
+power = 71
+eye = 53
+speed = 51
+arm = 70
+glove = 68
+
+[sub_resource type="Resource" id="Resource_30ijx"]
+script = ExtResource("1_to0wd")
+id = &"epv_delgado"
+display_name = "Percy Delgado"
+nickname = "Ash Cloud"
+number = 31
+positions = Array[StringName]([&"1b", &"lf"])
+contact = 56
+power = 79
+eye = 53
+speed = 36
+arm = 52
+glove = 42
+
+[sub_resource type="Resource" id="Resource_btwa7"]
+script = ExtResource("1_to0wd")
+id = &"epv_ridley"
+display_name = "Cleo Ridley"
+nickname = "Pyro"
+number = 16
+positions = Array[StringName]([&"lf", &"rf"])
+contact = 61
+power = 65
+eye = 53
+speed = 60
+arm = 60
+glove = 59
+
+[sub_resource type="Resource" id="Resource_werqv"]
+script = ExtResource("1_to0wd")
+id = &"epv_oyelaran"
+display_name = "Rhea Oyelaran"
+nickname = "Brimstone"
+number = 4
+positions = Array[StringName]([&"2b", &"ss"])
+contact = 56
+power = 59
+eye = 59
+speed = 68
+arm = 62
+glove = 73
+
+[sub_resource type="Resource" id="Resource_yo17r"]
+script = ExtResource("1_to0wd")
+id = &"epv_ravenswood"
+display_name = "Ellis Ravenswood"
+nickname = "Scorch"
+number = 26
+positions = Array[StringName]([&"c"])
+contact = 53
+power = 53
+eye = 42
+speed = 37
+arm = 72
+glove = 66
+
+[sub_resource type="Resource" id="Resource_rlqdi"]
+script = ExtResource("1_to0wd")
+id = &"epv_yilmaz"
+display_name = "Sully Yilmaz"
+nickname = "Ember"
+number = 14
+bats = &"L"
+positions = Array[StringName]([&"2b", &"3b", &"ss"])
+contact = 55
+eye = 49
+speed = 59
+arm = 65
+glove = 64
+
+[sub_resource type="Resource" id="Resource_5ytdm"]
+script = ExtResource("1_to0wd")
+id = &"epv_quimby"
+display_name = "Felix Quimby"
+nickname = "Caldera"
+number = 20
+bats = &"L"
+positions = Array[StringName]([&"lf", &"cf", &"rf"])
+contact = 61
+power = 55
+eye = 52
+speed = 70
+arm = 59
+glove = 63
+
+[sub_resource type="Resource" id="Resource_wbieu"]
+script = ExtResource("1_to0wd")
+id = &"epv_villanueva"
+display_name = "Tilly Villanueva"
+nickname = "Firestorm"
+number = 23
+bats = &"L"
+positions = Array[StringName]([&"c", &"1b"])
+contact = 45
+power = 60
+eye = 44
+speed = 27
+arm = 63
+glove = 56
+
+[sub_resource type="Resource" id="Resource_5wofc"]
+script = ExtResource("1_to0wd")
+id = &"epv_pemberton"
+display_name = "Harlan Pemberton"
+nickname = "Basalt"
+number = 34
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 73
+control = 61
+stuff = 63
+stamina = 75
+pitches = Array[StringName]([&"fastball", &"slider", &"splitter", &"curveball"])
+
+[sub_resource type="Resource" id="Resource_4iwbc"]
+script = ExtResource("1_to0wd")
+id = &"epv_takahashi"
+display_name = "Wanda Takahashi"
+nickname = "Molten"
+number = 42
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 68
+control = 54
+stuff = 69
+stamina = 40
+pitches = Array[StringName]([&"fastball", &"slider"])
+
+[sub_resource type="Resource" id="Resource_0y3jy"]
+script = ExtResource("1_to0wd")
+id = &"epv_oakes"
+display_name = "Jasper Oakes"
+nickname = "Hotfoot"
+number = 48
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 67
+control = 57
+stuff = 57
+stamina = 38
+pitches = Array[StringName]([&"fastball", &"cutter", &"splitter"])
+
+[sub_resource type="Resource" id="Resource_om4fh"]
+script = ExtResource("1_to0wd")
+id = &"epv_rasmussen"
+display_name = "Zeke Rasmussen"
+nickname = "Kindling"
+number = 52
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 69
+control = 51
+stuff = 72
+stamina = 36
+pitches = Array[StringName]([&"fastball", &"curveball", &"slider"])
+
+[sub_resource type="Resource" id="Resource_7roxj"]
+script = ExtResource("1_to0wd")
+id = &"epv_nightingale"
+display_name = "Lenny Nightingale"
+nickname = "Inferno"
+number = 61
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 80
+control = 56
+stuff = 64
+stamina = 28
+pitches = Array[StringName]([&"fastball", &"splitter"])
+
+[resource]
+script = ExtResource("2_kwnjs")
+id = &"vulcans"
+city = "Emberpeak"
+team_name = "Vulcans"
+abbreviation = "EPV"
+primary_color = Color(1, 0.41568628, 0, 1)
+secondary_color = Color(0.105882354, 0.105882354, 0.105882354, 1)
+accent_color = Color(0.7764706, 0.15686275, 0.15686275, 1)
+support_color = Color(0.84313726, 0.7647059, 0.6313726, 1)
+dark_color = Color(0.16470589, 0.11372549, 0.09411765, 1)
+highlight_color = Color(1, 0.827451, 0.3019608, 1)
+slogan = "Forged in Fire"
+emblem_shape = &"flame"
+mascot = "Cinder, a little lava golem with a hot temper"
+stadium = "Firelight Park"
+stadium_def = ExtResource("3_ahcch")
+identity = "Volcanic island sluggers. Molten bats, short tempers and a staff that throws pure fire. They erupt in big innings and cool off just as fast."
+rival = &"yetis"
+roster = Array[ExtResource("1_to0wd")]([SubResource("Resource_ak4s2"), SubResource("Resource_tvxvr"), SubResource("Resource_jktu3"), SubResource("Resource_mvsq1"), SubResource("Resource_yl62q"), SubResource("Resource_30ijx"), SubResource("Resource_btwa7"), SubResource("Resource_werqv"), SubResource("Resource_yo17r"), SubResource("Resource_rlqdi"), SubResource("Resource_5ytdm"), SubResource("Resource_wbieu"), SubResource("Resource_5wofc"), SubResource("Resource_4iwbc"), SubResource("Resource_0y3jy"), SubResource("Resource_om4fh"), SubResource("Resource_7roxj")])
+batting_order = Array[StringName]([&"epv_sinclair", &"epv_ashgrove", &"epv_sayers", &"epv_montclair", &"epv_rosewood", &"epv_delgado", &"epv_ridley", &"epv_oyelaran", &"epv_ravenswood"])
+lineup_positions = Array[StringName]([&"cf", &"ss", &"rf", &"1b", &"3b", &"dh", &"lf", &"2b", &"c"])
+starting_pitcher = &"epv_pemberton"
+bullpen = Array[StringName]([&"epv_takahashi", &"epv_oakes", &"epv_rasmussen", &"epv_nightingale"])
+swing_aggression = 1.12
+chase_scale = 1.2
+power_swing_rate = 0.5
+runner_aggression = 0.05
+edge_bias_scale = 0.9
+bullpen_hook = 0.65
+steal_rate = 0.7
+bunt_rate = 0.2

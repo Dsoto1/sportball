@@ -1,0 +1,137 @@
+[gd_resource type="Resource" script_class="StadiumDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/field_shape.gd" id="1_2wl0p"]
+[ext_resource type="Script" path="res://data/defs/stadium_piece.gd" id="2_j3t4y"]
+[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="3_2llqd"]
+
+[sub_resource type="Resource" id="Resource_wt22v"]
+script = ExtResource("1_2wl0p")
+id = &"citadel_park"
+display_name = "Citadel Park"
+points = PackedVector3Array(-45, 100, 3.4, -22, 115, 3.4, 0, 125, 3.4, 22, 118, 3.4, 45, 108, 3.4)
+air_drag_scale = 1.02
+
+[sub_resource type="Resource" id="Resource_r10jk"]
+script = ExtResource("2_j3t4y")
+kind = &"centerpiece"
+params = {
+"frame": &"arch"
+}
+
+[sub_resource type="Resource" id="Resource_ia03i"]
+script = ExtResource("2_j3t4y")
+kind = &"scoreboard"
+angle = -34.0
+
+[sub_resource type="Resource" id="Resource_61igp"]
+script = ExtResource("2_j3t4y")
+kind = &"slogan_board"
+angle = 34.0
+
+[sub_resource type="Resource" id="Resource_ncnwa"]
+script = ExtResource("2_j3t4y")
+kind = &"light_towers"
+
+[sub_resource type="Resource" id="Resource_0qmui"]
+script = ExtResource("2_j3t4y")
+kind = &"skyline"
+params = {
+"height": 0.7
+}
+
+[sub_resource type="Resource" id="Resource_qg3hj"]
+script = ExtResource("2_j3t4y")
+kind = &"arcade"
+angle = 50.0
+mirrored = true
+params = {
+"banners": 3,
+"cap": &"spire",
+"height": 12.0,
+"style": &"battlements",
+"tower_height": 10.0,
+"towers": 4
+}
+
+[sub_resource type="Resource" id="Resource_xj6r1"]
+script = ExtResource("2_j3t4y")
+kind = &"arcade"
+angle = 11.0
+mirrored = true
+params = {
+"banners": 2,
+"cap": &"spire",
+"height": 16.0,
+"span": 36.0,
+"style": &"battlements",
+"tower_height": 16.0,
+"towers": 2
+}
+
+[sub_resource type="Resource" id="Resource_d0nb8"]
+script = ExtResource("2_j3t4y")
+kind = &"statue"
+angle = 15.0
+mirrored = true
+params = {
+"figure": &"knight"
+}
+
+[sub_resource type="Resource" id="Resource_5ij81"]
+script = ExtResource("2_j3t4y")
+kind = &"cathedral"
+angle = -6.0
+params = {
+"distance": 150.0
+}
+
+[sub_resource type="Resource" id="Resource_2lqch"]
+script = ExtResource("2_j3t4y")
+kind = &"bridge"
+angle = -32.0
+params = {
+"distance": 40.0,
+"length": 120.0
+}
+
+[sub_resource type="Resource" id="Resource_0f0xv"]
+script = ExtResource("2_j3t4y")
+kind = &"flags"
+angle = -55.0
+params = {
+"count": 16,
+"span": 110.0
+}
+
+[sub_resource type="Resource" id="Resource_6gp50"]
+script = ExtResource("2_j3t4y")
+kind = &"wall_art"
+params = {
+"every": 8.0,
+"motif": &"emblem"
+}
+
+[resource]
+script = ExtResource("3_2llqd")
+id = &"citadel_park"
+display_name = "Citadel Park"
+blurb = "Sentinels home · a fortified citadel: battlements, knight guardians and a cathedral skyline"
+field_shape = SubResource("Resource_wt22v")
+seat_color = Color(0.12156863, 0.22745098, 0.43529412, 1)
+seat_color_alt = Color(0.09803922, 0.18431373, 0.3529412, 1)
+structure_color = Color(0.43137255, 0.42352942, 0.44705883, 1)
+accent_color = Color(0.83137256, 0.6862745, 0.21568628, 1)
+outfield_wall_color = Color(0.105882354, 0.16470589, 0.30980393, 1)
+wall_style = &"stone"
+wall_stripe = Color(0.6509804, 0.11764706, 0.1764706, 1)
+outfield_rows = 12
+decks = 3
+away_fan_share = 0.2
+attendance = 0.9
+sponsors = PackedStringArray("RAMPART ROOFING", "SQUIRE SANDWICHES", "PORTCULLIS PARKING", "BASTION BANK")
+skyline_color = Color(0.2901961, 0.2901961, 0.34509805, 1)
+window_color = Color(1, 0.8352941, 0.6039216, 1)
+facade_color = Color(0.54901963, 0.5411765, 0.5568628, 1)
+facade_surface = &"stone"
+structure_surface = &"stone"
+pieces = Array[ExtResource("2_j3t4y")]([SubResource("Resource_r10jk"), SubResource("Resource_ia03i"), SubResource("Resource_61igp"), SubResource("Resource_ncnwa"), SubResource("Resource_0qmui"), SubResource("Resource_qg3hj"), SubResource("Resource_xj6r1"), SubResource("Resource_d0nb8"), SubResource("Resource_5ij81"), SubResource("Resource_2lqch"), SubResource("Resource_0f0xv"), SubResource("Resource_6gp50")])

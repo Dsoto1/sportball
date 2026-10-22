@@ -1068,3 +1068,27 @@ The arcade facade had four styles. The sheets (and the proposed clubs' citadels,
 Reason: Owner observation that the different designs need more facade types.
 
 Affected systems: arcade module, catalog, generate_parks, tests, README, notes.
+
+## 2026-10-22 - Eighteen Clubs
+
+- **New clubs:** the owner chose an 18-club league. Seven are built from the proposed sheets:
+  - Silver Blossom Kitsune (Sakura Gate Park);
+  - Tidal Reign Krakens (Deepwater Park, the underwater sheet);
+  - Skyward Aviators (Cloudreach Stadium);
+  - Sandstone Legion (Forum Field; the sheet has no park name);
+  - Emberpeak Vulcans (Firelight Park);
+  - Ironspire Sentinels (Citadel Park);
+  - Crimson Dunes Scorpions (Amber Gate Park).
+- **Left as notes:** Redrock Rangers (a Kiln copy), Pinecrest Loggers (an Icebox copy), the Tidal Reign harbor version, and the Sailport Privateers.
+- **Identity:** each new club takes its sheet's six colors. Four new emblem shapes: blossom, trident, wings and flame. Each club also has its own play style, AI personality and rival.
+- **Modules from the sheets:**
+  - landmarks: torii gates, an aquarium wall (fish and sharks drift), floating islands, propeller towers (spinning), a cathedral, a volcano style for mountains (lava streaks, smoke);
+  - statues: fox, sea king, knight and scorpion figures, scaled up 2.2× so statues read from home plate;
+  - coral trees, cloth market canopies, flaming braziers;
+  - wall motifs: wings, flame, trident;
+  - an underwater sky.
+- **Facade styles:** `eaves` (red posts, pale panels, tiled eaves, paper lanterns), `carved` (a rock face with cave arches) and stacked `tiers` of arches (colosseum, aqueduct).
+- **Outfield walls:** new styles: wood, rock, marble, ice (frosted, icicles), glass (a lit aquarium) and neon (glowing cap). Every park also gets a trim stripe (painted or glowing) and pad seams. All 18 walls now differ.
+- **Balance:** an 18-club round robin is in progress. Results and any retuning follow in the next entry.
+
+Reason: Owner request to build the new teams (18 total) from their sheets, with new facades and more unique outfield walls.

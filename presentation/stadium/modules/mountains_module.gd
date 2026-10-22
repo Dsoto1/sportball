@@ -12,6 +12,9 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	root.name = stadium.unique_name("Mountains")
 	stadium.add_child(root)
 	var mesa := StringName(piece.param("style")) == &"mesa"
+	if StringName(piece.param("style")) == &"volcano":
+		_volcano(stadium, root, piece)
+		return
 	var count := int(piece.param("count"))
 	var tall := float(piece.param("height")) * piece.size
 	var rock := Color(0.66, 0.3, 0.18) if mesa else Color(0.42, 0.46, 0.55)
@@ -53,3 +56,52 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 		root.add_child(arch)
 		arch.look_at_from_position(spot, Vector3(0, 0, 0), Vector3.UP)
 		arch.rotate_object_local(Vector3.RIGHT, PI * 0.5)
+
+
+## One great volcano: a dark cone with a crater, glowing lava streaks down
+## its flanks, a lava glow in the crater and smoke rising from it.
+func _volcano(stadium: Stadium, root: Node3D, piece: StadiumPiece) -> void:
+	var tall := float(piece.param("height")) * piece.size
+	var spot := stadium.point(piece.angle, float(piece.param("distance")), 0.0)
+	var cone := Scenery.cylinder(root, tall * 1.3, tall * 0.18, tall, Color(0.25, 0.2, 0.2), 14)
+	cone.position = spot + Vector3.UP * tall * 0.5
+	cone.material_override = StadiumSurfaces.material(&"rock", Color(0.32, 0.26, 0.25), false, 3.0)
+	var lava := Stadium.glow(Color(1.0, 0.35, 0.05), 3.0)
+	var crater := Scenery.cylinder(root, tall * 0.17, tall * 0.17, 1.0, Color.ORANGE, 14)
+	crater.position = spot + Vector3.UP * (tall + 0.2)
+	crater.material_override = lava
+	# Lava streaks running down the field-facing flank, crater to foot.
+	var toward := (Vector3(0, 0, 0) - spot)
+	toward.y = 0.0
+	toward = toward.normalized()
+	for k in 5:
+		var side := toward.rotated(Vector3.UP, deg_to_rad(-40.0 + k * 20.0))
+		var crest := spot + side * tall * 0.18 + Vector3.UP * tall
+		var foot := spot + side * tall * 1.3 * (0.75 + 0.05 * (k % 3))
+		var length := crest.distance_to(foot)
+		var stream := stadium.box(Vector3(tall * 0.04, tall * 0.02, length), Color.ORANGE, root)
+		stream.position = (crest + foot) * 0.5 + side * tall * 0.03
+		stream.look_at_from_position(stream.position, foot + side * tall * 0.03, Vector3.UP)
+		stream.material_override = lava
+	var smoke := CPUParticles3D.new()
+	smoke.amount = 30
+	smoke.lifetime = 10.0
+	smoke.preprocess = 10.0
+	smoke.direction = Vector3(0.2, 1.0, 0.0)
+	smoke.spread = 15.0
+	smoke.initial_velocity_min = 6.0
+	smoke.initial_velocity_max = 10.0
+	smoke.gravity = Vector3(1.5, 0.5, 0.0)
+	smoke.scale_amount_min = tall * 0.08
+	smoke.scale_amount_max = tall * 0.16
+	var puff := SphereMesh.new()
+	puff.radial_segments = 8
+	puff.rings = 4
+	smoke.mesh = puff
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.25, 0.22, 0.22, 0.5)
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	smoke.material_override = mat
+	smoke.position = spot + Vector3.UP * tall
+	root.add_child(smoke)

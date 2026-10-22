@@ -11,7 +11,7 @@ func test_every_club_has_its_own_park() -> void:
 			check(not parks.has(team.stadium_def.id), "%s's park is nobody else's" % team.id)
 			parks[team.stadium_def.id] = team.id
 			check(team.stadium_def.blurb.begins_with(team.team_name), "%s park names its home club" % team.id)
-	check_eq(content().teams.size(), 11, "eleven clubs")
+	check_eq(content().teams.size(), 18, "eighteen clubs")
 	check_eq(parks.size(), content().parks.size(), "every park is somebody's home")
 
 

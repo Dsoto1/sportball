@@ -18,6 +18,12 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 		tree.position = Scenery.behind(stadium, angle + rng.randf_range(-1.0, 1.0), rng.randf_range(2.0, 14.0))
 		tree.rotation.y = rng.randf() * TAU
 		tree.scale = Vector3.ONE * piece.size * rng.randf_range(0.8, 1.2)
+		if kind == &"coral":
+			for c in 4:
+				var branch := Scenery.cylinder(tree, 0.5, 0.25, rng.randf_range(3.0, 7.0), [Color(0.98, 0.45, 0.45), Color(1.0, 0.65, 0.3), Color(0.75, 0.4, 0.95), Color(0.3, 0.85, 0.75)][c], 6)
+				branch.position = Vector3(rng.randf_range(-1.5, 1.5), 2.0, rng.randf_range(-1.5, 1.5))
+				branch.rotation = Vector3(rng.randf_range(-0.4, 0.4), 0.0, rng.randf_range(-0.4, 0.4))
+			continue
 		if ModelKit.has(kind):
 			# A modeled tree (Kenney Nature Kit), blossoms in pink.
 			var tall: float = {&"palm": 16.0, &"pine": 15.0, &"cactus": 11.0, &"round": 11.0, &"cypress": 14.0, &"blossom": 9.0, &"rock": 9.0}.get(kind, 12.0)

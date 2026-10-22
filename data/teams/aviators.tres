@@ -1,0 +1,300 @@
+[gd_resource type="Resource" script_class="TeamDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/player_def.gd" id="1_8va22"]
+[ext_resource type="Script" path="res://data/defs/team_def.gd" id="2_cgq5g"]
+[ext_resource type="Resource" path="res://data/stadiums/cloudreach.tres" id="3_xqrn1"]
+
+[sub_resource type="Resource" id="Resource_aqkqn"]
+script = ExtResource("1_8va22")
+id = &"ska_moreau"
+display_name = "Abe Moreau"
+nickname = "Tailwind"
+number = 1
+positions = Array[StringName]([&"cf", &"lf"])
+contact = 66
+eye = 51
+speed = 83
+arm = 65
+glove = 70
+
+[sub_resource type="Resource" id="Resource_cepvl"]
+script = ExtResource("1_8va22")
+id = &"ska_marchetti"
+display_name = "Nate Marchetti"
+nickname = "Barnstormer"
+number = 3
+positions = Array[StringName]([&"ss", &"2b"])
+contact = 65
+eye = 54
+speed = 83
+arm = 67
+glove = 71
+
+[sub_resource type="Resource" id="Resource_wjeia"]
+script = ExtResource("1_8va22")
+id = &"ska_kowalczyk"
+display_name = "Bea Kowalczyk"
+nickname = "Propwash"
+number = 8
+positions = Array[StringName]([&"rf", &"lf"])
+contact = 65
+power = 77
+eye = 47
+speed = 62
+arm = 75
+glove = 63
+
+[sub_resource type="Resource" id="Resource_b384o"]
+script = ExtResource("1_8va22")
+id = &"ska_loveless"
+display_name = "Orrin Loveless"
+nickname = "Cirrus"
+number = 25
+positions = Array[StringName]([&"1b"])
+contact = 54
+power = 91
+eye = 54
+speed = 44
+arm = 53
+glove = 57
+
+[sub_resource type="Resource" id="Resource_5i1hw"]
+script = ExtResource("1_8va22")
+id = &"ska_iwamoto"
+display_name = "Cal Iwamoto"
+nickname = "Loop"
+number = 10
+positions = Array[StringName]([&"3b", &"1b"])
+contact = 61
+power = 67
+eye = 52
+speed = 57
+arm = 71
+glove = 68
+
+[sub_resource type="Resource" id="Resource_y1ktp"]
+script = ExtResource("1_8va22")
+id = &"ska_larkspur"
+display_name = "Rafe Larkspur"
+nickname = "Updraft"
+number = 31
+bats = &"L"
+positions = Array[StringName]([&"1b", &"lf"])
+contact = 59
+power = 72
+eye = 45
+arm = 46
+
+[sub_resource type="Resource" id="Resource_c68mk"]
+script = ExtResource("1_8va22")
+id = &"ska_guzman"
+display_name = "Dash Guzmán"
+nickname = "Jet Stream"
+number = 16
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"lf", &"rf"])
+contact = 64
+power = 59
+speed = 64
+arm = 59
+glove = 57
+
+[sub_resource type="Resource" id="Resource_rfml8"]
+script = ExtResource("1_8va22")
+id = &"ska_kinsley"
+display_name = "Ruby Kinsley"
+nickname = "Goggles"
+number = 4
+bats = &"L"
+positions = Array[StringName]([&"2b", &"ss"])
+contact = 62
+power = 46
+eye = 53
+speed = 76
+arm = 58
+glove = 75
+
+[sub_resource type="Resource" id="Resource_1nnsi"]
+script = ExtResource("1_8va22")
+id = &"ska_esposito"
+display_name = "Emmett Esposito"
+nickname = "Zeppelin"
+number = 26
+positions = Array[StringName]([&"c"])
+contact = 48
+power = 57
+eye = 49
+speed = 40
+arm = 70
+glove = 63
+
+[sub_resource type="Resource" id="Resource_cf6ra"]
+script = ExtResource("1_8va22")
+id = &"ska_jessup"
+display_name = "Tess Jessup"
+nickname = "Ace"
+number = 14
+positions = Array[StringName]([&"2b", &"3b", &"ss"])
+contact = 65
+power = 49
+eye = 46
+speed = 68
+arm = 64
+glove = 67
+
+[sub_resource type="Resource" id="Resource_8oemn"]
+script = ExtResource("1_8va22")
+id = &"ska_castellanos"
+display_name = "Gil Castellanos"
+nickname = "Contrail"
+number = 20
+bats = &"L"
+positions = Array[StringName]([&"lf", &"cf", &"rf"])
+contact = 57
+power = 47
+eye = 52
+speed = 83
+arm = 61
+glove = 59
+
+[sub_resource type="Resource" id="Resource_4xa4a"]
+script = ExtResource("1_8va22")
+id = &"ska_huckabee"
+display_name = "Vida Huckabee"
+nickname = "Altitude"
+number = 23
+bats = &"L"
+positions = Array[StringName]([&"c", &"1b"])
+contact = 43
+power = 58
+eye = 35
+speed = 35
+arm = 67
+glove = 58
+
+[sub_resource type="Resource" id="Resource_3qgv5"]
+script = ExtResource("1_8va22")
+id = &"ska_achterberg"
+display_name = "Iggy Achterberg"
+nickname = "Wingtip"
+number = 34
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 61
+control = 61
+stuff = 66
+stamina = 75
+pitches = Array[StringName]([&"fastball", &"slider", &"changeup", &"curveball"])
+
+[sub_resource type="Resource" id="Resource_a4jqc"]
+script = ExtResource("1_8va22")
+id = &"ska_halfpenny"
+display_name = "Winnie Halfpenny"
+nickname = "Skybridge"
+number = 42
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 60
+control = 58
+stuff = 65
+stamina = 40
+
+[sub_resource type="Resource" id="Resource_66ysi"]
+script = ExtResource("1_8va22")
+id = &"ska_yardley"
+display_name = "Kip Yardley"
+nickname = "Nosedive"
+number = 48
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 60
+control = 62
+stuff = 65
+stamina = 38
+pitches = Array[StringName]([&"sinker", &"curveball", &"changeup"])
+
+[sub_resource type="Resource" id="Resource_l5el8"]
+script = ExtResource("1_8va22")
+id = &"ska_granger"
+display_name = "Ozzie Granger"
+nickname = "Thunderhead"
+number = 52
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 59
+control = 53
+stuff = 66
+stamina = 36
+pitches = Array[StringName]([&"cutter", &"slider", &"splitter"])
+
+[sub_resource type="Resource" id="Resource_up801"]
+script = ExtResource("1_8va22")
+id = &"ska_winterbottom"
+display_name = "Lyle Winterbottom"
+nickname = "Moonshot"
+number = 61
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 74
+control = 62
+stuff = 62
+stamina = 28
+pitches = Array[StringName]([&"fastball", &"splitter"])
+
+[resource]
+script = ExtResource("2_cgq5g")
+id = &"aviators"
+city = "Skyward"
+team_name = "Aviators"
+abbreviation = "SKA"
+primary_color = Color(0.23137255, 0.49019608, 0.84705883, 1)
+secondary_color = Color(0.83137256, 0.627451, 0.09019608, 1)
+accent_color = Color(0.72156864, 0.26666668, 0.16470589, 1)
+support_color = Color(0.41960785, 0.46666667, 0.5294118, 1)
+dark_color = Color(0.05882353, 0.16470589, 0.3019608, 1)
+highlight_color = Color(0.95686275, 0.9372549, 0.9019608, 1)
+slogan = "Above It All"
+emblem_shape = &"wings"
+mascot = "Captain Gale, a goggled pilot with a propeller cap"
+stadium = "Cloudreach Stadium"
+stadium_def = ExtResource("3_xqrn1")
+identity = "High-flying fly-ball club above the clouds. They launch everything into the jet stream and run down every gap in the outfield. Strikeouts happen; so do moonshots."
+rival = &"neutrons"
+roster = Array[ExtResource("1_8va22")]([SubResource("Resource_aqkqn"), SubResource("Resource_cepvl"), SubResource("Resource_wjeia"), SubResource("Resource_b384o"), SubResource("Resource_5i1hw"), SubResource("Resource_y1ktp"), SubResource("Resource_c68mk"), SubResource("Resource_rfml8"), SubResource("Resource_1nnsi"), SubResource("Resource_cf6ra"), SubResource("Resource_8oemn"), SubResource("Resource_4xa4a"), SubResource("Resource_3qgv5"), SubResource("Resource_a4jqc"), SubResource("Resource_66ysi"), SubResource("Resource_l5el8"), SubResource("Resource_up801")])
+batting_order = Array[StringName]([&"ska_moreau", &"ska_marchetti", &"ska_kowalczyk", &"ska_loveless", &"ska_iwamoto", &"ska_larkspur", &"ska_guzman", &"ska_kinsley", &"ska_esposito"])
+lineup_positions = Array[StringName]([&"cf", &"ss", &"rf", &"1b", &"3b", &"dh", &"lf", &"2b", &"c"])
+starting_pitcher = &"ska_achterberg"
+bullpen = Array[StringName]([&"ska_halfpenny", &"ska_yardley", &"ska_granger", &"ska_winterbottom"])
+swing_aggression = 1.1
+chase_scale = 1.15
+power_swing_rate = 0.48
+runner_aggression = 0.2
+steal_rate = 1.3
+bunt_rate = 0.3

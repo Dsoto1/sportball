@@ -156,6 +156,7 @@ seat_color_alt = Color(0.13333334, 0.22745098, 0.30980393, 1)
 structure_color = Color(0.72156864, 0.76862746, 0.8, 1)
 accent_color = Color(0.62352943, 0.9098039, 1, 1)
 outfield_wall_color = Color(0.078431375, 0.22745098, 0.3882353, 1)
+wall_style = &"ice"
 decks = 2
 home_fan_share = 0.5
 away_fan_share = 0.25

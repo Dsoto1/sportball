@@ -1,0 +1,160 @@
+[gd_resource type="Resource" script_class="StadiumDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/field_shape.gd" id="1_q6lra"]
+[ext_resource type="Script" path="res://data/defs/stadium_piece.gd" id="2_2pjeu"]
+[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="3_6grm6"]
+
+[sub_resource type="Resource" id="Resource_om0x8"]
+script = ExtResource("1_q6lra")
+id = &"amber_gate"
+display_name = "Amber Gate Park"
+points = PackedVector3Array(-45, 94, 3, -22, 113, 3, 0, 130, 3, 24, 120, 3, 45, 107, 3)
+air_drag_scale = 0.9
+
+[sub_resource type="Resource" id="Resource_4oyrr"]
+script = ExtResource("2_2pjeu")
+kind = &"centerpiece"
+params = {
+"frame": &"gate"
+}
+
+[sub_resource type="Resource" id="Resource_n437m"]
+script = ExtResource("2_2pjeu")
+kind = &"slogan_board"
+angle = 34.0
+
+[sub_resource type="Resource" id="Resource_pixr7"]
+script = ExtResource("2_2pjeu")
+kind = &"light_towers"
+
+[sub_resource type="Resource" id="Resource_nw5vl"]
+script = ExtResource("2_2pjeu")
+kind = &"mountains"
+angle = -100.0
+params = {
+"count": 12,
+"distance": 340.0,
+"height": 75.0,
+"span": 200.0,
+"style": &"mesa"
+}
+
+[sub_resource type="Resource" id="Resource_gy2ay"]
+script = ExtResource("2_2pjeu")
+kind = &"arcade"
+angle = 50.0
+mirrored = true
+params = {
+"banners": 4,
+"height": 12.0,
+"style": &"arches",
+"tiers": 2
+}
+
+[sub_resource type="Resource" id="Resource_g4iop"]
+script = ExtResource("2_2pjeu")
+kind = &"canopy"
+angle = 52.0
+mirrored = true
+params = {
+"style": &"cloth"
+}
+
+[sub_resource type="Resource" id="Resource_jlrk3"]
+script = ExtResource("2_2pjeu")
+kind = &"arcade"
+angle = 11.0
+mirrored = true
+params = {
+"banners": 3,
+"cap": &"dome",
+"height": 13.0,
+"span": 36.0,
+"style": &"carved",
+"tower_height": 10.0,
+"towers": 3
+}
+
+[sub_resource type="Resource" id="Resource_mitcy"]
+script = ExtResource("2_2pjeu")
+kind = &"statue"
+angle = 9.0
+mirrored = true
+params = {
+"figure": &"scorpion"
+}
+
+[sub_resource type="Resource" id="Resource_fw3im"]
+script = ExtResource("2_2pjeu")
+kind = &"waterfalls"
+angle = 5.0
+mirrored = true
+params = {
+"height": 20.0
+}
+
+[sub_resource type="Resource" id="Resource_v5dpj"]
+script = ExtResource("2_2pjeu")
+kind = &"trees"
+angle = 22.0
+mirrored = true
+params = {
+"count": 9,
+"kind": &"palm",
+"span": 30.0
+}
+
+[sub_resource type="Resource" id="Resource_xyap0"]
+script = ExtResource("2_2pjeu")
+kind = &"lamps"
+angle = -150.0
+params = {
+"count": 32,
+"span": 300.0,
+"style": &"brazier"
+}
+
+[sub_resource type="Resource" id="Resource_yabsd"]
+script = ExtResource("2_2pjeu")
+kind = &"flags"
+angle = -55.0
+params = {
+"count": 14,
+"span": 110.0
+}
+
+[sub_resource type="Resource" id="Resource_850kf"]
+script = ExtResource("2_2pjeu")
+kind = &"wall_art"
+params = {
+"motif": &"star"
+}
+
+[resource]
+script = ExtResource("3_6grm6")
+id = &"amber_gate"
+display_name = "Amber Gate Park"
+blurb = "Scorpions home · a desert canyon city: scorpion statues, an oasis of palms and market terraces"
+field_shape = SubResource("Resource_om0x8")
+seat_color = Color(0.54509807, 0.11764706, 0.1764706, 1)
+seat_color_alt = Color(0.4392157, 0.09411765, 0.14117648, 1)
+structure_color = Color(0.72156864, 0.5411765, 0.34509805, 1)
+accent_color = Color(0.83137256, 0.627451, 0.09019608, 1)
+outfield_wall_color = Color(0.36862746, 0.101960786, 0.14117648, 1)
+wall_style = &"stone"
+wall_stripe = Color(0.83137256, 0.627451, 0.09019608, 1)
+foul_rows = 25
+outfield_rows = 12
+decks = 3
+away_fan_share = 0.2
+attendance = 0.88
+sky = &"golden"
+sponsors = PackedStringArray("OASIS SPRINGS", "CARAVAN KEBAB", "SANDSTORM SUNSCREEN", "DUNE BUGGY RENTALS")
+skyline_color = Color(0.627451, 0.47058824, 0.3137255, 1)
+ground_color = Color(0.7882353, 0.6039216, 0.38431373, 1)
+window_color = Color(1, 0.8784314, 0.627451, 1)
+facade_color = Color(0.76862746, 0.57254905, 0.3529412, 1)
+facade_surface = &"stone"
+structure_surface = &"stone"
+ground_surface = &"sand"
+pieces = Array[ExtResource("2_2pjeu")]([SubResource("Resource_4oyrr"), SubResource("Resource_n437m"), SubResource("Resource_pixr7"), SubResource("Resource_nw5vl"), SubResource("Resource_gy2ay"), SubResource("Resource_g4iop"), SubResource("Resource_jlrk3"), SubResource("Resource_mitcy"), SubResource("Resource_fw3im"), SubResource("Resource_v5dpj"), SubResource("Resource_xyap0"), SubResource("Resource_yabsd"), SubResource("Resource_850kf")])

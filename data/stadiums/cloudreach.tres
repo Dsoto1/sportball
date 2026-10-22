@@ -1,0 +1,151 @@
+[gd_resource type="Resource" script_class="StadiumDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/field_shape.gd" id="1_pvb0w"]
+[ext_resource type="Script" path="res://data/defs/stadium_piece.gd" id="2_m0rp2"]
+[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="3_mh7wu"]
+
+[sub_resource type="Resource" id="Resource_ocp4l"]
+script = ExtResource("1_pvb0w")
+id = &"cloudreach"
+display_name = "Cloudreach Stadium"
+points = PackedVector3Array(-45, 102, 3, -22, 116, 3, 0, 125, 3, 22, 118, 3, 45, 108, 3)
+air_drag_scale = 0.9
+
+[sub_resource type="Resource" id="Resource_l6vnc"]
+script = ExtResource("2_m0rp2")
+kind = &"centerpiece"
+params = {
+"frame": &"gate"
+}
+
+[sub_resource type="Resource" id="Resource_3skfr"]
+script = ExtResource("2_m0rp2")
+kind = &"scoreboard"
+angle = -34.0
+
+[sub_resource type="Resource" id="Resource_b52m4"]
+script = ExtResource("2_m0rp2")
+kind = &"slogan_board"
+angle = 34.0
+
+[sub_resource type="Resource" id="Resource_7ifyp"]
+script = ExtResource("2_m0rp2")
+kind = &"light_towers"
+
+[sub_resource type="Resource" id="Resource_euhsm"]
+script = ExtResource("2_m0rp2")
+kind = &"skyline"
+params = {
+"height": 0.8
+}
+
+[sub_resource type="Resource" id="Resource_p68y6"]
+script = ExtResource("2_m0rp2")
+kind = &"islands"
+angle = -180.0
+params = {
+"count": 16,
+"span": 360.0
+}
+
+[sub_resource type="Resource" id="Resource_nqtn2"]
+script = ExtResource("2_m0rp2")
+kind = &"flying_craft"
+params = {
+"count": 6,
+"style": &"blimp"
+}
+
+[sub_resource type="Resource" id="Resource_xylns"]
+script = ExtResource("2_m0rp2")
+kind = &"arcade"
+angle = 50.0
+mirrored = true
+params = {
+"banners": 4,
+"cap": &"dome",
+"height": 11.0,
+"style": &"truss",
+"tower_height": 9.0,
+"towers": 5
+}
+
+[sub_resource type="Resource" id="Resource_14uv1"]
+script = ExtResource("2_m0rp2")
+kind = &"arcade"
+angle = 11.0
+mirrored = true
+params = {
+"banners": 3,
+"cap": &"dome",
+"height": 14.0,
+"span": 36.0,
+"style": &"glass",
+"tower_height": 14.0,
+"towers": 3
+}
+
+[sub_resource type="Resource" id="Resource_noeo2"]
+script = ExtResource("2_m0rp2")
+kind = &"propellers"
+angle = 36.0
+mirrored = true
+params = {
+"height": 16.0
+}
+
+[sub_resource type="Resource" id="Resource_53o1n"]
+script = ExtResource("2_m0rp2")
+kind = &"lighthouse"
+angle = -42.0
+
+[sub_resource type="Resource" id="Resource_vnwcq"]
+script = ExtResource("2_m0rp2")
+kind = &"waterfalls"
+angle = -16.0
+params = {
+"height": 24.0
+}
+
+[sub_resource type="Resource" id="Resource_eajvv"]
+script = ExtResource("2_m0rp2")
+kind = &"bridge"
+angle = -28.0
+params = {
+"distance": 40.0,
+"length": 120.0
+}
+
+[sub_resource type="Resource" id="Resource_xty5u"]
+script = ExtResource("2_m0rp2")
+kind = &"wall_art"
+params = {
+"motif": &"wings"
+}
+
+[resource]
+script = ExtResource("3_mh7wu")
+id = &"cloudreach"
+display_name = "Cloudreach Stadium"
+blurb = "Aviators home · a floating island high above the clouds: airships, skybridges and propeller towers"
+field_shape = SubResource("Resource_ocp4l")
+seat_color = Color(0.12156863, 0.30980393, 0.56078434, 1)
+seat_color_alt = Color(0.09411765, 0.24705882, 0.45490196, 1)
+structure_color = Color(0.65882355, 0.5137255, 0.24313726, 1)
+accent_color = Color(0.83137256, 0.627451, 0.09019608, 1)
+outfield_wall_color = Color(0.05882353, 0.16470589, 0.3019608, 1)
+wall_stripe = Color(0.83137256, 0.627451, 0.09019608, 1)
+foul_rows = 24
+outfield_rows = 10
+decks = 3
+home_fan_share = 0.55
+away_fan_share = 0.25
+sponsors = PackedStringArray("ZEPHYR AIRLINES", "PROPWASH PRETZELS", "CUMULUS COFFEE", "HIGH ALTITUDE HATS")
+skyline_color = Color(0.42352942, 0.56078434, 0.72156864, 1)
+ground_color = Color(0.93333334, 0.9490196, 0.972549, 1)
+window_color = Color(1, 0.9411765, 0.7529412, 1)
+facade_color = Color(0.6901961, 0.5411765, 0.30588236, 1)
+facade_surface = &"steel"
+structure_surface = &"steel"
+ground_surface = &"snow"
+pieces = Array[ExtResource("2_m0rp2")]([SubResource("Resource_l6vnc"), SubResource("Resource_3skfr"), SubResource("Resource_b52m4"), SubResource("Resource_7ifyp"), SubResource("Resource_euhsm"), SubResource("Resource_p68y6"), SubResource("Resource_nqtn2"), SubResource("Resource_xylns"), SubResource("Resource_14uv1"), SubResource("Resource_noeo2"), SubResource("Resource_53o1n"), SubResource("Resource_vnwcq"), SubResource("Resource_eajvv"), SubResource("Resource_xty5u")])

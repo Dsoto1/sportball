@@ -1,0 +1,309 @@
+[gd_resource type="Resource" script_class="TeamDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/player_def.gd" id="1_pdyb5"]
+[ext_resource type="Script" path="res://data/defs/team_def.gd" id="2_to4oe"]
+[ext_resource type="Resource" path="res://data/stadiums/citadel_park.tres" id="3_02p4u"]
+
+[sub_resource type="Resource" id="Resource_qh0b6"]
+script = ExtResource("1_pdyb5")
+id = &"iss_petrakis"
+display_name = "Rudy Petrakis"
+nickname = "Bastion"
+number = 1
+positions = Array[StringName]([&"cf", &"lf"])
+contact = 73
+power = 36
+eye = 65
+speed = 77
+arm = 70
+glove = 82
+
+[sub_resource type="Resource" id="Resource_wjsq8"]
+script = ExtResource("1_pdyb5")
+id = &"iss_moonlight"
+display_name = "Marlo Moonlight"
+nickname = "Rampart"
+number = 3
+bats = &"L"
+positions = Array[StringName]([&"ss", &"2b"])
+contact = 68
+power = 37
+eye = 57
+speed = 67
+arm = 83
+glove = 84
+
+[sub_resource type="Resource" id="Resource_d1r3g"]
+script = ExtResource("1_pdyb5")
+id = &"iss_nakagawa"
+display_name = "Ada Nakagawa"
+nickname = "Portcullis"
+number = 8
+bats = &"L"
+positions = Array[StringName]([&"rf", &"lf"])
+contact = 64
+power = 64
+eye = 60
+speed = 57
+arm = 79
+glove = 76
+
+[sub_resource type="Resource" id="Resource_g57pe"]
+script = ExtResource("1_pdyb5")
+id = &"iss_mcallister"
+display_name = "Nell McAllister"
+nickname = "Keep"
+number = 25
+positions = Array[StringName]([&"1b"])
+contact = 64
+power = 72
+eye = 54
+speed = 33
+arm = 55
+glove = 64
+
+[sub_resource type="Resource" id="Resource_gl78s"]
+script = ExtResource("1_pdyb5")
+id = &"iss_lindqvist"
+display_name = "Benny Lindqvist"
+nickname = "Squire"
+number = 10
+positions = Array[StringName]([&"3b", &"1b"])
+contact = 59
+power = 58
+eye = 51
+speed = 45
+arm = 83
+glove = 74
+
+[sub_resource type="Resource" id="Resource_wkkj6"]
+script = ExtResource("1_pdyb5")
+id = &"iss_mallory"
+display_name = "Pearl Mallory"
+nickname = "Halberd"
+number = 31
+positions = Array[StringName]([&"1b", &"lf"])
+contact = 59
+power = 62
+eye = 53
+speed = 37
+arm = 56
+glove = 55
+
+[sub_resource type="Resource" id="Resource_efgqq"]
+script = ExtResource("1_pdyb5")
+id = &"iss_jaramillo"
+display_name = "Cass Jaramillo"
+nickname = "Gauntlet"
+number = 16
+bats = &"L"
+positions = Array[StringName]([&"lf", &"rf"])
+contact = 61
+power = 47
+eye = 52
+speed = 60
+arm = 63
+glove = 71
+
+[sub_resource type="Resource" id="Resource_4sa43"]
+script = ExtResource("1_pdyb5")
+id = &"iss_lockwood"
+display_name = "Remi Lockwood"
+nickname = "Watchtower"
+number = 4
+bats = &"L"
+positions = Array[StringName]([&"2b", &"ss"])
+contact = 71
+power = 41
+eye = 55
+speed = 68
+arm = 73
+glove = 85
+
+[sub_resource type="Resource" id="Resource_yx7oj"]
+script = ExtResource("1_pdyb5")
+id = &"iss_hashimoto"
+display_name = "Dot Hashimoto"
+nickname = "Moat"
+number = 26
+bats = &"L"
+positions = Array[StringName]([&"c"])
+contact = 52
+power = 39
+eye = 55
+speed = 30
+arm = 78
+glove = 71
+
+[sub_resource type="Resource" id="Resource_5xv2v"]
+script = ExtResource("1_pdyb5")
+id = &"iss_langtry"
+display_name = "Sal Langtry"
+nickname = "Banner"
+number = 14
+positions = Array[StringName]([&"2b", &"3b", &"ss"])
+contact = 60
+power = 29
+eye = 56
+speed = 67
+arm = 65
+glove = 73
+
+[sub_resource type="Resource" id="Resource_e6pkf"]
+script = ExtResource("1_pdyb5")
+id = &"iss_fontaine"
+display_name = "Etta Fontaine"
+nickname = "Paladin"
+number = 20
+positions = Array[StringName]([&"lf", &"cf", &"rf"])
+contact = 63
+power = 41
+eye = 52
+speed = 74
+arm = 63
+glove = 79
+
+[sub_resource type="Resource" id="Resource_ds03c"]
+script = ExtResource("1_pdyb5")
+id = &"iss_kettering"
+display_name = "Theo Kettering"
+nickname = "Battlement"
+number = 23
+positions = Array[StringName]([&"c", &"1b"])
+contact = 47
+power = 37
+eye = 51
+speed = 33
+arm = 74
+glove = 74
+
+[sub_resource type="Resource" id="Resource_k3snc"]
+script = ExtResource("1_pdyb5")
+id = &"iss_duquesne"
+display_name = "Greta Duquesne"
+nickname = "Drawbridge"
+number = 34
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 62
+control = 72
+stuff = 73
+stamina = 75
+pitches = Array[StringName]([&"fastball", &"slider", &"changeup", &"curveball"])
+
+[sub_resource type="Resource" id="Resource_tdqh0"]
+script = ExtResource("1_pdyb5")
+id = &"iss_ingram"
+display_name = "Walt Ingram"
+nickname = "Crusader"
+number = 42
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 57
+control = 65
+stuff = 68
+stamina = 40
+
+[sub_resource type="Resource" id="Resource_hvhrl"]
+script = ExtResource("1_pdyb5")
+id = &"iss_bonaventure"
+display_name = "Inez Bonaventure"
+nickname = "Gargoyle"
+number = 48
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 58
+control = 70
+stuff = 69
+stamina = 38
+pitches = Array[StringName]([&"sinker", &"curveball", &"changeup"])
+
+[sub_resource type="Resource" id="Resource_q727s"]
+script = ExtResource("1_pdyb5")
+id = &"iss_hargrove"
+display_name = "Yates Hargrove"
+nickname = "Siege"
+number = 52
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 57
+control = 61
+stuff = 70
+stamina = 36
+pitches = Array[StringName]([&"cutter", &"slider", &"splitter"])
+
+[sub_resource type="Resource" id="Resource_7fd8f"]
+script = ExtResource("1_pdyb5")
+id = &"iss_zimmerly"
+display_name = "Kit Zimmerly"
+nickname = "Ironclad"
+number = 61
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 65
+control = 63
+stuff = 70
+stamina = 28
+pitches = Array[StringName]([&"fastball", &"splitter"])
+
+[resource]
+script = ExtResource("2_to4oe")
+id = &"sentinels"
+city = "Ironspire"
+team_name = "Sentinels"
+abbreviation = "ISS"
+primary_color = Color(0.18039216, 0.18039216, 0.21960784, 1)
+secondary_color = Color(0.12156863, 0.28235295, 0.56078434, 1)
+accent_color = Color(0.6509804, 0.11764706, 0.1764706, 1)
+support_color = Color(0.83137256, 0.6862745, 0.21568628, 1)
+dark_color = Color(0.06666667, 0.07450981, 0.101960786, 1)
+highlight_color = Color(0.9019608, 0.8862745, 0.8509804, 1)
+slogan = "Hold the Line"
+emblem_shape = &"shield"
+emblem_glyph = "IS"
+mascot = "Sir Bastion, a knight in oversized armor"
+stadium = "Citadel Park"
+stadium_def = ExtResource("3_02p4u")
+identity = "The fortress. Gold-glove gloves, cannon arms and a staff that paints corners like a cathedral fresco. They don't score much; they don't need to."
+rival = &"legion"
+roster = Array[ExtResource("1_pdyb5")]([SubResource("Resource_qh0b6"), SubResource("Resource_wjsq8"), SubResource("Resource_d1r3g"), SubResource("Resource_g57pe"), SubResource("Resource_gl78s"), SubResource("Resource_wkkj6"), SubResource("Resource_efgqq"), SubResource("Resource_4sa43"), SubResource("Resource_yx7oj"), SubResource("Resource_5xv2v"), SubResource("Resource_e6pkf"), SubResource("Resource_ds03c"), SubResource("Resource_k3snc"), SubResource("Resource_tdqh0"), SubResource("Resource_hvhrl"), SubResource("Resource_q727s"), SubResource("Resource_7fd8f")])
+batting_order = Array[StringName]([&"iss_petrakis", &"iss_moonlight", &"iss_nakagawa", &"iss_mcallister", &"iss_lindqvist", &"iss_mallory", &"iss_jaramillo", &"iss_lockwood", &"iss_hashimoto"])
+lineup_positions = Array[StringName]([&"cf", &"ss", &"rf", &"1b", &"3b", &"dh", &"lf", &"2b", &"c"])
+starting_pitcher = &"iss_duquesne"
+bullpen = Array[StringName]([&"iss_ingram", &"iss_bonaventure", &"iss_hargrove", &"iss_zimmerly"])
+swing_aggression = 0.95
+chase_scale = 0.85
+power_swing_rate = 0.3
+runner_aggression = -0.05
+edge_bias_scale = 1.15
+bullpen_hook = 0.5
+steal_rate = 0.8
+bunt_rate = 0.9

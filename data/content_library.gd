@@ -29,6 +29,13 @@ const TEAM_PATHS: Array[String] = [
 	"res://data/teams/conductors.tres",
 	"res://data/teams/swans.tres",
 	"res://data/teams/safecrackers.tres",
+	"res://data/teams/kitsune.tres",
+	"res://data/teams/krakens.tres",
+	"res://data/teams/aviators.tres",
+	"res://data/teams/legion.tres",
+	"res://data/teams/vulcans.tres",
+	"res://data/teams/sentinels.tres",
+	"res://data/teams/scorpions.tres",
 ]
 ## Every field position a defense must fill.
 const FIELD_POSITIONS: Array[StringName] = [&"p", &"c", &"1b", &"2b", &"ss", &"3b", &"lf", &"cf", &"rf"]

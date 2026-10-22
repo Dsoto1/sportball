@@ -1,0 +1,168 @@
+[gd_resource type="Resource" script_class="StadiumDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/field_shape.gd" id="1_4sje6"]
+[ext_resource type="Script" path="res://data/defs/stadium_piece.gd" id="2_i6hdv"]
+[ext_resource type="Script" path="res://data/defs/stadium_def.gd" id="3_agqh5"]
+
+[sub_resource type="Resource" id="Resource_qk4au"]
+script = ExtResource("1_4sje6")
+id = &"firelight"
+display_name = "Firelight Park"
+points = PackedVector3Array(-45, 101, 3, -22, 117, 3, 0, 126, 3, 24, 119, 3, 45, 110, 3)
+air_drag_scale = 0.98
+
+[sub_resource type="Resource" id="Resource_e7rjo"]
+script = ExtResource("2_i6hdv")
+kind = &"centerpiece"
+params = {
+"frame": &"gate"
+}
+
+[sub_resource type="Resource" id="Resource_i0mm2"]
+script = ExtResource("2_i6hdv")
+kind = &"slogan_board"
+angle = 34.0
+
+[sub_resource type="Resource" id="Resource_mj2kq"]
+script = ExtResource("2_i6hdv")
+kind = &"light_towers"
+
+[sub_resource type="Resource" id="Resource_3f7vq"]
+script = ExtResource("2_i6hdv")
+kind = &"mountains"
+angle = -12.0
+params = {
+"distance": 430.0,
+"height": 150.0,
+"style": &"volcano"
+}
+
+[sub_resource type="Resource" id="Resource_6utd5"]
+script = ExtResource("2_i6hdv")
+kind = &"water"
+angle = 20.0
+params = {
+"gap": 18.0,
+"span": 150.0,
+"style": &"moat",
+"width": 450.0
+}
+
+[sub_resource type="Resource" id="Resource_mak6g"]
+script = ExtResource("2_i6hdv")
+kind = &"sailboats"
+angle = 32.0
+params = {
+"count": 6,
+"span": 40.0
+}
+
+[sub_resource type="Resource" id="Resource_u72hd"]
+script = ExtResource("2_i6hdv")
+kind = &"lighthouse"
+angle = 42.0
+
+[sub_resource type="Resource" id="Resource_ab22m"]
+script = ExtResource("2_i6hdv")
+kind = &"arcade"
+angle = 50.0
+mirrored = true
+params = {
+"banners": 4,
+"cap": &"flat",
+"height": 11.0,
+"style": &"carved",
+"tower_height": 8.0,
+"towers": 5
+}
+
+[sub_resource type="Resource" id="Resource_utrqo"]
+script = ExtResource("2_i6hdv")
+kind = &"arcade"
+angle = 11.0
+mirrored = true
+params = {
+"banners": 3,
+"cap": &"flat",
+"height": 14.0,
+"span": 36.0,
+"style": &"carved",
+"tower_height": 12.0,
+"towers": 3
+}
+
+[sub_resource type="Resource" id="Resource_3o3vf"]
+script = ExtResource("2_i6hdv")
+kind = &"waterfalls"
+angle = -30.0
+params = {
+"height": 26.0
+}
+
+[sub_resource type="Resource" id="Resource_sn4q8"]
+script = ExtResource("2_i6hdv")
+kind = &"viaduct"
+angle = 18.0
+params = {
+"height": 22.0,
+"span": 20.0,
+"train": false
+}
+
+[sub_resource type="Resource" id="Resource_q57wx"]
+script = ExtResource("2_i6hdv")
+kind = &"trees"
+angle = -22.0
+params = {
+"count": 6,
+"kind": &"palm",
+"span": -20.0
+}
+
+[sub_resource type="Resource" id="Resource_ihh0h"]
+script = ExtResource("2_i6hdv")
+kind = &"lamps"
+angle = -150.0
+params = {
+"count": 34,
+"span": 300.0,
+"style": &"brazier"
+}
+
+[sub_resource type="Resource" id="Resource_csl2m"]
+script = ExtResource("2_i6hdv")
+kind = &"wall_art"
+params = {
+"glow": 1.5,
+"motif": &"flame"
+}
+
+[resource]
+script = ExtResource("3_agqh5")
+id = &"firelight"
+display_name = "Firelight Park"
+blurb = "Vulcans home · an island fortress under a live volcano: lava-lit cliffs, aqueducts and the sea"
+field_shape = SubResource("Resource_qk4au")
+seat_color = Color(0.47843137, 0.16470589, 0.101960786, 1)
+seat_color_alt = Color(0.36862746, 0.1254902, 0.078431375, 1)
+structure_color = Color(0.41568628, 0.3529412, 0.3137255, 1)
+accent_color = Color(1, 0.41568628, 0, 1)
+outfield_wall_color = Color(0.13333334, 0.105882354, 0.09411765, 1)
+wall_style = &"rock"
+wall_stripe = Color(1, 0.41568628, 0, 1)
+wall_stripe_glow = 2.0
+foul_rows = 25
+outfield_rows = 12
+decks = 3
+away_fan_share = 0.2
+attendance = 0.9
+sky = &"sunset"
+sponsors = PackedStringArray("MAGMA HOT SAUCE", "OBSIDIAN OPTICS", "CALDERA COFFEE", "ASHFALL INSURANCE")
+skyline_color = Color(0.22745098, 0.16470589, 0.16470589, 1)
+ground_color = Color(0.22745098, 0.16470589, 0.14117648, 1)
+window_color = Color(1, 0.7019608, 0.36078432, 1)
+facade_color = Color(0.3529412, 0.2509804, 0.21960784, 1)
+facade_surface = &"rock"
+structure_surface = &"stone"
+ground_surface = &"rock"
+pieces = Array[ExtResource("2_i6hdv")]([SubResource("Resource_e7rjo"), SubResource("Resource_i0mm2"), SubResource("Resource_mj2kq"), SubResource("Resource_3f7vq"), SubResource("Resource_6utd5"), SubResource("Resource_mak6g"), SubResource("Resource_u72hd"), SubResource("Resource_ab22m"), SubResource("Resource_utrqo"), SubResource("Resource_3o3vf"), SubResource("Resource_sn4q8"), SubResource("Resource_q57wx"), SubResource("Resource_ihh0h"), SubResource("Resource_csl2m")])

@@ -1,0 +1,309 @@
+[gd_resource type="Resource" script_class="TeamDef" format=3]
+
+[ext_resource type="Script" path="res://data/defs/player_def.gd" id="1_pjoh5"]
+[ext_resource type="Script" path="res://data/defs/team_def.gd" id="2_r2q3s"]
+[ext_resource type="Resource" path="res://data/stadiums/sakura_gate.tres" id="3_7p0ml"]
+
+[sub_resource type="Resource" id="Resource_oui10"]
+script = ExtResource("1_pjoh5")
+id = &"sbk_farrow"
+display_name = "Alder Farrow"
+nickname = "Foxfire"
+number = 1
+positions = Array[StringName]([&"cf", &"lf"])
+contact = 74
+power = 28
+eye = 63
+speed = 92
+arm = 67
+glove = 77
+
+[sub_resource type="Resource" id="Resource_0oye8"]
+script = ExtResource("1_pjoh5")
+id = &"sbk_waverly"
+display_name = "Odie Waverly"
+nickname = "Lantern"
+number = 3
+bats = &"L"
+positions = Array[StringName]([&"ss", &"2b"])
+contact = 73
+power = 34
+eye = 63
+speed = 76
+arm = 66
+glove = 73
+
+[sub_resource type="Resource" id="Resource_vgc0r"]
+script = ExtResource("1_pjoh5")
+id = &"sbk_ellery"
+display_name = "Birdie Ellery"
+nickname = "Petal"
+number = 8
+bats = &"L"
+positions = Array[StringName]([&"rf", &"lf"])
+contact = 71
+power = 53
+eye = 59
+speed = 69
+arm = 77
+glove = 57
+
+[sub_resource type="Resource" id="Resource_hhmbm"]
+script = ExtResource("1_pjoh5")
+id = &"sbk_vanderpool"
+display_name = "Percy Vanderpool"
+nickname = "Torii"
+number = 25
+positions = Array[StringName]([&"1b"])
+contact = 69
+power = 71
+eye = 59
+speed = 44
+arm = 48
+glove = 55
+
+[sub_resource type="Resource" id="Resource_4qwsd"]
+script = ExtResource("1_pjoh5")
+id = &"sbk_dunmore"
+display_name = "Cleo Dunmore"
+nickname = "Moonlit"
+number = 10
+positions = Array[StringName]([&"3b", &"1b"])
+contact = 70
+power = 53
+eye = 59
+speed = 52
+arm = 68
+glove = 61
+
+[sub_resource type="Resource" id="Resource_sgfj2"]
+script = ExtResource("1_pjoh5")
+id = &"sbk_underhill"
+display_name = "Rhea Underhill"
+nickname = "Nine Tails"
+number = 31
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"1b", &"lf"])
+contact = 73
+power = 56
+eye = 61
+speed = 43
+arm = 52
+glove = 41
+
+[sub_resource type="Resource" id="Resource_2yaml"]
+script = ExtResource("1_pjoh5")
+id = &"sbk_crumley"
+display_name = "Ellis Crumley"
+nickname = "Shrine"
+number = 16
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"lf", &"rf"])
+contact = 75
+power = 42
+eye = 53
+speed = 67
+arm = 63
+glove = 58
+
+[sub_resource type="Resource" id="Resource_mb1fe"]
+script = ExtResource("1_pjoh5")
+id = &"sbk_tolliver"
+display_name = "Sully Tolliver"
+nickname = "Spirit"
+number = 4
+positions = Array[StringName]([&"2b", &"ss"])
+contact = 73
+power = 37
+eye = 65
+speed = 76
+arm = 60
+glove = 73
+
+[sub_resource type="Resource" id="Resource_kag8c"]
+script = ExtResource("1_pjoh5")
+id = &"sbk_chandler"
+display_name = "Felix Chandler"
+nickname = "Wisp"
+number = 26
+bats = &"L"
+positions = Array[StringName]([&"c"])
+contact = 61
+power = 35
+eye = 54
+speed = 38
+arm = 65
+glove = 59
+
+[sub_resource type="Resource" id="Resource_4l56g"]
+script = ExtResource("1_pjoh5")
+id = &"sbk_tamberlane"
+display_name = "Tilly Tamberlane"
+nickname = "Origami"
+number = 14
+positions = Array[StringName]([&"2b", &"3b", &"ss"])
+contact = 72
+power = 23
+eye = 63
+speed = 73
+arm = 60
+glove = 70
+
+[sub_resource type="Resource" id="Resource_2vb2i"]
+script = ExtResource("1_pjoh5")
+id = &"sbk_bramble"
+display_name = "Harlan Bramble"
+nickname = "Sakura"
+number = 20
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"lf", &"cf", &"rf"])
+contact = 71
+power = 27
+eye = 62
+speed = 83
+arm = 61
+glove = 68
+
+[sub_resource type="Resource" id="Resource_tmohh"]
+script = ExtResource("1_pjoh5")
+id = &"sbk_strickland"
+display_name = "Wanda Strickland"
+nickname = "Trickster"
+number = 23
+positions = Array[StringName]([&"c", &"1b"])
+contact = 63
+power = 36
+eye = 49
+speed = 33
+arm = 60
+glove = 54
+
+[sub_resource type="Resource" id="Resource_t5o86"]
+script = ExtResource("1_pjoh5")
+id = &"sbk_beckwith"
+display_name = "Jasper Beckwith"
+nickname = "Mist"
+number = 34
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 51
+control = 63
+stuff = 70
+stamina = 75
+pitches = Array[StringName]([&"changeup", &"curveball", &"sinker", &"junkball"])
+
+[sub_resource type="Resource" id="Resource_l0u2x"]
+script = ExtResource("1_pjoh5")
+id = &"sbk_springfield"
+display_name = "Zeke Springfield"
+nickname = "Paper Crane"
+number = 42
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 52
+control = 62
+stuff = 71
+stamina = 40
+pitches = Array[StringName]([&"cutter", &"changeup", &"curveball"])
+
+[sub_resource type="Resource" id="Resource_rftrp"]
+script = ExtResource("1_pjoh5")
+id = &"sbk_ballantine"
+display_name = "Lenny Ballantine"
+nickname = "Koi"
+number = 48
+bats = &"L"
+throws = &"L"
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 48
+control = 62
+stuff = 67
+stamina = 38
+pitches = Array[StringName]([&"sinker", &"curveball", &"changeup"])
+
+[sub_resource type="Resource" id="Resource_ewhlk"]
+script = ExtResource("1_pjoh5")
+id = &"sbk_shackleford"
+display_name = "Rudy Shackleford"
+nickname = "Bamboo"
+number = 52
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 53
+control = 59
+stuff = 74
+stamina = 36
+pitches = Array[StringName]([&"slider", &"changeup", &"junkball"])
+
+[sub_resource type="Resource" id="Resource_1ntev"]
+script = ExtResource("1_pjoh5")
+id = &"sbk_abernathy"
+display_name = "Marlo Abernathy"
+nickname = "Illusion"
+number = 61
+positions = Array[StringName]([&"p"])
+contact = 20
+power = 15
+eye = 20
+speed = 40
+arm = 70
+velocity = 66
+control = 66
+stuff = 68
+stamina = 28
+pitches = Array[StringName]([&"cutter", &"curveball", &"splitter"])
+
+[resource]
+script = ExtResource("2_r2q3s")
+id = &"kitsune"
+city = "Silver Blossom"
+team_name = "Kitsune"
+abbreviation = "SBK"
+primary_color = Color(0.9098039, 0.7137255, 0.7882353, 1)
+secondary_color = Color(0.60784316, 0.10980392, 0.18431373, 1)
+accent_color = Color(0.83137256, 0.627451, 0.09019608, 1)
+support_color = Color(0.41960785, 0.44313726, 0.46666667, 1)
+dark_color = Color(0.101960786, 0.101960786, 0.101960786, 1)
+highlight_color = Color(0.972549, 0.9647059, 0.94509804, 1)
+slogan = "Nine Tails, One Spirit"
+emblem_shape = &"blossom"
+mascot = "Kiko, a nine-tailed fox spirit with a paper lantern"
+stadium = "Sakura Gate Park"
+stadium_def = ExtResource("3_7p0ml")
+identity = "Tricksters of the mountain shrine. Slap hitters who never strike out, foxes on the bases, and a staff of illusionists whose changeups vanish. They win by a thousand small cuts."
+rival = &"swans"
+roster = Array[ExtResource("1_pjoh5")]([SubResource("Resource_oui10"), SubResource("Resource_0oye8"), SubResource("Resource_vgc0r"), SubResource("Resource_hhmbm"), SubResource("Resource_4qwsd"), SubResource("Resource_sgfj2"), SubResource("Resource_2yaml"), SubResource("Resource_mb1fe"), SubResource("Resource_kag8c"), SubResource("Resource_4l56g"), SubResource("Resource_2vb2i"), SubResource("Resource_tmohh"), SubResource("Resource_t5o86"), SubResource("Resource_l0u2x"), SubResource("Resource_rftrp"), SubResource("Resource_ewhlk"), SubResource("Resource_1ntev")])
+batting_order = Array[StringName]([&"sbk_farrow", &"sbk_waverly", &"sbk_ellery", &"sbk_vanderpool", &"sbk_dunmore", &"sbk_underhill", &"sbk_crumley", &"sbk_tolliver", &"sbk_chandler"])
+lineup_positions = Array[StringName]([&"cf", &"ss", &"rf", &"1b", &"3b", &"dh", &"lf", &"2b", &"c"])
+starting_pitcher = &"sbk_beckwith"
+bullpen = Array[StringName]([&"sbk_springfield", &"sbk_ballantine", &"sbk_shackleford", &"sbk_abernathy"])
+swing_aggression = 0.95
+chase_scale = 0.75
+power_swing_rate = 0.22
+runner_aggression = 0.3
+edge_bias_scale = 1.15
+bullpen_hook = 0.55
+steal_rate = 2.0
+bunt_rate = 1.4

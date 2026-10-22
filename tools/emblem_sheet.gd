@@ -1,7 +1,7 @@
 extends SceneTree
 ## Renders every club's emblem in a grid (with its six-color set below) to
 ## one image. Needs a display:
-##   godot --path . --resolution 1200x800 -s res://tools/emblem_sheet.gd -- /tmp/emblems.png
+##   godot --path . --resolution 1200x1200 -s res://tools/emblem_sheet.gd -- /tmp/emblems.png
 var _frames := 0
 var _out := ""
 
@@ -24,14 +24,14 @@ func _init() -> void:
 	world.add_child(sun)
 	var cam := Camera3D.new()
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
-	cam.size = 8.0
+	cam.size = 12.0
 	cam.position = Vector3(0, 0, 10)
 	world.add_child(cam)
 	var cols := 6
 	for i in lib.teams.size():
 		var team: TeamDef = lib.teams[i]
 		var x := -5.0 + (i % cols) * 2.0
-		var y := 2.2 - (i / cols) * 4.0
+		var y := 4.0 - (i / cols) * 4.0
 		var e := Emblem.build(team, 1.6)
 		e.position = Vector3(x, y, 0)
 		world.add_child(e)
