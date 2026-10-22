@@ -28,6 +28,12 @@ const FOUL_EDGE := [[45.0, 97.0], [55.0, 72.0], [65.0, 52.0], [80.0, 40.0], [100
 const BATTERS_EYE := 6.0
 const AISLE_EVERY := 8.0
 const SEAT_SPACING := 0.62
+## A chair on each tread, m from the tread's front edge: the pan's front,
+## its height, the back's face and its top.
+const SEAT_FRONT := 0.42
+const SEAT_PAN := 0.42
+const SEAT_BACK := 0.72
+const SEAT_TOP := 0.85
 const FIELD_CENTER := Vector3(0.0, 0.0, -45.0)
 const WATER := Color(0.06, 0.22, 0.36)
 ## How far out the bay reaches (meters from home).
@@ -260,6 +266,8 @@ func _build_bowl() -> void:
 	plaza.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var riser := def.structure_color.darkened(0.35)
 	var eye := Color(0.06, 0.1, 0.09)
+	# Concrete treads (vertex colors are used as they are: this is mid-gray).
+	var tread := def.structure_color.lerp(Color(0.3, 0.3, 0.29), 0.6).darkened(0.25)
 	var a := -180.0
 	while a < 180.0:
 		var b := a + ANGLE_STEP
@@ -287,7 +295,16 @@ func _build_bowl() -> void:
 			elif k > 0 and is_deck_front(k):
 				face = def.accent_color.lerp(def.structure_color, 0.25)
 			_quad(st, point(a, ra, below_a), point(b, rb, below_b), point(b, rb, hb), point(a, ra, ha), face)
-			_quad(st, point(a, ra, ha), point(b, rb, hb), point(b, rb + ROW_DEPTH, hb), point(a, ra + ROW_DEPTH, ha), seat)
+			# The tread is concrete; the seats are a row of chairs on it (a
+			# pan and a back), one per step of the sweep, a shade apart so
+			# they read as single seats. Fans sit just in front of them.
+			var seated := not _is_aisle(mid) and absf(mid) >= BATTERS_EYE and not _is_walkway(a, k)
+			_quad(st, point(a, ra, ha), point(b, rb, hb), point(b, rb + ROW_DEPTH, hb), point(a, ra + ROW_DEPTH, ha), tread if seated or absf(mid) >= BATTERS_EYE else seat)
+			if seated:
+				var chair := seat.darkened(0.12) if int(a) % 2 == 0 else seat
+				for part: Vector4 in [Vector4(SEAT_FRONT, 0.0, SEAT_FRONT, SEAT_PAN), Vector4(SEAT_FRONT, SEAT_PAN, SEAT_BACK, SEAT_PAN), Vector4(SEAT_BACK, SEAT_PAN, SEAT_BACK, SEAT_TOP), Vector4(SEAT_BACK, SEAT_TOP, SEAT_BACK + 0.08, SEAT_TOP)]:
+					# Each part runs from (radius x, height y) to (z, w) off the tread's front edge.
+					_quad(st, point(a, ra + part.x, ha + part.y), point(b, rb + part.x, hb + part.y), point(b, rb + part.z, hb + part.w), point(a, ra + part.z, ha + part.w), chair if part.y < SEAT_TOP else chair.darkened(0.2))
 		# Back of the stand: a facade down to the ground with a trim band.
 		var top_a := row_height(a, pa, rows - 1)
 		var top_b := row_height(b, pb, rows - 1)
@@ -419,7 +436,8 @@ func _build_crowd(home: TeamDef, away: TeamDef) -> void:
 	while a < 180.0:
 		var p := profile(a)
 		for k in int(p.z):
-			var radius := p.x + k * ROW_DEPTH + ROW_DEPTH * 0.55
+			# On the chair's pan (the shader steps standing fans forward).
+			var radius := p.x + k * ROW_DEPTH + (SEAT_FRONT + SEAT_BACK) * 0.5
 			var step_deg := rad_to_deg(SEAT_SPACING / radius)
 			var s := a
 			while s < a + ANGLE_STEP:
@@ -453,7 +471,10 @@ func add_fans(seats: Array[Vector3], node_name: String = "Fans") -> void:
 	mm.instance_count = seats.size()
 	var neutral := [Color(0.92, 0.92, 0.9), Color(0.35, 0.35, 0.38), Color(0.85, 0.2, 0.2), Color(0.95, 0.8, 0.2), Color(0.2, 0.6, 0.65), Color(0.15, 0.15, 0.18)]
 	for i in seats.size():
-		mm.set_instance_transform(i, Transform3D(Basis(), seats[i]))
+		# Turned to face home plate: the shader steps standing fans that way.
+		var toward := Vector3(-seats[i].x, 0.0, -seats[i].z)
+		var basis := Basis.looking_at(toward.normalized()) if toward.length() > 0.1 else Basis()
+		mm.set_instance_transform(i, Transform3D(basis, seats[i]))
 		var roll := rng.randf()
 		var shirt: Color
 		if roll < def.home_fan_share:

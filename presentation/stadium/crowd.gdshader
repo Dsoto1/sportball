@@ -53,6 +53,12 @@ void vertex() {
 	float speed = pose == 0 ? 0.6 : (pose == 4 ? 5.5 : 4.0);
 	int frame = int(mod(floor(TIME * speed * tempo + phase * 4.0), 4.0));
 	v_cell = pose * 4 + frame;
+	// Seated fans sink onto the chair (the chair in front hides their
+	// shins); standing ones step forward off it, toward home plate (the
+	// instance faces it: -Z).
+	vec3 toward = -MODEL_MATRIX[2].xyz;
+	toward = length(toward.xz) > 0.001 ? normalize(vec3(toward.x, 0.0, toward.z)) : vec3(0.0);
+	origin += pose <= 1 ? vec3(0.0, -0.32, 0.0) : toward * 0.3;
 	vec3 world = origin + right * VERTEX.x + vec3(0.0, VERTEX.y, 0.0);
 	POSITION = PROJECTION_MATRIX * VIEW_MATRIX * vec4(world, 1.0);
 	v_skin = INSTANCE_CUSTOM.w;
