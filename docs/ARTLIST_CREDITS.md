@@ -33,3 +33,15 @@ The owner approved 12 models (3,600 credits) on 2026-10-22, knowingly going 75 c
 | 2026-10-22 | Planter urn (text-to-3D) | Hyper3D Rodin v2.5 Fast | 300 | 5,100 / 4,125 | AI-017 (gen 01a1614a-32b1-70c2-9ef9-2b8a717108be) |
 
 The owner approved the lantern, column and urn (900 credits) on 2026-10-22, past the monthly cap.
+
+## Meshy (separate account, 3,120 credits at sign-in)
+
+The owner approved a test batch of 3 signature landmarks on 2026-10-22, each capped at 30 credits.
+
+| Date | Item | Mode | Credits | Balance after | Task |
+|---|---|---|---|---|---|
+| 2026-10-22 | Sakura Gate waterfall cliff (text-to-3D) | preview + refine | 30 | | 01a1633d-7902-70c8-ac1b-078620b84c10 |
+| 2026-10-22 | Citadel cathedral spires (text-to-3D) | preview + refine | 30 | | 01a1633d-7a1d-748f-b819-33a1b088551c |
+| 2026-10-22 | Ledger Street domed bank (text-to-3D) | preview + refine | 30 | 3,030 | 01a1633d-7a84-73a8-90a5-26d7eafd4010 |
+
+The models are generated but not yet downloaded, because the environment blocks assets.meshy.ai.
