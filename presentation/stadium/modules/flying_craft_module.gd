@@ -18,10 +18,7 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 		craft.rotation.y = rng.randf() * TAU
 		craft.scale = Vector3.ONE * piece.size
 		if blimp:
-			var body := Scenery.sphere(craft, 6.0, home.primary_color, 0.45)
-			body.scale = Vector3(1.0, 1.0, 2.6)
-			var gondola := Scenery.cylinder(craft, 1.2, 1.2, 3.0, home.dark_color, 8)
-			gondola.position.y = -3.4
+			craft.add_child(ModelKit.spawn(&"airship", 16.0, rng))
 		else:
 			var hull := Scenery.sphere(craft, 4.0, home.primary_color, 0.3)
 			var dome := Scenery.sphere(craft, 1.6, Color(0.7, 0.9, 1.0), 0.8)

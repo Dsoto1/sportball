@@ -49,6 +49,15 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 				break
 			var a := spots[i]
 			var b := spots[i + 1]
+			if c == cars - 1:
+				# The engine leads (a sculpted locomotive), facing along the track.
+				var engine := Node3D.new()
+				root.add_child(engine)
+				engine.look_at_from_position((a + b) * 0.5 + Vector3.UP * (height + 0.8), b + Vector3.UP * (height + 0.8), Vector3.UP)
+				var loco := ModelKit.spawn(&"locomotive", 5.5, RandomNumberGenerator.new())
+				loco.rotation.y = PI * 0.5
+				engine.add_child(loco)
+				continue
 			var car := stadium.box(Vector3(3.6, 3.4, a.distance_to(b) * 0.92), home.primary_color if c > 0 else home.dark_color, root)
 			car.position = (a + b) * 0.5 + Vector3.UP * (height + 2.6)
 			car.look_at_from_position(car.position, b + Vector3.UP * (height + 2.6), Vector3.UP)

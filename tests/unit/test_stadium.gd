@@ -387,3 +387,18 @@ func test_every_facade_style_and_tower_cap_builds() -> void:
 			var arcade: Node3D = st.get_node("Arcade")
 			check(arcade.find_children("*", "MeshInstance3D", true, false).size() > 3, "%s with %s towers builds" % [style, cap])
 			st.free()
+
+
+func test_generated_models_load_and_dress_the_parks() -> void:
+	var rng := RandomNumberGenerator.new()
+	for role in [&"kitsune_statue", &"sea_king", &"knight", &"scorpion_idol", &"airship", &"tall_ship", &"locomotive", &"pagoda"]:
+		var node := ModelKit.spawn(role, 10.0, rng)
+		check(node.find_children("*", "MeshInstance3D", true, false).size() > 0, "%s loads" % role)
+		node.free()
+	for kit in [&"colosseum", &"gothic", &"temple", &"victorian"]:
+		var bay := ModelKit.mesh_of(StringName("bay_%s" % kit))
+		check(bay.has("mesh") and (bay["aabb"] as AABB).size.y > 0.0, "the %s bay has a mesh" % kit)
+	var st := _build_park(&"forum_field")
+	var batched := st.find_children("*", "MultiMeshInstance3D", true, false).filter(func(m: MultiMeshInstance3D) -> bool: return m.name != "Crowd")
+	check(batched.size() >= 2, "Forum Field's colosseum facades are batched bays (%d)" % batched.size())
+	st.free()

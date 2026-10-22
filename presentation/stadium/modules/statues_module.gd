@@ -17,6 +17,14 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	var pedestal := stadium.box(Vector3(5.0, 2.4, 3.0), stadium.def.structure_color.lightened(0.15), root, &"marble")
 	pedestal.position.y = 1.2
 	var figure := StringName(piece.param("figure"))
+	var modeled: StringName = {&"fox": &"kitsune_statue", &"titan": &"sea_king", &"knight": &"knight", &"scorpion": &"scorpion_idol"}.get(figure, &"")
+	if modeled != &"":
+		# A sculpted model on its own plinth (it replaces the pedestal).
+		pedestal.queue_free()
+		var model := ModelKit.spawn(modeled, 11.0, RandomNumberGenerator.new())
+		model.rotation.y = PI
+		root.add_child(model)
+		return
 	match figure:
 		&"bull":
 			_bull(root, bronze)

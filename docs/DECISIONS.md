@@ -1092,3 +1092,19 @@ Affected systems: arcade module, catalog, generate_parks, tests, README, notes.
 - **Balance:** an 18-club round robin is in progress. Results and any retuning follow in the next entry.
 
 Reason: Owner request to build the new teams (18 total) from their sheets, with new facades and more unique outfield walls.
+
+## 2026-10-22 - Generated Hero Props and Facade Kits
+
+- **What was generated:** the owner approved 12 text-to-3D models on Artlist (Hyper3D Rodin v2.5 Fast, 300 credits each, 3,600 total), knowingly going 75 credits over this game's monthly cap (now 4,200 of 4,125). All are logged in `docs/ARTLIST_CREDITS.md` and as AI-003 to AI-014 in the manifest.
+- **Size:** textures were cut from 2048 to 1024 px with `tools/repack_glb.py`, about 14 MB for all twelve. `tools/model_sheet.gd` renders a review sheet.
+- **Statues:** the fox, sea king, knight and scorpion statue figures now use the sculpted models. Forum Field's statues are knights too.
+- **Vehicles:** blimp-style flying craft are the steampunk airship. Each sailboat fleet's flagship is the tall ship. Viaduct trains are led by the locomotive.
+- **Pagodas:** pagoda-capped towers are the sculpted pagoda.
+- **Facade kits:** a new arcade style, `kit`, tiles a sculpted bay along the back of the stands, stretched to each bay and the facade height and drawn by one MultiMesh per facade. Towers and banners still work. Four kits:
+  - colosseum: Forum Field, Fountain Gardens, Amber Gate, the Kiln;
+  - gothic: Citadel Park, the Icebox outfield;
+  - temple: Sakura Gate;
+  - victorian: Ledger Street, the Horseshoe, Warehouse Row.
+- **Balance:** the first 18-club round robin (136 games each) ran .294 (Sentinels) to .603 (Safecrackers). The Sentinels and Kitsune got more offense and pitching, the Swans a little more of both, and the Safecrackers and Krakens were toned down. A rerun is in progress.
+
+Reason: Owner request to use the Artlist budget for depth and detail in the parks.

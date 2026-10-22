@@ -45,8 +45,10 @@ angle = 50.0
 mirrored = true
 params = {
 "banners": 3,
+"bay": 9.0,
 "height": 18.0,
-"style": &"arches",
+"kit": &"colosseum",
+"style": &"kit",
 "tiers": 3
 }
 
@@ -57,10 +59,12 @@ angle = 11.0
 mirrored = true
 params = {
 "banners": 2,
+"bay": 9.0,
 "cap": &"flat",
 "height": 16.0,
+"kit": &"colosseum",
 "span": 36.0,
-"style": &"arches",
+"style": &"kit",
 "tiers": 2,
 "tower_height": 8.0,
 "towers": 3
@@ -72,7 +76,7 @@ kind = &"statue"
 angle = 17.0
 mirrored = true
 params = {
-"figure": &"figure"
+"figure": &"knight"
 }
 
 [sub_resource type="Resource" id="Resource_kaonq"]

@@ -46,8 +46,10 @@ angle = 50.0
 mirrored = true
 params = {
 "banners": 4,
+"bay": 9.0,
 "height": 12.0,
-"style": &"arches",
+"kit": &"colosseum",
+"style": &"kit",
 "tiers": 2
 }
 

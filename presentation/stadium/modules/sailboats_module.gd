@@ -19,6 +19,9 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 		boat.position = Scenery.behind(stadium, angle, rng.randf_range(25.0, 120.0))
 		boat.rotation.y = rng.randf() * TAU
 		boat.scale = Vector3.ONE * k
+		if tall_ship:
+			boat.add_child(ModelKit.spawn(&"tall_ship", 12.0, rng))
+			continue
 		var hull := stadium.box(Vector3(2.6, 1.4, 9.0), home.primary_color if i % 2 == 0 else home.dark_color, boat)
 		hull.position.y = 0.4
 		var masts := 3 if tall_ship else 1

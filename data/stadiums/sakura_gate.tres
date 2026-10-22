@@ -56,9 +56,11 @@ angle = 50.0
 mirrored = true
 params = {
 "banners": 5,
+"bay": 9.0,
 "cap": &"pagoda",
 "height": 10.0,
-"style": &"eaves",
+"kit": &"temple",
+"style": &"kit",
 "tower_height": 9.0,
 "towers": 5
 }
@@ -70,10 +72,12 @@ angle = 11.0
 mirrored = true
 params = {
 "banners": 3,
+"bay": 9.0,
 "cap": &"pagoda",
 "height": 12.0,
+"kit": &"temple",
 "span": 36.0,
-"style": &"eaves",
+"style": &"kit",
 "tower_height": 14.0,
 "towers": 2
 }

@@ -14,7 +14,9 @@ extends StadiumModule
 ##   eaves:   red posts and pale panels under sweeping tiled eaves with
 ##            hanging lanterns (shrines, pagodas);
 ##   carved:  a rock face with arched cave openings, as if cut from a
-##            cliff (canyons, volcanoes).
+##            cliff (canyons, volcanoes);
+##   kit:     a sculpted bay model ("kit": colosseum, gothic, temple or
+##            victorian) repeated bay by bay, batched into one MultiMesh.
 ## Arches stack in "tiers" rows (2-3 for a colosseum or an aqueduct).
 ## Every "towers" bays a tower rises "tower_height" m above the facade,
 ## capped with a spire, dome, tiered pagoda roof or crenellations ("cap").
@@ -52,6 +54,9 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	var every_tower := int(piece.param("towers"))
 	# Bay edges: each carries its own back-of-stands radius and base height,
 	# so the facade follows the bowl without gaps.
+	if style == &"kit":
+		_build_kit(stadium, piece, home)
+		return
 	var radius_mid := stadium.stand_top(piece.angle + span * 0.5).x
 	var steps := maxi(1, int(absf(deg_to_rad(span)) * radius_mid / bay))
 	var edges: Array[Vector3] = []  # (angle, radius, base height)
@@ -195,10 +200,62 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 		banner.add_child(mark)
 
 
+## The kit style: one sculpted bay per bay width along the back of the
+## stands, each stretched to the bay and the facade height, all drawn by a
+## single MultiMesh. Towers and banners work as for the built styles.
+func _build_kit(stadium: Stadium, piece: StadiumPiece, home: TeamDef) -> void:
+	var kit := ModelKit.mesh_of(StringName("bay_%s" % piece.param("kit")))
+	if kit.is_empty():
+		return
+	var mesh_box: AABB = kit["aabb"]
+	var height := float(piece.param("height")) * piece.size
+	var bay := float(piece.param("bay"))
+	var span := float(piece.param("span"))
+	var radius_mid := stadium.stand_top(piece.angle + span * 0.5).x
+	var steps := maxi(1, int(absf(deg_to_rad(span)) * radius_mid / bay))
+	var root := Node3D.new()
+	root.name = stadium.unique_name("Arcade")
+	stadium.add_child(root)
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = kit["mesh"]
+	mm.instance_count = steps
+	var every_tower := int(piece.param("towers"))
+	for i in steps:
+		var a0 := piece.angle + span * i / steps
+		var a1 := piece.angle + span * (i + 1) / steps
+		var t0 := stadium.stand_top(a0)
+		var t1 := stadium.stand_top(a1)
+		var p0 := stadium.point(a0, t0.x + 0.2, t0.y + 0.4)
+		var p1 := stadium.point(a1, t1.x + 0.2, t1.y + 0.4)
+		var width := p0.distance_to(p1)
+		var across := (p1 - p0).normalized()
+		var facing := across.cross(Vector3.UP).normalized()
+		if facing.dot(-((p0 + p1) * 0.5).normalized()) < 0.0:
+			facing = -facing
+		# Local axes: X along the bay, Y up, Z toward the field.
+		var basis := Basis(across, Vector3.UP, facing)
+		var scale := Vector3(width / maxf(mesh_box.size.x, 0.01), height / maxf(mesh_box.size.y, 0.01), height / maxf(mesh_box.size.y, 0.01))
+		var fit := Transform3D(basis.scaled_local(scale), (p0 + p1) * 0.5)
+		var origin := Transform3D(Basis(), -Vector3(mesh_box.get_center().x, mesh_box.position.y, mesh_box.get_center().z))
+		mm.set_instance_transform(i, fit * origin * (kit["transform"] as Transform3D))
+		if every_tower > 0 and i > 0 and i % every_tower == 0:
+			_tower(stadium, root, piece, Vector3(a0, t0.x + 0.2, t0.y + 0.4), height, bay, home)
+	var mmi := MultiMeshInstance3D.new()
+	mmi.multimesh = mm
+	root.add_child(mmi)
+
+
 ## A tower standing through the facade at a bay edge, with its cap and a
 ## lit window.
 func _tower(stadium: Stadium, root: Node3D, piece: StadiumPiece, e: Vector3, height: float, bay: float, home: TeamDef) -> void:
 	var def := stadium.def
+	if StringName(piece.param("cap")) == &"pagoda":
+		# A sculpted five-tier pagoda standing through the facade.
+		var pagoda := ModelKit.spawn(&"pagoda", height + float(piece.param("tower_height")) * piece.size + 6.0, RandomNumberGenerator.new())
+		root.add_child(pagoda)
+		pagoda.position = stadium.point(e.x, e.y + 1.5, e.z)
+		return
 	var tw := clampf(bay * 0.55, 2.5, 6.0)
 	var tall := height + float(piece.param("tower_height")) * piece.size
 	var tower := Node3D.new()

@@ -6,6 +6,9 @@ class_name ModelKit
 
 const NATURE := "res://assets/third_party/kenney/nature-kit/"
 const CITY := "res://assets/third_party/kenney/city-kit-commercial/"
+## Hero props and facade bays generated for this game (Artlist AI,
+## Hyper3D Rodin; see docs/ARTLIST_CREDITS.md and the asset manifest).
+const ART := "res://assets/generated/artlist/stadium/"
 
 const SETS := {
 	&"palm": [NATURE + "tree_palmDetailedTall.glb", NATURE + "tree_palmTall.glb", NATURE + "tree_palmBend.glb"],
@@ -19,6 +22,18 @@ const SETS := {
 	&"bush": [NATURE + "plant_bushLarge.glb"],
 	&"tower": [CITY + "building-skyscraper-a.glb", CITY + "building-skyscraper-b.glb", CITY + "building-skyscraper-c.glb", CITY + "building-skyscraper-d.glb", CITY + "building-skyscraper-e.glb"],
 	&"building": [CITY + "building-a.glb", CITY + "building-b.glb", CITY + "building-c.glb", CITY + "building-d.glb", CITY + "building-e.glb", CITY + "building-f.glb", CITY + "building-g.glb", CITY + "building-h.glb"],
+	&"kitsune_statue": [ART + "kitsune_statue.glb"],
+	&"sea_king": [ART + "sea_king_statue.glb"],
+	&"knight": [ART + "knight_statue.glb"],
+	&"scorpion_idol": [ART + "scorpion_idol.glb"],
+	&"airship": [ART + "airship.glb"],
+	&"tall_ship": [ART + "tall_ship.glb"],
+	&"locomotive": [ART + "locomotive.glb"],
+	&"pagoda": [ART + "pagoda.glb"],
+	&"bay_colosseum": [ART + "bay_colosseum.glb"],
+	&"bay_gothic": [ART + "bay_gothic.glb"],
+	&"bay_temple": [ART + "bay_temple.glb"],
+	&"bay_victorian": [ART + "bay_victorian.glb"],
 	&"block": [CITY + "low-detail-building-a.glb", CITY + "low-detail-building-b.glb", CITY + "low-detail-building-c.glb", CITY + "low-detail-building-d.glb", CITY + "low-detail-building-wide-a.glb"],
 }
 
@@ -48,6 +63,26 @@ static func spawn(role: StringName, height: float, rng: RandomNumberGenerator, t
 		_tint_leaves(node, tint)
 	_no_shadows(node)
 	return node
+
+
+## The first mesh of a role's first variant, with its transform inside the
+## model and its bounds (for batching repeated pieces into a MultiMesh).
+static func mesh_of(role: StringName) -> Dictionary:
+	var path: String = SETS[role][0]
+	if not _scenes.has(path):
+		_scenes[path] = load(path)
+	var node: Node3D = (_scenes[path] as PackedScene).instantiate()
+	var out := {}
+	for mi: MeshInstance3D in node.find_children("*", "MeshInstance3D", true, false):
+		var xf := Transform3D.IDENTITY
+		var n: Node = mi
+		while n != node and n is Node3D:
+			xf = (n as Node3D).transform * xf
+			n = n.get_parent()
+		out = {"mesh": mi.mesh, "transform": xf, "aabb": xf * mi.get_aabb()}
+		break
+	node.free()
+	return out
 
 
 static func _aabb(node: Node) -> AABB:
