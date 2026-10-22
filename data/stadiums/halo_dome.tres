@@ -17,6 +17,7 @@ params = {
 "crown": true,
 "frame": &"model",
 "frame_model": &"set_deco_gate",
+"frame_width": 112.0,
 "pillar_cap": &"emblem"
 }
 

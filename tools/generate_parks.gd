@@ -12,7 +12,7 @@ extends SceneTree
 
 const PARKS := [
 	{
-		"id": &"halo_dome", "pillar_cap": &"emblem", "crown": true, "sky": &"sunset", "facade_color": Color("6a5a8c"), "facade_surface": &"marble", "structure_surface": &"steel", "decks": 3, "frame": &"model", "frame_model": &"set_deco_gate", "display_name": "The Halo Dome",
+		"id": &"halo_dome", "pillar_cap": &"emblem", "crown": true, "sky": &"sunset", "facade_color": Color("6a5a8c"), "facade_surface": &"marble", "structure_surface": &"steel", "decks": 3, "frame": &"model", "frame_model": &"set_deco_gate", "frame_width": 112.0, "display_name": "The Halo Dome",
 		"blurb": "Glitterati home · symmetrical, padded glass-and-gold wall",
 		"shape": [[-45, 96, 3.4], [-30, 104, 3.4], [-15, 112, 3.4], [0, 116, 4.2], [15, 112, 3.4], [30, 104, 3.4], [45, 96, 3.4]], "air": 1.0,
 		"seat_color": Color("3d2466"), "seat_color_alt": Color("2c1a4d"), "structure_color": Color("8f8aa3"), "accent_color": Color("ffc94a"),
@@ -141,7 +141,7 @@ const PARKS := [
 		"skyline_color": Color("3a2a3a"), "window_color": Color("ffc48a"),
 	},
 	{
-		"id": &"deepwater", "pillar_cap": &"emblem", "sky": &"underwater", "ground_color": Color("0e3b4a"), "facade_color": Color("6f8f8a"), "facade_surface": &"stone", "structure_surface": &"stone", "decks": 3, "frame": &"model", "frame_model": &"set_atlantis_gate", "display_name": "Deepwater Park",
+		"id": &"deepwater", "pillar_cap": &"emblem", "sky": &"underwater", "ground_color": Color("0e3b4a"), "facade_color": Color("6f8f8a"), "facade_surface": &"stone", "structure_surface": &"stone", "decks": 3, "frame": &"model", "frame_model": &"set_atlantis_gate", "frame_width": 112.0, "display_name": "Deepwater Park",
 		"blurb": "Krakens home · a sunken ruin under the sea: glass tanks, aqueducts and the sea king",
 		"shape": [[-45, 98, 3.0], [-20, 114, 3.0], [0, 123, 3.0], [22, 110, 3.0], [45, 102, 3.0]], "air": 1.06,
 		"seat_color": Color("123f55"), "seat_color_alt": Color("0d3245"), "structure_color": Color("5f7f7f"), "accent_color": Color("2ebbbb"),
@@ -152,7 +152,7 @@ const PARKS := [
 		"skyline_color": Color("123a48"), "window_color": Color("9ff3ff"),
 	},
 	{
-		"id": &"cloudreach", "pillar_cap": &"emblem", "ground_color": Color("eef2f8"), "ground_surface": &"snow", "facade_color": Color("b08a4e"), "facade_surface": &"steel", "structure_surface": &"steel", "decks": 3, "frame": &"model", "frame_model": &"set_sky_gate", "display_name": "Cloudreach Stadium",
+		"id": &"cloudreach", "pillar_cap": &"emblem", "ground_color": Color("eef2f8"), "ground_surface": &"snow", "facade_color": Color("b08a4e"), "facade_surface": &"steel", "structure_surface": &"steel", "decks": 3, "frame": &"model", "frame_model": &"set_sky_gate", "frame_width": 112.0, "display_name": "Cloudreach Stadium",
 		"blurb": "Aviators home · a floating island high above the clouds: airships, skybridges and propeller towers",
 		"shape": [[-45, 102, 3.0], [-22, 116, 3.0], [0, 125, 3.0], [22, 118, 3.0], [45, 108, 3.0]], "air": 0.9,
 		"seat_color": Color("1f4f8f"), "seat_color_alt": Color("183f74"), "structure_color": Color("a8833e"), "accent_color": Color("d4a017"),
@@ -238,6 +238,8 @@ func _init() -> void:
 				params["pillar_cap"] = spec["pillar_cap"]
 			if kind == &"centerpiece" and spec.has("frame_model"):
 				params["frame_model"] = spec["frame_model"]
+			if kind == &"centerpiece" and spec.has("frame_width"):
+				params["frame_width"] = spec["frame_width"]
 			park.add_piece(kind, NAN, params)
 		for p in spec.get("pieces", []):
 			park.add_piece(p[0], p[1] if p.size() > 1 else NAN, p[2] if p.size() > 2 else {}, p[3] if p.size() > 3 else false)
@@ -245,7 +247,7 @@ func _init() -> void:
 		if not problems.is_empty():
 			push_error("%s: %s" % [park.id, ", ".join(problems)])
 		for key in spec:
-			if key in ["shape", "air", "surface", "pieces", "standard", "skyline_height", "frame", "clock", "crown", "pillar_cap", "frame_model"]:
+			if key in ["shape", "air", "surface", "pieces", "standard", "skyline_height", "frame", "clock", "crown", "pillar_cap", "frame_model", "frame_width"]:
 				continue
 			var value: Variant = spec[key]
 			park.set(key, PackedStringArray(value) if key == "sponsors" else value)
