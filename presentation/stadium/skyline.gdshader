@@ -1,4 +1,5 @@
 shader_type spatial;
+render_mode cull_disabled;
 // Distant city towers: flat color with a procedural grid of windows, some
 // lit, picked per window from a hash of its world-space cell.
 

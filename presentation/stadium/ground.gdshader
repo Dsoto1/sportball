@@ -1,4 +1,5 @@
 shader_type spatial;
+render_mode cull_disabled;
 // The land (and open water) around a park, out to the horizon:
 // - the park's surface texture (world-space, top-down) tinted by the
 //   vertex color, broken up by large soft patches so it never reads as

@@ -1,4 +1,5 @@
 shader_type spatial;
+render_mode cull_disabled;
 // Stylized field surface: the project's flat palette color, with a CC0
 // photo texture (ambientCG) used only as low-contrast detail, sampled in
 // world space so the field never shows stretched UVs. Grass carries a

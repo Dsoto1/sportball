@@ -372,6 +372,14 @@ func _build_bowl() -> void:
 			# Paved city lots, a little of the skyline's tone in the gray
 			# (vertex colors are used as they are, linear: this is mid-gray).
 			outside = Color(0.15, 0.145, 0.14).lerp(def.skyline_color.darkened(0.6), 0.2)
+		# Behind the outfield wall, up to the bleachers' front (or the
+		# plaza where none stand): a paved gangway, never bare field grass.
+		if absf(mid) <= 46.0:
+			var wa := FieldLayout.fence_distance(clampf(a, -45.0, 45.0), tuning) + 0.25
+			var wb := FieldLayout.fence_distance(clampf(b, -45.0, 45.0), tuning) + 0.25
+			var to_a := pa.x if pa.z > 0 else back_a + 1.0
+			var to_b := pb.x if pb.z > 0 else back_b + 1.0
+			_quad(st, point(a, wa, 0.13), point(a, to_a + 0.05, 0.13), point(b, to_b + 0.05, 0.13), point(b, wb, 0.13), tread)
 		var edge_a := back_a + 1.0
 		var edge_b := back_b + 1.0
 		if is_water(mid):
@@ -398,7 +406,11 @@ func _build_bowl() -> void:
 	mi.material_override = mat
 	add_child(mi)
 	if StadiumSurfaces.KINDS.has(def.stand_surface):
-		mi.material_override = StadiumSurfaces.material(def.stand_surface, Color.WHITE, true)
+		# Its own copy, drawn from both sides: the bowl's faces wind either
+		# way round the circle, and a culled tread shows the grass under it.
+		var stand_mat: StandardMaterial3D = StadiumSurfaces.material(def.stand_surface, Color.WHITE, true).duplicate()
+		stand_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+		mi.material_override = stand_mat
 	var paving: StringName = &"stone" if def.structure_surface == &"stone" else &"concrete"
 	for part: Array in [[facade, "Facade", def.facade_surface, def.facade_tint()], [plaza, "Plaza", paving, def.structure_color.lerp(Color(0.78, 0.76, 0.72), 0.6)]]:
 		var tool: SurfaceTool = part[0]
@@ -892,15 +904,17 @@ func _build_backstop() -> void:
 		var a := 45.0
 		while a < 180.0 - 0.01:
 			var b := minf(a + 1.0, 180.0)
-			var sa := a * side
-			var sb := b * side
+			# Always in increasing spray angle, so both sides wind (and are
+			# lit) the same way.
+			var sa := a * side if side > 0.0 else -b
+			var sb := b * side if side > 0.0 else -a
 			var ra := profile(sa).x - 0.15
 			var rb := profile(sb).x - 0.15
 			var mid := (a + b) * 0.5
 			# Out past the poles the outfield wall's own track runs on.
 			if a >= 44.0:
-				var t0 := smoothstep(45.0, 50.0, a)
-				var t1 := smoothstep(45.0, 50.0, b)
+				var t0 := smoothstep(45.0, 50.0, absf(sa))
+				var t1 := smoothstep(45.0, 50.0, absf(sb))
 				_quad(track, point(sa, ra - TRACK_WIDTH * t0, GrayboxField.TRACK_TOP), point(sa, ra, GrayboxField.TRACK_TOP), point(sb, rb, GrayboxField.TRACK_TOP), point(sb, rb - TRACK_WIDTH * t1, GrayboxField.TRACK_TOP), Color.WHITE)
 			if absf(mid - DUGOUT_ANGLE) > dugout_half_angle() and not is_water(sa):
 				var ha := profile(sa).y - 0.3

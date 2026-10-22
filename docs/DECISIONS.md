@@ -1553,3 +1553,16 @@ sheet and architecture set:
 - the roof in the park's material and color.
 Most parks' architecture-set towers already frame the grandstand's ends.
 The set's towers are placed there only when present.
+
+## Stands solid from every angle
+
+High shots showed fans floating over grass. Cause: the bowl is built by
+sweeping round the circle, so its faces wind one way on one side and the
+other way on the other; the stands' textured material (and the ground,
+field surface and skyline shaders) drew one side only, so from above half
+the treads, the ground and the foul track vanished and the field's grass
+slab showed through. The bowl's material, ground.gdshader,
+field_surface.gdshader and skyline.gdshader now draw both sides, the foul
+wall and track are swept in one direction on both sides (so they light
+alike), and the strip between the outfield wall and the bleachers (or the
+plaza where none stand) is paved instead of bare grass.
