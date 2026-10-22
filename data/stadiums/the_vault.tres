@@ -106,11 +106,22 @@ params = {
 
 [sub_resource type="Resource" id="Resource_0emfr"]
 script = ExtResource("2_b78mq")
+kind = &"arcade"
+angle = 11.0
+mirrored = true
+params = {
+"banners": 3,
+"height": 16.0,
+"span": 36.0,
+"style": &"truss"
+}
+
+[sub_resource type="Resource" id="Resource_ssaq4"]
+script = ExtResource("2_b78mq")
 kind = &"canopy"
 angle = 52.0
 mirrored = true
 params = {
-"height": 11.7,
 "style": &"steel"
 }
 
@@ -131,10 +142,11 @@ home_fan_share = 0.5
 away_fan_share = 0.25
 attendance = 0.7
 night = true
+sky = &"night"
 turf = true
 sponsors = PackedStringArray("STRONGBOX SECURITY", "TITAN TURF", "DOMELIGHT DINER", "PRESSURE SEAL WINDOWS", "BIG TOP BURGERS")
 skyline_color = Color(0.11764706, 0.14117648, 0.2, 1)
 window_color = Color(1, 0.8352941, 0.6039216, 1)
 facade_color = Color(0.3529412, 0.36862746, 0.4, 1)
 structure_surface = &"steel"
-pieces = Array[ExtResource("2_b78mq")]([SubResource("Resource_iootr"), SubResource("Resource_4i8r7"), SubResource("Resource_t1ilx"), SubResource("Resource_pt7r0"), SubResource("Resource_ysqj7"), SubResource("Resource_mjxe6"), SubResource("Resource_mtp5g"), SubResource("Resource_w3um4"), SubResource("Resource_ewyli"), SubResource("Resource_eijjg"), SubResource("Resource_aq1kd"), SubResource("Resource_mhk2s"), SubResource("Resource_0emfr")])
+pieces = Array[ExtResource("2_b78mq")]([SubResource("Resource_iootr"), SubResource("Resource_4i8r7"), SubResource("Resource_t1ilx"), SubResource("Resource_pt7r0"), SubResource("Resource_ysqj7"), SubResource("Resource_mjxe6"), SubResource("Resource_mtp5g"), SubResource("Resource_w3um4"), SubResource("Resource_ewyli"), SubResource("Resource_eijjg"), SubResource("Resource_aq1kd"), SubResource("Resource_mhk2s"), SubResource("Resource_0emfr"), SubResource("Resource_ssaq4")])

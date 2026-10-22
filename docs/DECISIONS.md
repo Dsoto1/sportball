@@ -998,3 +998,26 @@ The sheets' tall, layered stands (arcades, windows, steel frames, roofs) are now
 Reason: Owner request for facade detail on the stands.
 
 Affected systems: modules (arcade, canopy new), StadiumModules (mirrored spans), Stadium (ground height), water module, generate_parks, stadium_tour, tests, README.
+
+## 2026-10-22 - Matching the Sheets: Sky, Field and Outfield Backdrop
+
+Owner direction: follow the reference sheets as drawn. My earlier proposal to strip trains, bridges and bunting from some parks is dropped.
+
+A side-by-side of every sheet's main view with our matching render showed three gaps common to all the parks.
+
+- **Sky and light (`StadiumDef.sky`):** day, golden, sunset, dusk or night, per sheet.
+  - Sunset: the Halo Dome, Foundry.
+  - Golden hour: the Kiln.
+  - Dusk with the lights on: Reactor Park, the Horseshoe.
+  - Night: the Vault.
+  - Day: everywhere else.
+  - Each look sets the sky gradient, a warm sun placed behind home plate (so the field is lit from the batter's side, as drawn), a neutral horizon-tinted ambient (so the grass stays green, not mint) and a slight saturation and contrast lift.
+- **Field:** deeper grass with stronger mowing stripes, and clay-colored dirt.
+- **Outfield backdrop:** each park now carries a second, taller arcade over the outfield bleachers in its own style, from 11° to 47° on both sides. Center stays open for the centerpiece.
+  - `Stadium.skyline_top()` gives the top of stands plus any facade.
+  - Boards, slogan boards, the centerpiece, statues, flags, lamps, waterfalls and canopies now stand on that line, so the backdrop never hides them.
+- **No stadium shadows on the field:** with low suns, the stands and towers raked long shadow streaks across the infield. The sheets' fields are evenly lit, so stadium geometry no longer casts shadows. Players still do.
+
+Reason: Owner direction to make the parks look like their reference sheets.
+
+Affected systems: StadiumDef (sky), GrayboxField (skies, lighting, field colors), Stadium (skyline_top, facade_height, no shadows), modules (boards, signs, centerpiece, statues, flags, lamps, waterfalls, canopy, light towers), generate_parks, tests.

@@ -8,7 +8,8 @@ extends StadiumModule
 func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef) -> void:
 	var def := stadium.def
 	var k := piece.size
-	var height := float(piece.param("height")) * k
+	# Measured from the top of whatever stands in front (stands, facade).
+	var height := float(piece.param("height")) * k + stadium.skyline_top(piece.angle).y * 0.6
 	var width := float(piece.param("width")) * k
 	var top := stadium.stand_top(piece.angle)
 	var spot := stadium.point(piece.angle, top.x + 6.0, 0.0)

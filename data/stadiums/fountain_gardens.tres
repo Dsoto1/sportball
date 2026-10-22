@@ -116,6 +116,18 @@ params = {
 "style": &"arches"
 }
 
+[sub_resource type="Resource" id="Resource_v23bh"]
+script = ExtResource("2_wib25")
+kind = &"arcade"
+angle = 11.0
+mirrored = true
+params = {
+"banners": 3,
+"height": 15.0,
+"span": 36.0,
+"style": &"arches"
+}
+
 [resource]
 script = ExtResource("3_hice1")
 id = &"fountain_gardens"
@@ -139,4 +151,4 @@ window_color = Color(0.84705883, 0.9254902, 1, 1)
 facade_color = Color(0.8392157, 0.8117647, 0.73333335, 1)
 facade_surface = &"marble"
 structure_surface = &"stone"
-pieces = Array[ExtResource("2_wib25")]([SubResource("Resource_k8u6i"), SubResource("Resource_q8oj0"), SubResource("Resource_kaaf5"), SubResource("Resource_48ww4"), SubResource("Resource_1xj3a"), SubResource("Resource_taq0n"), SubResource("Resource_0ixp3"), SubResource("Resource_bdrrb"), SubResource("Resource_4ub2c"), SubResource("Resource_o7030"), SubResource("Resource_xncfn"), SubResource("Resource_vtwq7"), SubResource("Resource_2eyij"), SubResource("Resource_gvaj5")])
+pieces = Array[ExtResource("2_wib25")]([SubResource("Resource_k8u6i"), SubResource("Resource_q8oj0"), SubResource("Resource_kaaf5"), SubResource("Resource_48ww4"), SubResource("Resource_1xj3a"), SubResource("Resource_taq0n"), SubResource("Resource_0ixp3"), SubResource("Resource_bdrrb"), SubResource("Resource_4ub2c"), SubResource("Resource_o7030"), SubResource("Resource_xncfn"), SubResource("Resource_vtwq7"), SubResource("Resource_2eyij"), SubResource("Resource_gvaj5"), SubResource("Resource_v23bh")])

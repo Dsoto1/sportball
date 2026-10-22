@@ -8,7 +8,7 @@ extends StadiumModule
 
 func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef) -> void:
 	var def := stadium.def
-	var top := stadium.stand_top(0.0)
+	var top := stadium.skyline_top(0.0)
 	var k := piece.size
 	var center := stadium.point(0.0, top.x + 4.0, top.y + float(piece.param("height")) * k)
 	var board := Node3D.new()

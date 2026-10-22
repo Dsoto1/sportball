@@ -106,11 +106,22 @@ params = {
 
 [sub_resource type="Resource" id="Resource_vply3"]
 script = ExtResource("2_nkemg")
+kind = &"arcade"
+angle = 11.0
+mirrored = true
+params = {
+"banners": 3,
+"height": 14.0,
+"span": 36.0,
+"style": &"timber"
+}
+
+[sub_resource type="Resource" id="Resource_0kbas"]
+script = ExtResource("2_nkemg")
 kind = &"canopy"
 angle = 52.0
 mirrored = true
 params = {
-"height": 9.7,
 "style": &"timber"
 }
 
@@ -136,4 +147,4 @@ facade_color = Color(0.5176471, 0.5803922, 0.6509804, 1)
 facade_surface = &"stone"
 structure_surface = &"wood"
 ground_surface = &"snow"
-pieces = Array[ExtResource("2_nkemg")]([SubResource("Resource_3lw56"), SubResource("Resource_77lqm"), SubResource("Resource_6v7py"), SubResource("Resource_305by"), SubResource("Resource_l5q8p"), SubResource("Resource_aca4j"), SubResource("Resource_qrntj"), SubResource("Resource_opbgw"), SubResource("Resource_rw4av"), SubResource("Resource_fknpk"), SubResource("Resource_mxnw4"), SubResource("Resource_acneu"), SubResource("Resource_vply3")])
+pieces = Array[ExtResource("2_nkemg")]([SubResource("Resource_3lw56"), SubResource("Resource_77lqm"), SubResource("Resource_6v7py"), SubResource("Resource_305by"), SubResource("Resource_l5q8p"), SubResource("Resource_aca4j"), SubResource("Resource_qrntj"), SubResource("Resource_opbgw"), SubResource("Resource_rw4av"), SubResource("Resource_fknpk"), SubResource("Resource_mxnw4"), SubResource("Resource_acneu"), SubResource("Resource_vply3"), SubResource("Resource_0kbas")])

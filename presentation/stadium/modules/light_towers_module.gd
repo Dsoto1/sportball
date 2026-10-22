@@ -30,3 +30,6 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 				var lamp := stadium.box(Vector3(1.2, 1.2, 0.3), Color.WHITE, bank)
 				lamp.position = Vector3(-3.75 + col * 1.5, -1.5 + row * 1.5, -0.5)
 				lamp.material_override = Stadium.glow(Color(1.0, 0.97, 0.85), 6.0 if def.night else 2.5)
+	# Low suns would rake their shadows across the whole field.
+	for mi: MeshInstance3D in root.find_children("*", "MeshInstance3D", true, false):
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

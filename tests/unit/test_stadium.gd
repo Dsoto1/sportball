@@ -360,3 +360,16 @@ func test_mirrored_spans_sweep_away_from_center() -> void:
 				lo = minf(lo, absf(rad_to_deg(atan2(v.x, -v.z))))
 		check(lo > 45.0, "%s stays out of the outfield (nearest %.0f°)" % [name, lo])
 	st.free()
+
+
+func test_boards_stand_above_the_facades() -> void:
+	for park in content().parks:
+		var st := Stadium.new()
+		st.build(content().tuning_for(park), park, content().team(&"glitterati"), content().team(&"gearheads"))
+		for angle in [-34.0, 0.0, 30.0]:
+			check(st.skyline_top(angle).y >= st.stand_top(angle).y, "%s: skyline at or above the stands" % park.id)
+		check(st.facade_height(25.0) > 0.0, "%s has an outfield backdrop" % park.id)
+		check(st.facade_height(0.0) == 0.0, "%s leaves center open for the centerpiece" % park.id)
+		st.free()
+	check_eq(content().park(&"the_kiln").sky_kind(), &"golden", "the Kiln plays at golden hour")
+	check_eq(content().park(&"the_vault").sky_kind(), &"night", "the Vault plays at night")

@@ -102,11 +102,22 @@ params = {
 
 [sub_resource type="Resource" id="Resource_rdo3b"]
 script = ExtResource("2_smn81")
+kind = &"arcade"
+angle = 11.0
+mirrored = true
+params = {
+"banners": 3,
+"height": 16.0,
+"span": 36.0,
+"style": &"truss"
+}
+
+[sub_resource type="Resource" id="Resource_gt3op"]
+script = ExtResource("2_smn81")
 kind = &"canopy"
 angle = 52.0
 mirrored = true
 params = {
-"height": 11.7,
 "style": &"steel"
 }
 
@@ -127,9 +138,10 @@ home_fan_share = 0.45
 away_fan_share = 0.3
 attendance = 0.82
 night = true
+sky = &"dusk"
 sponsors = PackedStringArray("ATOMIC FALLS POWER & LIGHT", "MUSHROOM CLOUD MALTS", "FISSION FIZZ", "RAY-GUN RADIO")
 skyline_color = Color(0.23921569, 0.24705882, 0.18039216, 1)
 window_color = Color(0.78431374, 1, 0.84705883, 1)
 facade_color = Color(0.41568628, 0.43137255, 0.4392157, 1)
 structure_surface = &"steel"
-pieces = Array[ExtResource("2_smn81")]([SubResource("Resource_f7572"), SubResource("Resource_mr6iu"), SubResource("Resource_lexrw"), SubResource("Resource_ubcck"), SubResource("Resource_pc4ek"), SubResource("Resource_6tw7a"), SubResource("Resource_rqh0y"), SubResource("Resource_5b7v7"), SubResource("Resource_3c86f"), SubResource("Resource_rbxcs"), SubResource("Resource_jt861"), SubResource("Resource_rdo3b")])
+pieces = Array[ExtResource("2_smn81")]([SubResource("Resource_f7572"), SubResource("Resource_mr6iu"), SubResource("Resource_lexrw"), SubResource("Resource_ubcck"), SubResource("Resource_pc4ek"), SubResource("Resource_6tw7a"), SubResource("Resource_rqh0y"), SubResource("Resource_5b7v7"), SubResource("Resource_3c86f"), SubResource("Resource_rbxcs"), SubResource("Resource_jt861"), SubResource("Resource_rdo3b"), SubResource("Resource_gt3op")])

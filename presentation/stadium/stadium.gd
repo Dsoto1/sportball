@@ -67,6 +67,11 @@ func build(p_tuning: BaseballTuning, p_def: StadiumDef, home: TeamDef, away: Tea
 	for piece in def.pieces:
 		if piece != null:
 			StadiumModules.build(self, piece, home, away)
+	# The park casts no shadows on the field: the sheets' fields are evenly
+	# lit, and low suns would rake the stands' shadows across the infield.
+	# Players keep theirs.
+	for gi: GeometryInstance3D in find_children("*", "GeometryInstance3D", true, false):
+		gi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 
 ## The crowd reacts (0..1); it settles back over a couple of seconds.
@@ -136,6 +141,34 @@ func stand_top(angle: float) -> Vector2:
 	var p := profile(angle)
 	var rows := int(p.z)
 	return Vector2(p.x + rows * ROW_DEPTH, row_height(angle, p, rows - 1))
+
+
+## How tall the park's arcade facades stand at a spray angle (0 where
+## there is none), cornice included.
+func facade_height(angle: float) -> float:
+	angle = wrapf(angle, -180.0, 180.0)
+	var best := 0.0
+	for piece in def.pieces_of(&"arcade"):
+		var spans := [[piece.angle, float(piece.param("span"))]]
+		if piece.mirrored:
+			spans.append([-piece.angle, -float(piece.param("span"))])
+		for sp: Array in spans:
+			var lo := minf(sp[0], sp[0] + sp[1])
+			var hi := maxf(sp[0], sp[0] + sp[1])
+			var a := angle
+			if a < lo:
+				a += 360.0
+			if a >= lo and a <= hi:
+				best = maxf(best, float(piece.param("height")) * piece.size + 0.7)
+	return best
+
+
+## The top of everything standing on the back of the stands at an angle:
+## (radius, height) of the stands' last row raised by any facade there.
+## Boards, signs, flags and lamps stand on this so a facade never hides them.
+func skyline_top(angle: float) -> Vector2:
+	var top := stand_top(angle)
+	return Vector2(top.x, top.y + facade_height(angle))
 
 
 ## Open water at this spray angle: within 22 degrees of a bay piece.

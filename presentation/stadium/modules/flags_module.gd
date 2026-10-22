@@ -10,7 +10,7 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	var colors := [home.primary_color, home.secondary_color, home.accent_color]
 	var i := 0
 	for angle in Scenery.spread(piece.angle, float(piece.param("span")), int(piece.param("count"))):
-		var top := stadium.stand_top(angle)
+		var top := stadium.skyline_top(angle)
 		var base := stadium.point(angle, top.x, top.y + 1.2)
 		var pole := stadium.box(Vector3(0.18, 7.0 * piece.size, 0.18), Color(0.85, 0.85, 0.82), root)
 		pole.position = base + Vector3.UP * 3.5 * piece.size
@@ -26,3 +26,5 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 			mark.position = Vector3(0.05, 0, -1.3 * piece.size)
 			flag.add_child(mark)
 		i += 1
+	for mi: MeshInstance3D in root.find_children("*", "MeshInstance3D", true, false):
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

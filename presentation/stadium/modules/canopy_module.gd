@@ -19,7 +19,7 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	var edges: Array[Array] = []
 	for i in steps + 1:
 		var a := piece.angle + span * i / steps
-		var top := stadium.stand_top(a)
+		var top := stadium.skyline_top(a)
 		var back := stadium.point(a, top.x + 0.2, top.y + rise)
 		var front := stadium.point(a, top.x - depth, top.y + rise + depth * 0.18)
 		edges.append([back, front])
@@ -40,7 +40,7 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	# Struts from the front edge down to the stands, every few meters.
 	for i in range(0, steps + 1, 3):
 		var a := piece.angle + span * i / steps
-		var top := stadium.stand_top(a)
+		var top := stadium.skyline_top(a)
 		var foot := stadium.point(a, top.x - depth * 0.55, stadium.row_height(a, stadium.profile(a), maxi(0, int(stadium.profile(a).z) - int(depth * 0.55 / Stadium.ROW_DEPTH))))
 		var head: Vector3 = edges[i][1]
 		var strut := stadium.box(Vector3(0.35, 0.35, foot.distance_to(head)), def.structure_color.darkened(0.4), root, &"wood" if timber else &"steel")

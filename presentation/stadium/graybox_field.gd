@@ -4,9 +4,9 @@ extends Node3D
 ## changes baseball rules. Grass and dirt use the field surface shader:
 ## project palette colors with CC0 ambientCG texture as subtle detail.
 
-const GRASS := Color(0.17, 0.45, 0.19)
+const GRASS := Color(0.13, 0.38, 0.13)
 const TURF := Color(0.07, 0.4, 0.2)
-const DIRT := Color(0.72, 0.43, 0.24)
+const DIRT := Color(0.64, 0.37, 0.22)
 const FOUL_POLE := Color(1.0, 0.8, 0.1)
 const CHALK := Color(0.95, 0.95, 0.9)
 const WALL := Color(0.16, 0.22, 0.38)
@@ -34,9 +34,9 @@ func build(tuning: BaseballTuning, park: StadiumDef = null) -> void:
 	var turf := park != null and park.turf
 	# Turf: a brighter, flatter green in crisp 5-yard seams instead of mowing.
 	var grass := TURF if turf else GRASS
-	_grass_mat = _surface(grass, GRASS_TEX, GRASS_NORMAL, 0.385, 2.5, 0.05 if turf else 0.028)
+	_grass_mat = _surface(grass, GRASS_TEX, GRASS_NORMAL, 0.385, 2.5, 0.05 if turf else 0.075)
 	_grass_mat.set_shader_parameter("stripe_width", 4.57 if turf else 9.0)
-	_infield_grass_mat = _surface(grass.lightened(0.04), GRASS_TEX, GRASS_NORMAL, 0.385, 2.5, 0.05 if turf else 0.02)
+	_infield_grass_mat = _surface(grass.lightened(0.04), GRASS_TEX, GRASS_NORMAL, 0.385, 2.5, 0.05 if turf else 0.06)
 	if turf:
 		for m in [_grass_mat, _infield_grass_mat]:
 			m.set_shader_parameter("detail_strength", 0.25)
@@ -138,21 +138,44 @@ func _build_fence() -> void:
 ## Day: sun and a painted sky. Night: floodlights from high over the
 ## infield under a dark sky, with glow so the lamps bloom. Dome: the same
 ## floods, brighter fill, no sky at all.
+## Sky looks, from the parks' sheets: [sky top, horizon, sun color, sun
+## elevation (deg), sun yaw (deg), sun energy, ambient energy]. The sun
+## stays behind home plate, as on the sheets, so the field is lit warm
+## from the batter's side.
+const SKIES := {
+	&"day": [Color(0.2, 0.45, 0.82), Color(0.72, 0.84, 0.95), Color(1.0, 0.98, 0.94), -55.0, 35.0, 1.15, 0.45],
+	&"golden": [Color(0.3, 0.46, 0.78), Color(1.0, 0.76, 0.5), Color(1.0, 0.86, 0.66), -34.0, 25.0, 1.2, 0.45],
+	&"sunset": [Color(0.32, 0.24, 0.55), Color(1.0, 0.58, 0.4), Color(1.0, 0.78, 0.6), -26.0, 15.0, 1.1, 0.5],
+	&"dusk": [Color(0.1, 0.1, 0.3), Color(0.95, 0.5, 0.45), Color(1.0, 0.7, 0.55), -12.0, 10.0, 0.35, 0.45],
+	&"night": [Color(0.01, 0.015, 0.05), Color(0.09, 0.1, 0.2), Color(1.0, 0.96, 0.88), -72.0, 15.0, 0.0, 0.4],
+}
+
+
+## The park's sky (see SKIES) and its light: the sun low and warm at golden
+## hour and sunset; floodlights (and a softer fill) whenever the lights are
+## on, at dusk and night, with glow so lamps bloom. Dome: floods, no sky.
 func _build_lighting() -> void:
-	var night := _park != null and _park.night
+	var lights_on := _park != null and _park.night
 	var roof := _park != null and _park.is_roofed()
-	var sun := DirectionalLight3D.new()
-	sun.name = "Sun" if not (night or roof) else "Floodlights"
-	sun.rotation_degrees = Vector3(-55, 35, 0) if not (night or roof) else Vector3(-72, 15, 0)
-	sun.light_energy = 1.1 if not (night or roof) else 1.0
-	sun.light_color = Color.WHITE if not (night or roof) else Color(1.0, 0.96, 0.88)
-	sun.shadow_enabled = true
-	if night or roof:
-		# Floodlights light the park but draw no sun in the sky.
-		sun.sky_mode = DirectionalLight3D.SKY_MODE_LIGHT_ONLY
-	add_child(sun)
-	if night or roof:
-		# A second, shadowless bank from the other side softens the shadows.
+	var kind: StringName = _park.sky_kind() if _park != null else &"day"
+	var look: Array = SKIES.get(kind, SKIES[&"day"])
+	if float(look[5]) > 0.0 and not roof:
+		var sun := DirectionalLight3D.new()
+		sun.name = "Sun"
+		sun.rotation_degrees = Vector3(look[3], look[4], 0)
+		sun.light_energy = look[5]
+		sun.light_color = look[2]
+		sun.shadow_enabled = not lights_on
+		add_child(sun)
+	if lights_on or roof:
+		var flood := DirectionalLight3D.new()
+		flood.name = "Floodlights"
+		flood.rotation_degrees = Vector3(-72, 15, 0)
+		flood.light_energy = 1.0 if kind == &"night" or roof else 0.75
+		flood.light_color = Color(1.0, 0.96, 0.88)
+		flood.shadow_enabled = true
+		flood.sky_mode = DirectionalLight3D.SKY_MODE_LIGHT_ONLY
+		add_child(flood)
 		var fill := DirectionalLight3D.new()
 		fill.name = "FloodFill"
 		fill.rotation_degrees = Vector3(-60, 200, 0)
@@ -162,30 +185,37 @@ func _build_lighting() -> void:
 		add_child(fill)
 	var env := WorldEnvironment.new()
 	var environment := Environment.new()
-	# A painted-looking day sky; ambient light comes from it.
 	var sky_mat := ProceduralSkyMaterial.new()
-	sky_mat.sky_top_color = Color(0.16, 0.38, 0.74) if not night else Color(0.01, 0.015, 0.05)
-	sky_mat.sky_horizon_color = Color(0.62, 0.78, 0.93) if not night else Color(0.09, 0.1, 0.2)
-	sky_mat.ground_bottom_color = Color(0.2, 0.3, 0.25) if not night else Color(0.02, 0.03, 0.04)
-	sky_mat.ground_horizon_color = sky_mat.sky_horizon_color
+	sky_mat.sky_top_color = look[0]
+	sky_mat.sky_horizon_color = look[1]
+	sky_mat.sky_curve = 0.12
+	sky_mat.ground_bottom_color = (look[1] as Color).darkened(0.7)
+	sky_mat.ground_horizon_color = look[1]
 	sky_mat.sun_angle_max = 20.0
 	var sky := Sky.new()
 	sky.sky_material = sky_mat
 	environment.background_mode = Environment.BG_SKY
 	environment.sky = sky
-	environment.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	environment.ambient_light_energy = 0.45
-	if night or roof:
-		environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-		environment.ambient_light_color = Color(0.55, 0.6, 0.75) if night else Color(0.7, 0.7, 0.75)
-		environment.ambient_light_energy = 0.4 if night else 0.5
+	# Ambient from a soft neutral of the horizon, not the blue sky dome, so
+	# the grass stays green rather than mint.
+	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	environment.ambient_light_color = (look[1] as Color).lerp(Color(0.85, 0.85, 0.8), 0.6)
+	environment.ambient_light_energy = look[6]
+	if lights_on or roof:
 		environment.glow_enabled = true
 		environment.glow_intensity = 0.6
 		environment.glow_hdr_threshold = 1.2
+	if kind == &"night" or roof:
+		environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+		environment.ambient_light_color = Color(0.55, 0.6, 0.75) if not roof else Color(0.7, 0.7, 0.75)
+		environment.ambient_light_energy = 0.4 if not roof else 0.5
 	if roof:
 		environment.background_mode = Environment.BG_COLOR
 		environment.background_color = Color(0.05, 0.05, 0.07)
 	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	environment.adjustment_enabled = true
+	environment.adjustment_saturation = 1.06
+	environment.adjustment_contrast = 1.06
 	env.environment = environment
 	add_child(env)
 

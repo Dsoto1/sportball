@@ -8,7 +8,7 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	var root := Node3D.new()
 	root.name = stadium.unique_name("Statue")
 	stadium.add_child(root)
-	var top := stadium.stand_top(piece.angle)
+	var top := stadium.skyline_top(piece.angle)
 	var spot := stadium.point(piece.angle, top.x - 1.0, top.y + 0.6)
 	root.look_at_from_position(spot, Vector3(0, spot.y, -45.0), Vector3.UP)
 	root.scale = Vector3.ONE * piece.size

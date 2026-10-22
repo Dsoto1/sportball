@@ -32,8 +32,18 @@ extends Resource
 @export var away_fan_share: float = 0.12
 ## Fraction of seats with someone in them.
 @export var attendance: float = 0.85
-## Played under the lights: night sky, floodlights, glowing landmarks.
+## Played under the lights: floodlights, lit windows, glowing landmarks.
 @export var night: bool = false
+## The sky and sun, from the park's sheet: &"day", &"golden" (late
+## afternoon), &"sunset", &"dusk" (lights on, last light in the sky) or
+## &"night"; empty follows `night`.
+@export var sky: StringName = &""
+
+
+func sky_kind() -> StringName:
+	if sky != &"":
+		return sky
+	return &"night" if night else &"day"
 ## Artificial turf instead of grass (look only; its speed is in field_shape).
 @export var turf: bool = false
 ## Fictional sponsors on the boards (original names only).

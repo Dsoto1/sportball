@@ -6,7 +6,7 @@ extends StadiumModule
 
 func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef) -> void:
 	var def := stadium.def
-	var top := stadium.stand_top(piece.angle)
+	var top := stadium.skyline_top(piece.angle)
 	var center := stadium.point(piece.angle, top.x + 2.0, top.y + float(piece.param("height")) * piece.size)
 	var sign := Node3D.new()
 	sign.name = stadium.unique_name("SloganBoard")

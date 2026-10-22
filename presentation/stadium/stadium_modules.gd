@@ -251,9 +251,9 @@ const CATALOG := {
 	},
 	&"canopy": {
 		"name": "Canopy", "category": &"structure", "unique": false, "placed": true,
-		"about": "A roof over the top rows of the stands across span degrees, in steel or timber, with a lit front edge and struts.",
+		"about": "A roof over the top rows of the stands across span degrees, in steel or timber, with a lit front edge and struts. It sits height m above any facade there.",
 		"angle": 55.0, "angle_range": [-180.0, 180.0],
-		"params": {"style": [&"steel"], "span": [120.0, -360.0, 360.0], "depth": [9.0, 3.0, 20.0], "height": [10.0, 3.0, 24.0]},
+		"params": {"style": [&"steel"], "span": [120.0, -360.0, 360.0], "depth": [9.0, 3.0, 20.0], "height": [0.5, 0.0, 24.0]},
 		"choices": {"style": [&"steel", &"timber"]},
 		"script": preload("res://presentation/stadium/modules/canopy_module.gd"),
 	},

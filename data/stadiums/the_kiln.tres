@@ -98,6 +98,18 @@ params = {
 "style": &"arches"
 }
 
+[sub_resource type="Resource" id="Resource_u2mh8"]
+script = ExtResource("2_6juw2")
+kind = &"arcade"
+angle = 11.0
+mirrored = true
+params = {
+"banners": 3,
+"height": 14.0,
+"span": 36.0,
+"style": &"arches"
+}
+
 [resource]
 script = ExtResource("3_4twl7")
 id = &"the_kiln"
@@ -115,6 +127,7 @@ decks = 2
 home_fan_share = 0.45
 away_fan_share = 0.3
 attendance = 0.8
+sky = &"golden"
 sponsors = PackedStringArray("SUNBAKED SODA", "MESA MOTOR LODGE", "CACTUS CANDY CO.", "COPPER CANYON CHILI")
 skyline_color = Color(0.6901961, 0.5411765, 0.38431373, 1)
 ground_color = Color(0.56078434, 0.2901961, 0.17254902, 1)
@@ -123,4 +136,4 @@ facade_color = Color(0.69803923, 0.3529412, 0.23529412, 1)
 facade_surface = &"rock"
 structure_surface = &"stone"
 ground_surface = &"sand"
-pieces = Array[ExtResource("2_6juw2")]([SubResource("Resource_tqy5q"), SubResource("Resource_w7e58"), SubResource("Resource_dly8v"), SubResource("Resource_ubg3t"), SubResource("Resource_hiw75"), SubResource("Resource_dcbhf"), SubResource("Resource_sbprt"), SubResource("Resource_1aefi"), SubResource("Resource_6coa7"), SubResource("Resource_nqdqv"), SubResource("Resource_ku2ib")])
+pieces = Array[ExtResource("2_6juw2")]([SubResource("Resource_tqy5q"), SubResource("Resource_w7e58"), SubResource("Resource_dly8v"), SubResource("Resource_ubg3t"), SubResource("Resource_hiw75"), SubResource("Resource_dcbhf"), SubResource("Resource_sbprt"), SubResource("Resource_1aefi"), SubResource("Resource_6coa7"), SubResource("Resource_nqdqv"), SubResource("Resource_ku2ib"), SubResource("Resource_u2mh8")])
