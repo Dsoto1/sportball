@@ -1123,3 +1123,26 @@ Reason: Owner request to use the Artlist budget for depth and detail in the park
   - flat tops: a corbelled parapet with merlons on all four sides.
 
 Reason: Owner request to tint the bays to each park, add detail to the hand-built shapes, and vary facades instead of repeating one design.
+
+## 2026-10-22 - Three Detail Passes Against the Sheets
+
+All 18 parks were rendered from behind home plate next to their sheets, three times. Each round added what the comparison showed missing.
+
+- **Pass 1:**
+  - Every centerpiece gets flanking pillars hung with long club banners (emblem on each). The caps are a lamp, a flaming brazier (Forum Field, Firelight, Amber Gate, Foundry) or the emblem.
+  - Viaducts lift above the facades so their trains read, flying craft fly lower, and hero statues scale up (`scale` setting).
+  - The line-score board is now opt-in, since the sheets keep left field for banners and towers.
+  - Ledger Street's outfield gets domed towers. A leftover bridge left Citadel Park.
+- **Pass 2:**
+  - New `string_lights`: warm bulbs sagging along the stands, one MultiMesh per park, colored per park. Every park has them.
+  - New `planters`: shrubs and flowers along the terraces (two MultiMeshes) at the Halo Dome, Ledger Street, Fountain Gardens, Sakura Gate (pink), Deepwater (coral colors), Cloudreach, Forum Field and Amber Gate.
+  - Foundry gets braziers.
+- **Pass 3:**
+  - Waterfalls stand on the outfield stands in front of the backdrop and rise above it, pushed to at least 15° so they flank the centerpiece.
+  - They're now a rock cliff with three stepped ledges, blue water, foam, shrubs and mist.
+  - String lights skip the center gap.
+- **Fixes:**
+  - Catalog validation skips range checks on non-numeric settings (colors).
+  - The compare script renders one park at a time, since three at once ran the container out of memory.
+
+Reason: Owner request to compare each park with its sheet and add missing detail, three times over.

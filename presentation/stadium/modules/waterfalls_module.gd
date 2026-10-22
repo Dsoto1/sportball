@@ -10,11 +10,15 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	var k := piece.size
 	# Stands on the back rows of the outfield stands, in front of any facade,
 	# and rises above it, so the falls frame the centerpiece as on the sheets.
-	var top := stadium.stand_top(piece.angle)
+	# Flank the centerpiece rather than cover it (it spans about +-12 deg).
+	var angle := piece.angle
+	if stadium.def.has_piece(&"centerpiece") and absf(angle) < 15.0:
+		angle = 15.0 * (signf(angle) if angle != 0.0 else 1.0)
+	var top := stadium.stand_top(angle)
 	var base := top.y - 1.0
-	var height := float(piece.param("height")) * k + stadium.facade_height(piece.angle)
+	var height := float(piece.param("height")) * k + stadium.facade_height(angle)
 	var width := float(piece.param("width")) * k
-	var spot := stadium.point(piece.angle, top.x - 2.5, base)
+	var spot := stadium.point(angle, top.x - 2.5, base)
 	var fall := Node3D.new()
 	fall.name = stadium.unique_name("Waterfall")
 	stadium.add_child(fall)

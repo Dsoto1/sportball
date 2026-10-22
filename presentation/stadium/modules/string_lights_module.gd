@@ -15,6 +15,9 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	for r in runs:
 		var a0 := piece.angle + span * r / runs
 		var a1 := piece.angle + span * (r + 1) / runs
+		# Leave the centerpiece's gap in center field unstrung.
+		if absf(wrapf(a0, -180.0, 180.0)) < 12.0 or absf(wrapf(a1, -180.0, 180.0)) < 12.0:
+			continue
 		var t0 := stadium.skyline_top(a0)
 		var t1 := stadium.skyline_top(a1)
 		var p0 := stadium.point(a0, t0.x - 0.6, t0.y + lift)
