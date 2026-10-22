@@ -128,9 +128,7 @@ func _model(h: float) -> Array:
 	var m := ModelKit.spawn(role, h, _rng)
 	var box := ModelKit._aabb(m)
 	m.position = Vector3(-box.get_center().x, -box.position.y, -box.get_center().z) * m.scale
-	if _rng.randf() < 0.5:
-		m.scale.x *= -1.0
-		m.position.x *= -1.0
+	# No mirroring: a negative scale turns the back-culled model inside out.
 	b.add_child(m)
 	if _haze > 0.0:
 		for mi: MeshInstance3D in m.find_children("*", "MeshInstance3D", true, false):

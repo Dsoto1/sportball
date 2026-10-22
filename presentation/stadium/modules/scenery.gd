@@ -61,3 +61,62 @@ static func water_band(stadium: Stadium, piece: StadiumPiece, angle: float) -> V
 		return Vector2.ZERO
 	var start := stadium.stand_top(angle).x + float(piece.param("gap"))
 	return Vector2(start, minf(start + width, 900.0))
+
+
+## A surface of revolution: `profile` is a list of Vector3(radius, height,
+## shade) from the base up, swept around `sides` times. `jitter` roughens
+## each ring's radius per side (eroded rock), with a smooth per-side bias so
+## buttresses and gullies run the full height. Shade (0..1) darkens that
+## ring's vertex color (strata, caps, stains), which the material multiplies
+## with its texture. Base at the node origin.
+static func lathe(parent: Node, profile: Array, sides: int, jitter: float, rng: RandomNumberGenerator, material: Material) -> MeshInstance3D:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var bias: Array[float] = []
+	for s in sides:
+		bias.append(rng.randf_range(-1.0, 1.0))
+	var rings: Array = []
+	for r in profile.size():
+		var p: Vector3 = profile[r]
+		var ring: Array[Vector3] = []
+		for s in sides:
+			var a := TAU * s / sides
+			var wobble := 1.0 + jitter * (0.65 * bias[s] + 0.35 * rng.randf_range(-1.0, 1.0))
+			if r == profile.size() - 1 and p.x < 0.01:
+				wobble = 1.0
+			ring.append(Vector3(cos(a) * p.x * wobble, p.y, sin(a) * p.x * wobble))
+		rings.append(ring)
+	for r in profile.size() - 1:
+		var c0 := Color.WHITE.darkened((profile[r] as Vector3).z)
+		var c1 := Color.WHITE.darkened((profile[r + 1] as Vector3).z)
+		var lo: Array[Vector3] = rings[r]
+		var hi: Array[Vector3] = rings[r + 1]
+		for s in sides:
+			var n := (s + 1) % sides
+			st.set_color(c0)
+			st.add_vertex(lo[s])
+			st.set_color(c1)
+			st.add_vertex(hi[s])
+			st.set_color(c1)
+			st.add_vertex(hi[n])
+			st.set_color(c0)
+			st.add_vertex(lo[s])
+			st.set_color(c1)
+			st.add_vertex(hi[n])
+			st.set_color(c0)
+			st.add_vertex(lo[n])
+	# Close the top.
+	var top: Array[Vector3] = rings[rings.size() - 1]
+	var center := Vector3(0, (profile[profile.size() - 1] as Vector3).y, 0)
+	var ct := Color.WHITE.darkened((profile[profile.size() - 1] as Vector3).z)
+	for s in sides:
+		st.set_color(ct)
+		st.add_vertex(center)
+		st.add_vertex(top[(s + 1) % sides])
+		st.add_vertex(top[s])
+	st.generate_normals()
+	var mi := MeshInstance3D.new()
+	mi.mesh = st.commit()
+	mi.material_override = material
+	parent.add_child(mi)
+	return mi

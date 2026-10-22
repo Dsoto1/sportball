@@ -40,8 +40,10 @@ kind = &"terraces"
 angle = 13.0
 mirrored = true
 params = {
+"density": 0.95,
 "levels": [1.0],
-"rows": 2,
+"out": 0.5,
+"rows": 4,
 "span": 30.0
 }
 
@@ -110,22 +112,13 @@ params = {
 
 [sub_resource type="Resource" id="Resource_3bbly"]
 script = ExtResource("2_mb518")
-kind = &"bridge"
-angle = 75.0
-params = {
-"distance": 65.0,
-"length": 80.0
-}
-
-[sub_resource type="Resource" id="Resource_jlw3u"]
-script = ExtResource("2_mb518")
 kind = &"bunting"
 angle = 50.0
 params = {
 "span": 260.0
 }
 
-[sub_resource type="Resource" id="Resource_3btit"]
+[sub_resource type="Resource" id="Resource_jlw3u"]
 script = ExtResource("2_mb518")
 kind = &"arcade"
 angle = 50.0
@@ -143,7 +136,7 @@ params = {
 "towers": 5
 }
 
-[sub_resource type="Resource" id="Resource_t5nf2"]
+[sub_resource type="Resource" id="Resource_3btit"]
 script = ExtResource("2_mb518")
 kind = &"arcade"
 angle = 11.0
@@ -162,7 +155,7 @@ params = {
 "towers": 3
 }
 
-[sub_resource type="Resource" id="Resource_7ah7a"]
+[sub_resource type="Resource" id="Resource_t5nf2"]
 script = ExtResource("2_mb518")
 kind = &"wall_art"
 params = {
@@ -170,7 +163,7 @@ params = {
 "motif": &"emblem"
 }
 
-[sub_resource type="Resource" id="Resource_tnswc"]
+[sub_resource type="Resource" id="Resource_7ah7a"]
 script = ExtResource("2_mb518")
 kind = &"lamps"
 angle = -150.0
@@ -179,7 +172,7 @@ params = {
 "span": 300.0
 }
 
-[sub_resource type="Resource" id="Resource_54fgl"]
+[sub_resource type="Resource" id="Resource_tnswc"]
 script = ExtResource("2_mb518")
 kind = &"planters"
 angle = -46.0
@@ -189,17 +182,7 @@ params = {
 "span": 92.0
 }
 
-[sub_resource type="Resource" id="Resource_ikrfh"]
-script = ExtResource("2_mb518")
-kind = &"props"
-angle = -150.0
-params = {
-"every": 7,
-"height": 7.5,
-"model": &"lantern"
-}
-
-[sub_resource type="Resource" id="Resource_g8c4n"]
+[sub_resource type="Resource" id="Resource_54fgl"]
 script = ExtResource("2_mb518")
 kind = &"props"
 angle = -46.0
@@ -235,4 +218,4 @@ window_color = Color(1, 0.88235295, 0.65882355, 1)
 facade_color = Color(0.627451, 0.3137255, 0.23529412, 1)
 facade_surface = &"brick"
 structure_surface = &"stone"
-pieces = Array[ExtResource("2_mb518")]([SubResource("Resource_oeo3i"), SubResource("Resource_cq0mc"), SubResource("Resource_7xix8"), SubResource("Resource_up8hn"), SubResource("Resource_hcvew"), SubResource("Resource_qnulu"), SubResource("Resource_gnn5p"), SubResource("Resource_7qw1n"), SubResource("Resource_p8geh"), SubResource("Resource_rnwrq"), SubResource("Resource_52ddh"), SubResource("Resource_1hcmg"), SubResource("Resource_3bbly"), SubResource("Resource_jlw3u"), SubResource("Resource_3btit"), SubResource("Resource_t5nf2"), SubResource("Resource_7ah7a"), SubResource("Resource_tnswc"), SubResource("Resource_54fgl"), SubResource("Resource_ikrfh"), SubResource("Resource_g8c4n")])
+pieces = Array[ExtResource("2_mb518")]([SubResource("Resource_oeo3i"), SubResource("Resource_cq0mc"), SubResource("Resource_7xix8"), SubResource("Resource_up8hn"), SubResource("Resource_hcvew"), SubResource("Resource_qnulu"), SubResource("Resource_gnn5p"), SubResource("Resource_7qw1n"), SubResource("Resource_p8geh"), SubResource("Resource_rnwrq"), SubResource("Resource_52ddh"), SubResource("Resource_1hcmg"), SubResource("Resource_3bbly"), SubResource("Resource_jlw3u"), SubResource("Resource_3btit"), SubResource("Resource_t5nf2"), SubResource("Resource_7ah7a"), SubResource("Resource_tnswc"), SubResource("Resource_54fgl")])

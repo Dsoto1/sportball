@@ -265,6 +265,10 @@ func _build_kit(stadium: Stadium, piece: StadiumPiece, home: TeamDef) -> void:
 		var facing := across.cross(Vector3.UP).normalized()
 		if facing.dot(-((p0 + p1) * 0.5).normalized()) < 0.0:
 			facing = -facing
+		# Keep the basis right-handed on mirrored (negative span) runs: a
+		# left-handed one turns the model inside out, and with back faces
+		# culled from the sculpted bays it would draw nothing.
+		across = Vector3.UP.cross(facing).normalized()
 		# Local axes: X along the bay, Y up, Z toward the field.
 		var basis := Basis(across, Vector3.UP, facing)
 		# Every "pavilion" bays one stands taller and steps forward, so the

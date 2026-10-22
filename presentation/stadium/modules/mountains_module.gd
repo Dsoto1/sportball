@@ -23,24 +23,42 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 		var spot := stadium.point(angle, float(piece.param("distance")) * rng.randf_range(0.85, 1.2), 0.0)
 		var h := tall * rng.randf_range(0.6, 1.15)
 		if mesa:
-			var w := h * rng.randf_range(1.0, 2.2)
-			var butte := Scenery.cylinder(root, w * 0.55, w * 0.42, h, rock.darkened(rng.randf_range(0.0, 0.2)), 7)
-			butte.position = spot + Vector3.UP * h * 0.5
+			# A butte: a talus apron, sheer eroded walls banded with strata
+			# (light and dark rings), a dark caprock overhanging the top.
+			var w := h * rng.randf_range(0.5, 1.1)
+			var mat := StadiumSurfaces.material(&"rock", rock.darkened(rng.randf_range(0.0, 0.15)), true, 1.0 + h / 60.0)
+			var prof := [Vector3(w * 1.25, 0.0, 0.25), Vector3(w * 1.02, h * 0.12, 0.1), Vector3(w * 0.9, h * 0.2, 0.0)]
+			var y := 0.2
+			var band := 0
+			while y < 0.9:
+				var step := rng.randf_range(0.06, 0.13)
+				prof.append(Vector3(w * (0.86 - y * 0.08) * rng.randf_range(0.97, 1.03), h * (y + step), [0.0, 0.18, -0.15, 0.08][band % 4]))
+				y += step
+				band += 1
+			prof.append(Vector3(w * 0.84, h * 0.94, 0.45))
+			prof.append(Vector3(w * 0.8, h, 0.4))
+			prof.append(Vector3(0.0, h, 0.4))
+			var butte := Scenery.lathe(root, prof, 22, 0.12, rng, mat)
+			butte.position = spot
 			butte.rotation.y = rng.randf() * TAU
-			butte.material_override = StadiumSurfaces.material(&"rock", butte.material_override.albedo_color, false, 1.0 + h / 60.0)
-			# Strata: a paler band and a dark cap.
-			var band := Scenery.cylinder(butte, w * 0.5, w * 0.48, h * 0.12, rock.lightened(0.25), 7)
-			band.position.y = h * 0.1
-			var cap := Scenery.cylinder(butte, w * 0.43, w * 0.43, h * 0.06, rock.darkened(0.35), 7)
-			cap.position.y = h * 0.5
 		else:
-			var peak := Scenery.cylinder(root, h * 0.75, 0.0, h, rock.darkened(rng.randf_range(0.0, 0.2)), 7)
-			peak.position = spot + Vector3.UP * h * 0.5
+			# A peak: concave flanks, ridged by the per-side jitter, snow above
+			# the tree line (white vertex color on a snow-dusted rock texture).
+			var mat := StadiumSurfaces.material(&"rock", rock.darkened(rng.randf_range(0.0, 0.2)), true, 1.0 + h / 60.0)
+			var prof := []
+			for k in 9:
+				var t := k / 8.0
+				prof.append(Vector3(h * 0.75 * pow(1.0 - t, 1.35), h * t, 0.0))
+			var peak := Scenery.lathe(root, prof, 18, 0.22, rng, mat)
+			peak.position = spot
 			peak.rotation.y = rng.randf() * TAU
-			peak.material_override = StadiumSurfaces.material(&"rock", peak.material_override.albedo_color, false, 1.0 + h / 60.0)
-			var snow := Scenery.cylinder(peak, h * 0.75 * 0.36, 0.0, h * 0.36, Color(0.95, 0.97, 1.0), 7)
-			snow.position.y = h * 0.32
-			snow.material_override = StadiumSurfaces.material(&"snow", Color(0.97, 0.98, 1.0), false, 3.0)
+			var snow_prof := []
+			for k in 4:
+				var t := 0.62 + 0.38 * k / 3.0
+				snow_prof.append(Vector3(h * 0.75 * pow(1.0 - t, 1.35) * 1.03, h * t, 0.0))
+			var snow := Scenery.lathe(root, snow_prof, 18, 0.22, rng, StadiumSurfaces.material(&"snow", Color(0.97, 0.98, 1.0), false, 3.0))
+			snow.position = spot + Vector3.UP * 0.2
+			snow.rotation.y = peak.rotation.y
 	if mesa and bool(piece.param("arch")):
 		# A natural stone arch standing over the outfield horizon.
 		var arch_angle := piece.angle + float(piece.param("span")) * 0.5
@@ -63,11 +81,21 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 func _volcano(stadium: Stadium, root: Node3D, piece: StadiumPiece) -> void:
 	var tall := float(piece.param("height")) * piece.size
 	var spot := stadium.point(piece.angle, float(piece.param("distance")), 0.0)
-	var cone := Scenery.cylinder(root, tall * 1.3, tall * 0.18, tall, Color(0.25, 0.2, 0.2), 14)
-	cone.position = spot + Vector3.UP * tall * 0.5
-	cone.material_override = StadiumSurfaces.material(&"rock", Color(0.32, 0.26, 0.25), false, 3.0)
-	var lava := Stadium.glow(Color(1.0, 0.35, 0.05), 3.0)
-	var crater := Scenery.cylinder(root, tall * 0.17, tall * 0.17, 1.0, Color.ORANGE, 14)
+	# A concave cone, ridged and gullied, darker toward the summit where
+	# the ash lies, with a crater rim.
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash("volcano" + stadium.def.id)
+	var prof := []
+	for k in 11:
+		var t := k / 10.0
+		prof.append(Vector3(tall * (0.12 + 0.78 * pow(1.0 - t, 1.6)), tall * t, 0.1 + 0.45 * t))
+	prof.append(Vector3(tall * 0.14, tall * 1.02, 0.6))
+	prof.append(Vector3(tall * 0.1, tall * 0.97, 0.75))
+	prof.append(Vector3(0.0, tall * 0.97, 0.8))
+	var cone := Scenery.lathe(root, prof, 28, 0.08, rng, StadiumSurfaces.material(&"rock", Color(0.36, 0.3, 0.28), true, 3.0))
+	cone.position = spot
+	var lava := Stadium.glow(Color(0.95, 0.22, 0.03), 1.2)
+	var crater := Scenery.cylinder(root, tall * 0.1, tall * 0.1, 1.0, Color.ORANGE, 14)
 	crater.position = spot + Vector3.UP * (tall + 0.2)
 	crater.material_override = lava
 	# Lava streaks running down the field-facing flank, crater to foot.
@@ -75,14 +103,18 @@ func _volcano(stadium: Stadium, root: Node3D, piece: StadiumPiece) -> void:
 	toward.y = 0.0
 	toward = toward.normalized()
 	for k in 5:
-		var side := toward.rotated(Vector3.UP, deg_to_rad(-40.0 + k * 20.0))
-		var crest := spot + side * tall * 0.18 + Vector3.UP * tall
-		var foot := spot + side * tall * 1.3 * (0.75 + 0.05 * (k % 3))
-		var length := crest.distance_to(foot)
-		var stream := stadium.box(Vector3(tall * 0.04, tall * 0.02, length), Color.ORANGE, root)
-		stream.position = (crest + foot) * 0.5 + side * tall * 0.03
-		stream.look_at_from_position(stream.position, foot + side * tall * 0.03, Vector3.UP)
-		stream.material_override = lava
+		var side := toward.rotated(Vector3.UP, deg_to_rad(-40.0 + k * 20.0 + rng.randf_range(-5.0, 5.0)))
+		# Down the concave flank in segments, narrowing as it cools.
+		var reach := 0.55 + 0.1 * (k % 3)
+		for seg in 6:
+			var t0 := 1.0 - reach * seg / 6.0
+			var t1 := 1.0 - reach * (seg + 1) / 6.0
+			var a := spot + side * tall * (0.12 + 0.78 * pow(1.0 - t0, 1.6) + 0.015) + Vector3.UP * tall * t0
+			var b := spot + side * tall * (0.12 + 0.78 * pow(1.0 - t1, 1.6) + 0.015) + Vector3.UP * tall * t1
+			var stream := stadium.box(Vector3(tall * 0.014 * (1.0 - seg * 0.12), tall * 0.008, a.distance_to(b)), Color.ORANGE, root)
+			stream.position = (a + b) * 0.5
+			stream.look_at_from_position(stream.position, b, Vector3.UP)
+			stream.material_override = lava
 	var smoke := CPUParticles3D.new()
 	smoke.amount = 30
 	smoke.lifetime = 10.0

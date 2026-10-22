@@ -1351,3 +1351,19 @@ Reason: Owner request for another detail pass against the sheets. The balance ch
 - **Pipeline:** the generation prompts, processing script and park converter used for the roll-out are recorded with the session scratch tools. Each section goes through weld, cull_back, weld, simplify, then repack_glb at 2048 px.
 - **Repository size:** the 75 Meshy models take about 420 MB as GLB, plus about 155 MB of textures Godot extracts on import, all in Git LFS.
 - **Scoreboard gate fit:** where a gatehouse's crest covered the board's team name, the gate is scaled wider so its opening clears the board: 112 m at Halo Dome, Deepwater, Cloudreach and Forum Field, and 160 m at Firelight. The Halo Dome drops its floating ring, since the deco gate carries its own crown.
+
+## 2026-10-22 - Clean-Up After the Architecture Sets
+
+- **Mirrored facades and blocks drew nothing:** a mirrored arcade run (negative span) built a left-handed basis, which turned the sculpted bay inside out. With the back faces culled, those bays vanished, which is why Ledger Street's left side looked bare. Bays now always use a right-handed basis. Backdrop blocks are no longer randomly mirrored, for the same reason.
+- **Natural backdrops rebuilt** with the new `Scenery.lathe`: a surface of revolution with per-side jitter (buttresses and gullies running the full height) and per-ring vertex shading (strata, caps, stains).
+  - **Mesas:** a talus apron, sheer eroded walls banded with light and dark strata, and an overhanging dark caprock.
+  - **Peaks:** concave ridged flanks, with snow down to about 60%.
+  - **Volcano:** a concave gullied cone, darker toward the ash-covered summit, with a crater rim. Lava streams follow the slope in narrowing segments.
+  - **Cooling towers:** a true hyperboloid shell on a plinth, weather-stained toward the lip.
+- **Removed** leftovers that clashed with the sets:
+  - The tan propeller pylons and bridge at Cloudreach.
+  - The bridge at Ledger Street.
+  - The viaduct and palms at Firelight.
+  - Lantern rows at Ledger Street and the Vault, and urns at Cloudreach.
+- **Firelight:** the volcano now rises behind the left-field stands, as on the sheet, instead of hiding behind the fortress gate.
+- **Fan terraces** are now 4 rows deep at 95% density everywhere. Ledger Street's sits closer to its facade.

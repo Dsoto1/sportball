@@ -42,8 +42,9 @@ kind = &"terraces"
 angle = 13.0
 mirrored = true
 params = {
+"density": 0.95,
 "levels": [1.0],
-"rows": 2,
+"rows": 4,
 "span": 36.0
 }
 
