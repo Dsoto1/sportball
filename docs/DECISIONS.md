@@ -1146,3 +1146,12 @@ All 18 parks were rendered from behind home plate next to their sheets, three ti
   - The compare script renders one park at a time, since three at once ran the container out of memory.
 
 Reason: Owner request to compare each park with its sheet and add missing detail, three times over.
+
+## 2026-10-22 - Lanterns, Columns and Urns
+
+- **Generated:** three more Artlist models were approved and made: a lantern cluster, an ornate column and a planter urn (900 credits). This game's month now totals 5,100 of its 4,125 cap. They're logged as AI-015 to AI-017.
+- **New module `props`:** a row of one of the three, every few degrees across a span, either on top of the stands and facades or on the outfield terrace. Each row is one MultiMesh, tinted toward the park's facade color by the bay shader (`tint`). Lantern rows add a warm glowing lamp, and rows skip the center gap.
+- **Applied:**
+  - Lantern clusters ring the stands at 15 parks.
+  - Urns stand on the terraces at the Halo Dome, Ledger Street, Fountain Gardens, Cloudreach, Forum Field and Amber Gate.
+  - Colonnades of ornate columns stand at Fountain Gardens, Deepwater and Forum Field.

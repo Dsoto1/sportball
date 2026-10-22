@@ -167,6 +167,16 @@ params = {
 "every": 5.0
 }
 
+[sub_resource type="Resource" id="Resource_vwl8m"]
+script = ExtResource("2_lnk5g")
+kind = &"props"
+angle = -150.0
+params = {
+"every": 6,
+"height": 7.5,
+"model": &"lantern"
+}
+
 [resource]
 script = ExtResource("3_ypbrp")
 id = &"sakura_gate"
@@ -192,4 +202,4 @@ window_color = Color(1, 0.76862746, 0.5411765, 1)
 facade_color = Color(0.47843137, 0.14117648, 0.1254902, 1)
 facade_surface = &"wood"
 structure_surface = &"wood"
-pieces = Array[ExtResource("2_lnk5g")]([SubResource("Resource_s74iq"), SubResource("Resource_2qcw0"), SubResource("Resource_hr4ow"), SubResource("Resource_xqta4"), SubResource("Resource_twnlk"), SubResource("Resource_spi2t"), SubResource("Resource_wek3x"), SubResource("Resource_tfrrr"), SubResource("Resource_b2ggk"), SubResource("Resource_1a3r5"), SubResource("Resource_3gmcm"), SubResource("Resource_vhmi4"), SubResource("Resource_7jbfp"), SubResource("Resource_1vbk2"), SubResource("Resource_3skcn"), SubResource("Resource_xjidy")])
+pieces = Array[ExtResource("2_lnk5g")]([SubResource("Resource_s74iq"), SubResource("Resource_2qcw0"), SubResource("Resource_hr4ow"), SubResource("Resource_xqta4"), SubResource("Resource_twnlk"), SubResource("Resource_spi2t"), SubResource("Resource_wek3x"), SubResource("Resource_tfrrr"), SubResource("Resource_b2ggk"), SubResource("Resource_1a3r5"), SubResource("Resource_3gmcm"), SubResource("Resource_vhmi4"), SubResource("Resource_7jbfp"), SubResource("Resource_1vbk2"), SubResource("Resource_3skcn"), SubResource("Resource_xjidy"), SubResource("Resource_vwl8m")])

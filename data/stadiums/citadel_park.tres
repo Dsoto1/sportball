@@ -110,6 +110,16 @@ params = {
 "color": Color(1, 0.8352941, 0.6039216, 1)
 }
 
+[sub_resource type="Resource" id="Resource_6gp50"]
+script = ExtResource("2_j3t4y")
+kind = &"props"
+angle = -150.0
+params = {
+"every": 7,
+"height": 7.5,
+"model": &"lantern"
+}
+
 [resource]
 script = ExtResource("3_2llqd")
 id = &"citadel_park"
@@ -133,4 +143,4 @@ window_color = Color(1, 0.8352941, 0.6039216, 1)
 facade_color = Color(0.54901963, 0.5411765, 0.5568628, 1)
 facade_surface = &"stone"
 structure_surface = &"stone"
-pieces = Array[ExtResource("2_j3t4y")]([SubResource("Resource_r10jk"), SubResource("Resource_ia03i"), SubResource("Resource_61igp"), SubResource("Resource_ncnwa"), SubResource("Resource_0qmui"), SubResource("Resource_qg3hj"), SubResource("Resource_xj6r1"), SubResource("Resource_d0nb8"), SubResource("Resource_5ij81"), SubResource("Resource_2lqch"), SubResource("Resource_0f0xv")])
+pieces = Array[ExtResource("2_j3t4y")]([SubResource("Resource_r10jk"), SubResource("Resource_ia03i"), SubResource("Resource_61igp"), SubResource("Resource_ncnwa"), SubResource("Resource_0qmui"), SubResource("Resource_qg3hj"), SubResource("Resource_xj6r1"), SubResource("Resource_d0nb8"), SubResource("Resource_5ij81"), SubResource("Resource_2lqch"), SubResource("Resource_0f0xv"), SubResource("Resource_6gp50")])

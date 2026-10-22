@@ -34,6 +34,9 @@ const SETS := {
 	&"bay_gothic": [ART + "bay_gothic.glb"],
 	&"bay_temple": [ART + "bay_temple.glb"],
 	&"bay_victorian": [ART + "bay_victorian.glb"],
+	&"lantern_cluster": [ART + "lantern_cluster.glb"],
+	&"column": [ART + "column.glb"],
+	&"planter_urn": [ART + "planter_urn.glb"],
 	&"block": [CITY + "low-detail-building-a.glb", CITY + "low-detail-building-b.glb", CITY + "low-detail-building-c.glb", CITY + "low-detail-building-d.glb", CITY + "low-detail-building-wide-a.glb"],
 }
 

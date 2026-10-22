@@ -146,6 +146,29 @@ params = {
 "color": Color(0.62352943, 0.9529412, 1, 1)
 }
 
+[sub_resource type="Resource" id="Resource_7ai4n"]
+script = ExtResource("2_i0spf")
+kind = &"props"
+angle = -150.0
+params = {
+"every": 7,
+"height": 7.5,
+"model": &"lantern"
+}
+
+[sub_resource type="Resource" id="Resource_mi75j"]
+script = ExtResource("2_i0spf")
+kind = &"props"
+angle = -46.0
+params = {
+"every": 7,
+"height": 10,
+"model": &"column",
+"place": &"terrace",
+"span": 92.0,
+"tint": 0.6
+}
+
 [resource]
 script = ExtResource("3_g7bjb")
 id = &"deepwater"
@@ -171,4 +194,4 @@ window_color = Color(0.62352943, 0.9529412, 1, 1)
 facade_color = Color(0.43529412, 0.56078434, 0.5411765, 1)
 facade_surface = &"stone"
 structure_surface = &"stone"
-pieces = Array[ExtResource("2_i0spf")]([SubResource("Resource_ishok"), SubResource("Resource_cbmm1"), SubResource("Resource_7vq3x"), SubResource("Resource_k8dg8"), SubResource("Resource_r6hhh"), SubResource("Resource_skpg2"), SubResource("Resource_f41hn"), SubResource("Resource_2nvy3"), SubResource("Resource_5gvei"), SubResource("Resource_8r6tk"), SubResource("Resource_qowj7"), SubResource("Resource_p58t1"), SubResource("Resource_5d5yf"), SubResource("Resource_u5qq5")])
+pieces = Array[ExtResource("2_i0spf")]([SubResource("Resource_ishok"), SubResource("Resource_cbmm1"), SubResource("Resource_7vq3x"), SubResource("Resource_k8dg8"), SubResource("Resource_r6hhh"), SubResource("Resource_skpg2"), SubResource("Resource_f41hn"), SubResource("Resource_2nvy3"), SubResource("Resource_5gvei"), SubResource("Resource_8r6tk"), SubResource("Resource_qowj7"), SubResource("Resource_p58t1"), SubResource("Resource_5d5yf"), SubResource("Resource_u5qq5"), SubResource("Resource_7ai4n"), SubResource("Resource_mi75j")])

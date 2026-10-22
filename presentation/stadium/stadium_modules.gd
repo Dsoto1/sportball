@@ -315,6 +315,14 @@ const CATALOG := {
 		"params": {"span": [90.0, -360.0, 360.0], "density": [1.5, 0.2, 6.0], "flower": [Color(0.95, 0.5, 0.7)], "green": [Color(0.22, 0.5, 0.22)]},
 		"script": preload("res://presentation/stadium/modules/planters_module.gd"),
 	},
+	&"props": {
+		"name": "Prop Row", "category": &"structure", "unique": false, "placed": true,
+		"about": "A row of sculpted lantern clusters, ornate columns or planter urns along the top of the stands or on the outfield terrace, tinted toward the park's facade color.",
+		"angle": -150.0, "angle_range": [-180.0, 180.0],
+		"params": {"model": [&"lantern"], "span": [300.0, -360.0, 360.0], "every": [8.0, 2.0, 40.0], "height": [4.0, 1.0, 20.0], "place": [&"top"], "tint": [0.0, 0.0, 1.0]},
+		"choices": {"model": [&"lantern", &"column", &"urn"], "place": [&"top", &"terrace"]},
+		"script": preload("res://presentation/stadium/modules/props_module.gd"),
+	},
 	&"dome": {
 		"name": "Dome", "category": &"structure", "unique": true, "placed": false,
 		"about": "A sealed roof over the whole park: catwalk rings, light banks, a glowing crown. Indoor light.",

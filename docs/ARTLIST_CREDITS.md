@@ -28,3 +28,8 @@ and build from that.
 | 2026-10-22 | Victorian brick facade bay (text-to-3D) | Hyper3D Rodin v2.5 Fast | 300 | 4,200 / 4,125 | AI-014 (gen 01a16110-54fd-74ea-8374-5fe0853b3d88) |
 
 The owner approved 12 models (3,600 credits) on 2026-10-22, knowingly going 75 credits over this game's monthly cap.
+| 2026-10-22 | Lantern cluster (text-to-3D) | Hyper3D Rodin v2.5 Fast | 300 | 4,500 / 4,125 | AI-015 (gen 01a1614a-2dba-7a1e-b3f9-6162f5de2dff) |
+| 2026-10-22 | Ornate column (text-to-3D) | Hyper3D Rodin v2.5 Fast | 300 | 4,800 / 4,125 | AI-016 (gen 01a1614a-3045-79a6-b074-1def5937c5bb) |
+| 2026-10-22 | Planter urn (text-to-3D) | Hyper3D Rodin v2.5 Fast | 300 | 5,100 / 4,125 | AI-017 (gen 01a1614a-32b1-70c2-9ef9-2b8a717108be) |
+
+The owner approved the lantern, column and urn (900 credits) on 2026-10-22, past the monthly cap.

@@ -157,6 +157,16 @@ params = {
 "style": &"brazier"
 }
 
+[sub_resource type="Resource" id="Resource_oo2qw"]
+script = ExtResource("2_07v1h")
+kind = &"props"
+angle = -150.0
+params = {
+"every": 9,
+"height": 7.5,
+"model": &"lantern"
+}
+
 [resource]
 script = ExtResource("3_ysf7v")
 id = &"foundry_field"
@@ -182,4 +192,4 @@ window_color = Color(1, 0.7019608, 0.36078432, 1)
 facade_color = Color(0.5411765, 0.2901961, 0.19607843, 1)
 facade_surface = &"brick"
 structure_surface = &"steel"
-pieces = Array[ExtResource("2_07v1h")]([SubResource("Resource_ml5p1"), SubResource("Resource_4aj37"), SubResource("Resource_0ohw5"), SubResource("Resource_s8cmx"), SubResource("Resource_05um3"), SubResource("Resource_sr515"), SubResource("Resource_rr4sb"), SubResource("Resource_rep1b"), SubResource("Resource_vvbo7"), SubResource("Resource_7a83r"), SubResource("Resource_tpvtf"), SubResource("Resource_a0pts"), SubResource("Resource_1cgio"), SubResource("Resource_cg6nc"), SubResource("Resource_tsrjm"), SubResource("Resource_51qwj"), SubResource("Resource_vh3h6"), SubResource("Resource_maeoh")])
+pieces = Array[ExtResource("2_07v1h")]([SubResource("Resource_ml5p1"), SubResource("Resource_4aj37"), SubResource("Resource_0ohw5"), SubResource("Resource_s8cmx"), SubResource("Resource_05um3"), SubResource("Resource_sr515"), SubResource("Resource_rr4sb"), SubResource("Resource_rep1b"), SubResource("Resource_vvbo7"), SubResource("Resource_7a83r"), SubResource("Resource_tpvtf"), SubResource("Resource_a0pts"), SubResource("Resource_1cgio"), SubResource("Resource_cg6nc"), SubResource("Resource_tsrjm"), SubResource("Resource_51qwj"), SubResource("Resource_vh3h6"), SubResource("Resource_maeoh"), SubResource("Resource_oo2qw")])

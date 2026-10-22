@@ -408,3 +408,15 @@ func test_generated_models_load_and_dress_the_parks() -> void:
 	var batched := st.find_children("*", "MultiMeshInstance3D", true, false).filter(func(m: MultiMeshInstance3D) -> bool: return m.name != "Crowd")
 	check(batched.size() >= 2, "Forum Field's colosseum facades are batched bays (%d)" % batched.size())
 	st.free()
+
+
+func test_prop_rows_build() -> void:
+	for model in [&"lantern", &"column", &"urn"]:
+		var park := _blank_park()
+		park.add_piece(&"centerpiece")
+		park.add_piece(&"props", -60.0, {"model": model, "span": 120.0})
+		check(park.validate().is_empty(), "%s row is valid: %s" % [model, park.validate()])
+		var st := _build_def(park)
+		var row: MultiMeshInstance3D = st.get_node("Props")
+		check(row.multimesh.instance_count >= 10, "a row of %ss (%d)" % [model, row.multimesh.instance_count])
+		st.free()

@@ -152,6 +152,28 @@ params = {
 "color": Color(1, 0.7529412, 0.4392157, 1)
 }
 
+[sub_resource type="Resource" id="Resource_6ir88"]
+script = ExtResource("2_2pjeu")
+kind = &"props"
+angle = -150.0
+params = {
+"every": 6,
+"height": 7.5,
+"model": &"lantern"
+}
+
+[sub_resource type="Resource" id="Resource_eepsg"]
+script = ExtResource("2_2pjeu")
+kind = &"props"
+angle = -46.0
+params = {
+"every": 7,
+"height": 5.5,
+"model": &"urn",
+"place": &"terrace",
+"span": 92.0
+}
+
 [resource]
 script = ExtResource("3_6grm6")
 id = &"amber_gate"
@@ -179,4 +201,4 @@ facade_color = Color(0.76862746, 0.57254905, 0.3529412, 1)
 facade_surface = &"stone"
 structure_surface = &"stone"
 ground_surface = &"sand"
-pieces = Array[ExtResource("2_2pjeu")]([SubResource("Resource_4oyrr"), SubResource("Resource_n437m"), SubResource("Resource_pixr7"), SubResource("Resource_nw5vl"), SubResource("Resource_gy2ay"), SubResource("Resource_g4iop"), SubResource("Resource_jlrk3"), SubResource("Resource_mitcy"), SubResource("Resource_fw3im"), SubResource("Resource_v5dpj"), SubResource("Resource_xyap0"), SubResource("Resource_yabsd"), SubResource("Resource_850kf"), SubResource("Resource_uokn4"), SubResource("Resource_d7mwy")])
+pieces = Array[ExtResource("2_2pjeu")]([SubResource("Resource_4oyrr"), SubResource("Resource_n437m"), SubResource("Resource_pixr7"), SubResource("Resource_nw5vl"), SubResource("Resource_gy2ay"), SubResource("Resource_g4iop"), SubResource("Resource_jlrk3"), SubResource("Resource_mitcy"), SubResource("Resource_fw3im"), SubResource("Resource_v5dpj"), SubResource("Resource_xyap0"), SubResource("Resource_yabsd"), SubResource("Resource_850kf"), SubResource("Resource_uokn4"), SubResource("Resource_d7mwy"), SubResource("Resource_6ir88"), SubResource("Resource_eepsg")])

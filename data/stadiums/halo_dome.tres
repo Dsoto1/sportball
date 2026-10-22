@@ -145,6 +145,28 @@ params = {
 "span": 92.0
 }
 
+[sub_resource type="Resource" id="Resource_5t8gj"]
+script = ExtResource("2_un8dc")
+kind = &"props"
+angle = -150.0
+params = {
+"every": 7,
+"height": 7.5,
+"model": &"lantern"
+}
+
+[sub_resource type="Resource" id="Resource_b3ivy"]
+script = ExtResource("2_un8dc")
+kind = &"props"
+angle = -46.0
+params = {
+"every": 6,
+"height": 5.5,
+"model": &"urn",
+"place": &"terrace",
+"span": 92.0
+}
+
 [resource]
 script = ExtResource("3_bqeas")
 id = &"halo_dome"
@@ -167,4 +189,4 @@ window_color = Color(1, 0.8235294, 0.47843137, 1)
 facade_color = Color(0.41568628, 0.3529412, 0.54901963, 1)
 facade_surface = &"marble"
 structure_surface = &"steel"
-pieces = Array[ExtResource("2_un8dc")]([SubResource("Resource_fwpx2"), SubResource("Resource_8s2kh"), SubResource("Resource_rkpyr"), SubResource("Resource_rkhve"), SubResource("Resource_iofs5"), SubResource("Resource_5ix5a"), SubResource("Resource_6b8ye"), SubResource("Resource_mt3jj"), SubResource("Resource_ejy07"), SubResource("Resource_pjoj3"), SubResource("Resource_yath7"), SubResource("Resource_dmp26"), SubResource("Resource_hpvue"), SubResource("Resource_faqeu"), SubResource("Resource_oevcm"), SubResource("Resource_2m2fl"), SubResource("Resource_3b8d8")])
+pieces = Array[ExtResource("2_un8dc")]([SubResource("Resource_fwpx2"), SubResource("Resource_8s2kh"), SubResource("Resource_rkpyr"), SubResource("Resource_rkhve"), SubResource("Resource_iofs5"), SubResource("Resource_5ix5a"), SubResource("Resource_6b8ye"), SubResource("Resource_mt3jj"), SubResource("Resource_ejy07"), SubResource("Resource_pjoj3"), SubResource("Resource_yath7"), SubResource("Resource_dmp26"), SubResource("Resource_hpvue"), SubResource("Resource_faqeu"), SubResource("Resource_oevcm"), SubResource("Resource_2m2fl"), SubResource("Resource_3b8d8"), SubResource("Resource_5t8gj"), SubResource("Resource_b3ivy")])
