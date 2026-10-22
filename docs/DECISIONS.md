@@ -1400,3 +1400,12 @@ Reason: Owner request for another detail pass against the sheets. The balance ch
   - Lattice and floodlight banks: Foundry, Pier 9, the Kiln and Warehouse Row (twin heads); Reactor gets halo rings in green light.
   - Deco pylons: the Halo Dome, Deepwater and Cloudreach (halo rings); Ledger Street and the Vault (banks); the Horseshoe (twin gaslight lanterns).
   - Stone towers with crown lanterns: the Icebox, Fountain Gardens, Sakura Gate (paper-lantern orange), Forum Field, Firelight, Citadel Park and Amber Gate.
+
+## 2026-10-22 - Balance on the Sheet Walls
+
+- With every park's walls changed, a 136-game-per-club league run had the Swans at .338 and the Scorpions at .610.
+- **Changes:**
+  - Swans: more contact, power and eye, and a stronger staff.
+  - Sentinels: a little more power.
+  - Scorpions: less contact, power and stuff.
+- **Rerun:** 17 clubs fall between .441 and .551. The Glitterati sit at .596, a little high. Their roster is hand-authored, so they're left as they are pending another run.
