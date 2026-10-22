@@ -37,10 +37,21 @@ params = {
 
 [sub_resource type="Resource" id="Resource_ysqj7"]
 script = ExtResource("2_b78mq")
+kind = &"landmarks"
+angle = -50.0
+params = {
+"height": 48.0,
+"rows": 3,
+"stone": Color(0.36078432, 0.37254903, 0.4, 1),
+"style": &"town"
+}
+
+[sub_resource type="Resource" id="Resource_mjxe6"]
+script = ExtResource("2_b78mq")
 kind = &"vault_door"
 angle = -37.0
 
-[sub_resource type="Resource" id="Resource_mjxe6"]
+[sub_resource type="Resource" id="Resource_mtp5g"]
 script = ExtResource("2_b78mq")
 kind = &"slogan_board"
 angle = -21.0
@@ -49,7 +60,7 @@ params = {
 "text": "Vaultborough Safecrackers"
 }
 
-[sub_resource type="Resource" id="Resource_mtp5g"]
+[sub_resource type="Resource" id="Resource_w3um4"]
 script = ExtResource("2_b78mq")
 kind = &"searchlights"
 angle = -70.0
@@ -58,7 +69,7 @@ params = {
 "span": 140.0
 }
 
-[sub_resource type="Resource" id="Resource_w3um4"]
+[sub_resource type="Resource" id="Resource_ewyli"]
 script = ExtResource("2_b78mq")
 kind = &"viaduct"
 angle = 18.0
@@ -67,7 +78,7 @@ params = {
 "span": 32.0
 }
 
-[sub_resource type="Resource" id="Resource_ewyli"]
+[sub_resource type="Resource" id="Resource_eijjg"]
 script = ExtResource("2_b78mq")
 kind = &"bridge"
 angle = 40.0
@@ -76,7 +87,7 @@ params = {
 "length": 160.0
 }
 
-[sub_resource type="Resource" id="Resource_eijjg"]
+[sub_resource type="Resource" id="Resource_aq1kd"]
 script = ExtResource("2_b78mq")
 kind = &"bunting"
 angle = 50.0
@@ -84,7 +95,7 @@ params = {
 "span": 260.0
 }
 
-[sub_resource type="Resource" id="Resource_aq1kd"]
+[sub_resource type="Resource" id="Resource_mhk2s"]
 script = ExtResource("2_b78mq")
 kind = &"arcade"
 angle = 50.0
@@ -98,7 +109,7 @@ params = {
 "towers": 5
 }
 
-[sub_resource type="Resource" id="Resource_mhk2s"]
+[sub_resource type="Resource" id="Resource_0emfr"]
 script = ExtResource("2_b78mq")
 kind = &"arcade"
 angle = 11.0
@@ -110,7 +121,7 @@ params = {
 "style": &"truss"
 }
 
-[sub_resource type="Resource" id="Resource_0emfr"]
+[sub_resource type="Resource" id="Resource_ssaq4"]
 script = ExtResource("2_b78mq")
 kind = &"canopy"
 angle = 52.0
@@ -119,7 +130,7 @@ params = {
 "style": &"steel"
 }
 
-[sub_resource type="Resource" id="Resource_ssaq4"]
+[sub_resource type="Resource" id="Resource_ghcdt"]
 script = ExtResource("2_b78mq")
 kind = &"wall_art"
 params = {
@@ -128,7 +139,7 @@ params = {
 "motif": &"crossed"
 }
 
-[sub_resource type="Resource" id="Resource_ghcdt"]
+[sub_resource type="Resource" id="Resource_lscrl"]
 script = ExtResource("2_b78mq")
 kind = &"lamps"
 angle = -150.0
@@ -137,7 +148,7 @@ params = {
 "span": 300.0
 }
 
-[sub_resource type="Resource" id="Resource_lscrl"]
+[sub_resource type="Resource" id="Resource_kdwo5"]
 script = ExtResource("2_b78mq")
 kind = &"props"
 angle = -150.0
@@ -174,4 +185,4 @@ skyline_color = Color(0.11764706, 0.14117648, 0.2, 1)
 window_color = Color(1, 0.8352941, 0.6039216, 1)
 facade_color = Color(0.3529412, 0.36862746, 0.4, 1)
 structure_surface = &"steel"
-pieces = Array[ExtResource("2_b78mq")]([SubResource("Resource_iootr"), SubResource("Resource_4i8r7"), SubResource("Resource_t1ilx"), SubResource("Resource_pt7r0"), SubResource("Resource_ysqj7"), SubResource("Resource_mjxe6"), SubResource("Resource_mtp5g"), SubResource("Resource_w3um4"), SubResource("Resource_ewyli"), SubResource("Resource_eijjg"), SubResource("Resource_aq1kd"), SubResource("Resource_mhk2s"), SubResource("Resource_0emfr"), SubResource("Resource_ssaq4"), SubResource("Resource_ghcdt"), SubResource("Resource_lscrl")])
+pieces = Array[ExtResource("2_b78mq")]([SubResource("Resource_iootr"), SubResource("Resource_4i8r7"), SubResource("Resource_t1ilx"), SubResource("Resource_pt7r0"), SubResource("Resource_ysqj7"), SubResource("Resource_mjxe6"), SubResource("Resource_mtp5g"), SubResource("Resource_w3um4"), SubResource("Resource_ewyli"), SubResource("Resource_eijjg"), SubResource("Resource_aq1kd"), SubResource("Resource_mhk2s"), SubResource("Resource_0emfr"), SubResource("Resource_ssaq4"), SubResource("Resource_ghcdt"), SubResource("Resource_lscrl"), SubResource("Resource_kdwo5")])

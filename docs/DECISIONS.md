@@ -1213,3 +1213,26 @@ Reason: Owner request for another detail pass against the sheets. The balance ch
   - **Lamp posts or braziers:** kept at the Horseshoe, Ledger Street, the Vault, Warehouse Row, Forum Field, Firelight and Amber Gate.
   - **Flags:** kept at Ledger Street, Pier 9, Fountain Gardens, Forum Field, Citadel Park and Amber Gate.
 - 39 pieces were removed in all.
+
+## 2026-10-22 - Layered Landmark Backdrops (Free Kenney Kits)
+
+- **Why:** the sheets show tall buildings in layers filling the space behind the stands up to about half the frame. Ours stopped at one low band, and that was the root of the bland, flat look.
+- **Assets:** six free CC0 Kenney kits (Castle, City Industrial, Factory, Fantasy Town, Modular Buildings, Pirate), about 18 MB, logged as KEN-006 to KEN-011.
+- **New `kit_palette` shader:** the kits share one palette texture of a few swatch families. The shader remaps each family to a park color role (stone, metal, roof, accent, trim, window), keeping each swatch's lightness. Far rows fade toward the horizon color, and windows glow at night.
+- **New `landmarks` module:** tall landmarks across the outfield in up to three rows, each row farther, about 45% taller and hazier. The front row leaves the scoreboard gap. Styles:
+  - **castle:** stacked square and hexagon towers with spires, or crenellated tops (`flat`), banners and curtain walls.
+  - **industrial:** factory halls with chimneys, steel gantries with catwalks and hoppers, water towers and tanks.
+  - **town:** stacked townhouse blocks with setbacks, and houses.
+  - **harbor:** stone towers, dock pavilions and masts.
+  - **pagoda:** the sculpted pagoda among blossom trees.
+- **Applied to 15 parks:**
+  - Castle: Citadel Park (blue spires), the Icebox, Firelight (dark stone, red roofs), Forum Field and Amber Gate (flat sandstone).
+  - Industrial: Foundry Field, Reactor Park and the Kiln.
+  - Town: Ledger Street, Warehouse Row, the Horseshoe, the Vault and Fountain Gardens.
+  - Harbor: Pier 9.
+  - Pagoda: Sakura Gate.
+  - Halo Dome, Deepwater and Cloudreach keep their own skylines (city towers, aquarium, islands).
+- **Fixes:**
+  - Sculpted models are centered on their origin, so the pagodas now stand on their base.
+  - Tinted trees use a cached tinted mesh copy, since per-surface overrides logged null-material errors.
+  - The model contact-sheet tool fits any number of models and takes a name filter.

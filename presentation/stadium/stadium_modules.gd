@@ -95,6 +95,14 @@ const CATALOG := {
 		"choices": {"style": [&"water", &"terrace", &"ice", &"molten"], "tree": [&"round", &"blossom", &"pine", &"palm", &"cypress"]},
 		"script": preload("res://presentation/stadium/modules/waterfalls_module.gd"),
 	},
+	&"landmarks": {
+		"name": "Landmarks", "category": &"scenery", "unique": false, "placed": true,
+		"about": "Tall landmarks behind the outfield stands in up to three rows of depth, taller and hazier with distance: castle towers, industrial halls and gantries, townhouse blocks, harbor towers or pagodas, from free Kenney kits recolored to the park.",
+		"angle": -50.0, "angle_range": [-180.0, 180.0],
+		"params": {"style": [&"castle"], "span": [100.0, -360.0, 360.0], "rows": [2.0, 1.0, 3.0], "height": [38.0, 15.0, 90.0], "gap": [12.0, 0.0, 120.0], "center_gap": [12.0, 0.0, 40.0], "flat": [false], "stone": [Color(0, 0, 0, 0)], "roof": [Color(0, 0, 0, 0)]},
+		"choices": {"style": [&"castle", &"industrial", &"town", &"harbor", &"pagoda"]},
+		"script": preload("res://presentation/stadium/modules/landmarks_module.gd"),
+	},
 	&"trees": {
 		"name": "Trees", "category": &"scenery", "unique": false, "placed": true,
 		"about": "A grove behind the stands across span degrees: palms, pines, cacti, round shade trees, cypresses or blossoming trees.",

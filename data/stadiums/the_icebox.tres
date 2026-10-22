@@ -36,6 +36,17 @@ params = {
 
 [sub_resource type="Resource" id="Resource_l5q8p"]
 script = ExtResource("2_nkemg")
+kind = &"landmarks"
+angle = -50.0
+params = {
+"height": 42.0,
+"rows": 3,
+"stone": Color(0.54901963, 0.5882353, 0.6509804, 1),
+"style": &"castle"
+}
+
+[sub_resource type="Resource" id="Resource_aca4j"]
+script = ExtResource("2_nkemg")
 kind = &"mountains"
 angle = -125.0
 params = {
@@ -45,7 +56,7 @@ params = {
 "span": 250.0
 }
 
-[sub_resource type="Resource" id="Resource_aca4j"]
+[sub_resource type="Resource" id="Resource_qrntj"]
 script = ExtResource("2_nkemg")
 kind = &"trees"
 angle = 10.0
@@ -56,7 +67,7 @@ params = {
 "span": 10.0
 }
 
-[sub_resource type="Resource" id="Resource_qrntj"]
+[sub_resource type="Resource" id="Resource_opbgw"]
 script = ExtResource("2_nkemg")
 kind = &"trees"
 angle = 22.0
@@ -67,7 +78,7 @@ params = {
 "span": 45.0
 }
 
-[sub_resource type="Resource" id="Resource_opbgw"]
+[sub_resource type="Resource" id="Resource_rw4av"]
 script = ExtResource("2_nkemg")
 kind = &"gondola"
 angle = -32.0
@@ -75,12 +86,12 @@ params = {
 "span": -40.0
 }
 
-[sub_resource type="Resource" id="Resource_rw4av"]
+[sub_resource type="Resource" id="Resource_fknpk"]
 script = ExtResource("2_nkemg")
 kind = &"icicles"
 angle = -180.0
 
-[sub_resource type="Resource" id="Resource_fknpk"]
+[sub_resource type="Resource" id="Resource_mxnw4"]
 script = ExtResource("2_nkemg")
 kind = &"arcade"
 angle = 50.0
@@ -91,7 +102,7 @@ params = {
 "style": &"timber"
 }
 
-[sub_resource type="Resource" id="Resource_mxnw4"]
+[sub_resource type="Resource" id="Resource_acneu"]
 script = ExtResource("2_nkemg")
 kind = &"arcade"
 angle = 11.0
@@ -108,7 +119,7 @@ params = {
 "towers": 3
 }
 
-[sub_resource type="Resource" id="Resource_acneu"]
+[sub_resource type="Resource" id="Resource_vply3"]
 script = ExtResource("2_nkemg")
 kind = &"canopy"
 angle = 52.0
@@ -117,7 +128,7 @@ params = {
 "style": &"timber"
 }
 
-[sub_resource type="Resource" id="Resource_vply3"]
+[sub_resource type="Resource" id="Resource_0kbas"]
 script = ExtResource("2_nkemg")
 kind = &"wall_art"
 params = {
@@ -125,7 +136,7 @@ params = {
 "motif": &"snowflake"
 }
 
-[sub_resource type="Resource" id="Resource_0kbas"]
+[sub_resource type="Resource" id="Resource_l41tx"]
 script = ExtResource("2_nkemg")
 kind = &"icicles"
 angle = -60.0
@@ -156,4 +167,4 @@ facade_color = Color(0.5176471, 0.5803922, 0.6509804, 1)
 facade_surface = &"stone"
 structure_surface = &"wood"
 ground_surface = &"snow"
-pieces = Array[ExtResource("2_nkemg")]([SubResource("Resource_3lw56"), SubResource("Resource_77lqm"), SubResource("Resource_6v7py"), SubResource("Resource_305by"), SubResource("Resource_l5q8p"), SubResource("Resource_aca4j"), SubResource("Resource_qrntj"), SubResource("Resource_opbgw"), SubResource("Resource_rw4av"), SubResource("Resource_fknpk"), SubResource("Resource_mxnw4"), SubResource("Resource_acneu"), SubResource("Resource_vply3"), SubResource("Resource_0kbas")])
+pieces = Array[ExtResource("2_nkemg")]([SubResource("Resource_3lw56"), SubResource("Resource_77lqm"), SubResource("Resource_6v7py"), SubResource("Resource_305by"), SubResource("Resource_l5q8p"), SubResource("Resource_aca4j"), SubResource("Resource_qrntj"), SubResource("Resource_opbgw"), SubResource("Resource_rw4av"), SubResource("Resource_fknpk"), SubResource("Resource_mxnw4"), SubResource("Resource_acneu"), SubResource("Resource_vply3"), SubResource("Resource_0kbas"), SubResource("Resource_l41tx")])

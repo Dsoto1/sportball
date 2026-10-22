@@ -1,7 +1,7 @@
 extends SceneTree
 ## Renders every GLB in a folder side by side (each scaled to the same
 ## height, three-quarter view) to one image, to review generated models.
-##   godot --path . --resolution 1600x900 -s res://tools/model_sheet.gd -- res://assets/generated/artlist/stadium /tmp/sheet.png
+##   godot --path . --resolution 1600x900 -s res://tools/model_sheet.gd -- res://assets/generated/artlist/stadium /tmp/sheet.png [prefix,prefix]
 var _frames := 0
 var _out := ""
 
@@ -23,9 +23,21 @@ func _init() -> void:
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-40, 30, 0)
 	world.add_child(sun)
-	var files := Array(DirAccess.get_files_at(dir)).filter(func(f: String) -> bool: return f.ends_with(".glb"))
+	# Optional third argument: comma-separated name prefixes to include.
+	var only: PackedStringArray = args[2].split(",") if args.size() > 2 else PackedStringArray()
+	var files := Array(DirAccess.get_files_at(dir)).filter(func(f: String) -> bool:
+		if not f.ends_with(".glb"):
+			return false
+		if only.is_empty():
+			return true
+		for prefix in only:
+			if f.begins_with(prefix):
+				return true
+		return false)
 	files.sort()
-	var cols := 6
+	# A grid that fills a 16:9 frame.
+	var cols := maxi(6, ceili(sqrt(files.size() * 1.6)))
+	var rows := ceili(files.size() / float(cols))
 	for i in files.size():
 		var node: Node3D = (load(dir.path_join(files[i])) as PackedScene).instantiate()
 		var box := AABB()
@@ -41,14 +53,14 @@ func _init() -> void:
 		var label := Label3D.new()
 		label.text = files[i].get_basename()
 		label.pixel_size = 0.01
-		label.font_size = 36
+		label.font_size = 28
 		label.modulate = Color.BLACK
 		label.position = Vector3((i % cols) * 4.0 - (cols - 1) * 2.0, -(i / cols) * 4.6 + 0.0, 1.0)
 		world.add_child(label)
 	var cam := Camera3D.new()
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
-	cam.size = 10.5
-	cam.position = Vector3(0, 0, 20)
+	cam.size = maxf(rows * 4.6 + 0.6, cols * 4.0 / 1.7778 + 0.4)
+	cam.position = Vector3(0, 2.0 - (rows - 1) * 2.3, 20)
 	world.add_child(cam)
 	process_frame.connect(func() -> void:
 		_frames += 1

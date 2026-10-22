@@ -30,6 +30,18 @@ kind = &"light_towers"
 
 [sub_resource type="Resource" id="Resource_nw5vl"]
 script = ExtResource("2_2pjeu")
+kind = &"landmarks"
+angle = -50.0
+params = {
+"flat": true,
+"height": 36.0,
+"rows": 2,
+"stone": Color(0.7882353, 0.6039216, 0.38431373, 1),
+"style": &"castle"
+}
+
+[sub_resource type="Resource" id="Resource_gy2ay"]
+script = ExtResource("2_2pjeu")
 kind = &"mountains"
 angle = -100.0
 params = {
@@ -40,7 +52,7 @@ params = {
 "style": &"mesa"
 }
 
-[sub_resource type="Resource" id="Resource_gy2ay"]
+[sub_resource type="Resource" id="Resource_g4iop"]
 script = ExtResource("2_2pjeu")
 kind = &"arcade"
 angle = 50.0
@@ -54,7 +66,7 @@ params = {
 "tiers": 2
 }
 
-[sub_resource type="Resource" id="Resource_g4iop"]
+[sub_resource type="Resource" id="Resource_jlrk3"]
 script = ExtResource("2_2pjeu")
 kind = &"canopy"
 angle = 52.0
@@ -63,7 +75,7 @@ params = {
 "style": &"cloth"
 }
 
-[sub_resource type="Resource" id="Resource_jlrk3"]
+[sub_resource type="Resource" id="Resource_mitcy"]
 script = ExtResource("2_2pjeu")
 kind = &"arcade"
 angle = 11.0
@@ -78,7 +90,7 @@ params = {
 "towers": 3
 }
 
-[sub_resource type="Resource" id="Resource_mitcy"]
+[sub_resource type="Resource" id="Resource_fw3im"]
 script = ExtResource("2_2pjeu")
 kind = &"statue"
 angle = 9.0
@@ -88,7 +100,7 @@ params = {
 "scale": 1.6
 }
 
-[sub_resource type="Resource" id="Resource_fw3im"]
+[sub_resource type="Resource" id="Resource_v5dpj"]
 script = ExtResource("2_2pjeu")
 kind = &"bunting"
 angle = 50.0
@@ -97,7 +109,7 @@ params = {
 "span": 260.0
 }
 
-[sub_resource type="Resource" id="Resource_v5dpj"]
+[sub_resource type="Resource" id="Resource_xyap0"]
 script = ExtResource("2_2pjeu")
 kind = &"trees"
 angle = 6.0
@@ -108,7 +120,7 @@ params = {
 "span": 6.0
 }
 
-[sub_resource type="Resource" id="Resource_xyap0"]
+[sub_resource type="Resource" id="Resource_yabsd"]
 script = ExtResource("2_2pjeu")
 kind = &"trees"
 angle = 22.0
@@ -119,7 +131,7 @@ params = {
 "span": 30.0
 }
 
-[sub_resource type="Resource" id="Resource_yabsd"]
+[sub_resource type="Resource" id="Resource_850kf"]
 script = ExtResource("2_2pjeu")
 kind = &"lamps"
 angle = -150.0
@@ -129,7 +141,7 @@ params = {
 "style": &"brazier"
 }
 
-[sub_resource type="Resource" id="Resource_850kf"]
+[sub_resource type="Resource" id="Resource_uokn4"]
 script = ExtResource("2_2pjeu")
 kind = &"flags"
 angle = -55.0
@@ -138,14 +150,14 @@ params = {
 "span": 110.0
 }
 
-[sub_resource type="Resource" id="Resource_uokn4"]
+[sub_resource type="Resource" id="Resource_d7mwy"]
 script = ExtResource("2_2pjeu")
 kind = &"wall_art"
 params = {
 "motif": &"star"
 }
 
-[sub_resource type="Resource" id="Resource_d7mwy"]
+[sub_resource type="Resource" id="Resource_6ir88"]
 script = ExtResource("2_2pjeu")
 kind = &"planters"
 angle = -46.0
@@ -155,7 +167,7 @@ params = {
 "span": 92.0
 }
 
-[sub_resource type="Resource" id="Resource_6ir88"]
+[sub_resource type="Resource" id="Resource_eepsg"]
 script = ExtResource("2_2pjeu")
 kind = &"props"
 angle = -46.0
@@ -194,4 +206,4 @@ facade_color = Color(0.76862746, 0.57254905, 0.3529412, 1)
 facade_surface = &"stone"
 structure_surface = &"stone"
 ground_surface = &"sand"
-pieces = Array[ExtResource("2_2pjeu")]([SubResource("Resource_4oyrr"), SubResource("Resource_n437m"), SubResource("Resource_pixr7"), SubResource("Resource_nw5vl"), SubResource("Resource_gy2ay"), SubResource("Resource_g4iop"), SubResource("Resource_jlrk3"), SubResource("Resource_mitcy"), SubResource("Resource_fw3im"), SubResource("Resource_v5dpj"), SubResource("Resource_xyap0"), SubResource("Resource_yabsd"), SubResource("Resource_850kf"), SubResource("Resource_uokn4"), SubResource("Resource_d7mwy"), SubResource("Resource_6ir88")])
+pieces = Array[ExtResource("2_2pjeu")]([SubResource("Resource_4oyrr"), SubResource("Resource_n437m"), SubResource("Resource_pixr7"), SubResource("Resource_nw5vl"), SubResource("Resource_gy2ay"), SubResource("Resource_g4iop"), SubResource("Resource_jlrk3"), SubResource("Resource_mitcy"), SubResource("Resource_fw3im"), SubResource("Resource_v5dpj"), SubResource("Resource_xyap0"), SubResource("Resource_yabsd"), SubResource("Resource_850kf"), SubResource("Resource_uokn4"), SubResource("Resource_d7mwy"), SubResource("Resource_6ir88"), SubResource("Resource_eepsg")])

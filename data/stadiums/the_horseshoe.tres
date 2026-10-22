@@ -35,6 +35,17 @@ params = {
 
 [sub_resource type="Resource" id="Resource_26mby"]
 script = ExtResource("2_olas1")
+kind = &"landmarks"
+angle = -50.0
+params = {
+"height": 48.0,
+"rows": 3,
+"stone": Color(0.3529412, 0.2901961, 0.28235295, 1),
+"style": &"town"
+}
+
+[sub_resource type="Resource" id="Resource_gnd8x"]
+script = ExtResource("2_olas1")
 kind = &"viaduct"
 angle = 14.0
 params = {
@@ -42,7 +53,7 @@ params = {
 "span": 40.0
 }
 
-[sub_resource type="Resource" id="Resource_gnd8x"]
+[sub_resource type="Resource" id="Resource_1t2v1"]
 script = ExtResource("2_olas1")
 kind = &"lamps"
 angle = -150.0
@@ -51,7 +62,7 @@ params = {
 "span": 300.0
 }
 
-[sub_resource type="Resource" id="Resource_1t2v1"]
+[sub_resource type="Resource" id="Resource_ugxod"]
 script = ExtResource("2_olas1")
 kind = &"bunting"
 angle = 50.0
@@ -59,7 +70,7 @@ params = {
 "span": 260.0
 }
 
-[sub_resource type="Resource" id="Resource_ugxod"]
+[sub_resource type="Resource" id="Resource_oqwa8"]
 script = ExtResource("2_olas1")
 kind = &"arcade"
 angle = 50.0
@@ -75,7 +86,7 @@ params = {
 "towers": 6
 }
 
-[sub_resource type="Resource" id="Resource_oqwa8"]
+[sub_resource type="Resource" id="Resource_x303p"]
 script = ExtResource("2_olas1")
 kind = &"arcade"
 angle = 11.0
@@ -87,7 +98,7 @@ params = {
 "style": &"arches"
 }
 
-[sub_resource type="Resource" id="Resource_x303p"]
+[sub_resource type="Resource" id="Resource_y7kvt"]
 script = ExtResource("2_olas1")
 kind = &"wall_art"
 params = {
@@ -96,7 +107,7 @@ params = {
 "motif": &"star"
 }
 
-[sub_resource type="Resource" id="Resource_y7kvt"]
+[sub_resource type="Resource" id="Resource_5wqvr"]
 script = ExtResource("2_olas1")
 kind = &"string_lights"
 angle = -150.0
@@ -105,7 +116,7 @@ params = {
 "every": 4.0
 }
 
-[sub_resource type="Resource" id="Resource_5wqvr"]
+[sub_resource type="Resource" id="Resource_tefms"]
 script = ExtResource("2_olas1")
 kind = &"props"
 angle = -150.0
@@ -142,4 +153,4 @@ window_color = Color(1, 0.8784314, 0.627451, 1)
 facade_color = Color(0.6039216, 0.47843137, 0.36862746, 1)
 facade_surface = &"stone"
 structure_surface = &"brick"
-pieces = Array[ExtResource("2_olas1")]([SubResource("Resource_tgobb"), SubResource("Resource_o5o6h"), SubResource("Resource_b4fev"), SubResource("Resource_2quui"), SubResource("Resource_26mby"), SubResource("Resource_gnd8x"), SubResource("Resource_1t2v1"), SubResource("Resource_ugxod"), SubResource("Resource_oqwa8"), SubResource("Resource_x303p"), SubResource("Resource_y7kvt"), SubResource("Resource_5wqvr")])
+pieces = Array[ExtResource("2_olas1")]([SubResource("Resource_tgobb"), SubResource("Resource_o5o6h"), SubResource("Resource_b4fev"), SubResource("Resource_2quui"), SubResource("Resource_26mby"), SubResource("Resource_gnd8x"), SubResource("Resource_1t2v1"), SubResource("Resource_ugxod"), SubResource("Resource_oqwa8"), SubResource("Resource_x303p"), SubResource("Resource_y7kvt"), SubResource("Resource_5wqvr"), SubResource("Resource_tefms")])

@@ -101,15 +101,26 @@ static func _aabb(node: Node) -> AABB:
 	return box
 
 
+## Tinted copies of meshes, one per mesh and tint, shared by every spawn.
+static var _tinted := {}
+
+
 static func _tint_leaves(node: Node, tint: Color) -> void:
+	# A tinted copy of the mesh (not a per-surface override, which the
+	# renderer logs as a null material on some drivers).
 	for mi: MeshInstance3D in node.find_children("*", "MeshInstance3D", true, false):
-		for s in mi.mesh.get_surface_count():
-			var mat := mi.mesh.surface_get_material(s)
-			if mat != null and String(mat.resource_name).to_lower().contains("leaf"):
-				var m := StandardMaterial3D.new()
-				m.albedo_color = tint
-				m.roughness = 0.8
-				mi.set_surface_override_material(s, m)
+		var key := [mi.mesh, tint]
+		if not _tinted.has(key):
+			var copy: Mesh = mi.mesh.duplicate()
+			for s in copy.get_surface_count():
+				var mat := copy.surface_get_material(s)
+				if mat != null and String(mat.resource_name).to_lower().contains("leaf"):
+					var m := StandardMaterial3D.new()
+					m.albedo_color = tint
+					m.roughness = 0.8
+					copy.surface_set_material(s, m)
+			_tinted[key] = copy
+		mi.mesh = _tinted[key]
 
 
 static func _no_shadows(node: Node) -> void:

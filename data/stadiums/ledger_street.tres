@@ -35,16 +35,27 @@ params = {
 
 [sub_resource type="Resource" id="Resource_hcvew"]
 script = ExtResource("2_mb518")
+kind = &"landmarks"
+angle = -50.0
+params = {
+"height": 40.0,
+"rows": 3,
+"stone": Color(0.7882353, 0.6901961, 0.5411765, 1),
+"style": &"town"
+}
+
+[sub_resource type="Resource" id="Resource_qnulu"]
+script = ExtResource("2_mb518")
 kind = &"wall_scoreboard"
 angle = -28.0
 
-[sub_resource type="Resource" id="Resource_qnulu"]
+[sub_resource type="Resource" id="Resource_gnn5p"]
 script = ExtResource("2_mb518")
 kind = &"statue"
 angle = 22.0
 mirrored = true
 
-[sub_resource type="Resource" id="Resource_gnn5p"]
+[sub_resource type="Resource" id="Resource_7qw1n"]
 script = ExtResource("2_mb518")
 kind = &"trees"
 angle = 30.0
@@ -55,7 +66,7 @@ params = {
 "span": 25.0
 }
 
-[sub_resource type="Resource" id="Resource_7qw1n"]
+[sub_resource type="Resource" id="Resource_p8geh"]
 script = ExtResource("2_mb518")
 kind = &"flags"
 angle = -55.0
@@ -64,7 +75,7 @@ params = {
 "span": 110.0
 }
 
-[sub_resource type="Resource" id="Resource_p8geh"]
+[sub_resource type="Resource" id="Resource_rnwrq"]
 script = ExtResource("2_mb518")
 kind = &"water"
 angle = 65.0
@@ -73,7 +84,7 @@ params = {
 "width": 24.0
 }
 
-[sub_resource type="Resource" id="Resource_rnwrq"]
+[sub_resource type="Resource" id="Resource_52ddh"]
 script = ExtResource("2_mb518")
 kind = &"bridge"
 angle = 75.0
@@ -82,7 +93,7 @@ params = {
 "length": 80.0
 }
 
-[sub_resource type="Resource" id="Resource_52ddh"]
+[sub_resource type="Resource" id="Resource_1hcmg"]
 script = ExtResource("2_mb518")
 kind = &"bunting"
 angle = 50.0
@@ -90,7 +101,7 @@ params = {
 "span": 260.0
 }
 
-[sub_resource type="Resource" id="Resource_1hcmg"]
+[sub_resource type="Resource" id="Resource_3bbly"]
 script = ExtResource("2_mb518")
 kind = &"arcade"
 angle = 50.0
@@ -106,7 +117,7 @@ params = {
 "towers": 5
 }
 
-[sub_resource type="Resource" id="Resource_3bbly"]
+[sub_resource type="Resource" id="Resource_jlw3u"]
 script = ExtResource("2_mb518")
 kind = &"arcade"
 angle = 11.0
@@ -121,7 +132,7 @@ params = {
 "towers": 3
 }
 
-[sub_resource type="Resource" id="Resource_jlw3u"]
+[sub_resource type="Resource" id="Resource_3btit"]
 script = ExtResource("2_mb518")
 kind = &"wall_art"
 params = {
@@ -129,7 +140,7 @@ params = {
 "motif": &"emblem"
 }
 
-[sub_resource type="Resource" id="Resource_3btit"]
+[sub_resource type="Resource" id="Resource_t5nf2"]
 script = ExtResource("2_mb518")
 kind = &"lamps"
 angle = -150.0
@@ -138,7 +149,7 @@ params = {
 "span": 300.0
 }
 
-[sub_resource type="Resource" id="Resource_t5nf2"]
+[sub_resource type="Resource" id="Resource_7ah7a"]
 script = ExtResource("2_mb518")
 kind = &"planters"
 angle = -46.0
@@ -148,7 +159,7 @@ params = {
 "span": 92.0
 }
 
-[sub_resource type="Resource" id="Resource_7ah7a"]
+[sub_resource type="Resource" id="Resource_tnswc"]
 script = ExtResource("2_mb518")
 kind = &"props"
 angle = -150.0
@@ -158,7 +169,7 @@ params = {
 "model": &"lantern"
 }
 
-[sub_resource type="Resource" id="Resource_tnswc"]
+[sub_resource type="Resource" id="Resource_54fgl"]
 script = ExtResource("2_mb518")
 kind = &"props"
 angle = -46.0
@@ -194,4 +205,4 @@ window_color = Color(1, 0.88235295, 0.65882355, 1)
 facade_color = Color(0.627451, 0.3137255, 0.23529412, 1)
 facade_surface = &"brick"
 structure_surface = &"stone"
-pieces = Array[ExtResource("2_mb518")]([SubResource("Resource_oeo3i"), SubResource("Resource_cq0mc"), SubResource("Resource_7xix8"), SubResource("Resource_up8hn"), SubResource("Resource_hcvew"), SubResource("Resource_qnulu"), SubResource("Resource_gnn5p"), SubResource("Resource_7qw1n"), SubResource("Resource_p8geh"), SubResource("Resource_rnwrq"), SubResource("Resource_52ddh"), SubResource("Resource_1hcmg"), SubResource("Resource_3bbly"), SubResource("Resource_jlw3u"), SubResource("Resource_3btit"), SubResource("Resource_t5nf2"), SubResource("Resource_7ah7a"), SubResource("Resource_tnswc")])
+pieces = Array[ExtResource("2_mb518")]([SubResource("Resource_oeo3i"), SubResource("Resource_cq0mc"), SubResource("Resource_7xix8"), SubResource("Resource_up8hn"), SubResource("Resource_hcvew"), SubResource("Resource_qnulu"), SubResource("Resource_gnn5p"), SubResource("Resource_7qw1n"), SubResource("Resource_p8geh"), SubResource("Resource_rnwrq"), SubResource("Resource_52ddh"), SubResource("Resource_1hcmg"), SubResource("Resource_3bbly"), SubResource("Resource_jlw3u"), SubResource("Resource_3btit"), SubResource("Resource_t5nf2"), SubResource("Resource_7ah7a"), SubResource("Resource_tnswc"), SubResource("Resource_54fgl")])

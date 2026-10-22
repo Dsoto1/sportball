@@ -36,10 +36,21 @@ params = {
 
 [sub_resource type="Resource" id="Resource_05um3"]
 script = ExtResource("2_07v1h")
+kind = &"landmarks"
+angle = -50.0
+params = {
+"gap": 30.0,
+"height": 40.0,
+"rows": 3,
+"style": &"industrial"
+}
+
+[sub_resource type="Resource" id="Resource_sr515"]
+script = ExtResource("2_07v1h")
 kind = &"wall_scoreboard"
 angle = 26.0
 
-[sub_resource type="Resource" id="Resource_sr515"]
+[sub_resource type="Resource" id="Resource_rr4sb"]
 script = ExtResource("2_07v1h")
 kind = &"smokestacks"
 angle = -32.0
@@ -48,7 +59,7 @@ params = {
 "span": -40.0
 }
 
-[sub_resource type="Resource" id="Resource_rr4sb"]
+[sub_resource type="Resource" id="Resource_rep1b"]
 script = ExtResource("2_07v1h")
 kind = &"cranes"
 angle = 22.0
@@ -57,7 +68,7 @@ params = {
 "span": 30.0
 }
 
-[sub_resource type="Resource" id="Resource_rep1b"]
+[sub_resource type="Resource" id="Resource_vvbo7"]
 script = ExtResource("2_07v1h")
 kind = &"bridge"
 angle = 38.0
@@ -65,7 +76,7 @@ params = {
 "distance": 140.0
 }
 
-[sub_resource type="Resource" id="Resource_vvbo7"]
+[sub_resource type="Resource" id="Resource_7a83r"]
 script = ExtResource("2_07v1h")
 kind = &"smokestacks"
 angle = 13.0
@@ -76,7 +87,7 @@ params = {
 "span": 6.0
 }
 
-[sub_resource type="Resource" id="Resource_7a83r"]
+[sub_resource type="Resource" id="Resource_tpvtf"]
 script = ExtResource("2_07v1h")
 kind = &"water"
 angle = 10.0
@@ -85,7 +96,7 @@ params = {
 "width": 70.0
 }
 
-[sub_resource type="Resource" id="Resource_tpvtf"]
+[sub_resource type="Resource" id="Resource_a0pts"]
 script = ExtResource("2_07v1h")
 kind = &"arcade"
 angle = 50.0
@@ -96,7 +107,7 @@ params = {
 "style": &"truss"
 }
 
-[sub_resource type="Resource" id="Resource_a0pts"]
+[sub_resource type="Resource" id="Resource_1cgio"]
 script = ExtResource("2_07v1h")
 kind = &"arcade"
 angle = 11.0
@@ -108,7 +119,7 @@ params = {
 "style": &"truss"
 }
 
-[sub_resource type="Resource" id="Resource_1cgio"]
+[sub_resource type="Resource" id="Resource_cg6nc"]
 script = ExtResource("2_07v1h")
 kind = &"canopy"
 angle = 52.0
@@ -117,7 +128,7 @@ params = {
 "style": &"steel"
 }
 
-[sub_resource type="Resource" id="Resource_cg6nc"]
+[sub_resource type="Resource" id="Resource_tsrjm"]
 script = ExtResource("2_07v1h")
 kind = &"wall_art"
 params = {
@@ -149,4 +160,4 @@ window_color = Color(1, 0.7019608, 0.36078432, 1)
 facade_color = Color(0.5411765, 0.2901961, 0.19607843, 1)
 facade_surface = &"brick"
 structure_surface = &"steel"
-pieces = Array[ExtResource("2_07v1h")]([SubResource("Resource_ml5p1"), SubResource("Resource_4aj37"), SubResource("Resource_0ohw5"), SubResource("Resource_s8cmx"), SubResource("Resource_05um3"), SubResource("Resource_sr515"), SubResource("Resource_rr4sb"), SubResource("Resource_rep1b"), SubResource("Resource_vvbo7"), SubResource("Resource_7a83r"), SubResource("Resource_tpvtf"), SubResource("Resource_a0pts"), SubResource("Resource_1cgio"), SubResource("Resource_cg6nc")])
+pieces = Array[ExtResource("2_07v1h")]([SubResource("Resource_ml5p1"), SubResource("Resource_4aj37"), SubResource("Resource_0ohw5"), SubResource("Resource_s8cmx"), SubResource("Resource_05um3"), SubResource("Resource_sr515"), SubResource("Resource_rr4sb"), SubResource("Resource_rep1b"), SubResource("Resource_vvbo7"), SubResource("Resource_7a83r"), SubResource("Resource_tpvtf"), SubResource("Resource_a0pts"), SubResource("Resource_1cgio"), SubResource("Resource_cg6nc"), SubResource("Resource_tsrjm")])
