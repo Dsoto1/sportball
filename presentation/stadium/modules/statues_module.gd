@@ -27,7 +27,18 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 		return
 	match figure:
 		&"bull":
-			_bull(root, bronze)
+			if ModelKit.has(&"bull_statue"):
+				# The sculpted bronze (Meshy), charging off the pedestal.
+				var bull := ModelKit.spawn(&"bull_statue", 4.2, RandomNumberGenerator.new())
+				bull.rotation.y = PI
+				var box := ModelKit._aabb(bull)
+				# Hooves on the pedestal's top (the model's origin is its middle).
+				bull.position = Vector3(box.get_center().x * bull.scale.x, 2.4 - box.position.y * bull.scale.y, box.get_center().z * bull.scale.z)
+				root.add_child(bull)
+				var size := box.size * bull.scale.x
+				pedestal.scale = Vector3(maxf(1.0, size.x * 1.15 / 5.0), 1.0, maxf(1.0, size.z * 1.15 / 3.0))
+			else:
+				_bull(root, bronze)
 		&"fox":
 			_fox(root, Color(0.95, 0.93, 0.88))
 		&"titan":

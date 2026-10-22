@@ -1566,3 +1566,16 @@ field_surface.gdshader and skyline.gdshader now draw both sides, the foul
 wall and track are swept in one direction on both sides (so they light
 alike), and the strip between the outfield wall and the bleachers (or the
 plaza where none stand) is paved instead of bare grass.
+
+## Back wall and plaza closed; the Bankers' bull
+
+Thin green lines behind the stands were the field's grass showing through
+two kinds of gap: a 1 m strip between the stands' back wall and the plaza,
+and slits in the back wall wherever the stands' depth steps from one
+degree to the next (most where the grandstand begins). The plaza now
+starts under the stands and the land under the plaza, and each step in
+depth gets its own short wall.
+
+The Bankers' statues (statue figure "bull") are a Meshy bronze charging
+bull (MSH-076, 30 credits) on the pedestal, hooves on its top; the
+primitive bull stays as the fallback.

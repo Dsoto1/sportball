@@ -138,3 +138,9 @@ The owner approved 6 modular light-tower pieces on 2026-10-22 (option 1: Artlist
 | 2026-10-22 | Light head: floodlight bank | Hyper3D Rodin v2.5 Fast | 300 | 6,300 / 4,125 | AI-021 (gen 01a1646d-7e6f-72ac-a51f-fc4e7d193c29) |
 | 2026-10-22 | Light head: halo lamp ring | Hyper3D Rodin v2.5 Fast | 300 | 6,600 / 4,125 | AI-022 (gen 01a1646d-823b-7404-a452-4489e6f9cdc3) |
 | 2026-10-22 | Light head: crown lantern | Hyper3D Rodin v2.5 Fast | 300 | 6,900 / 4,125 | AI-023 (gen 01a1646d-85f0-7fbc-b0bf-76dc8bfef6ac) |
+
+The owner approved the Bankers' bronze bull on 2026-10-22: 30 credits (balance 5,870 before).
+
+| Date | Item | Mode | Credits | Balance after | Task |
+|---|---|---|---|---|---|
+| 2026-10-22 | Ledger Street bronze charging bull (text-to-3D) | preview + refine | 30 | 5,840 | 01a165b2-9ec4-7080-b73d-17950672abe6 |

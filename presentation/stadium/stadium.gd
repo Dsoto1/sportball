@@ -303,6 +303,8 @@ func _build_bowl() -> void:
 	var tread := def.structure_color.lerp(Color(0.3, 0.3, 0.29), 0.6).darkened(0.25)
 	var concourse := def.structure_color.darkened(0.7)
 	var fascia := def.accent_color.lerp(def.structure_color, 0.25)
+	var prev_back := -1.0
+	var prev_top := 0.0
 	var a := -180.0
 	while a < 180.0:
 		var b := a + ANGLE_STEP
@@ -366,6 +368,14 @@ func _build_bowl() -> void:
 		var back_b := pb.x + rows * ROW_DEPTH
 		_quad(st, point(a, back_a, top_a), point(b, back_b, top_b), point(b, back_b, top_b + 1.2), point(a, back_a, top_a + 1.2), def.accent_color.darkened(0.2))
 		_quad(facade, point(b, back_b, 0.0), point(a, back_a, 0.0), point(a, back_a, top_a + 1.2), point(b, back_b, top_b + 1.2), Color.WHITE)
+		# Where the stands step deeper or shallower from one degree to the
+		# next, a wall closes the step (no slit through to the ground).
+		if prev_back > 0.0 and absf(prev_back - back_a) > 0.01:
+			var hi := maxf(prev_top, top_a) + 1.2
+			_quad(facade, point(a, minf(prev_back, back_a), 0.0), point(a, maxf(prev_back, back_a), 0.0), point(a, maxf(prev_back, back_a), hi), point(a, minf(prev_back, back_a), hi), Color.WHITE)
+			_quad(st, point(a, minf(prev_back, back_a), hi), point(a, maxf(prev_back, back_a), hi), point(a, maxf(prev_back, back_a), hi - 1.2), point(a, minf(prev_back, back_a), hi - 1.2), def.accent_color.darkened(0.2))
+		prev_back = back_b
+		prev_top = top_b
 		# Outside the park: the bay on the water side, ground everywhere else.
 		var outside := def.skyline_color.darkened(0.45) if def.ground_color.a == 0.0 else def.ground_color
 		if is_city():
@@ -377,11 +387,12 @@ func _build_bowl() -> void:
 		if absf(mid) <= 46.0:
 			var wa := FieldLayout.fence_distance(clampf(a, -45.0, 45.0), tuning) + 0.25
 			var wb := FieldLayout.fence_distance(clampf(b, -45.0, 45.0), tuning) + 0.25
-			var to_a := pa.x if pa.z > 0 else back_a + 1.0
-			var to_b := pb.x if pb.z > 0 else back_b + 1.0
+			var to_a := pa.x if pa.z > 0 else back_a
+			var to_b := pb.x if pb.z > 0 else back_b
 			_quad(st, point(a, wa, 0.13), point(a, to_a + 0.05, 0.13), point(b, to_b + 0.05, 0.13), point(b, wb, 0.13), tread)
-		var edge_a := back_a + 1.0
-		var edge_b := back_b + 1.0
+		# The plaza (or water) runs right up to the back wall.
+		var edge_a := back_a - 0.05
+		var edge_b := back_b - 0.05
 		if is_water(mid):
 			_quad(st, point(a, edge_a, 0.14), point(a, WATER_EDGE, 0.14), point(b, WATER_EDGE, 0.14), point(b, edge_b, 0.14), WATER)
 			edge_a = WATER_EDGE
@@ -389,9 +400,12 @@ func _build_bowl() -> void:
 		else:
 			# The concourse: paving round the back of the stands, a step up
 			# from the land so the two never flicker.
-			_quad(plaza, point(a, edge_a, 0.12), point(a, edge_a + PLAZA_WIDTH, 0.12), point(b, edge_b + PLAZA_WIDTH, 0.12), point(b, edge_b, 0.12), Color.WHITE)
-			edge_a += PLAZA_WIDTH
-			edge_b += PLAZA_WIDTH
+			# From under the stands (hidden by them) so a step in their depth
+			# never opens a slit; the land starts under the plaza for the same
+			# reason.
+			_quad(plaza, point(a, pa.x, 0.12), point(a, edge_a + PLAZA_WIDTH, 0.12), point(b, edge_b + PLAZA_WIDTH, 0.12), point(b, pb.x, 0.12), Color.WHITE)
+			edge_a += PLAZA_WIDTH * 0.5
+			edge_b += PLAZA_WIDTH * 0.5
 		# Above the field's 320 m grass slab (top at -0.01), so the two never flicker.
 		_quad(ground, point(a, edge_a, 0.1), point(a, GROUND_RIM, 0.1), point(b, GROUND_RIM, 0.1), point(b, edge_b, 0.1), outside)
 		a = b

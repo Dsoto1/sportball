@@ -50,6 +50,7 @@ const SETS := {
 	&"head_halo": [LIGHTS + "head_halo.glb"],
 	&"head_crown": [LIGHTS + "head_crown.glb"],
 	&"sakura_cliff": [MESHY + "sakura_cliff.glb"],
+	&"bull_statue": [MESHY + "bull_statue.glb"],
 	&"cathedral_spires": [MESHY + "cathedral_spires.glb"],
 	&"domed_bank": [MESHY + "domed_bank.glb"],
 	&"block": [CITY + "low-detail-building-a.glb", CITY + "low-detail-building-b.glb", CITY + "low-detail-building-c.glb", CITY + "low-detail-building-d.glb", CITY + "low-detail-building-wide-a.glb"],
