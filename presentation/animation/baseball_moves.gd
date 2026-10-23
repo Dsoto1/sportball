@@ -52,7 +52,8 @@ static func P(right: float, up: float, forward: float) -> Vector3:
 static var STANCE := {
 	"drop": 0.1, "hips": Vector3(8, -5, 0), "chest": Vector3(12, -18, 0), "head": Vector3(-8, 85, 0),
 	"foot_l": P(-0.34, 0.1, 0.05), "foot_r": P(0.34, 0.1, -0.02),
-	"knee_l": P(-0.4, 0, 1), "knee_r": P(0.4, 0, 1),
+	# Knees over the feet, a touch out: an athletic set, not a squat.
+	"knee_l": P(-0.15, 0, 1), "knee_r": P(0.15, 0, 1),
 	# Hands at the back shoulder (the shoulders sit about 1.44 m up the
 	# rig), just in front of it, the back elbow up, so the bat rests back
 	# behind the head, as every hitter sets up.

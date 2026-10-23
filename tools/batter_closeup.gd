@@ -11,7 +11,7 @@ extends SceneTree
 ## `slowmo` for the whip from the press to contact at quarter speed.
 ## `style:<name>` overrides the batter's style for the stills too;
 ## `hands` frames the grip tight instead of the whole batter.
-const AROUND := [Vector3(1.6, 1.3, -1.2), Vector3(-2.6, 1.4, 1.2), Vector3(0.0, 1.5, 3.2)]
+const AROUND := [0, 1, 2, 3]
 const SWING_FROM := Vector3(3.2, 1.3, -1.4)
 ## Frames (at 60 fps) of the sequence: windup from WINDUP_FROM, the pitch
 ## from PITCH_FROM, the press at PRESS; shots saved at SHOTS.
@@ -63,10 +63,33 @@ func _process(_d: float) -> bool:
 	var at := batter.global_position if batter != null else Vector3.ZERO
 	if _swing:
 		return _swing_sequence(at)
+	if batter != null and _style != &"":
+		batter.style = _style
+	if batter != null and OS.get_cmdline_user_args().has("lefty") and not _view._bats_left:
+		# A lefty in the other box, as the match places one.
+		_view._bats_left = true
+		batter.set_lefty(true)
+		batter.position = _view._batter_spot()
+		batter.face(batter.position + Vector3.LEFT)
+		at = batter.global_position
+	# Nothing between the camera and the batter.
+	for f: Node3D in _view._fielders:
+		if f.global_position.distance_to(at) < 4.0:
+			f.visible = false
+	for n: Node in _view.get_children():
+		if n is Node3D and n.name.begins_with("Umpire"):
+			(n as Node3D).visible = false
 	if _shot >= AROUND.size():
 		return true
-	_cam.position = at + AROUND[_shot]
-	_cam.look_at(at + Vector3(0, 1.1, 0))
+	# From the pitcher, square to his chest (the plate side), from his back
+	# side, and high from behind the plate: relative to how he stands.
+	var fwd := -batter.global_transform.basis.z if batter != null else Vector3.FORWARD
+	fwd = Vector3(fwd.x, 0.0, fwd.z).normalized()
+	var side := -1.0 if _view._bats_left else 1.0
+	var around := [Vector3(0.9 * side, 1.5, -3.0), fwd * 3.0 + Vector3(0, 1.3, 0), -fwd * 2.8 + Vector3(0, 1.5, -1.0), Vector3(-0.6 * side, 2.6, 3.4)]
+	_cam.position = at + around[_shot]
+	_cam.look_at(at + Vector3(0, 1.2, 0))
+	_cam.near = 0.05
 	if OS.get_cmdline_user_args().has("hands") and batter != null:
 		# Tight on the grip from three sides.
 		var g := batter.grip_position()
@@ -74,7 +97,7 @@ func _process(_d: float) -> bool:
 		var views := [-b.z, b.x, -b.x - b.z]
 		_cam.position = g + (views[_shot] as Vector3).normalized() * 0.5 + Vector3.UP * 0.08
 		_cam.look_at(g, Vector3.UP)
-	if _frames % 6 == 0:
+	if _frames % 6 == 3:
 		root.get_texture().get_image().save_png(_out.path_join("batter_%d.png" % _shot))
 		_shot += 1
 	return false

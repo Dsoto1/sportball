@@ -85,6 +85,12 @@ const BAT := {
 }
 
 
+## Shoulders above the pelvis (m, mannequin) and the classic set-up's lean
+## (hips plus chest pitch, degrees) the stance hands are written for.
+const SHOULDER_ABOVE_PELVIS := 0.5
+const SET_UP_LEAN := 20.0
+
+
 static func P(right: float, up: float, forward: float) -> Vector3:
 	return PoseBaker.P(right, up, forward)
 
@@ -130,7 +136,7 @@ static func poses(style: StringName) -> Dictionary:
 	match style:
 		&"crouch":
 			stance = _with(stance, {
-				"drop": 0.22, "hips": Vector3(14, -5, 0), "chest": Vector3(26, -18, 0),
+				"drop": 0.17, "hips": Vector3(14, -5, 0), "chest": Vector3(24, -18, 0),
 				"foot_l": P(-0.42, 0.1, 0.05), "foot_r": P(0.42, 0.1, -0.02),
 				"hand_r": P(0.24, 1.46, 0.08), "hand_l": P(0.19, 1.39, 0.11),
 			})
@@ -203,6 +209,18 @@ static func poses(style: StringName) -> Dictionary:
 		if out > 0.0:
 			pose["hand_l"] = (pose["hand_l"] as Vector3) + Vector3(0, 0, out)
 			pose["hand_r"] = (pose["hand_r"] as Vector3) + Vector3(0, 0, out)
+	# Hands ride with the shoulders: the targets are body space, and the
+	# pelvis drop (and a deeper lean than the classic set-up's) lowers the
+	# shoulders under them, which put a crouched hitter's hands at his ear.
+	# Taken off here, each style's hands sit where it puts them relative to
+	# his actual shoulders: the top hand at about shoulder height, just off
+	# the back shoulder.
+	for pose: Dictionary in [stance, load]:
+		var sink := float(pose.get("drop", 0.0))
+		var lean := deg_to_rad((pose.get("hips", Vector3.ZERO) as Vector3).x + (pose.get("chest", Vector3.ZERO) as Vector3).x)
+		var ahead := maxf(0.0, SHOULDER_ABOVE_PELVIS * (sin(lean) - sin(deg_to_rad(SET_UP_LEAN))))
+		for hand in ["hand_l", "hand_r"]:
+			pose[hand] = (pose[hand] as Vector3) + Vector3(0, -sink, ahead)
 	# Feet: square to the plate while he waits and loads; from the plant on,
 	# the lead foot lands a third open and braces there (it must not spin
 	# with the hips), while the back foot pivots (its own toe_r per pose).

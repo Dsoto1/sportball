@@ -1876,3 +1876,24 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
 - **Waterfalls back, as sculpted models:** Sakura Gate's blossom cliff
   waterfall rises behind left-center, and Fountain Gardens' marble
   cascades stand either side of the board. Hero models gain both.
+
+## Batting stance: hands by the back shoulder, per style
+
+- The owner found the stance and the way the bat is held up "not the
+  best". Cause: the stance hands are body-space targets, and the pelvis
+  `drop` (and a deeper lean) lowered the shoulders under them, so the
+  hands rose to the ear on the classic set-up and to the helmet on the
+  crouch, with the bat flattened over the face. `BattingStyles.poses` now
+  lowers the stance and load hands by the drop and moves them ahead by any
+  lean beyond the classic 20 degrees: every style keeps its own hand spot,
+  measured from where his shoulders actually are. The top hand sits at
+  about shoulder height just off the back shoulder, the lead forearm
+  across the chest, the back elbow up, and the bat rises over the back
+  shoulder behind the helmet (wrap tips the barrel toward the pitcher;
+  slap holds it lower and flatter).
+- Knee poles from 40% outward to 15%: knees over the feet, an athletic
+  set rather than a squat. The crouch eases from a 22 to a 17 cm drop.
+- `tools/batter_closeup.gd`: the stills now apply `style:`, frame the
+  batter from the pitcher, his chest, his back and high behind the plate,
+  hide the catcher and umpire, take `lefty`, and no longer save the first
+  still before the camera has moved.
