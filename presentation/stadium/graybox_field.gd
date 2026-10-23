@@ -24,6 +24,8 @@ const CUTOUT_TOP := 0.12
 const CHALK_TOP := 0.15
 ## The batter's box, 6 ft long, centered on the plate.
 const BOX_LENGTH := 1.8288
+## The plate's back point (toward the catcher), m behind its middle.
+const PLATE_POINT := 0.2159
 
 const SURFACE := preload("res://presentation/stadium/field_surface.gdshader")
 const GRASS_TEX := preload("res://assets/third_party/ambientcg/Grass004/Grass004_512_Color.jpg")
@@ -171,9 +173,13 @@ func _build_foul_lines() -> void:
 		var length := FieldLayout.fence_distance(side * _tuning.foul_line_angle, _tuning)
 		# The chalk starts where the line leaves the batter's box (its front
 		# line, toward the pitcher): it meets the box, never runs through it.
-		var start := BOX_LENGTH * 0.5 / maxf(absf(dir.z), 0.01)
-		var run := length - start
-		var line := _add_box("FoulLine", Vector3(0.12, 0.03, run), dir * (start + run * 0.5) + Vector3(0, CHALK_TOP - 0.015, 0), CHALK)
+		# As on a real field the line runs from the plate's back point (the
+		# diamond's corner, 8.5 in behind its middle) and is chalked only
+		# from the box's front line out, ending flush against it.
+		var corner := Vector3(0.0, 0.0, PLATE_POINT)
+		var start := (BOX_LENGTH * 0.5 + PLATE_POINT + 0.04) / maxf(absf(dir.z), 0.01)
+		var run := (length + PLATE_POINT / maxf(absf(dir.z), 0.01)) - start
+		var line := _add_box("FoulLine", Vector3(0.12, 0.03, run), corner + dir * (start + run * 0.5) + Vector3(0, CHALK_TOP - 0.015, 0), CHALK)
 		line.look_at_from_position(line.position, line.position + dir, Vector3.UP)
 		# Yellow, standing well above the wall, with a screen fin on the fair side.
 		var tall := FieldLayout.fence_height(side * _tuning.foul_line_angle, _tuning) + 13.0

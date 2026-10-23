@@ -1688,3 +1688,8 @@ shoulder (classic 48 degrees up, yawed 118 toward the catcher; open and
 leg kick close to it). Lefties mirror it. Each style's slot depth was
 refit (slot_for_tilt) so the swing keeps its Statcast swing-path tilt. tools/grip_test.gd `body`
 shows the whole stance from four sides.
+
+Foul lines (follow-up): they now run from the plate's back point (the
+diamond's corner), not its middle, and are chalked only from the batter's
+boxes out, ending flush on each box's front line about two thirds of the
+way across, as on a real field.
