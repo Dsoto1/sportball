@@ -1754,3 +1754,17 @@ rubber sits on the table.
 - tools/grip_test.gd `swing:<p>` holds the swing at any moment: the
   hands stay wrapped on the handle from the slot through contact and the
   extension.
+
+## Pitcher's view and dugouts against the sheets
+
+Comparing every sheet's "pitcher's view" and "first base line (home
+dugout)" panels with the same views in the game (scratch tool
+pv_sheet.sh: sheet panel beside the render, park by park):
+- Every sheet hangs the club's name across the wall behind home. The
+  backstop wall now carries a banner in the club's dark color, the name
+  in big letters following the wall's curve and an emblem either end.
+- The sheets' dugouts are fronted by a tall signboard. The dugout roof
+  now carries a 1.5 m band in the club's color (VISITORS for the away
+  side) with the full club name between two emblems and lit trim, and the
+  players stand at the rail (their own excitement, on their feet) rather
+  than sitting out of sight at the back.

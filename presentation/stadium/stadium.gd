@@ -112,6 +112,7 @@ func build(p_tuning: BaseballTuning, p_def: StadiumDef, home: TeamDef, away: Tea
 	_build_batters_eye()
 	_build_dugouts(home, away)
 	_build_backstop()
+	_build_backstop_banner(home)
 	_build_grandstand()
 	_build_markers(home)
 	_build_fascia(home)
@@ -877,11 +878,30 @@ func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
 		for k in 7:
 			var post := box(Vector3(0.1, 1.05, 0.1), def.accent_color.darkened(0.3), dugout)
 			post.position = Vector3(-w * 0.5 + 0.5 + k * (w - 1.0) / 6.0, 0.52, -0.2)
-		var fascia := box(Vector3(w + 1.0, 0.8, 0.3), home.primary_color if is_home else home.dark_color, dugout)
-		fascia.position = Vector3(0, DUGOUT_ROOF - 0.3, -0.35)
-		var sign := label(home.team_name.to_upper() if is_home else "VISITORS", 84, home.highlight_color, dugout)
-		sign.position = Vector3(0, DUGOUT_ROOF - 0.3, -0.52)
+		# The signboard over the opening (as on the sheets): a tall band in
+		# the club's color, the name large between its emblems, a lit trim.
+		var band_h := 1.5
+		var band_y := DUGOUT_ROOF + band_h * 0.5 - 0.5
+		var fascia := box(Vector3(w + 1.0, band_h, 0.3), club.primary_color.darkened(0.15) if is_home else home.dark_color, dugout)
+		fascia.position = Vector3(0, band_y, -0.35)
+		for edge: float in [-1.0, 1.0]:
+			var stripe := box(Vector3(w + 1.1, 0.1, 0.32), home.accent_color, dugout)
+			stripe.position = Vector3(0, band_y + edge * (band_h * 0.5 - 0.05), -0.37)
+			stripe.material_override = glow(home.accent_color, 1.2)
+			var badge := Emblem.build(club, 1.15, 0.5)
+			badge.position = Vector3(edge * (w * 0.5 - 0.6), band_y, -0.55)
+			badge.rotation.y = PI
+			dugout.add_child(badge)
+		var sign := label(club.full_name().to_upper() if is_home else "VISITORS", 150, home.highlight_color, dugout)
+		sign.position = Vector3(0, band_y, -0.52)
 		sign.rotation.y = PI
+		sign.outline_size = 16
+		sign.outline_modulate = home.dark_color
+		# Fit the name between the badges.
+		var room := w - 3.0
+		var wide := sign.font.get_string_size(sign.text, HORIZONTAL_ALIGNMENT_LEFT, -1, sign.font_size).x * sign.pixel_size
+		if wide > room * 0.82:
+			sign.pixel_size *= room * 0.82 / wide
 		var lamp := box(Vector3(w, 0.08, 0.08), Color.WHITE, dugout)
 		lamp.position = Vector3(0, DUGOUT_ROOF - 0.35, 0.2)
 		lamp.material_override = glow(Color(1.0, 0.92, 0.75), 2.0)
@@ -892,13 +912,20 @@ func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
 		mark.rotation.y = PI
 		dugout.add_child(mark)
 		# The bench: the players, in their club's jerseys.
+		# Standing at the rail, as on the sheets (a few further back).
 		var spots: Array[Vector3] = []
 		var x := -w * 0.5 + 1.0
 		while x < w * 0.5 - 1.0:
-			if rng.randf() < 0.7:
-				spots.append(dugout.transform * Vector3(x, floor_y, 2.85))
-			x += 0.85
+			if rng.randf() < 0.75:
+				spots.append(dugout.transform * Vector3(x, floor_y, 0.75 if rng.randf() < 0.7 else 1.6))
+			x += 0.8
 		add_fans(spots, "Bench_%s" % club.abbreviation, club)
+		# The bench crowd is on its feet whatever the stands are doing.
+		var bench_node: MultiMeshInstance3D = get_node_or_null("Bench_%s" % club.abbreviation)
+		if bench_node != null:
+			var m: ShaderMaterial = (bench_node.material_override as ShaderMaterial).duplicate()
+			m.set_shader_parameter("excitement", 0.55)
+			bench_node.material_override = m
 
 
 ## The field's wall round the foul territory: from each foul pole round
@@ -972,6 +999,59 @@ func _build_backstop() -> void:
 	net_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	netting.material_override = net_mat
 	add_child(netting)
+
+
+## The club's banner across the wall behind home, as every sheet has it:
+## a band in the club's dark color along the top of the backstop wall, the
+## club name in big letters following its curve, an emblem either end.
+func _build_backstop_banner(home: TeamDef) -> void:
+	var root := Node3D.new()
+	root.name = "BackstopBanner"
+	add_child(root)
+	var span := 26.0
+	var band := SurfaceTool.new()
+	band.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var h := BACKSTOP_WALL
+	var lo := h * 0.32
+	var hi := h - 0.12
+	var a := 180.0 - span
+	while a < 180.0 + span - 0.01:
+		var b := a + 1.0
+		var sa := wrapf(a, -180.0, 180.0)
+		var sb := wrapf(b, -180.0, 180.0)
+		var ra := profile(sa).x - 0.2
+		var rb := profile(sb).x - 0.2
+		_quad(band, point(sa, ra, lo), point(sb, rb, lo), point(sb, rb, hi), point(sa, ra, hi), home.dark_color.srgb_to_linear())
+		a = b
+	band.generate_normals()
+	var mi := MeshInstance3D.new()
+	mi.mesh = band.commit()
+	var m := StandardMaterial3D.new()
+	m.vertex_color_use_as_albedo = true
+	m.cull_mode = BaseMaterial3D.CULL_DISABLED
+	m.roughness = 0.6
+	mi.material_override = m
+	root.add_child(mi)
+	# The name, letter by letter round the curve, facing the field.
+	var text := home.team_name.to_upper()
+	var px := 0.03
+	var glyph := 150.0 * px * 0.66
+	var r := profile(180.0).x - 0.28
+	var total := rad_to_deg(text.length() * glyph / r)
+	for i in text.length():
+		var ang := 180.0 - total * 0.5 + total * (i + 0.5) / text.length()
+		var letter := label(text[i], 150, home.highlight_color, root)
+		letter.pixel_size = px
+		letter.outline_size = 14
+		letter.outline_modulate = home.primary_color.darkened(0.3)
+		letter.position = point(wrapf(ang, -180.0, 180.0), r, (lo + hi) * 0.5)
+		face_home(letter)
+	for side: float in [-1.0, 1.0]:
+		var ang := 180.0 + side * (total * 0.5 + 4.0)
+		var badge := Emblem.build(home, 1.6, 0.6)
+		badge.position = point(wrapf(ang, -180.0, 180.0), profile(wrapf(ang, -180.0, 180.0)).x - 0.3, (lo + hi) * 0.5)
+		root.add_child(badge)
+		face_home(badge)
 
 
 ## The wall's dressing: distances in big numbers (the foul-pole distances
