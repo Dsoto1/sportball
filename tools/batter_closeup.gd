@@ -9,6 +9,7 @@ extends SceneTree
 ## style argument's neighbour (swing <style> flip) to barrel it and watch
 ## the bat flip after contact, `pitcher` to watch from the mound, or
 ## `slowmo` for the whip from the press to contact at quarter speed.
+## `style:<name>` overrides the batter's style for the stills too.
 const AROUND := [Vector3(1.6, 1.3, -1.2), Vector3(-2.6, 1.4, 1.2), Vector3(0.0, 1.5, 3.2)]
 const SWING_FROM := Vector3(3.2, 1.3, -1.4)
 ## Frames (at 60 fps) of the sequence: windup from WINDUP_FROM, the pitch
@@ -32,9 +33,12 @@ const SLOWMO_SHOTS := [132, 137, 139, 141, 143, 145, 147, 150, 156]
 
 func _initialize() -> void:
 	_out = OS.get_cmdline_user_args()[0]
-	_swing = OS.get_cmdline_user_args().size() > 1
-	if OS.get_cmdline_user_args().size() > 2:
+	_swing = OS.get_cmdline_user_args().size() > 1 and OS.get_cmdline_user_args()[1] == "swing"
+	if _swing and OS.get_cmdline_user_args().size() > 2:
 		_style = StringName(OS.get_cmdline_user_args()[2])
+	for a: String in OS.get_cmdline_user_args():
+		if a.begins_with("style:"):
+			_style = StringName(a.substr(6))
 	_flip = OS.get_cmdline_user_args().has("flip")
 	root.add_child(load("res://app/main.tscn").instantiate())
 

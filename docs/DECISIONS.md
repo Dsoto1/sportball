@@ -1636,3 +1636,25 @@ branding:
   right; pinch hit and steal options bottom left; a steal hint under the
   mini field when anyone is on. The small batter card under the scorebug
   gives way to the banner.
+
+## The grip, home plate and the batter's boxes
+
+- Grip (BatGrip): the hands used to be pinned to the bat at the wrists,
+  so the handle ran through the wrists and the fingers stuck out. Now the
+  handle runs across each palm at the base of the fingers, thumbs and
+  index fingers toward the barrel, the hands stacked with the knob just
+  below the bottom hand, and the fingers and thumbs curled round it; each
+  arm reaches to wherever its wrist must be for that.
+- Stance: after the owner's reference (a left-handed hitter set up), the
+  hands sit up by the back shoulder with the back elbow raised, closer to
+  the body (HANDS_OUT 0.2 to 0.12 m), the bat standing up (classic and
+  open 66 degrees). Crouch and slap keep lower hands, but at the chest
+  rather than the belt.
+- Home plate: the rulebook pentagon (17 in front, 8.5 in sides, 12 in
+  edges to the point) with a beveled black rubber rim, flush in its dirt.
+- Chalk: both batter's boxes (4 x 6 ft, inside line 6 in off the plate,
+  centered on the plate) and the catcher's box. The boxes are the same
+  box BattingStyles keeps every stance's feet in, so feet and strides
+  land inside the chalk.
+- Batting HUD mirrors for lefties (card and swing controls on the right
+  with him, scouting on the left).

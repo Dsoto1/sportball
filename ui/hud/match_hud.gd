@@ -61,6 +61,8 @@ var _slide_step := false
 var _pitching := false
 # Batting.
 var _batting := false
+## The hitter bats left: his card and the scouting list swap sides.
+var _lefty := false
 var _banner := {}
 var _hitter := {}
 var _swing_box: PanelContainer
@@ -392,7 +394,7 @@ func _build_batting() -> void:
 	_swing_box = PanelContainer.new()
 	_swing_box.add_theme_stylebox_override("panel", panel_style())
 	_swing_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_swing_box.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	_swing_box.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	_swing_box.position = Vector2(-372, -196)
 	_swing_box.size = Vector2(348, 172)
 	add_child(_swing_box)
@@ -409,7 +411,7 @@ func _build_batting() -> void:
 	_bat_options.scroll_active = false
 	_bat_options.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_bat_options.add_theme_font_size_override("normal_font_size", 19)
-	_bat_options.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+	_bat_options.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	_bat_options.position = Vector2(LEFT + 6, -130)
 	_bat_options.size = Vector2(460, 120)
 	add_child(_bat_options)
@@ -435,8 +437,8 @@ func show_batting(visible_now: bool, families: Array[PitchFamilyDef] = []) -> vo
 		_selected = -1
 		_pitch_list.visible = true
 		_prompt.visible = false
-		_refresh_pitches()
 		_refresh_batting()
+		_refresh_pitches()
 	elif not _pitching:
 		_pitch_list.visible = false
 		_prompt.visible = true
@@ -456,6 +458,12 @@ func _refresh_batting() -> void:
 	for pos: StringName in defense:
 		if defense[pos] == b.id:
 			position = StringName(String(pos).to_upper())
+	_lefty = b.bats_left()
+	var card: Panel = _hitter["box"]
+	card.position = Vector2(size.x - 24 - 12 - card.size.x, 470) if _lefty else Vector2(LEFT + 12, 470)
+	# The swing controls and options swap too (mirror of the righty layout).
+	_swing_box.position = Vector2(LEFT, size.y - 196) if _lefty else Vector2(size.x - 372, size.y - 196)
+	_bat_options.position = Vector2(LEFT + 6, size.y - 270) if _lefty else Vector2(LEFT + 6, size.y - 130)
 	(_banner["badge"] as Badge).set_letter(str(b.number), team)
 	_banner["title"].text = "#%d  %s" % [b.number, b.display_name.to_upper()]
 	_banner["pos"].text = String(position)
@@ -580,8 +588,9 @@ func _refresh_pitches() -> void:
 	# Pitching: the list is yours down the left. Batting: it is the pitcher's,
 	# down the right, as scouting.
 	if _batting:
-		_pitch_list.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-		_pitch_list.position = Vector2(size.x - 24 - 310, 400)
+		# Opposite the batter: a lefty stands on the right of the frame.
+		_pitch_list.set_anchors_preset(Control.PRESET_TOP_LEFT)
+		_pitch_list.position = Vector2(LEFT + 12, 400) if _lefty else Vector2(size.x - 24 - 310, 400)
 	else:
 		_pitch_list.set_anchors_preset(Control.PRESET_TOP_LEFT)
 		_pitch_list.position = Vector2(LEFT + 12, 370)

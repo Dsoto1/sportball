@@ -53,10 +53,12 @@ static var STANCE := {
 	"drop": 0.1, "hips": Vector3(8, -5, 0), "chest": Vector3(12, -18, 0), "head": Vector3(-8, 85, 0),
 	"foot_l": P(-0.34, 0.1, 0.05), "foot_r": P(0.34, 0.1, -0.02),
 	"knee_l": P(-0.4, 0, 1), "knee_r": P(0.4, 0, 1),
-	"hand_r": P(0.2, 1.4, 0.1), "hand_l": P(0.14, 1.33, 0.14),
-	"elbow_r": P(1, -0.6, -0.2), "elbow_l": P(0, -1, 0.4),
+	# Hands up by the back shoulder, the back elbow raised, as a hitter
+	# sets up.
+	"hand_r": P(0.28, 1.72, 0.0), "hand_l": P(0.24, 1.65, 0.04),
+	"elbow_r": P(1, 0.6, -0.4), "elbow_l": P(0, -1, 0.5),
 }
-static var STANCE_BOB := _with(STANCE, {"drop": 0.12, "hand_r": P(0.22, 1.43, 0.08), "hand_l": P(0.16, 1.36, 0.12)})
+static var STANCE_BOB := _with(STANCE, {"drop": 0.12, "hand_r": P(0.3, 1.74, -0.01), "hand_l": P(0.26, 1.67, 0.03)})
 static var STRIDE := _with(STANCE, {
 	"drop": 0.14, "hips": Vector3(8, 8, 0), "chest": Vector3(12, -26, 0), "head": Vector3(-8, 85, 0),
 	"foot_l": P(-0.52, 0.1, 0.07), "hand_r": P(0.18, 1.3, 0.06), "hand_l": P(0.12, 1.24, 0.1),

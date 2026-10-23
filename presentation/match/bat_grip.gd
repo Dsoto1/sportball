@@ -1,9 +1,13 @@
 class_name BatGrip
 extends SkeletonModifier3D
 ## Puts the batter's hands on the bat. The swing animation brings his hands
-## roughly where they belong; this reaches both arms (two-bone IK) onto the
-## handle, bottom hand near the knob and top hand just above it, and holds
-## the bat there pointing where the swing says. Visual only.
+## roughly where they belong; this wraps both hands round the handle as a
+## real grip: the handle runs across each palm at the base of the fingers,
+## thumbs and index fingers toward the barrel, the hands stacked (bottom
+## hand at the knob, top hand touching it), fingers and thumbs curled round
+## it. Each arm reaches (two-bone IK) to wherever its wrist must be for
+## that, and the bat is held there pointing where the swing says. Visual
+## only.
 
 ## The bat node (handle at its origin, barrel along -Z), placed every frame.
 var bat: Node3D
@@ -20,6 +24,18 @@ var one_hand := false
 ## bottom hand.
 var choke := 0.0
 
+## Where the handle crosses the palm, in the hand bone's frame (fingers
+## along +Y, the index side +Z for the right hand): the base of the
+## fingers, a little out from the palm.
+const PALM := Vector3(0.0, 0.085, 0.0)
+## How far the handle's axis sits off the palm (half a handle and a glove).
+const PALM_DEPTH := 0.03
+## Handle below the bottom hand's middle to the knob (half a hand).
+const KNOB_ROOM := 0.05
+## Finger curl round the handle, per joint (degrees).
+const CURL := [72.0, 88.0, 60.0]
+const FINGERS := ["index", "middle", "ring", "pinky"]
+
 
 func _process_modification_with_delta(_delta: float) -> void:
 	var sk := get_skeleton()
@@ -35,11 +51,49 @@ func _process_modification_with_delta(_delta: float) -> void:
 	var spread := gap / maxf((xf.basis * d).length(), 0.001)
 	var bottom_target := mid - d * spread * 0.5
 	var top_target := mid + d * spread * 0.5
-	_reach(sk, bottom_side, bottom_target)
+	_grip(sk, bottom_side, bottom_target, d)
 	if not one_hand:
-		_reach(sk, top_side, top_target)
+		_grip(sk, top_side, top_target, d)
 	var up := Vector3.UP if absf(direction.normalized().dot(Vector3.UP)) < 0.98 else Vector3.FORWARD
-	bat.global_transform = Transform3D(Basis.looking_at(direction, up), xf * bottom_target - direction.normalized() * choke)
+	# The knob just below the bottom hand (its palm is centered on the axis).
+	bat.global_transform = Transform3D(Basis.looking_at(direction, up), xf * bottom_target - direction.normalized() * (choke + KNOB_ROOM))
+
+
+## One hand round the handle at `on_axis` (skeleton space), the handle
+## along d: works out the hand's turn (thumb side up the bat, fingers
+## across it, carrying on from the forearm), reaches the arm so the palm
+## lands there, then sets the hand and curls the fingers.
+func _grip(sk: Skeleton3D, side: String, on_axis: Vector3, d: Vector3) -> void:
+	var hand := sk.find_bone("hand_" + side)
+	var lower := sk.find_bone("lowerarm_" + side)
+	# This hand's own sides (the skeleton mirrors left and right).
+	var index_side := signf(sk.get_bone_rest(sk.find_bone("index_01_" + side)).origin.z)
+	var palm_side := signf(sk.get_bone_rest(sk.find_bone("thumb_01_" + side)).origin.x)
+	var forearm := (sk.get_bone_global_pose(hand).origin - sk.get_bone_global_pose(lower).origin).normalized()
+	var y := (forearm - d * forearm.dot(d))
+	if y.length() < 0.01:
+		y = d.cross(Vector3.UP)
+	y = y.normalized()
+	var z := d * index_side
+	var x := y.cross(z).normalized()
+	var basis := Basis(x, y, z).orthonormalized()
+	var palm := basis * (PALM + Vector3(PALM_DEPTH * palm_side, 0.0, 0.0))
+	_reach(sk, side, on_axis - palm)
+	var parent_g := sk.get_bone_global_pose(lower)
+	sk.set_bone_pose_rotation(hand, (parent_g.basis.inverse() * basis).get_rotation_quaternion())
+	# Fingers curl toward the palm, round the handle; the thumb wraps over.
+	for finger: String in FINGERS:
+		for j in 3:
+			var b := sk.find_bone("%s_%02d_%s" % [finger, j + 1, side])
+			if b < 0:
+				continue
+			var r := sk.get_bone_rest(b).basis
+			sk.set_bone_pose_rotation(b, (r * Basis(Vector3(1, 0, 0), deg_to_rad(CURL[j]))).get_rotation_quaternion())
+	for j in 3:
+		var b := sk.find_bone("thumb_%02d_%s" % [j + 1, side])
+		if b >= 0:
+			var r := sk.get_bone_rest(b).basis
+			sk.set_bone_pose_rotation(b, (r * Basis(Vector3(1, 0, 0), deg_to_rad(25.0 + j * 15.0) * -palm_side)).get_rotation_quaternion())
 
 
 ## Two-bone IK for one arm: the wrist lands on target, elbow bent down and out.

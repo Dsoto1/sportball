@@ -35,7 +35,7 @@ const PLATE_CLEAR := 0.5
 const BOX_TOWARD_PITCHER := -1.4
 const BOX_TOWARD_CATCHER := 0.42
 ## The lead hand sits at least this far in front of him (m) before the swing.
-const HANDS_OUT := 0.2
+const HANDS_OUT := 0.12
 ## Feet per style, fit to Statcast's batting-stance tracking (229 MLB
 ## hitters, Baseball Savant): stance width (m between the feet), stance
 ## angle (degrees open: the lead foot set back from the plate) and stride
@@ -76,9 +76,9 @@ const NAMES := {&"classic": "Classic", &"crouch": "Crouch", &"open": "Open", &"l
 ## lets the top hand go after contact. choke (m) moves the hands up the
 ## handle.
 const BAT := {
-	&"classic": {"slot_lift": -60.0, "yaw": 100.0, "lift": 50.0, "load_yaw": 15.0, "load_lift": 5.0, "waggle": 6.0, "finish_yaw": -170.0, "finish_lift": 40.0, "one_hand": false, "choke": 0.0},
+	&"classic": {"slot_lift": -60.0, "yaw": 100.0, "lift": 66.0, "load_yaw": 15.0, "load_lift": 5.0, "waggle": 6.0, "finish_yaw": -170.0, "finish_lift": 40.0, "one_hand": false, "choke": 0.0},
 	&"crouch": {"slot_lift": -59.0, "yaw": 105.0, "lift": 38.0, "load_yaw": 12.0, "load_lift": 0.0, "waggle": 4.0, "finish_yaw": -165.0, "finish_lift": 30.0, "one_hand": false, "choke": 0.0},
-	&"open": {"slot_lift": -57.0, "yaw": 92.0, "lift": 58.0, "load_yaw": 20.0, "load_lift": 2.0, "waggle": 9.0, "finish_yaw": -170.0, "finish_lift": 42.0, "one_hand": false, "choke": 0.0},
+	&"open": {"slot_lift": -57.0, "yaw": 92.0, "lift": 66.0, "load_yaw": 20.0, "load_lift": 2.0, "waggle": 9.0, "finish_yaw": -170.0, "finish_lift": 42.0, "one_hand": false, "choke": 0.0},
 	&"leg_kick": {"slot_lift": -70.0, "yaw": 100.0, "lift": 62.0, "load_yaw": 28.0, "load_lift": 8.0, "waggle": 3.0, "finish_yaw": -185.0, "finish_lift": 48.0, "one_hand": false, "choke": 0.0},
 	&"wrap": {"slot_lift": -80.0, "yaw": 145.0, "lift": 28.0, "load_yaw": 15.0, "load_lift": 0.0, "waggle": 2.0, "finish_yaw": -180.0, "finish_lift": 25.0, "one_hand": true, "choke": 0.0},
 	&"slap": {"slot_lift": -40.0, "yaw": 80.0, "lift": 32.0, "load_yaw": 6.0, "load_lift": 0.0, "waggle": 10.0, "finish_yaw": -110.0, "finish_lift": 12.0, "one_hand": false, "choke": 0.08},
@@ -132,9 +132,9 @@ static func poses(style: StringName) -> Dictionary:
 			stance = _with(stance, {
 				"drop": 0.22, "hips": Vector3(14, -5, 0), "chest": Vector3(26, -18, 0),
 				"foot_l": P(-0.42, 0.1, 0.05), "foot_r": P(0.42, 0.1, -0.02),
-				"hand_r": P(0.2, 1.22, 0.14), "hand_l": P(0.14, 1.15, 0.17),
+				"hand_r": P(0.24, 1.46, 0.08), "hand_l": P(0.19, 1.39, 0.11),
 			})
-			load = _with(stance, {"drop": 0.24, "shift": P(0.04, 0, 0), "hips": Vector3(14, -14, 0), "chest": Vector3(26, -28, 0), "hand_r": P(0.25, 1.24, 0.1), "hand_l": P(0.19, 1.17, 0.13)})
+			load = _with(stance, {"drop": 0.24, "shift": P(0.04, 0, 0), "hips": Vector3(14, -14, 0), "chest": Vector3(26, -28, 0), "hand_r": P(0.28, 1.48, 0.05), "hand_l": P(0.22, 1.41, 0.08)})
 			stride = _with(stride, {"drop": 0.24, "foot_l": P(-0.6, 0.1, 0.07), "foot_r": P(0.42, 0.1, -0.02), "hips": Vector3(14, 8, 0), "chest": Vector3(26, -24, 0)})
 			contact = _with(contact, {"drop": 0.22, "foot_l": P(-0.6, 0.1, 0.07)})
 			extend = _with(extend, {"drop": 0.2, "foot_l": P(-0.6, 0.1, 0.07)})
@@ -177,10 +177,10 @@ static func poses(style: StringName) -> Dictionary:
 				"drop": 0.14, "chest": Vector3(16, -12, 0),
 				"foot_l": P(-0.28, 0.1, 0.06), "foot_r": P(0.3, 0.1, -0.02),
 				# Lower and out in front of the back shoulder, bat flatter.
-				"hand_r": P(0.14, 1.18, 0.25), "hand_l": P(0.08, 1.13, 0.28),
+				"hand_r": P(0.18, 1.4, 0.14), "hand_l": P(0.12, 1.34, 0.17),
 				"elbow_r": P(1, -1, 0), "elbow_l": P(-0.2, -1, 0.3),
 			})
-			load = _with(stance, {"hips": Vector3(10, -8, 0), "chest": Vector3(16, -20, 0), "hand_r": P(0.18, 1.2, 0.22), "hand_l": P(0.12, 1.15, 0.25)})
+			load = _with(stance, {"hips": Vector3(10, -8, 0), "chest": Vector3(16, -20, 0), "hand_r": P(0.22, 1.42, 0.11), "hand_l": P(0.16, 1.36, 0.14)})
 			stride = _with(stride, {"drop": 0.15, "foot_l": P(-0.4, 0.1, 0.08), "foot_r": P(0.3, 0.1, -0.02), "hand_r": P(0.16, 1.18, 0.2), "hand_l": P(0.1, 1.13, 0.23)})
 			contact = _with(contact, {"foot_l": P(-0.4, 0.1, 0.08), "hips": Vector3(8, 40, 0), "chest": Vector3(16, -8, 0), "head": Vector3(-5, -2, 0)})
 			extend = _with(extend, {"foot_l": P(-0.4, 0.1, 0.08), "hips": Vector3(6, 55, 0), "chest": Vector3(12, 0, 0), "head": Vector3(-5, -25, 0)})

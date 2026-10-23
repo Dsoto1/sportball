@@ -93,10 +93,74 @@ func _build_infield() -> void:
 	mound.position = Vector3(0, 0.05, -18.4)
 	mound.name = "Mound"
 	add_child(mound)
-	_add_box("HomePlate", Vector3(0.43, 0.06, 0.43), Vector3(0, CHALK_TOP - 0.03, 0), CHALK)
+	_build_home_plate()
+	_build_batters_boxes()
 	for base in [FieldLayout.FIRST, FieldLayout.SECOND, FieldLayout.THIRD]:
 		var bag := _add_box("Base%d" % base, Vector3(0.6, 0.12, 0.6), FieldLayout.base_position(base) + Vector3(0, CHALK_TOP + 0.0, 0), CHALK)
 		bag.rotation_degrees.y = 45.0
+
+
+## Home plate to the rulebook: a five-sided slab of whitened rubber, 17 in
+## across the front (facing the pitcher), 8.5 in down each side, and two
+## 12 in edges meeting at the point toward the catcher, with a beveled
+## black rubber rim, set flush in its dirt cutout.
+func _build_home_plate() -> void:
+	var w := 0.2159  # half of 17 in
+	var outline := [Vector2(-w, -w), Vector2(w, -w), Vector2(w, 0.0), Vector2(0.0, w), Vector2(-w, 0.0)]
+	for layer: Array in [[1.08, CHALK_TOP - 0.005, Color(0.08, 0.08, 0.09)], [1.0, CHALK_TOP + 0.012, CHALK]]:
+		var scale: float = layer[0]
+		var top: float = layer[1]
+		var st := SurfaceTool.new()
+		st.begin(Mesh.PRIMITIVE_TRIANGLES)
+		var center := Vector3(0, top, 0.0)
+		for i in outline.size():
+			var a: Vector2 = outline[i] * scale
+			var b: Vector2 = outline[(i + 1) % outline.size()] * scale
+			# Top, then the sloped edge down to the dirt.
+			st.set_normal(Vector3.UP)
+			st.add_vertex(center)
+			st.add_vertex(Vector3(b.x, top, b.y))
+			st.add_vertex(Vector3(a.x, top, a.y))
+			var out_a := Vector3(a.x, 0.0, a.y) * 1.04
+			var out_b := Vector3(b.x, 0.0, b.y) * 1.04
+			for v: Vector3 in [Vector3(a.x, top, a.y), Vector3(b.x, top, b.y), out_b, Vector3(a.x, top, a.y), out_b, out_a]:
+				st.add_vertex(v)
+		st.generate_normals()
+		var mi := MeshInstance3D.new()
+		mi.name = "HomePlate" if scale == 1.0 else "HomePlateRim"
+		mi.mesh = st.commit()
+		var m := _mat(layer[2])
+		m.roughness = 0.6
+		m.cull_mode = BaseMaterial3D.CULL_DISABLED
+		mi.material_override = m
+		add_child(mi)
+
+
+## The batter's boxes and catcher's box in chalk, as on a real field: each
+## batter's box 4 ft wide and 6 ft long, its inside line 6 in off the
+## plate, centered on the plate's middle; the catcher's box behind. Every
+## batting stance's feet, stride included, land inside them.
+func _build_batters_boxes() -> void:
+	var line := 0.076  # 3 in chalk
+	var inside := 0.2159 + 0.1524
+	var width := 1.2192
+	var length := 1.8288
+	# Centered on the plate's middle: the same box BattingStyles keeps every
+	# stance's feet in (BOX_TOWARD_PITCHER / BOX_TOWARD_CATCHER from the
+	# batter's spot).
+	var mid_z := 0.0
+	for side: float in [-1.0, 1.0]:
+		var x0 := side * inside
+		var x1 := side * (inside + width)
+		var xm := (x0 + x1) * 0.5
+		for z: float in [mid_z - length * 0.5, mid_z + length * 0.5]:
+			_add_box("BoxLine", Vector3(width + line, 0.012, line), Vector3(xm, CHALK_TOP - 0.004, z), CHALK)
+		for x: float in [x0, x1]:
+			_add_box("BoxLine", Vector3(line, 0.012, length), Vector3(x, CHALK_TOP - 0.004, mid_z), CHALK)
+	# The catcher's box: 43 in wide, running 8 ft back from the boxes.
+	var back := mid_z + length * 0.5
+	for x: float in [-0.546, 0.546]:
+		_add_box("CatcherBox", Vector3(line, 0.012, 2.44), Vector3(x, CHALK_TOP - 0.004, back + 1.22), CHALK)
 
 
 func _build_foul_lines() -> void:
