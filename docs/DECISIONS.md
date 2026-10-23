@@ -1658,3 +1658,20 @@ branding:
   land inside the chalk.
 - Batting HUD mirrors for lefties (card and swing controls on the right
   with him, scouting on the left).
+
+## Grip in the fingers; foul lines meet the boxes
+
+After the owner's grip reference (handle in the fingers with the wrists
+at extension, not deep in the palms with the wrists locked):
+- The handle sits at the base of the fingers (11.5 cm up the hand), the
+  wrists cocked back 28 degrees.
+- Fingers and thumbs wrap by fitting, not by fixed angles: each joint
+  bends until its next knuckle sits on the handle's surface (3 cm off its
+  axis), so the hand closes round the bat at any angle; the thumb joints
+  try their own axes and are kept from lying along the handle.
+- The bat mesh already sits its knob 6 cm below the grip point; the
+  extra knob room added last pass is gone.
+- tools/grip_test.gd renders the grip alone (four views) for checking.
+
+Chalk: the foul lines start where they meet the batter's boxes, as on a
+real field, instead of running through them to the plate.

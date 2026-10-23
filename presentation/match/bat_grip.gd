@@ -2,7 +2,8 @@ class_name BatGrip
 extends SkeletonModifier3D
 ## Puts the batter's hands on the bat. The swing animation brings his hands
 ## roughly where they belong; this wraps both hands round the handle as a
-## real grip: the handle runs across each palm at the base of the fingers,
+## real grip: the handle sits in the fingers, not deep in the palm, the
+## wrists cocked back (extension, not locked in flexion),
 ## thumbs and index fingers toward the barrel, the hands stacked (bottom
 ## hand at the knob, top hand touching it), fingers and thumbs curled round
 ## it. Each arm reaches (two-bone IK) to wherever its wrist must be for
@@ -27,13 +28,20 @@ var choke := 0.0
 ## Where the handle crosses the palm, in the hand bone's frame (fingers
 ## along +Y, the index side +Z for the right hand): the base of the
 ## fingers, a little out from the palm.
-const PALM := Vector3(0.0, 0.085, 0.0)
+const PALM := Vector3(0.0, 0.115, 0.0)
 ## How far the handle's axis sits off the palm (half a handle and a glove).
 const PALM_DEPTH := 0.03
-## Handle below the bottom hand's middle to the knob (half a hand).
-const KNOB_ROOM := 0.05
+## Extra handle below the bottom hand (the bat mesh already sits its knob
+## 6 cm below the grip point).
+const KNOB_ROOM := 0.0
 ## Finger curl round the handle, per joint (degrees).
-const CURL := [72.0, 88.0, 60.0]
+## A knuckle's distance from the handle's axis when wrapped round it:
+## handle radius plus a gloved finger's half thickness.
+const WRAP := 0.03
+## How far each finger joint may bend (degrees).
+const MAX_BEND := [95.0, 110.0, 90.0]
+## Wrist extension: the hand bent back from the forearm line (degrees).
+const EXTENSION := 28.0
 const FINGERS := ["index", "middle", "ring", "pinky"]
 
 
@@ -76,24 +84,57 @@ func _grip(sk: Skeleton3D, side: String, on_axis: Vector3, d: Vector3) -> void:
 	y = y.normalized()
 	var z := d * index_side
 	var x := y.cross(z).normalized()
+	# Cock the wrist back: the fingers tip away from the palm side, about
+	# the handle's own line (so the hand stays square to the bat).
+	var palm_normal := x * palm_side
+	var e := deg_to_rad(EXTENSION)
+	y = (y * cos(e) - palm_normal * sin(e)).normalized()
+	x = y.cross(z).normalized()
 	var basis := Basis(x, y, z).orthonormalized()
 	var palm := basis * (PALM + Vector3(PALM_DEPTH * palm_side, 0.0, 0.0))
 	_reach(sk, side, on_axis - palm)
 	var parent_g := sk.get_bone_global_pose(lower)
 	sk.set_bone_pose_rotation(hand, (parent_g.basis.inverse() * basis).get_rotation_quaternion())
-	# Fingers curl toward the palm, round the handle; the thumb wraps over.
+	# Fingers and thumb wrap the handle: each joint bends until the next
+	# knuckle sits on the handle's surface (handle plus finger thickness
+	# from its axis), so the hand closes round it at any bat angle.
 	for finger: String in FINGERS:
 		for j in 3:
-			var b := sk.find_bone("%s_%02d_%s" % [finger, j + 1, side])
-			if b < 0:
-				continue
-			var r := sk.get_bone_rest(b).basis
-			sk.set_bone_pose_rotation(b, (r * Basis(Vector3(1, 0, 0), deg_to_rad(CURL[j]))).get_rotation_quaternion())
+			_wrap(sk, "%s_%02d_%s" % [finger, j + 1, side], "%s_%02d%s_%s" % [finger, j + 2, "_leaf" if j == 2 else "", side], on_axis, d, Vector3(1, 0, 0), 0.0, MAX_BEND[j])
+	# The thumb's joints turn on their own axes: each tries all three and
+	# keeps the bend that wraps it best (over the fingers, round the handle).
 	for j in 3:
-		var b := sk.find_bone("thumb_%02d_%s" % [j + 1, side])
-		if b >= 0:
-			var r := sk.get_bone_rest(b).basis
-			sk.set_bone_pose_rotation(b, (r * Basis(Vector3(1, 0, 0), deg_to_rad(25.0 + j * 15.0) * -palm_side)).get_rotation_quaternion())
+		_wrap(sk, "thumb_%02d_%s" % [j + 1, side], "thumb_%02d%s_%s" % [j + 2, "_leaf" if j == 2 else "", side], on_axis, d, Vector3.ZERO, -80.0, 80.0, 1.2)
+
+
+## Bends one joint (about its local `axis`, between lo and hi degrees off
+## its rest; a zero axis tries the joint's X and Z) so its child knuckle
+## lands nearest WRAP from the handle's axis (and, with `across`, near the
+## hand's own spot along it: wrapped round, not laid along).
+func _wrap(sk: Skeleton3D, bone_name: String, child_name: String, on_axis: Vector3, d: Vector3, axis: Vector3, lo: float, hi: float, across: float = 0.0) -> void:
+	var b := sk.find_bone(bone_name)
+	var c := sk.find_bone(child_name)
+	if b < 0 or c < 0:
+		return
+	var rest := sk.get_bone_rest(b).basis
+	var axes: Array[Vector3] = [Vector3(1, 0, 0), Vector3(0, 0, 1)]
+	if axis != Vector3.ZERO:
+		axes = [axis]
+	var best := Basis()
+	var best_err := INF
+	for ax in axes:
+		var a := lo
+		while a <= hi:
+			var turn := Basis(ax, deg_to_rad(a))
+			sk.set_bone_pose_rotation(b, (rest * turn).get_rotation_quaternion())
+			var p := sk.get_bone_global_pose(c).origin - on_axis
+			# `across` keeps it wrapping round, not lying along the handle.
+			var err := absf((p - d * p.dot(d)).length() - WRAP) + absf(p.dot(d)) * across
+			if err < best_err - 0.0005:
+				best_err = err
+				best = turn
+			a += 6.0
+	sk.set_bone_pose_rotation(b, (rest * best).get_rotation_quaternion())
 
 
 ## Two-bone IK for one arm: the wrist lands on target, elbow bent down and out.

@@ -9,7 +9,8 @@ extends SceneTree
 ## style argument's neighbour (swing <style> flip) to barrel it and watch
 ## the bat flip after contact, `pitcher` to watch from the mound, or
 ## `slowmo` for the whip from the press to contact at quarter speed.
-## `style:<name>` overrides the batter's style for the stills too.
+## `style:<name>` overrides the batter's style for the stills too;
+## `hands` frames the grip tight instead of the whole batter.
 const AROUND := [Vector3(1.6, 1.3, -1.2), Vector3(-2.6, 1.4, 1.2), Vector3(0.0, 1.5, 3.2)]
 const SWING_FROM := Vector3(3.2, 1.3, -1.4)
 ## Frames (at 60 fps) of the sequence: windup from WINDUP_FROM, the pitch
@@ -66,6 +67,13 @@ func _process(_d: float) -> bool:
 		return true
 	_cam.position = at + AROUND[_shot]
 	_cam.look_at(at + Vector3(0, 1.1, 0))
+	if OS.get_cmdline_user_args().has("hands") and batter != null:
+		# Tight on the grip from three sides.
+		var g := batter.grip_position()
+		var b := batter.global_transform.basis
+		var views := [-b.z, b.x, -b.x - b.z]
+		_cam.position = g + (views[_shot] as Vector3).normalized() * 0.5 + Vector3.UP * 0.08
+		_cam.look_at(g, Vector3.UP)
 	if _frames % 6 == 0:
 		root.get_texture().get_image().save_png(_out.path_join("batter_%d.png" % _shot))
 		_shot += 1

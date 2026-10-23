@@ -22,6 +22,8 @@ const DIRT_TOP := 0.06
 const INFIELD_GRASS_TOP := 0.09
 const CUTOUT_TOP := 0.12
 const CHALK_TOP := 0.15
+## The batter's box, 6 ft long, centered on the plate.
+const BOX_LENGTH := 1.8288
 
 const SURFACE := preload("res://presentation/stadium/field_surface.gdshader")
 const GRASS_TEX := preload("res://assets/third_party/ambientcg/Grass004/Grass004_512_Color.jpg")
@@ -144,7 +146,7 @@ func _build_batters_boxes() -> void:
 	var line := 0.076  # 3 in chalk
 	var inside := 0.2159 + 0.1524
 	var width := 1.2192
-	var length := 1.8288
+	var length := BOX_LENGTH
 	# Centered on the plate's middle: the same box BattingStyles keeps every
 	# stance's feet in (BOX_TOWARD_PITCHER / BOX_TOWARD_CATCHER from the
 	# batter's spot).
@@ -167,7 +169,11 @@ func _build_foul_lines() -> void:
 	for side in [-1.0, 1.0]:
 		var dir := FieldLayout.direction_for_spray(side * _tuning.foul_line_angle)
 		var length := FieldLayout.fence_distance(side * _tuning.foul_line_angle, _tuning)
-		var line := _add_box("FoulLine", Vector3(0.12, 0.03, length), dir * length * 0.5 + Vector3(0, CHALK_TOP - 0.015, 0), CHALK)
+		# The chalk starts where the line leaves the batter's box (its front
+		# line, toward the pitcher): it meets the box, never runs through it.
+		var start := BOX_LENGTH * 0.5 / maxf(absf(dir.z), 0.01)
+		var run := length - start
+		var line := _add_box("FoulLine", Vector3(0.12, 0.03, run), dir * (start + run * 0.5) + Vector3(0, CHALK_TOP - 0.015, 0), CHALK)
 		line.look_at_from_position(line.position, line.position + dir, Vector3.UP)
 		# Yellow, standing well above the wall, with a screen fin on the fair side.
 		var tall := FieldLayout.fence_height(side * _tuning.foul_line_angle, _tuning) + 13.0
