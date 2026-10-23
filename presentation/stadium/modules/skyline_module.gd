@@ -1,4 +1,6 @@
 extends StadiumModule
+
+const PALETTE := preload("res://presentation/stadium/kit_palette.gdshader")
 ## A city round the park, built on the street grid the ground draws (city
 ## blocks Stadium.CITY_BLOCK m apart): one building per lot, squared to the
 ## streets. The nearer blocks get modeled buildings and towers (Kenney City
@@ -73,7 +75,7 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 				var basis := Basis.from_scale(Vector3(w, h, d))
 				towers.append(Transform3D(basis, at + offset + Vector3(0.0, h * 0.5, 0.0)))
 	for mesh: Mesh in models:
-		var mmi := _batch(mesh, models[mesh])
+		var mmi := _batch(_in_park_colors(mesh, stadium), models[mesh])
 		mmi.name = "Buildings"
 		root.add_child(mmi)
 	_plant_parkland(stadium, root, taken, block, origin)
@@ -206,3 +208,34 @@ func _batch(mesh: Mesh, transforms: Array) -> MultiMeshInstance3D:
 	mmi.multimesh = mm
 	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return mmi
+
+
+## A copy of a city-kit mesh repainted in the park's own city tones (the
+## kit's white and pale-blue swatches through the palette shader), so the
+## near city sits in the same light and palette as the park and its far
+## towers instead of standing out stark white.
+func _in_park_colors(mesh: Mesh, stadium: Stadium) -> Mesh:
+	var def := stadium.def
+	var copy: Mesh = mesh.duplicate()
+	var city := def.skyline_color
+	var look: Array = GrayboxField.SKIES.get(def.sky_kind(), GrayboxField.SKIES[&"day"])
+	var horizon: Color = (look[1] as Color).lerp(look[0], 0.3)
+	for i in copy.get_surface_count():
+		var src := copy.surface_get_material(i) as BaseMaterial3D
+		if src == null or src.albedo_texture == null:
+			continue
+		var m := ShaderMaterial.new()
+		m.shader = PALETTE
+		m.set_shader_parameter("albedo_tex", src.albedo_texture)
+		# Walls a light version of the city tone, glass its windows.
+		m.set_shader_parameter("stone", city.lerp(Color(0.86, 0.84, 0.8), 0.55))
+		m.set_shader_parameter("metal", city.lerp(Color(0.5, 0.5, 0.52), 0.5))
+		m.set_shader_parameter("roof", city.darkened(0.2))
+		m.set_shader_parameter("accent", def.accent_color.lerp(city, 0.5))
+		m.set_shader_parameter("trim", def.accent_color.lerp(Color(0.8, 0.78, 0.74), 0.5))
+		m.set_shader_parameter("window", def.window_color)
+		m.set_shader_parameter("window_glow", 1.4 if def.night else 0.0)
+		m.set_shader_parameter("haze_color", horizon)
+		m.set_shader_parameter("haze", 0.18)
+		copy.surface_set_material(i, m)
+	return copy

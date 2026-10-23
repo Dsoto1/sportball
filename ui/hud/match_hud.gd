@@ -188,17 +188,14 @@ func _build_scorebug() -> void:
 		_bug["abbr%d" % i] = _text(bug, Vector2(x + 54, 10), 26, Color.WHITE, true)
 		_bug["runs%d" % i] = _text(bug, Vector2(x + 140, 6), 32, Color.WHITE, true)
 	_bug["inning"] = _text(bug, Vector2(14, 54), 20, Color.WHITE, true)
-	_bug["count"] = _text(bug, Vector2(86, 54), 20, Color.WHITE, true)
-	_bug["balls"] = Dots.new(3, Color(0.4, 0.9, 0.5))
-	_bug["balls"].position = Vector2(150, 62)
-	bug.add_child(_bug["balls"])
-	_bug["strikes"] = Dots.new(2, Color(1.0, 0.75, 0.25))
-	_bug["strikes"].position = Vector2(206, 62)
-	bug.add_child(_bug["strikes"])
-	_text(bug, Vector2(250, 54), 20, Color.WHITE, true).text = "OUTS"
-	_bug["outs"] = Dots.new(2, Color(1.0, 0.35, 0.3))
-	_bug["outs"].position = Vector2(326, 62)
-	bug.add_child(_bug["outs"])
+	_bug["count"] = _text(bug, Vector2(66, 54), 20, Color.WHITE, true)
+	# Lamps labeled B, S and O so they never rely on color alone.
+	for spec: Array in [["B", "balls", 3, Color(0.4, 0.9, 0.5), 128.0], ["S", "strikes", 2, Color(1.0, 0.75, 0.25), 210.0], ["O", "outs", 2, Color(1.0, 0.35, 0.3), 276.0]]:
+		_text(bug, Vector2(spec[4], 54), 20, DIM, true).text = spec[0]
+		var dots := Dots.new(spec[2], spec[3])
+		dots.position = Vector2(spec[4] + 20.0, 62)
+		bug.add_child(dots)
+		_bug[spec[1]] = dots
 	_bug["bases"] = BaseDiamond.new()
 	_bug["bases"].position = Vector2(388, 2)
 	_bug["bases"].size = Vector2(88, 82)

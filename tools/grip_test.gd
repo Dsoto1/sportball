@@ -12,6 +12,8 @@ var _cam: Camera3D
 var _style: StringName = &"classic"
 var _lefty := false
 var _body := false
+## `swing:<p>`: hold the swing at progress p instead of the stance.
+var _swing := -1.0
 var _shots: Array[Image] = []
 
 
@@ -22,6 +24,9 @@ func _initialize() -> void:
 		_style = StringName(args[1])
 	_lefty = args.has("lefty")
 	_body = args.has("body")
+	for a: String in args:
+		if a.begins_with("swing:"):
+			_swing = a.substr(6).to_float()
 	var env := WorldEnvironment.new()
 	env.environment = Environment.new()
 	env.environment.background_mode = Environment.BG_COLOR
@@ -54,12 +59,18 @@ func _initialize() -> void:
 
 func _process(delta: float) -> bool:
 	_frames += 1
-	_actor.animate(ActorView.Pose.BAT_STANCE, delta)
 	var bat := BattingStyles.approach_bat(_style, 0.0, 0.0)
+	if _swing >= 0.0:
+		# A moment of the swing (0..1, contact at BattingStyles.CONTACT_AT).
+		_actor.animate(ActorView.Pose.SWING, delta, 0.0, false, _swing)
+		bat = BattingStyles.swing_bat(_style, _swing, BattingStyles.approach_bat(_style, 1.0, 0.0))
+	else:
+		_actor.animate(ActorView.Pose.BAT_STANCE, delta)
 	var side := -1.0 if _lefty else 1.0
 	var y := deg_to_rad(bat.x)
 	var e := deg_to_rad(bat.y)
-	_actor.grip_bat(_bat, Vector3(cos(e) * cos(y) * side, sin(e), cos(e) * sin(y)), 0.1, false, float(BattingStyles.BAT[_style]["choke"]))
+	var one_hand := _swing > BattingStyles.ONE_HAND_RELEASE and bool(BattingStyles.BAT[_style]["one_hand"])
+	_actor.grip_bat(_bat, Vector3(cos(e) * cos(y) * side, sin(e), cos(e) * sin(y)), 0.1, one_hand, float(BattingStyles.BAT[_style]["choke"]))
 	if _frames < 30:
 		return false
 	var g := _actor.grip_position()

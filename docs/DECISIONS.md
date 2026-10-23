@@ -1743,3 +1743,14 @@ rubber sits on the table.
 - Two clays: the lighter infield mix (base paths, arc, cutouts) and the
   darker, redder packing clay of the mound and the plate area, as on a
   real field.
+
+## Loose ends: city tones, scorebug labels, grip through the swing
+
+- The near city's Kenney buildings (white and pale blue) are repainted
+  through the kit palette shader in each park's own city tone, glass in
+  its window color (lit at night), lightly hazed, so the city reads as
+  one with the park and its far towers.
+- The scorebug's count lamps are labeled B, S and O (never color alone).
+- tools/grip_test.gd `swing:<p>` holds the swing at any moment: the
+  hands stay wrapped on the handle from the slot through contact and the
+  extension.
