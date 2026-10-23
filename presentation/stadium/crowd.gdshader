@@ -14,6 +14,10 @@ uniform sampler2D atlas : filter_linear_mipmap, repeat_disable;
 uniform float excitement : hint_range(0.0, 1.0) = 0.0;
 uniform vec3 skin_light : source_color = vec3(0.96, 0.8, 0.66);
 uniform vec3 skin_dark : source_color = vec3(0.36, 0.23, 0.15);
+// The fans are unshaded billboards: this stands in for the park's light
+// (lower at dusk and under a roof), and each fan's instance alpha for the
+// shade it sits in (under an overhanging deck).
+uniform float light_level = 1.0;
 // Atlas layout: 8 cells across, 3 down; pose p frame f is cell p * 4 + f.
 const float COLS = 8.0;
 const float ROWS = 3.0;
@@ -92,5 +96,5 @@ void fragment() {
 	else if (region == 5) { col = vec3(0.12, 0.12, 0.13); }
 	else if (region == 6 || region == 7) { col = skin; }
 	else if (region == 8) { col = hair_color(fract(v_phase * 31.0)); }
-	ALBEDO = col * (0.45 + s.g * 0.75) * v_shade;
+	ALBEDO = col * (0.45 + s.g * 0.75) * v_shade * light_level * COLOR.a;
 }

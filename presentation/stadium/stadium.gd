@@ -33,6 +33,26 @@ const FASCIA_LETTER := 0.8
 const FASCIA_LETTER_Y := -0.4
 ## Behind home the first deck's fascia carries the club's name alone.
 const HOME_NAME_SPAN := 26.0
+## The centerpiece behind home, per architecture set (as each sheet's
+## pitcher's view shows it): which of the set's sections stands on the
+## first deck behind the plate, and how wide (m).
+const HOME_PIECE := {
+	&"deco": [&"bay", 24.0], &"foundry": [&"bay", 27.0], &"bank": [&"bay", 24.0],
+	&"pier": [&"block", 21.0], &"kiln": [&"bay", 22.5], &"alpine": [&"block", 15.0],
+	&"reactor": [&"gate", 22.5], &"lamp": [&"gate", 21.0], &"rail": [&"gate", 24.0],
+	&"garden": [&"gate", 22.5], &"vault": [&"bay", 22.5], &"temple": [&"bay", 27.0],
+	&"atlantis": [&"gate", 22.5], &"sky": [&"bay", 25.5], &"forum": [&"gate", 22.5],
+	&"volcano": [&"gate", 22.5], &"gothic": [&"bay", 24.0], &"desert": [&"bay", 24.0],
+}
+## The columns holding up each deck's front, per set: round or square, and
+## a color of their own where the set has one (else the facade's).
+const COLUMN_STYLE := {
+	&"deco": [&"round"], &"bank": [&"round"], &"garden": [&"round"], &"forum": [&"round"],
+	&"desert": [&"round"], &"sky": [&"round"], &"atlantis": [&"round"],
+	&"temple": [&"round", Color(0.62, 0.1, 0.08)], &"pier": [&"square", Color(0.42, 0.28, 0.16)],
+	&"alpine": [&"square", Color(0.36, 0.24, 0.14)], &"foundry": [&"square", Color(0.16, 0.15, 0.15)],
+	&"reactor": [&"square", Color(0.2, 0.22, 0.22)], &"vault": [&"square", Color(0.14, 0.15, 0.17)],
+}
 const ANGLE_STEP := 1.0
 ## Inner edge of the stands (meters from home) by |spray angle| past the
 ## foul poles; inside the poles the bleachers start just behind the wall.
@@ -122,6 +142,8 @@ func build(p_tuning: BaseballTuning, p_def: StadiumDef, home: TeamDef, away: Tea
 	if def.grandstand.get("banners", false):
 		_build_hanging_banners(home)
 	_build_grandstand()
+	_build_home_stand()
+	_build_back_facade()
 	_build_markers(home)
 	_build_fascia(home)
 	# The city goes up last, on the lots the park's own pieces left free.
@@ -195,6 +217,24 @@ func deck_front(angle: float, p: Vector3, k: int) -> Vector2:
 
 func is_deck_front(k: int) -> bool:
 	return def.decks > 1 and k % rows_per_deck() == 0
+
+
+## The unshaded crowd's brightness, to sit with the park's lit surfaces.
+func crowd_light() -> float:
+	if def.is_roofed():
+		return 0.72
+	return {&"day": 0.8, &"golden": 0.78, &"sunset": 0.72, &"dusk": 0.6, &"underwater": 0.68, &"night": 0.64}.get(def.sky_kind(), 0.8)
+
+
+## How much light row k gets at a spray angle: the rows under an
+## overhanging deck sit in its shade (0.62); everything else 1.
+func row_light(angle: float, k: int) -> float:
+	if def.decks < 2 or overhang(angle) < 0.05:
+		return 1.0
+	var next_front := (k / rows_per_deck() + 1) * rows_per_deck()
+	if next_front >= int(profile(angle).z):
+		return 1.0
+	return 0.62 if (next_front - k) * ROW_DEPTH <= overhang(angle) + 0.3 else 1.0
 
 
 ## Height of row k's tread at a spray angle (p = profile(angle)). The decks
@@ -331,6 +371,7 @@ func _build_bowl() -> void:
 			var rb := pb.x + k * ROW_DEPTH
 			var ha := row_height(a, pa, k)
 			var hb := row_height(b, pb, k)
+			var lit := row_light(mid, k)
 			var below_a := 0.0 if k == 0 else row_height(a, pa, k - 1)
 			var below_b := 0.0 if k == 0 else row_height(b, pb, k - 1)
 			# Riser (the step's face), then the tread (where fans sit). A
@@ -343,7 +384,7 @@ func _build_bowl() -> void:
 				face = concourse if overhang(mid) > 0.05 else def.accent_color.lerp(def.structure_color, 0.25)
 			# The front wall opens onto the dugouts.
 			if k > 0 or absf(absf(mid) - DUGOUT_ANGLE) > dugout_half_angle():
-				_quad(st, point(a, ra, below_a), point(b, rb, below_b), point(b, rb, hb), point(a, ra, ha), face)
+				_quad(st, point(a, ra, below_a), point(b, rb, below_b), point(b, rb, hb), point(a, ra, ha), face * lit)
 			# An upper deck reaches out over the one below: its slab (the
 			# soffit under it in shade), the fascia across its front and a
 			# parapet on top.
@@ -361,12 +402,12 @@ func _build_bowl() -> void:
 			# pan and a back), one per step of the sweep, a shade apart so
 			# they read as single seats. Fans sit just in front of them.
 			var seated := not _is_aisle(mid) and absf(mid) >= BATTERS_EYE and not _is_walkway(a, k)
-			_quad(st, point(a, ra, ha), point(b, rb, hb), point(b, rb + ROW_DEPTH, hb), point(a, ra + ROW_DEPTH, ha), tread if seated or absf(mid) >= BATTERS_EYE else seat)
+			_quad(st, point(a, ra, ha), point(b, rb, hb), point(b, rb + ROW_DEPTH, hb), point(a, ra + ROW_DEPTH, ha), (tread if seated or absf(mid) >= BATTERS_EYE else seat) * lit)
 			if seated:
 				# Vertex colors are used as they are (linear): convert, so the
 				# chairs keep the park's own (dark) seat colors and never read
 				# as grass from above.
-				var chair := (seat.darkened(0.12) if int(a) % 2 == 0 else seat).srgb_to_linear()
+				var chair := (seat.darkened(0.12) if int(a) % 2 == 0 else seat).srgb_to_linear() * lit
 				for part: Vector4 in [Vector4(SEAT_FRONT, 0.0, SEAT_FRONT, SEAT_PAN), Vector4(SEAT_FRONT, SEAT_PAN, SEAT_BACK, SEAT_PAN), Vector4(SEAT_BACK, SEAT_PAN, SEAT_BACK, SEAT_TOP), Vector4(SEAT_BACK, SEAT_TOP, SEAT_BACK + 0.08, SEAT_TOP)]:
 					# Each part runs from (radius x, height y) to (z, w) off the tread's front edge.
 					_quad(st, point(a, ra + part.x, ha + part.y), point(b, rb + part.x, hb + part.y), point(b, rb + part.z, hb + part.w), point(a, ra + part.z, ha + part.w), chair if part.y < SEAT_TOP else chair.darkened(0.2))
@@ -521,6 +562,7 @@ func _quad(st: SurfaceTool, p0: Vector3, p1: Vector3, p2: Vector3, p3: Vector3, 
 
 func _build_crowd(home: TeamDef, away: TeamDef) -> void:
 	var seats: Array[Vector3] = []
+	var shades := PackedFloat32Array()
 	var a := -180.0
 	while a < 180.0:
 		var p := profile(a)
@@ -530,13 +572,14 @@ func _build_crowd(home: TeamDef, away: TeamDef) -> void:
 			var step_deg := rad_to_deg(SEAT_SPACING / radius)
 			var s := a
 			while s < a + ANGLE_STEP:
-				if not _is_aisle(s) and absf(s) >= BATTERS_EYE + 1.0 and not _is_walkway(a, k) and rng.randf() < def.attendance:
+				if not _is_aisle(s) and absf(s) >= BATTERS_EYE + 1.0 and not _is_walkway(a, k) and not _behind_home_piece(s, k) and rng.randf() < def.attendance:
 					seats.append(point(s + rng.randf_range(-0.1, 0.1) * step_deg, radius, row_height(a, p, k)))
+					shades.append(row_light(a, k))
 				s += step_deg
 		a += ANGLE_STEP
 	_home = home
 	_away = away
-	add_fans(seats, "Crowd")
+	add_fans(seats, "Crowd", null, shades)
 
 
 ## Fans standing at these spots (one billboard each), dressed in the home,
@@ -544,7 +587,7 @@ func _build_crowd(home: TeamDef, away: TeamDef) -> void:
 ## with the main crowd. Used by the bowl and by modules that put fans on
 ## balconies and terraces.
 ## With `club`, they are its players instead (its jerseys, sitting tight).
-func add_fans(seats: Array[Vector3], node_name: String = "Fans", club: TeamDef = null) -> void:
+func add_fans(seats: Array[Vector3], node_name: String = "Fans", club: TeamDef = null, shades := PackedFloat32Array()) -> void:
 	if seats.is_empty() or _home == null:
 		return
 	var home := _home
@@ -578,7 +621,10 @@ func add_fans(seats: Array[Vector3], node_name: String = "Fans", club: TeamDef =
 		if club != null:
 			shirt = club.primary_color
 			temper = rng.randf_range(0.3, 0.6)
-		mm.set_instance_color(i, shirt.lightened(rng.randf_range(-0.1, 0.1)) if club == null else shirt)
+		var fan := shirt.lightened(rng.randf_range(-0.1, 0.1)) if club == null else shirt
+		# Alpha: the shade the fan sits in (the shader dims the whole figure).
+		fan.a = shades[i] if i < shades.size() else 1.0
+		mm.set_instance_color(i, fan)
 		mm.set_instance_custom_data(i, Color(rng.randf(), rng.randf(), temper, rng.randf()))
 	var mmi := MultiMeshInstance3D.new()
 	mmi.name = unique_name(node_name)
@@ -587,6 +633,7 @@ func add_fans(seats: Array[Vector3], node_name: String = "Fans", club: TeamDef =
 		_crowd_mat = ShaderMaterial.new()
 		_crowd_mat.shader = CROWD_SHADER
 		_crowd_mat.set_shader_parameter("atlas", CROWD_ATLAS)
+		_crowd_mat.set_shader_parameter("light_level", crowd_light())
 	mmi.material_override = _crowd_mat
 	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(mmi)
@@ -606,6 +653,187 @@ func _build_batters_eye() -> void:
 ## How much of the home-plate grandstand stands at a spray angle (0..1).
 func grandstand(angle: float) -> float:
 	return smoothstep(GRAND_FROM, GRAND_FULL, absf(wrapf(angle, -180.0, 180.0)))
+
+
+## The outside of the bowl, seen from the air and the approach: the back
+## wall broken into bays by pilasters, a string course at each deck's
+## height and rows of windows (lit after dark), in the park's own tones,
+## so it never reads as one blank drum.
+func _build_back_facade() -> void:
+	var pilasters: Array[Transform3D] = []
+	var courses: Array[Transform3D] = []
+	var windows: Array[Transform3D] = []
+	var step := 3.0
+	for side: float in [-1.0, 1.0]:
+		var a := 46.0
+		while a <= 180.0:
+			var angle := a * side
+			var p := profile(angle)
+			var rows := int(p.z)
+			if rows > 0 and not is_water(angle):
+				var back := p.x + rows * ROW_DEPTH
+				var top := row_height(angle, p, rows - 1) + 1.2
+				var outward := point(angle, 1.0, 0.0)
+				var basis := Basis.looking_at(outward)
+				pilasters.append(Transform3D(basis * Basis.from_scale(Vector3(0.9, top, 0.6)), point(angle, back + 0.25, top * 0.5)))
+				# Between this pilaster and the next: windows, a row per floor.
+				var mid := angle + step * 0.5 * side
+				var pm := profile(mid)
+				if int(pm.z) > 0 and absf(mid) <= 180.0:
+					var back_m := pm.x + int(pm.z) * ROW_DEPTH
+					var top_m := row_height(mid, pm, int(pm.z) - 1) + 1.2
+					var bay := deg_to_rad(step) * back_m
+					var floor_y := 3.0
+					while floor_y + 2.6 < top_m - 1.5:
+						windows.append(Transform3D(Basis.looking_at(point(mid, 1.0, 0.0)) * Basis.from_scale(Vector3(bay * 0.42, 2.2, 0.12)), point(mid, back_m + 0.06, floor_y + 1.1)))
+						floor_y += 4.6
+					for d in range(1, def.decks):
+						var kd := d * rows_per_deck()
+						if kd < int(pm.z):
+							courses.append(Transform3D(Basis.looking_at(point(mid, 1.0, 0.0)) * Basis.from_scale(Vector3(bay + 0.1, 0.45, 0.3)), point(mid, back_m + 0.12, row_height(mid, pm, kd))))
+			a += step
+	var cube := BoxMesh.new()
+	cube.size = Vector3.ONE
+	var tone := def.facade_tint()
+	var lit := def.night or def.sky_kind() == &"dusk" or def.is_roofed()
+	var glass: BaseMaterial3D = glow(def.window_color, 1.1) if lit else StandardMaterial3D.new()
+	if not lit:
+		glass.albedo_color = tone.darkened(0.7).lerp(Color(0.12, 0.16, 0.22), 0.5)
+		glass.roughness = 0.25
+	for part: Array in [["BackPilasters", pilasters, surface_mat(&"facade", tone.darkened(0.22))], ["BackCourses", courses, surface_mat(&"facade", def.accent_color.lerp(tone, 0.5))], ["BackWindows", windows, glass]]:
+		var list: Array = part[1]
+		if list.is_empty():
+			continue
+		var mm := MultiMesh.new()
+		mm.transform_format = MultiMesh.TRANSFORM_3D
+		mm.mesh = cube
+		mm.instance_count = list.size()
+		for n in list.size():
+			mm.set_instance_transform(n, list[n])
+		var mmi := MultiMeshInstance3D.new()
+		mmi.name = part[0]
+		mmi.multimesh = mm
+		mmi.material_override = part[2]
+		add_child(mmi)
+
+
+## The first deck's centerpiece behind home: the set section (HOME_PIECE)
+## and how far it reaches either side of 180 (deg), or [] for none.
+func home_piece() -> Array:
+	var set_name := StringName(def.grandstand.get("set", &""))
+	if def.decks < 2 or not HOME_PIECE.has(set_name):
+		return []
+	var role := StringName("set_%s_%s" % [set_name, HOME_PIECE[set_name][0]])
+	if not ModelKit.has(role):
+		return []
+	var r := deck_front(180.0, profile(180.0), rows_per_deck()).x
+	return [role, float(HOME_PIECE[set_name][1]), rad_to_deg(HOME_PIECE[set_name][1] * 0.5 / r) + 0.5]
+
+
+## Whether row k at a spray angle sits behind the home centerpiece (no
+## fans there: they would show through it).
+func _behind_home_piece(angle: float, k: int) -> bool:
+	if k < rows_per_deck():
+		return false
+	var piece := home_piece()
+	return not piece.is_empty() and absf(wrapf(angle - 180.0, -180.0, 180.0)) < piece[2]
+
+
+## Behind home, as on every sheet's pitcher's view: the park's own
+## centerpiece on the first deck behind the plate, columns in its style
+## under each overhanging deck's front with a lantern on each, and a row
+## of warm lamps under every deck so the concourses glow.
+func _build_home_stand() -> void:
+	var root := Node3D.new()
+	root.name = "HomeStand"
+	add_child(root)
+	var set_name := StringName(def.grandstand.get("set", &""))
+	var piece := home_piece()
+	if not piece.is_empty():
+		var model := ModelKit.spawn(piece[0], 1.0, RandomNumberGenerator.new())
+		# Bounds in the model's own units (spawn's scale aside).
+		var box := ModelKit._aabb(model)
+		# As wide as asked, never taller than the deck above can take.
+		var size := minf(float(piece[1]) / maxf(box.size.x, 0.01), 18.0 / maxf(box.size.y, 0.01))
+		model.name = "HomePiece"
+		root.add_child(model)
+		var front := deck_front(180.0, profile(180.0), rows_per_deck())
+		var at := point(180.0, front.x + 0.3 + box.size.z * size * 0.5, front.y)
+		# Facing home (the set's models face +Z), centered on its bounds.
+		var basis := Basis.looking_at(Vector3(0, 0, 0) - at * Vector3(1, 0, 1)).rotated(Vector3.UP, PI) * Basis.from_scale(Vector3.ONE * size)
+		var center := box.get_center()
+		model.transform = Transform3D(basis, at - basis * Vector3(center.x, box.position.y, center.z))
+	var style: Array = COLUMN_STYLE.get(set_name, [&"square"])
+	var column_color: Color = style[1] if style.size() > 1 else def.facade_tint()
+	var shafts: Array[Transform3D] = []
+	var caps: Array[Transform3D] = []
+	var lamps: Array[Transform3D] = []
+	var half_piece: float = piece[2] if not piece.is_empty() else 0.0
+	for d in range(1, def.decks):
+		var k := d * rows_per_deck()
+		for side: float in [-1.0, 1.0]:
+			# Lamps under the deck, every couple of degrees.
+			var a := 62.0
+			while a <= 180.0:
+				var angle := a * side
+				var p := profile(angle)
+				if k < int(p.z) and overhang(angle) > 0.05:
+					var front := deck_front(angle, p, k)
+					var spot := point(angle, front.x + 0.9, front.y - FASCIA_DROP - 0.06)
+					lamps.append(Transform3D(Basis.looking_at(-spot * Vector3(1, 0, 1)) * Basis.from_scale(Vector3(0.7, 0.07, 0.3)), spot))
+				a += 2.5
+			# Columns on the aisles, under the deck's front.
+			a = 64.0
+			while a <= 176.0:
+				var angle := a * side
+				var p := profile(angle)
+				if k < int(p.z) and overhang(angle) > 0.05 and absf(180.0 - a) > half_piece + 1.0:
+					var front := deck_front(angle, p, k)
+					var radius := front.x + 0.45
+					var under := clampi(int((radius - p.x) / ROW_DEPTH), 0, k - 1)
+					var base := row_height(angle, p, under)
+					var top := front.y - FASCIA_DROP
+					var basis := Basis.looking_at(-point(angle, 1.0, 0.0))
+					var mid := point(angle, radius, (base + top) * 0.5)
+					var thick := 0.85 if style[0] == &"square" else 0.9
+					shafts.append(Transform3D(basis * Basis.from_scale(Vector3(thick, top - base, thick)), mid))
+					caps.append(Transform3D(basis * Basis.from_scale(Vector3(thick + 0.35, 0.35, thick + 0.35)), point(angle, radius, top - 0.17)))
+					caps.append(Transform3D(basis * Basis.from_scale(Vector3(thick + 0.3, 0.4, thick + 0.3)), point(angle, radius, base + 0.2)))
+					# A lantern on the field side, at head height above the rows.
+					var lantern := point(angle, radius - thick * 0.5 - 0.25, base + (top - base) * 0.62)
+					lamps.append(Transform3D(basis * Basis.from_scale(Vector3(0.4, 0.62, 0.4)), lantern))
+				a += AISLE_EVERY
+	var column_mesh: Mesh
+	if style[0] == &"round":
+		var cyl := CylinderMesh.new()
+		cyl.top_radius = 0.5
+		cyl.bottom_radius = 0.5
+		cyl.height = 1.0
+		cyl.radial_segments = 12
+		cyl.rings = 1
+		column_mesh = cyl
+	else:
+		var cube := BoxMesh.new()
+		cube.size = Vector3.ONE
+		column_mesh = cube
+	var cap_mesh := BoxMesh.new()
+	cap_mesh.size = Vector3.ONE
+	var warm := def.window_color.lerp(Color(1.0, 0.85, 0.6), 0.5)
+	for part: Array in [["Columns", column_mesh, shafts, surface_mat(&"facade", column_color)], ["ColumnCaps", cap_mesh, caps, surface_mat(&"facade", column_color.darkened(0.25))], ["Lamps", cap_mesh, lamps, glow(warm, 3.2)]]:
+		var list: Array = part[2]
+		if list.is_empty():
+			continue
+		var mm := MultiMesh.new()
+		mm.transform_format = MultiMesh.TRANSFORM_3D
+		mm.mesh = part[1]
+		mm.instance_count = list.size()
+		for n in list.size():
+			mm.set_instance_transform(n, list[n])
+		var mmi := MultiMeshInstance3D.new()
+		mmi.name = part[0]
+		mmi.multimesh = mm
+		mmi.material_override = part[3]
+		root.add_child(mmi)
 
 
 ## The grandstand behind home, in the park's architecture
@@ -830,16 +1058,38 @@ func dugout_half_angle() -> float:
 
 
 ## The foul stands' inner edge at a spray angle (past the foul poles):
-## from this side's own corner, closing in behind home.
+## from this side's own corner, closing in behind home. A monotone cubic
+## through FOUL_EDGE's points (no kinks where they meet, no overshoot),
+## level at 180 so the two sides join in one smooth arc behind the plate.
 func profile_inner(angle: float) -> float:
 	var a := absf(wrapf(angle, -180.0, 180.0))
-	var corner := FieldLayout.fence_distance(signf(angle) * 45.0, tuning) + 5.0
-	for i in range(1, FOUL_EDGE.size()):
-		if a <= FOUL_EDGE[i][0]:
-			var t: float = (a - FOUL_EDGE[i - 1][0]) / (FOUL_EDGE[i][0] - FOUL_EDGE[i - 1][0])
-			var start: float = corner if i == 1 else FOUL_EDGE[i - 1][1]
-			return lerpf(start, FOUL_EDGE[i][1], t)
-	return FOUL_EDGE[-1][1]
+	var xs: Array[float] = []
+	var ys: Array[float] = []
+	for i in FOUL_EDGE.size():
+		xs.append(FOUL_EDGE[i][0])
+		ys.append(FieldLayout.fence_distance(signf(angle) * 45.0, tuning) + 5.0 if i == 0 else FOUL_EDGE[i][1])
+	if a >= xs[-1]:
+		return ys[-1]
+	var n := xs.size()
+	var secant: Array[float] = []
+	for i in n - 1:
+		secant.append((ys[i + 1] - ys[i]) / (xs[i + 1] - xs[i]))
+	# Fritsch-Carlson slopes: harmonic means of the neighboring secants.
+	var slope: Array[float] = [secant[0]]
+	for i in range(1, n - 1):
+		var s0 := secant[i - 1]
+		var s1 := secant[i]
+		slope.append(0.0 if s0 * s1 <= 0.0 else 2.0 / (1.0 / s0 + 1.0 / s1))
+	slope.append(0.0)
+	var i := 0
+	while i < n - 2 and a > xs[i + 1]:
+		i += 1
+	var h := xs[i + 1] - xs[i]
+	var t := clampf((a - xs[i]) / h, 0.0, 1.0)
+	var t2 := t * t
+	var t3 := t2 * t
+	return (2.0 * t3 - 3.0 * t2 + 1.0) * ys[i] + (t3 - 2.0 * t2 + t) * h * slope[i] \
+		+ (-2.0 * t3 + 3.0 * t2) * ys[i + 1] + (t3 - t2) * h * slope[i + 1]
 
 
 func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
@@ -945,7 +1195,10 @@ func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
 			if rng.randf() < 0.85:
 				spots.append(dugout.transform * Vector3(x, floor_y, 0.8))
 			x += 0.75
-		add_fans(spots, "Bench_%s" % club.abbreviation, club)
+		var bench_shade := PackedFloat32Array()
+		bench_shade.resize(spots.size())
+		bench_shade.fill(0.78)
+		add_fans(spots, "Bench_%s" % club.abbreviation, club, bench_shade)
 		# Seated whatever the stands are doing.
 		var bench_node: MultiMeshInstance3D = get_node_or_null("Bench_%s" % club.abbreviation)
 		if bench_node != null:
@@ -1059,6 +1312,15 @@ func _build_backstop_banner(home: TeamDef) -> void:
 	m.roughness = 0.6
 	mi.material_override = m
 	root.add_child(mi)
+	# Along the band either side of the plate, the club's emblem (as the
+	# sheets paint theirs); straight behind the plate stays plain, the
+	# pitcher's backdrop.
+	for off: float in [-24.0, -17.0, -10.0, 10.0, 17.0, 24.0]:
+		var ang := wrapf(180.0 + off, -180.0, 180.0)
+		var mark := Emblem.build(home, (hi - lo) * 0.82, 0.3)
+		mark.position = point(ang, profile(ang).x - 0.3, (lo + hi) * 0.5)
+		root.add_child(mark)
+		face_home(mark)
 	# The name itself stands up on the first deck's fascia behind home,
 	# above the pitcher's eye line rather than right behind the batter.
 	var k := rows_per_deck()
@@ -1094,7 +1356,10 @@ func _build_hanging_banners(home: TeamDef) -> void:
 	root.name = "HangingBanners"
 	add_child(root)
 	var k := rows_per_deck() if def.decks > 1 else 0
-	for off: float in [-24.0, -12.0, 12.0, 24.0]:
+	# Clear of the home centerpiece, either side of it.
+	var piece := home_piece()
+	var inner: float = (piece[2] + 3.0) if not piece.is_empty() else 12.0
+	for off: float in [-inner - 12.0, -inner, inner, inner + 12.0]:
 		var ang := wrapf(180.0 + off, -180.0, 180.0)
 		var p := profile(ang)
 		var top: float
@@ -1114,7 +1379,7 @@ func _build_hanging_banners(home: TeamDef) -> void:
 		face_home(banner)
 		# The club's boldest color on the inner pair, its dark on the outer.
 		var bold := home.primary_color if home.primary_color.s * home.primary_color.v >= home.secondary_color.s * home.secondary_color.v else home.secondary_color
-		var cloth_color := bold if absf(off) < 18.0 else home.dark_color
+		var cloth_color := bold if absf(off) <= inner else home.dark_color
 		box(Vector3(3.6, 0.14, 0.14), def.accent_color.darkened(0.2), banner).position = Vector3(0, 0, 0)
 		var cloth := box(Vector3(3.0, length, 0.05), cloth_color, banner)
 		cloth.position = Vector3(0, -length * 0.5, 0)
@@ -1180,7 +1445,7 @@ func _build_fascia(home: TeamDef) -> void:
 		# Letter by letter, each on the band at its own angle, so the words
 		# follow the curve of the stands. About 0.62 em per glyph.
 		var glyph := 110.0 * pixel * 0.62
-		var last := 180.0 - HOME_NAME_SPAN if d == 1 else 172.0
+		var last := 180.0 - HOME_NAME_SPAN if d == 1 else (152.0 if d == 0 else 172.0)
 		for side: float in [-1.0, 1.0]:
 			var a := 62.0
 			while true:

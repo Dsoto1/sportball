@@ -97,5 +97,5 @@ void fragment() {
 	ALBEDO = col * (1.0 - haze);
 	EMISSION = emission * (1.0 - haze) + haze_color * haze;
 	ROUGHNESS = mix(rough, 1.0, haze);
-	SPECULAR = 0.5 * (1.0 - haze);
+	SPECULAR = (water > 0.0 ? 0.5 : 0.15) * (1.0 - haze);
 }

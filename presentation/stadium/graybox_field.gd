@@ -389,11 +389,11 @@ func _build_fence() -> void:
 ## stays behind home plate, as on the sheets, so the field is lit warm
 ## from the batter's side.
 const SKIES := {
-	&"day": [Color(0.2, 0.45, 0.82), Color(0.72, 0.84, 0.95), Color(1.0, 0.98, 0.94), -55.0, 35.0, 1.15, 0.45],
-	&"golden": [Color(0.3, 0.46, 0.78), Color(1.0, 0.76, 0.5), Color(1.0, 0.86, 0.66), -34.0, 25.0, 1.2, 0.45],
-	&"sunset": [Color(0.32, 0.24, 0.55), Color(1.0, 0.58, 0.4), Color(1.0, 0.78, 0.6), -26.0, 15.0, 1.1, 0.5],
+	&"day": [Color(0.2, 0.45, 0.82), Color(0.72, 0.84, 0.95), Color(1.0, 0.96, 0.9), -48.0, 35.0, 1.0, 0.3],
+	&"golden": [Color(0.3, 0.46, 0.78), Color(1.0, 0.76, 0.5), Color(1.0, 0.84, 0.62), -34.0, 25.0, 1.05, 0.3],
+	&"sunset": [Color(0.32, 0.24, 0.55), Color(1.0, 0.58, 0.4), Color(1.0, 0.76, 0.58), -26.0, 15.0, 1.0, 0.32],
 	&"dusk": [Color(0.1, 0.1, 0.3), Color(0.95, 0.5, 0.45), Color(1.0, 0.7, 0.55), -12.0, 10.0, 0.35, 0.45],
-	&"underwater": [Color(0.02, 0.18, 0.3), Color(0.1, 0.55, 0.62), Color(0.7, 0.95, 1.0), -70.0, 20.0, 0.9, 0.6],
+	&"underwater": [Color(0.02, 0.18, 0.3), Color(0.1, 0.55, 0.62), Color(0.7, 0.95, 1.0), -70.0, 20.0, 0.8, 0.4],
 	&"night": [Color(0.01, 0.015, 0.05), Color(0.09, 0.1, 0.2), Color(1.0, 0.96, 0.88), -72.0, 15.0, 0.0, 0.4],
 }
 
@@ -459,10 +459,20 @@ func _build_lighting() -> void:
 	if roof:
 		environment.background_mode = Environment.BG_COLOR
 		environment.background_color = Color(0.05, 0.05, 0.07)
+	# The lighting pass: a filmic curve a little under 1 so whites and the
+	# saturated club colors stop clipping, ambient occlusion where the
+	# stands' rows, chairs and decks meet (Forward+ only), and a touch of
+	# contrast rather than extra saturation.
 	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	environment.tonemap_exposure = 0.92
+	environment.tonemap_white = 6.0
+	environment.ssao_enabled = true
+	environment.ssao_radius = 1.4
+	environment.ssao_intensity = 1.6
+	environment.ssao_light_affect = 0.15
 	environment.adjustment_enabled = true
-	environment.adjustment_saturation = 1.06
-	environment.adjustment_contrast = 1.06
+	environment.adjustment_saturation = 0.96
+	environment.adjustment_contrast = 1.1
 	env.environment = environment
 	add_child(env)
 

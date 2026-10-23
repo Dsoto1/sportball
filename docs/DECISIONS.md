@@ -1788,3 +1788,39 @@ pv_sheet.sh: sheet panel beside the render, park by park):
   first deck's fascia (the deck's other words stop 26 degrees short of
   home), so it no longer sits right behind the batter in the pitcher's
   view. The backstop keeps its plain dark band.
+
+## Behind home, lighting pass, aerial dressing
+
+- **Smooth backstop.** The foul stands' inner edge was straight segments
+  between FOUL_EDGE's points, with kinks where they met and a point
+  behind the plate. It is now a monotone cubic (Fritsch-Carlson) through
+  the same points, level at 180, so the wall behind home is one arc.
+- **Behind home, per park (the sheets' pitcher's views).** Every sheet
+  breaks the stands behind home into bays, under warm lamps, with a
+  landmark behind the plate. Now:
+  - the park's architecture set stands on the first deck behind the plate
+    (HOME_PIECE: deco hall, foundry shed, bank front, boathouse, kiln
+    arches, alpine lodge, reactor gate, lamp gate, rail gate, garden gate,
+    vault front, temple hall, Atlantis gate, sky palace, forum gate,
+    volcano gate, gothic hall, desert front), the fans behind it removed;
+  - columns in the set's style (round or square, the set's own color)
+    hold up each overhanging deck's front on the aisles, a lantern on each;
+  - a row of warm lamps runs under every deck;
+  - the backstop band carries the club's emblem either side of the plate,
+    straight behind it left plain as the pitcher's backdrop, and the low
+    wall's wordmarks stop short of it;
+  - the hanging banners move out past the centerpiece.
+- **Lighting pass ("everything so bright").** The grass and dirt had the
+  default specular, so at grazing angles the whole field mirrored the sky
+  (the mint look); now 0.12, the land 0.15. Day sun 1.15 to 1.0 and
+  ambient 0.45 to 0.3 (golden, sunset and underwater likewise), filmic at
+  exposure 0.92 with white 6, contrast 1.1 and saturation 0.96, and SSAO
+  on (Forward+). The crowd is unshaded, so it gets a light level per sky
+  (0.8 day down to 0.6 dusk) and fans under an overhanging deck sit in
+  its shade (0.62), as do the treads and chairs there.
+- **Aerial.** The back of the bowl was one blank drum from the air: now
+  pilasters every 3 degrees, a string course at each deck and rows of
+  windows (lit at night, dusk or under a roof), in the park's tones.
+  The set models are ~75k triangles each, too heavy to tile round the
+  bowl, so this is boxes in three MultiMeshes. Sakura Gate's land was
+  near black; lightened.

@@ -21,6 +21,9 @@ uniform float stripe_width = 7.0;
 uniform int pattern = 1;
 uniform float normal_strength = 0.4;
 uniform float roughness_value = 0.92;
+// Grass and dirt hardly shine: at grazing angles the default specular
+// mirrors the sky across the whole field and washes it out.
+uniform float specular_value = 0.12;
 // Walls: map the texture along the wall and up it instead of across the ground.
 uniform bool vertical_uv = false;
 
@@ -59,4 +62,5 @@ void fragment() {
 	NORMAL_MAP = texture(detail_normal, uv).rgb;
 	NORMAL_MAP_DEPTH = normal_strength;
 	ROUGHNESS = roughness_value;
+	SPECULAR = specular_value;
 }

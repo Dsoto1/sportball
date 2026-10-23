@@ -26,6 +26,7 @@ var _cheer := -1.0
 ## Mound mode: hide the players and ball (the camera stands where the
 ## pitcher does) so only the park is seen.
 var _bare := false
+var _fov := 0.0
 ## "nocrowd": the stands empty, to see the seats and structure.
 var _nocrowd := false
 
@@ -60,6 +61,9 @@ func _initialize() -> void:
 	for a: String in OS.get_cmdline_user_args():
 		if a == "nocrowd":
 			_nocrowd = true
+		if a.begins_with("fov:"):
+			# A cam: shot at this field of view (the match cameras' own).
+			_fov = a.substr(4).to_float()
 		if a.begins_with("cheer:"):
 			# Hold the crowd at this excitement (0 calm .. 1 a home run).
 			_cheer = a.substr(6).to_float()
@@ -108,6 +112,8 @@ func _process(_d: float) -> bool:
 	cam.position = _shots[_i][0]
 	cam.look_at(_shots[_i][1])
 	cam.fov = 55.0 if _shots == SHOTS else (70.0 if _i < 8 or _shots.size() != 9 else 62.0)
+	if _fov > 0.0:
+		cam.fov = _fov
 	if _frames % 8 == 0:
 		root.get_texture().get_image().save_png(_out.path_join("%s_%d.png" % [_park_id if _park_id != &"" else &"tour", _i]))
 		_i += 1
