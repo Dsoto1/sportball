@@ -162,6 +162,7 @@ attendance = 0.9
 sky = &"sunset"
 mowing = "stripes"
 grandstand = {
+"banners": true,
 "roof": &"battlement",
 "roof_color": Color(0.22745098, 0.17254902, 0.15686275, 1),
 "set": &"volcano",

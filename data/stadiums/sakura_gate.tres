@@ -230,6 +230,7 @@ sky = &"sunset"
 mowing = "diagonal"
 mowing_width = 6.0
 grandstand = {
+"banners": true,
 "roof": &"pagoda",
 "roof_color": Color(0.22745098, 0.16470589, 0.16470589, 1),
 "set": &"temple",

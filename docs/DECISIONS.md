@@ -1768,3 +1768,14 @@ pv_sheet.sh: sheet panel beside the render, park by park):
   side) with the full club name between two emblems and lit trim, and the
   players stand at the rail (their own excitement, on their feet) rather
   than sitting out of sight at the back.
+- The other fifteen sheets (second pass) all seat the players on a bench
+  at the front of the dugout under a row of warm lamps, with a lantern
+  either side of the opening. The dugout floor is now 0.3 m below the
+  field (was 0.6, which hid the seated players), the bench sits behind a
+  lower rail, the players sit (excitement 0), and lamps and lanterns glow.
+- The castle, temple, arena and fantasy sheets (Vault, Sakura Gate,
+  Deepwater, Cloudreach, Forum, Firelight, Citadel, Amber Gate) hang tall
+  club banners either side of home. A park's `grandstand.banners` flag
+  hangs four from the first deck's front: the inner pair in the club's
+  boldest color, the outer pair in its dark, each with trim, emblem and a
+  swallow tail.

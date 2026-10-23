@@ -161,6 +161,7 @@ away_fan_share = 0.2
 attendance = 0.9
 mowing_width = 11.0
 grandstand = {
+"banners": true,
 "roof": &"battlement",
 "roof_color": Color(0.41568628, 0.45490196, 0.5019608, 1),
 "set": &"gothic",

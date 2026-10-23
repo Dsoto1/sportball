@@ -113,6 +113,8 @@ func build(p_tuning: BaseballTuning, p_def: StadiumDef, home: TeamDef, away: Tea
 	_build_dugouts(home, away)
 	_build_backstop()
 	_build_backstop_banner(home)
+	if def.grandstand.get("banners", false):
+		_build_hanging_banners(home)
 	_build_grandstand()
 	_build_markers(home)
 	_build_fascia(home)
@@ -860,7 +862,7 @@ func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
 		dugout.look_at_from_position(front, front - out, Vector3.UP)
 		var w := p1.distance_to(p2)
 		var inside := def.structure_color.darkened(0.55)
-		var floor_y := -0.6
+		var floor_y := -0.3
 		var floor_slab := box(Vector3(w, 0.1, 4.2), inside.darkened(0.3), dugout, &"concrete")
 		floor_slab.position = Vector3(0, floor_y - 0.05, 1.5)
 		var back := box(Vector3(w, DUGOUT_ROOF - floor_y, 0.3), inside, dugout, &"facade")
@@ -873,11 +875,11 @@ func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
 		# The lip at field level and the padded rail the players lean on.
 		var lip := box(Vector3(w, -floor_y, 0.3), inside, dugout)
 		lip.position = Vector3(0, floor_y * 0.5, -0.15)
-		var rail := box(Vector3(w, 0.16, 0.16), def.accent_color, dugout)
-		rail.position = Vector3(0, 1.05, -0.2)
+		var rail := box(Vector3(w, 0.12, 0.12), def.accent_color, dugout)
+		rail.position = Vector3(0, 0.75, -0.2)
 		for k in 7:
-			var post := box(Vector3(0.1, 1.05, 0.1), def.accent_color.darkened(0.3), dugout)
-			post.position = Vector3(-w * 0.5 + 0.5 + k * (w - 1.0) / 6.0, 0.52, -0.2)
+			var post := box(Vector3(0.08, 0.75, 0.08), def.accent_color.darkened(0.3), dugout)
+			post.position = Vector3(-w * 0.5 + 0.5 + k * (w - 1.0) / 6.0, 0.37, -0.2)
 		# The signboard over the opening (as on the sheets): a tall band in
 		# the club's color, the name large between its emblems, a lit trim.
 		var band_h := 1.5
@@ -902,29 +904,45 @@ func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
 		var wide := sign.font.get_string_size(sign.text, HORIZONTAL_ALIGNMENT_LEFT, -1, sign.font_size).x * sign.pixel_size
 		if wide > room * 0.82:
 			sign.pixel_size *= room * 0.82 / wide
-		var lamp := box(Vector3(w, 0.08, 0.08), Color.WHITE, dugout)
-		lamp.position = Vector3(0, DUGOUT_ROOF - 0.35, 0.2)
-		lamp.material_override = glow(Color(1.0, 0.92, 0.75), 2.0)
-		var bench := box(Vector3(w - 1.0, 0.45, 0.6), club.secondary_color.darkened(0.2), dugout)
-		bench.position = Vector3(0, floor_y + 0.22, 3.1)
+		# Under the roof, a row of warm lamps (the sheets' dugouts glow), and
+		# a lantern on the wall either side of the opening.
+		var warm := Color(1.0, 0.86, 0.6)
+		var lamps := int(w / 1.6)
+		for k in lamps:
+			var bulb := box(Vector3(0.45, 0.07, 0.22), warm, dugout)
+			bulb.position = Vector3(-w * 0.5 + (k + 0.5) * w / lamps, DUGOUT_ROOF - 0.34, 0.5)
+			bulb.material_override = glow(warm, 3.0)
+		for end: float in [-1.0, 1.0]:
+			var lantern := Node3D.new()
+			lantern.position = Vector3(end * (w * 0.5 + 0.2), 1.7, -0.6)
+			dugout.add_child(lantern)
+			box(Vector3(0.46, 0.08, 0.46), def.accent_color.darkened(0.4), lantern).position.y = 0.42
+			box(Vector3(0.46, 0.08, 0.46), def.accent_color.darkened(0.4), lantern).position.y = -0.42
+			var flame := box(Vector3(0.36, 0.76, 0.36), warm, lantern)
+			flame.material_override = glow(warm, 3.5)
+			box(Vector3(0.1, 0.1, 0.4), def.accent_color.darkened(0.4), lantern).position = Vector3(0, 0.3, 0.3)
+		# The bench along the front, the players sitting on it in their
+		# club's jerseys (as on every sheet), the back wall dark behind.
+		var bench := box(Vector3(w - 1.0, 0.1, 0.5), club.secondary_color.darkened(0.2), dugout)
+		bench.position = Vector3(0, floor_y + 0.47, 1.05)
+		var bench_back := box(Vector3(w - 1.0, 0.5, 0.08), club.secondary_color.darkened(0.35), dugout)
+		bench_back.position = Vector3(0, floor_y + 0.75, 1.32)
 		var mark := Emblem.build(club, 1.8, 0.4)
 		mark.position = Vector3(0, 1.4, 3.44)
 		mark.rotation.y = PI
 		dugout.add_child(mark)
-		# The bench: the players, in their club's jerseys.
-		# Standing at the rail, as on the sheets (a few further back).
 		var spots: Array[Vector3] = []
 		var x := -w * 0.5 + 1.0
 		while x < w * 0.5 - 1.0:
-			if rng.randf() < 0.75:
-				spots.append(dugout.transform * Vector3(x, floor_y, 0.75 if rng.randf() < 0.7 else 1.6))
-			x += 0.8
+			if rng.randf() < 0.85:
+				spots.append(dugout.transform * Vector3(x, floor_y, 0.8))
+			x += 0.75
 		add_fans(spots, "Bench_%s" % club.abbreviation, club)
-		# The bench crowd is on its feet whatever the stands are doing.
+		# Seated whatever the stands are doing.
 		var bench_node: MultiMeshInstance3D = get_node_or_null("Bench_%s" % club.abbreviation)
 		if bench_node != null:
 			var m: ShaderMaterial = (bench_node.material_override as ShaderMaterial).duplicate()
-			m.set_shader_parameter("excitement", 0.55)
+			m.set_shader_parameter("excitement", 0.0)
 			bench_node.material_override = m
 
 
@@ -1053,6 +1071,50 @@ func _build_backstop_banner(home: TeamDef) -> void:
 		root.add_child(badge)
 		face_home(badge)
 
+
+## Tall club banners hanging from the first deck's front either side of
+## home, as the castle, temple and arena sheets show them: a rod, the cloth
+## in the club's color with a trim either edge, the emblem on it, a
+## pointed tail.
+func _build_hanging_banners(home: TeamDef) -> void:
+	var root := Node3D.new()
+	root.name = "HangingBanners"
+	add_child(root)
+	var k := rows_per_deck() if def.decks > 1 else 0
+	for off: float in [-24.0, -12.0, 12.0, 24.0]:
+		var ang := wrapf(180.0 + off, -180.0, 180.0)
+		var p := profile(ang)
+		var top: float
+		var radius: float
+		if k > 0 and k < int(p.z):
+			var front := deck_front(ang, p, k)
+			top = front.y - FASCIA_DROP - 0.05
+			radius = front.x - 0.25
+		else:
+			var st := stand_top(ang)
+			top = st.y + 4.0
+			radius = st.x - 0.4
+		var length := clampf(top - (p.y + 2.5), 3.0, 8.0)
+		var banner := Node3D.new()
+		root.add_child(banner)
+		banner.position = point(ang, radius, top)
+		face_home(banner)
+		# The club's boldest color on the inner pair, its dark on the outer.
+		var bold := home.primary_color if home.primary_color.s * home.primary_color.v >= home.secondary_color.s * home.secondary_color.v else home.secondary_color
+		var cloth_color := bold if absf(off) < 18.0 else home.dark_color
+		box(Vector3(3.6, 0.14, 0.14), def.accent_color.darkened(0.2), banner).position = Vector3(0, 0, 0)
+		var cloth := box(Vector3(3.0, length, 0.05), cloth_color, banner)
+		cloth.position = Vector3(0, -length * 0.5, 0)
+		for edge: float in [-1.0, 1.0]:
+			var trim := box(Vector3(0.2, length, 0.07), home.highlight_color, banner)
+			trim.position = Vector3(edge * 1.4, -length * 0.5, 0.01)
+		for edge: float in [-1.0, 1.0]:
+			var tail := box(Vector3(2.0, 1.0, 0.05), cloth_color, banner)
+			tail.position = Vector3(edge * 0.75, -length - 0.3, 0)
+			tail.rotation.z = edge * deg_to_rad(30.0)
+		var badge := Emblem.build(home, 2.1, 0.4)
+		badge.position = Vector3(0, -length * 0.45, 0.06)
+		banner.add_child(badge)
 
 ## The wall's dressing: distances in big numbers (the foul-pole distances
 ## near each pole, as on the sheets, and center field) and the home club's

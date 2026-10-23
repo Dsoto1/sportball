@@ -154,6 +154,7 @@ home_fan_share = 0.55
 away_fan_share = 0.25
 mowing = "sunburst"
 grandstand = {
+"banners": true,
 "roof": &"sail",
 "roof_color": Color(0.95686275, 0.9647059, 0.98039216, 1),
 "set": &"sky",
