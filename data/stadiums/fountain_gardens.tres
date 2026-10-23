@@ -62,6 +62,32 @@ mirrored = true
 
 [sub_resource type="Resource" id="Resource_0ixp3"]
 script = ExtResource("2_wib25")
+kind = &"hero"
+angle = -24.0
+params = {
+"base": 6.0,
+"clear": 12.0,
+"distance": 2.0,
+"height": 40.0,
+"model": &"garden_falls",
+"turn": 15.0
+}
+
+[sub_resource type="Resource" id="Resource_bdrrb"]
+script = ExtResource("2_wib25")
+kind = &"hero"
+angle = 24.0
+params = {
+"base": 6.0,
+"clear": 12.0,
+"distance": 2.0,
+"height": 40.0,
+"model": &"garden_falls",
+"turn": -15.0
+}
+
+[sub_resource type="Resource" id="Resource_4ub2c"]
+script = ExtResource("2_wib25")
 kind = &"trees"
 angle = 9.0
 mirrored = true
@@ -71,7 +97,7 @@ params = {
 "span": 6.0
 }
 
-[sub_resource type="Resource" id="Resource_bdrrb"]
+[sub_resource type="Resource" id="Resource_o7030"]
 script = ExtResource("2_wib25")
 kind = &"trees"
 angle = 22.0
@@ -82,7 +108,7 @@ params = {
 "span": 30.0
 }
 
-[sub_resource type="Resource" id="Resource_4ub2c"]
+[sub_resource type="Resource" id="Resource_xncfn"]
 script = ExtResource("2_wib25")
 kind = &"trees"
 angle = 4.0
@@ -93,7 +119,7 @@ params = {
 "span": 8.0
 }
 
-[sub_resource type="Resource" id="Resource_o7030"]
+[sub_resource type="Resource" id="Resource_vtwq7"]
 script = ExtResource("2_wib25")
 kind = &"statue"
 angle = 27.0
@@ -102,12 +128,12 @@ params = {
 "figure": &"swan"
 }
 
-[sub_resource type="Resource" id="Resource_xncfn"]
+[sub_resource type="Resource" id="Resource_2eyij"]
 script = ExtResource("2_wib25")
 kind = &"conservatory"
 angle = 42.0
 
-[sub_resource type="Resource" id="Resource_vtwq7"]
+[sub_resource type="Resource" id="Resource_gvaj5"]
 script = ExtResource("2_wib25")
 kind = &"flags"
 angle = -50.0
@@ -116,7 +142,7 @@ params = {
 "span": 100.0
 }
 
-[sub_resource type="Resource" id="Resource_2eyij"]
+[sub_resource type="Resource" id="Resource_v23bh"]
 script = ExtResource("2_wib25")
 kind = &"water"
 params = {
@@ -126,7 +152,7 @@ params = {
 "width": 16.0
 }
 
-[sub_resource type="Resource" id="Resource_gvaj5"]
+[sub_resource type="Resource" id="Resource_csqm1"]
 script = ExtResource("2_wib25")
 kind = &"arcade"
 angle = 50.0
@@ -144,7 +170,7 @@ params = {
 "towers": 3
 }
 
-[sub_resource type="Resource" id="Resource_v23bh"]
+[sub_resource type="Resource" id="Resource_yye1n"]
 script = ExtResource("2_wib25")
 kind = &"arcade"
 angle = 11.0
@@ -163,7 +189,7 @@ params = {
 "towers": 3
 }
 
-[sub_resource type="Resource" id="Resource_csqm1"]
+[sub_resource type="Resource" id="Resource_224d4"]
 script = ExtResource("2_wib25")
 kind = &"wall_art"
 params = {
@@ -172,7 +198,7 @@ params = {
 "numbers": Color(0.9098039, 0.7607843, 0.3529412, 1)
 }
 
-[sub_resource type="Resource" id="Resource_yye1n"]
+[sub_resource type="Resource" id="Resource_vtxve"]
 script = ExtResource("2_wib25")
 kind = &"planters"
 angle = -46.0
@@ -182,7 +208,7 @@ params = {
 "span": 92.0
 }
 
-[sub_resource type="Resource" id="Resource_224d4"]
+[sub_resource type="Resource" id="Resource_je7kx"]
 script = ExtResource("2_wib25")
 kind = &"props"
 angle = -46.0
@@ -194,7 +220,7 @@ params = {
 "span": 92.0
 }
 
-[sub_resource type="Resource" id="Resource_vtxve"]
+[sub_resource type="Resource" id="Resource_6by2d"]
 script = ExtResource("2_wib25")
 kind = &"props"
 angle = -46.0
@@ -241,4 +267,4 @@ window_color = Color(0.84705883, 0.9254902, 1, 1)
 facade_color = Color(0.8392157, 0.8117647, 0.73333335, 1)
 facade_surface = &"marble"
 structure_surface = &"stone"
-pieces = Array[ExtResource("2_wib25")]([SubResource("Resource_k8u6i"), SubResource("Resource_q8oj0"), SubResource("Resource_kaaf5"), SubResource("Resource_48ww4"), SubResource("Resource_1xj3a"), SubResource("Resource_taq0n"), SubResource("Resource_0ixp3"), SubResource("Resource_bdrrb"), SubResource("Resource_4ub2c"), SubResource("Resource_o7030"), SubResource("Resource_xncfn"), SubResource("Resource_vtwq7"), SubResource("Resource_2eyij"), SubResource("Resource_gvaj5"), SubResource("Resource_v23bh"), SubResource("Resource_csqm1"), SubResource("Resource_yye1n"), SubResource("Resource_224d4"), SubResource("Resource_vtxve")])
+pieces = Array[ExtResource("2_wib25")]([SubResource("Resource_k8u6i"), SubResource("Resource_q8oj0"), SubResource("Resource_kaaf5"), SubResource("Resource_48ww4"), SubResource("Resource_1xj3a"), SubResource("Resource_taq0n"), SubResource("Resource_0ixp3"), SubResource("Resource_bdrrb"), SubResource("Resource_4ub2c"), SubResource("Resource_o7030"), SubResource("Resource_xncfn"), SubResource("Resource_vtwq7"), SubResource("Resource_2eyij"), SubResource("Resource_gvaj5"), SubResource("Resource_v23bh"), SubResource("Resource_csqm1"), SubResource("Resource_yye1n"), SubResource("Resource_224d4"), SubResource("Resource_vtxve"), SubResource("Resource_je7kx"), SubResource("Resource_6by2d")])

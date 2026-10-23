@@ -1185,6 +1185,18 @@ func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
 		bench.position = Vector3(0, floor_y + 0.47, 1.05)
 		var bench_back := box(Vector3(w - 1.0, 0.5, 0.08), club.secondary_color.darkened(0.35), dugout)
 		bench_back.position = Vector3(0, floor_y + 0.75, 1.32)
+		# Against the back wall: the helmet cubbies and the bat rack either
+		# side of the emblem, the drinks cooler down at one end.
+		for prop: Array in [[&"helmet_cubbies", -w * 0.3, 2.3, 3.1, 0.0], [&"bat_rack", w * 0.3, 1.5, 3.36, 0.5], [&"water_cooler", w * 0.5 - 1.3, 0.75, 2.3, 0.0]]:
+			if not ModelKit.has(prop[0]):
+				continue
+			var item := ModelKit.spawn(prop[0], prop[2], RandomNumberGenerator.new())
+			var box := ModelKit._aabb(item)
+			var c := box.get_center() * item.scale.x
+			# Models face +Z; the dugout's field side is -Z.
+			item.rotation.y = PI
+			item.position = Vector3(prop[1] + c.x, floor_y + prop[4] - box.position.y * item.scale.y, prop[3] + c.z)
+			dugout.add_child(item)
 		var mark := Emblem.build(club, 1.8, 0.4)
 		mark.position = Vector3(0, 1.4, 3.44)
 		mark.rotation.y = PI

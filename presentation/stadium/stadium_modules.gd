@@ -109,7 +109,7 @@ const CATALOG := {
 		"about": "One sculpted landmark model (cliff, cathedral, domed bank...) behind the outfield stands, facing home plate, rising over them.",
 		"angle": 0.0, "angle_range": [-180.0, 180.0],
 		"params": {"model": [&"cathedral_spires"], "height": [60.0, 10.0, 200.0], "distance": [20.0, -20.0, 300.0], "base": [0.0, -20.0, 80.0], "turn": [0.0, -180.0, 180.0], "clear": [12.0, 0.0, 60.0], "foot": [&""], "foot_count": [12.0, 0.0, 40.0]},
-		"choices": {"model": [&"sakura_cliff", &"cathedral_spires", &"domed_bank"], "foot": [&"", &"round", &"blossom", &"cypress", &"pine", &"palm"]},
+		"choices": {"model": [&"sakura_cliff", &"cathedral_spires", &"domed_bank", &"sakura_falls", &"garden_falls"], "foot": [&"", &"round", &"blossom", &"cypress", &"pine", &"palm"]},
 		"script": preload("res://presentation/stadium/modules/hero_module.gd"),
 	},
 	&"terraces": {

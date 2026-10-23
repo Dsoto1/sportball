@@ -25,10 +25,11 @@ const BEARD_SHARE := 0.35
 ## wrist at y = -0.95, about 1.9 units tall.
 const GLOVE := preload("res://assets/generated/artlist/glove/glove.glb")
 const GLOVE_SCALE := 0.15
+const GEAR_DIR := "res://assets/generated/meshy/gear/"
 const BACK_FONT := preload("res://assets/third_party/fonts/bungee/Bungee-Regular.ttf")
 ## Rest-pose (skeleton space, m) spots: the number between the shoulder
 ## blades, the crown of the head. +X is the body's left, +Z its front.
-const BACK_NUMBER_AT := Vector3(0.0, 1.3, -0.175)
+const BACK_NUMBER_AT := Vector3(0.0, 1.3, -0.2)
 const CROWN := Vector3(0.0, 1.68, 0.0)
 const BLEND := 0.12
 ## Arcade proportions: a little broader and bigger than life, so players
@@ -58,6 +59,14 @@ var _skeleton: Skeleton3D
 var _helmet: Node3D
 var _cap: Node3D
 var _back: Label3D
+var _mask: Node3D
+var _chest: Node3D
+var _shins: Array[Node3D] = []
+var _mitt: Node3D
+var _catcher := false
+var _glove_on := true
+var _cloth: MeshInstance3D
+var _cloth_mat: ShaderMaterial
 var _grip_ik: BatGrip
 ## How this batter stands and swings (BattingStyles).
 var style: StringName = &"classic"
@@ -94,6 +103,15 @@ func setup(color: Color, tag: String) -> void:
 	_kit.set_shader_parameter("skin_tex", SKIN_TEX)
 	_kit.set_shader_parameter("skin_normal", SKIN_NORMAL)
 	_mesh.material_override = _kit
+	# The uniform itself, as cloth standing off the painted body.
+	_cloth = MeshInstance3D.new()
+	_cloth.name = "Uniform"
+	_cloth.mesh = UniformLook.shell_for(_mesh)
+	_cloth.skin = _mesh.skin
+	skeleton.add_child(_cloth)
+	_cloth.skeleton = NodePath("..")
+	_cloth_mat = UniformLook.cloth_material()
+	_cloth.material_override = _cloth_mat
 	_hair = _wear(skeleton, HAIR, "")
 	_beard = _wear(skeleton, BEARD, "")
 	_player.add_animation_library(BaseballMoves.LIBRARY, BaseballMoves.library(skeleton, _player))
@@ -138,9 +156,11 @@ func set_tag_visible(value: bool) -> void:
 ## Fielders wear a glove and a cap; batters and runners wear batting
 ## gloves and a helmet.
 func set_glove_visible(value: bool) -> void:
-	_glove.visible = value
-	_cap.visible = value
-	_helmet.visible = not value
+	_glove_on = value
+	_glove.visible = value and not _catcher
+	_mitt.visible = value and _catcher
+	_cap.visible = value and not _catcher
+	_helmet.visible = not value and not _catcher
 	_kit.set_shader_parameter("gloved", not value)
 	if _pose <= Pose.IDLE:
 		_play(_idle_clip(), 1.0, 0.0)
@@ -181,13 +201,19 @@ func set_look(color: Color, tag: String, trim: Color = Color(0, 0, 0, 0), home: 
 	_kit.set_shader_parameter("trim", second)
 	_kit.set_shader_parameter("socks", color.darkened(0.25))
 	_kit.set_shader_parameter("pants", Color(0.94, 0.93, 0.89) if home else Color(0.66, 0.67, 0.7))
-	for gear: Node3D in [_helmet, _cap]:
-		for part in gear.find_children("*", "MeshInstance3D", true, false):
-			if part.has_meta("team_part"):
-				var shell := GrayboxField._mat(color if part.get_meta("team_part") == "main" else second)
-				shell.roughness = 0.25 if gear == _helmet else 0.8
-				shell.metallic_specular = 0.7
-				part.material_override = shell
+	for key in ["jersey", "trim", "pants"]:
+		_cloth_mat.set_shader_parameter(key, _kit.get_shader_parameter(key))
+	for gear: Node3D in [_helmet, _cap, _mask, _chest] + _shins:
+		for part: MeshInstance3D in gear.find_children("*", "MeshInstance3D", true, false):
+			if not part.has_meta("gear_part"):
+				continue
+			# The model's own (white) texture tinted to the team: its
+			# shading, seams and stitching stay; the mask's cage stays dark.
+			var source := part.mesh.surface_get_material(0) as StandardMaterial3D
+			var tinted: StandardMaterial3D = source.duplicate() if source != null else StandardMaterial3D.new()
+			tinted.albedo_color = color.lightened(0.08) if gear in [_helmet, _cap, _mask] else color.lerp(Color(0.2, 0.2, 0.22), 0.35)
+			tinted.roughness = 0.3 if gear == _helmet else 0.8
+			part.material_override = tinted
 	_back.modulate = second.lightened(0.25)
 	_back.outline_modulate = color.darkened(0.5)
 	_tag.text = tag
@@ -334,33 +360,65 @@ func _attach(skeleton: Skeleton3D, bone: String, node: Node3D, at: Transform3D) 
 	return attach
 
 
-## A glossy batting helmet (shell, brim, ear flap on the left for a righty)
-## and a soft cap (crown, button, long brim), both on the head.
+## Headwear and the catcher's gear: sculpted models (Meshy, white, tinted
+## to the team where they are team-colored), all built facing +Z with +Y
+## up, as the skeleton's rest pose does, so each is placed by its bounds.
+## The batting helmet and a cap on the head; the catcher's mask, chest
+## protector, shin guards and mitt are shown only on the catcher.
 func _build_headwear(skeleton: Skeleton3D) -> void:
-	_helmet = Node3D.new()
-	_helmet.name = "Helmet"
 	# The head is a narrow egg: about 0.17 m wide, 0.23 deep, top at 1.83.
-	_helmet_part(_helmet, _dome(0.105, 0.165), Vector3(0, 0, -0.005), Vector3(1, 1, 1.28), "main")
-	_helmet_part(_helmet, _disc(0.07, 0.014), Vector3(0, 0.005, 0.135), Vector3(1.2, 1.0, 0.8), "main")
-	for side: float in [1.0, -1.0]:
-		# Skeleton +X is the body's left.
-		var flap := Node3D.new()
-		flap.name = "FlapLeft" if side > 0.0 else "FlapRight"
-		_helmet.add_child(flap)
-		var shell := _helmet_part(flap, _dome(0.06, 0.03), Vector3(0.085 * side, -0.06, 0.025), Vector3(1.0, 1.0, 1.15), "main")
-		shell.rotation.z = -PI * 0.5 * side
-		var hole := _helmet_part(flap, _disc(0.026, 0.01), Vector3(0.116 * side, -0.055, 0.02), Vector3.ONE, "trim")
-		hole.rotation.z = PI * 0.5
-	_helmet.get_node("FlapRight").visible = false
-	_attach(skeleton, "Head", _helmet, Transform3D(Basis.IDENTITY, CROWN))
-	_cap = Node3D.new()
+	_helmet = _gear(skeleton, "batting_helmet", "Head", 0.25, Vector3(0, 1.86, -0.02), &"top", "main")
+	_helmet.name = "Helmet"
+	# The sculpted helmet has a flap either side; these stay for callers.
+	for flap in ["FlapLeft", "FlapRight"]:
+		var n := Node3D.new()
+		n.name = flap
+		_helmet.add_child(n)
+	_cap = _gear(skeleton, "cap", "Head", 0.205, Vector3(0, 1.845, 0.0), &"top", "main", 0.39)
 	_cap.name = "Cap"
-	_helmet_part(_cap, _dome(0.098, 0.14), Vector3(0, 0.01, 0.0), Vector3(1, 1, 1.24), "main")
-	_helmet_part(_cap, _disc(0.014, 0.014), Vector3(0, 0.15, 0.0), Vector3.ONE, "trim")
-	var brim := _helmet_part(_cap, _disc(0.075, 0.01), Vector3(0, 0.02, 0.15), Vector3(1.05, 1.0, 1.0), "trim")
-	brim.rotation.x = 0.12
-	_attach(skeleton, "Head", _cap, Transform3D(Basis.IDENTITY, CROWN))
 	_cap.visible = false
+	_mask = _gear(skeleton, "catcher_mask", "Head", 0.25, Vector3(0, 1.87, 0.0), &"top", "main", 0.22)
+	_chest = _gear(skeleton, "chest_protector", "spine_03", 0.52, Vector3(0, 1.52, 0.02), &"top", "main")
+	for side: float in [1.0, -1.0]:
+		var bone := "calf_l" if side > 0.0 else "calf_r"
+		_shins.append(_gear(skeleton, "shin_guard", bone, 0.19, Vector3(0.1 * side, 0.58, 0.02), &"top", "main"))
+	_mitt = (load(GEAR_DIR + "catcher_mitt.glb") as PackedScene).instantiate()
+	_mitt.scale = Vector3.ONE * GLOVE_SCALE
+	_mitt.position = Vector3(0.0, 0.95 * GLOVE_SCALE * 0.75, 0.0)
+	_hand.add_child(_mitt)
+	set_catcher(false)
+
+
+## Catchers wear the mask, chest protector, shin guards and mitt.
+func set_catcher(value: bool) -> void:
+	_catcher = value
+	for gear: Node3D in [_mask, _chest, _mitt] + _shins:
+		gear.visible = value
+	_glove.visible = _glove_on and not value
+	_mitt.visible = _glove_on and value
+	if value:
+		_cap.visible = false
+		_helmet.visible = false
+
+
+## A gear model on a bone: `width` m across, its `anchor` (its top) at a
+## rest-pose spot (skeleton space). `back` shifts it forward by that share
+## of its depth (a brim reaches out in front of the crown it sits on).
+func _gear(skeleton: Skeleton3D, model: String, bone: String, width: float, at: Vector3, anchor: StringName, part: String, back: float = 0.0) -> Node3D:
+	var node: Node3D = (load(GEAR_DIR + model + ".glb") as PackedScene).instantiate()
+	var box := ModelKit._aabb(node)
+	var k := width / maxf(box.size.x, 0.001)
+	var center := box.get_center()
+	var top := box.end.y if anchor == &"top" else box.position.y
+	var holder := Node3D.new()
+	holder.name = model
+	holder.add_child(node)
+	node.transform = Transform3D(Basis.from_scale(Vector3.ONE * k), -Vector3(center.x, top, center.z - back * box.size.z * 0.5) * k)
+	for mi: MeshInstance3D in node.find_children("*", "MeshInstance3D", true, false):
+		mi.set_meta("gear_part", part)
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	_attach(skeleton, bone, holder, Transform3D(Basis.IDENTITY, at))
+	return holder
 
 
 func _helmet_part(parent: Node3D, mesh: Mesh, at: Vector3, size: Vector3, part: String) -> MeshInstance3D:

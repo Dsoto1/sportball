@@ -1853,3 +1853,26 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   kitsune moves to 42 degrees, clear of the slogan board. Hero
   landmarks keep their distance but their turned footprint's front
   edge never comes within 2 m of the stands.
+
+## Cloth uniforms, sculpted gear, dugout props, waterfalls
+
+- **Uniforms are cloth, not paint.** The owner saw the kit "like a
+  sticker": it was color painted on the body mesh. Now `UniformLook.shell_for`
+  copies the jersey, sleeve trim, belt and pants out of the body and
+  stands them off the skin (1.6-3.2 cm: looser lower on the jersey,
+  sleeves widening to the cuff, pants roomy at the seat and bloused over
+  the socks), with the body's own skinning so they follow every clip.
+  `cloth.gdshader` adds the button placket and buttons, pant piping, folds
+  where kits gather and a woven grain; the inside of a sleeve is in shade.
+  The number on the back moves out to sit on the cloth.
+- **Sculpted gear (Meshy, 11 models, 330 credits approved).** Cap and
+  batting helmet replace the primitive shapes; the catcher now wears a
+  mask, chest protector, shin guards and a catcher's mitt. White models
+  tinted to the team (their shading and stitching kept), placed on bones
+  by their bounds (`ActorView._gear`). `set_catcher` shows the catcher's
+  set. The sculpted helmet has a flap either side, so lefties need no swap.
+- **Dugouts:** helmet cubbies and a bat rack either side of the emblem,
+  and a drinks cooler at one end, in every park.
+- **Waterfalls back, as sculpted models:** Sakura Gate's blossom cliff
+  waterfall rises behind left-center, and Fountain Gardens' marble
+  cascades stand either side of the board. Hero models gain both.

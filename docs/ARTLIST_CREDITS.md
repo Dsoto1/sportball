@@ -144,3 +144,19 @@ The owner approved the Bankers' bronze bull on 2026-10-22: 30 credits (balance 5
 | Date | Item | Mode | Credits | Balance after | Task |
 |---|---|---|---|---|---|
 | 2026-10-22 | Ledger Street bronze charging bull (text-to-3D) | preview + refine | 30 | 5,840 | 01a165b2-9ec4-7080-b73d-17950672abe6 |
+
+The owner approved 11 models on 2026-10-23 (gear, dugout props, two waterfalls): 30 credits each, 330 total (balance 5,840 before, 5,510 after, checked).
+
+| Date | Item | Mode | Credits | Balance after | Task |
+|---|---|---|---|---|---|
+| 2026-10-23 | Baseball cap (text-to-3d) | preview + refine | 30 | | preview 01a168b1-97e7-75b4-81d2-622ff63eb974, refine 01a168b2-4bd8-760f-9648-0b232c93c453 |
+| 2026-10-23 | Batting helmet with ear flap (text-to-3d) | preview + refine | 30 | | preview 01a168b3-1dc3-77ba-9f64-a513608c1c2f, refine 01a168b3-d369-707c-a572-dc7d73b563b7 |
+| 2026-10-23 | Catcher's helmet and face cage (text-to-3d) | preview + refine | 30 | | preview 01a168b3-2c9e-70f2-bb3a-e7b2796b481c, refine 01a168b4-2c8b-75b5-aefb-0e7907b336e3 |
+| 2026-10-23 | Catcher's mitt (text-to-3d) | preview + refine | 30 | | preview 01a168b3-246c-7553-8a5e-f5aa8d552058, refine 01a168b4-254a-7786-a924-89ef6dd60be1 |
+| 2026-10-23 | Catcher's chest protector (text-to-3d) | preview + refine | 30 | | preview 01a168b3-33ef-72c0-a274-fa8f03e57113, refine 01a168b4-3519-7491-be0d-6e79c13ed072 |
+| 2026-10-23 | Catcher's shin guard (text-to-3d) | preview + refine | 30 | | preview 01a168b3-3b5e-721b-9717-c45a4383ed75, refine 01a168b3-f04b-71a1-b1d3-8d0a07749ef4 |
+| 2026-10-23 | Dugout bat rack (text-to-3d) | preview + refine | 30 | | preview 01a168b3-4430-7443-ba05-f2f97bb87674, refine 01a168b3-f461-7432-9ebf-d2faa1e4ce52 |
+| 2026-10-23 | Dugout helmet cubbies (text-to-3d) | preview + refine | 30 | | preview 01a168b3-4ba7-762b-a64f-25c429325d08, refine 01a168b4-4978-7382-b487-d80cf11c6be9 |
+| 2026-10-23 | Dugout drinks cooler (text-to-3d) | preview + refine | 30 | | preview 01a168b3-5303-731f-b707-0600903e7a2c, refine 01a168b4-02a3-7313-bcba-2b6dca699561 |
+| 2026-10-23 | Blossom waterfall cliff (Sakura Gate) (text-to-3d) | preview + refine | 30 | | preview 01a168b3-5b60-72fa-af8c-8cc463988023, refine 01a168b4-ff65-7400-8b4b-51aaa294edd7 |
+| 2026-10-23 | Marble terraced cascade (Fountain Gardens) (text-to-3d) | preview + refine | 30 | 5,510 | preview 01a168b3-6302-73ed-989e-b6587cf1211e, refine 01a168b4-63db-7267-a865-d95b4aed22b7 |

@@ -390,6 +390,7 @@ func reset_for_pitch(state: MatchState) -> void:
 		_fielders[i].position = FieldLayout.fielder_spot(i, tuning)
 		_fielders[i].face(Vector3.ZERO)
 		_fielders[i].set_crouch(tuning.fielder_ids[i] == &"c")
+		_fielders[i].set_catcher(tuning.fielder_ids[i] == &"c")
 	_clear_runners()
 	_batting_home = state.batting_team() == MatchState.HOME
 	var batter := _runner_actor(state.current_batter(), batting_color, batting_trim)
