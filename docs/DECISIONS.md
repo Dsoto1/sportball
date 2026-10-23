@@ -1700,3 +1700,20 @@ front edge 60 ft 6 in from the plate's back point), the runner's lane up
 the last 45 ft of the first-base line (3 ft wide, foul side), both coach's
 boxes (20 x 10 ft, 15 ft off the lines, ending level with the bases) and
 both on-deck circles (5 ft across, 37 ft from home toward the dugouts).
+
+## A real infield and a mound you stand on
+
+The infield was one big dirt disc round the mound that spilled behind
+home and into foul territory. Now the dirt lies as on a real field: base
+paths 3 ft either side of the lines round the diamond, the arc out past
+the bases (95 ft from the rubber's front, fair territory only, a fan from
+home between the foul lines), the 13 ft circle round home and the
+cutouts round the bags, with grass inside the diamond and in foul
+territory.
+
+The mound was a flat 25 cm puck the players stood in. It is now built to
+the rulebook (18 ft across, its center 59 ft from the plate's point,
+10 in high, a flat table round the rubber sloping off to the grass), and
+FieldLayout.ground_height is its surface: every player's feet are raised
+onto it each frame (presentation only; play stays on the flat). The
+rubber sits on the table.

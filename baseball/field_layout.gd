@@ -88,3 +88,25 @@ static func is_fair_angle(spray_deg: float, tuning: BaseballTuning) -> bool:
 
 static func base_name(base: int) -> String:
 	return ["home", "1st", "2nd", "3rd", "home"][clampi(base, 0, 4)]
+
+
+# --- The mound (presentation: where feet stand; play stays on the flat) ---
+
+## The pitcher's mound to the rulebook: 18 ft across, its center 59 ft
+## from the plate's back point, 10 in high, with a flat table round the
+## rubber (whose front edge is 60 ft 6 in from the point) sloping off to
+## the infield grass.
+const PLATE_POINT := 0.2159
+const MOUND_CENTER := Vector3(0.0, 0.0, PLATE_POINT - 17.983)
+const MOUND_RADIUS := 2.743
+const MOUND_TABLE := 0.95
+const MOUND_HEIGHT := 0.254
+const RUBBER_FRONT_Z := PLATE_POINT - 18.44
+
+
+## Height of the field's surface under a point (the mound; 0 elsewhere).
+static func ground_height(at: Vector3) -> float:
+	var d := Vector2(at.x - MOUND_CENTER.x, at.z - MOUND_CENTER.z).length()
+	if d >= MOUND_RADIUS:
+		return 0.0
+	return MOUND_HEIGHT * smoothstep(MOUND_RADIUS, MOUND_TABLE, d)

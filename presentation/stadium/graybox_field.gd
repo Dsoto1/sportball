@@ -75,27 +75,45 @@ func build(tuning: BaseballTuning, park: StadiumDef = null) -> void:
 
 func _build_infield() -> void:
 	var half := FieldLayout.BASE_DISTANCE / sqrt(2.0)
-	var dirt := _add_box("InfieldDirt", Vector3(FieldLayout.BASE_DISTANCE + 6, 0.04, FieldLayout.BASE_DISTANCE + 6), Vector3(0, DIRT_TOP - 0.02, -half), DIRT)
+	# Dirt the way a real infield lies: the base paths (3 ft either side of
+	# the lines, round the diamond), the arc out past the bases (95 ft from
+	# the rubber, fair territory only), the circle round home (13 ft) and
+	# the cutouts round the bags; grass inside the diamond and all round.
+	var dirt := _add_box("InfieldDirt", Vector3(FieldLayout.BASE_DISTANCE + 1.83, 0.04, FieldLayout.BASE_DISTANCE + 1.83), Vector3(0, DIRT_TOP - 0.02, -half), DIRT)
 	dirt.rotation_degrees.y = 45.0
 	dirt.material_override = _dirt_mat
-	# The infield arc: dirt out past the bases, the way a real infield looks.
-	_add_disc("InfieldArc", 29.0, Vector3(0, ARC_TOP - 0.015, -18.4), _dirt_mat, 0.03)
-	var grass := _add_box("InfieldGrass", Vector3(FieldLayout.BASE_DISTANCE - 4, 0.05, FieldLayout.BASE_DISTANCE - 4), Vector3(0, INFIELD_GRASS_TOP - 0.025, -half), GRASS.lightened(0.05))
+	_build_infield_arc()
+	var grass := _add_box("InfieldGrass", Vector3(FieldLayout.BASE_DISTANCE - 1.83, 0.05, FieldLayout.BASE_DISTANCE - 1.83), Vector3(0, INFIELD_GRASS_TOP - 0.025, -half), GRASS.lightened(0.05))
 	grass.rotation_degrees.y = 45.0
 	grass.material_override = _infield_grass_mat
-	# Cutouts around home plate and each bag.
-	_add_disc("HomeCircle", 4.0, Vector3(0, CUTOUT_TOP - 0.01, 0), _dirt_mat)
+	_add_disc("HomeCircle", 3.96, Vector3(0, CUTOUT_TOP - 0.01, 0), _dirt_mat)
 	for base in [FieldLayout.FIRST, FieldLayout.SECOND, FieldLayout.THIRD]:
 		_add_disc("BaseCircle%d" % base, 2.6, FieldLayout.base_position(base) + Vector3(0, CUTOUT_TOP - 0.01, 0), _dirt_mat)
+	# The mound: 18 ft across, 10 in high, a flat table round the rubber
+	# sloping off to the grass (FieldLayout.ground_height is its surface).
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var c := FieldLayout.MOUND_CENTER
+	var rings := 10
+	var sides := 48
+	for i in rings:
+		var r0 := FieldLayout.MOUND_RADIUS * i / rings
+		var r1 := FieldLayout.MOUND_RADIUS * (i + 1) / rings
+		for k in sides:
+			var a0 := TAU * k / sides
+			var a1 := TAU * (k + 1) / sides
+			var pts := []
+			for rr: Array in [[r0, a0], [r1, a0], [r1, a1], [r0, a1]]:
+				var q := c + Vector3(cos(rr[1]) * rr[0], 0.0, sin(rr[1]) * rr[0])
+				q.y = FieldLayout.ground_height(q) + INFIELD_GRASS_TOP - 0.02
+				pts.append(q)
+			for v: Vector3 in [pts[0], pts[2], pts[1], pts[0], pts[3], pts[2]]:
+				st.add_vertex(v)
+	st.generate_normals()
 	var mound := MeshInstance3D.new()
-	var cyl := CylinderMesh.new()
-	cyl.top_radius = 2.4
-	cyl.bottom_radius = 2.8
-	cyl.height = 0.25
-	mound.mesh = cyl
-	mound.material_override = _dirt_mat
-	mound.position = Vector3(0, 0.05, -18.4)
 	mound.name = "Mound"
+	mound.mesh = st.commit()
+	mound.material_override = _dirt_mat
 	add_child(mound)
 	_build_home_plate()
 	_build_batters_boxes()
@@ -109,6 +127,35 @@ func _build_infield() -> void:
 ## across the front (facing the pitcher), 8.5 in down each side, and two
 ## 12 in edges meeting at the point toward the catcher, with a beveled
 ## black rubber rim, set flush in its dirt cutout.
+## The infield arc: dirt from home out to 95 ft from the rubber's front,
+## across fair territory (a fan from home between the foul lines).
+func _build_infield_arc() -> void:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var c := Vector3(0.0, 0.0, FieldLayout.RUBBER_FRONT_Z)
+	var radius := 95.0 * 0.3048
+	var y := ARC_TOP
+	var steps := 90
+	var prev := Vector3.ZERO
+	for i in steps + 1:
+		var a := -_tuning.foul_line_angle + 2.0 * _tuning.foul_line_angle * i / steps
+		var d := FieldLayout.direction_for_spray(a)
+		# Where the ray from home meets the arc: |t d - c| = radius.
+		var b := d.dot(c)
+		var t := b + sqrt(maxf(b * b - c.length_squared() + radius * radius, 0.0))
+		var edge := d * t + Vector3(0, y, 0)
+		if i > 0:
+			for v: Vector3 in [Vector3(0, y, 0), prev, edge]:
+				st.set_normal(Vector3.UP)
+				st.add_vertex(v)
+		prev = edge
+	var arc := MeshInstance3D.new()
+	arc.name = "InfieldArc"
+	arc.mesh = st.commit()
+	arc.material_override = _dirt_mat
+	add_child(arc)
+
+
 func _build_home_plate() -> void:
 	var w := 0.2159  # half of 17 in
 	var outline := [Vector2(-w, -w), Vector2(w, -w), Vector2(w, 0.0), Vector2(0.0, w), Vector2(-w, 0.0)]
@@ -177,7 +224,7 @@ func _build_field_marks() -> void:
 	var y := CHALK_TOP - 0.004
 	# Pitcher's rubber: 24 x 6 in of whitened rubber, its front edge
 	# 60 ft 6 in from the plate's back point, on the mound's top.
-	var rubber := _add_box("PitchersRubber", Vector3(24 * 0.0254, 0.03, 6 * 0.0254), Vector3(0, 0.19, PLATE_POINT - 60.5 * ft - 3 * 0.0254), CHALK)
+	var rubber := _add_box("PitchersRubber", Vector3(24 * 0.0254, 0.03, 6 * 0.0254), Vector3(0, FieldLayout.MOUND_HEIGHT + INFIELD_GRASS_TOP - 0.01, FieldLayout.RUBBER_FRONT_Z - 3 * 0.0254), CHALK)
 	rubber.name = "PitchersRubber"
 	for side: float in [-1.0, 1.0]:
 		var along := FieldLayout.direction_for_spray(side * 45.0)

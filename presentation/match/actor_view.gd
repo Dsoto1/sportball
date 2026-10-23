@@ -294,6 +294,8 @@ func animate(pose: Pose, delta: float, speed: float = 0.0, juke: bool = false, p
 	var target := sin(_clock * 9.0) * 0.22 if juke else 0.0
 	_sway = lerpf(_sway, target, 1.0 - exp(-delta * 14.0))
 	_model.position.x = _sway
+	# Feet on the field's surface: up on the mound, flat everywhere else.
+	_model.position.y = FieldLayout.ground_height(global_position)
 
 
 ## Moves the meshes of a base-character scene onto this skeleton (same
