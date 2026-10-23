@@ -6,6 +6,10 @@ extends RefCounted
 ## 4 = home again (scored).
 
 const BASE_DISTANCE := 27.43
+## The bags at first, second and third: 15 in square, 4 in tall, turned
+## 45 degrees to the baselines (home plate lies flush with the ground).
+const BASE_SIZE := 0.381
+const BASE_HEIGHT := 0.1016
 const HOME := 0
 const FIRST := 1
 const SECOND := 2
@@ -108,6 +112,45 @@ const MOUND_SLOPE := 1.0 / 12.0
 const MOUND_SLOPE_RUN := 1.8288
 ## The roll-off to the grass round the edge (m).
 const MOUND_ROLL := 0.75
+
+
+## The surface's normal under a point (straight up off the mound).
+static func ground_normal(at: Vector3) -> Vector3:
+	var e := 0.05
+	var dx := ground_height(at + Vector3(e, 0, 0)) - ground_height(at - Vector3(e, 0, 0))
+	var dz := ground_height(at + Vector3(0, 0, e)) - ground_height(at - Vector3(0, 0, e))
+	return Vector3(-dx, 2.0 * e, -dz).normalized()
+
+
+## A ball (its lowest point at `p`, `radius` m round) inside a bag at
+## first, second or third: the outward normal of the face it came through
+## and how deep it is in (`{}` when it touches none).
+static func base_contact(p: Vector3, radius: float) -> Dictionary:
+	if p.y > BASE_HEIGHT:
+		return {}
+	for base in [FIRST, SECOND, THIRD]:
+		var c := base_position(base)
+		var d := Vector2(p.x - c.x, p.z - c.z)
+		if d.length() > BASE_SIZE:
+			continue
+		# The bag's own axes (turned 45 degrees).
+		var u := (d.x + d.y) * 0.70710678
+		var w := (d.x - d.y) * 0.70710678
+		var half := BASE_SIZE * 0.5 + radius
+		if absf(u) > half or absf(w) > half:
+			continue
+		var depths := [BASE_HEIGHT - p.y, half - absf(u), half - absf(w)]
+		var axis := 0
+		for i in range(1, 3):
+			if depths[i] < depths[axis]:
+				axis = i
+		var n := Vector3.UP
+		if axis == 1:
+			n = Vector3(signf(u), 0.0, signf(u)) * 0.70710678
+		elif axis == 2:
+			n = Vector3(signf(w), 0.0, -signf(w)) * 0.70710678
+		return {"normal": n, "depth": depths[axis], "base": base}
+	return {}
 
 
 ## Height of the field's surface under a point (the mound; 0 elsewhere).

@@ -1897,3 +1897,29 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   batter from the pitcher, his chest, his back and high behind the plate,
   hide the catcher and umpire, take `lefty`, and no longer save the first
   still before the camera has moved.
+
+## Flush field surfaces, a solid mound and bags, the lead arm in front
+
+- **Field layers flush with the ground.** Dirt, infield grass, cutouts and
+  chalk stood 6-15 cm above the ground (the old way to stop them flickering
+  against each other), so the lines floated and players' feet and the ball
+  sank into the dirt. They now lie within 1.6 cm of it, and which layer
+  shows is settled by pulling each one a hair toward the camera in its
+  shader (`pull`, GrayboxField.LAYER_PULL): it stays put on screen and only
+  wins the depth test. Flat marks (lines, plate, rim) use `chalk.gdshader`.
+  A shader that writes POSITION anywhere loses the engine's own
+  projection, so it is always written.
+- **The ball plays off the mound and the bags.** BallTrajectory bounces
+  off the mound's real surface (FieldLayout.ground_height and its normal),
+  rolls up and down its slope, and hops off its lip when it comes in fast.
+  The bags at first, second and third are solid (15 in square, 4 in tall,
+  FieldLayout.BASE_SIZE/BASE_HEIGHT): a ball that hits one comes off the
+  face it struck (livelier off a side than the top) and the trajectory
+  records `hit_base`. The bags are drawn at that size; home plate stays
+  flush. Tests: never through the mound; a roller at third glances off.
+- **Lead arm in front.** Seen from behind, the lead arm's upper arm hung
+  behind the body with its elbow pointing back ("inverted"): the hands were
+  only 8-12 cm in front of the chest, so the solver routed the arm round
+  the outside. Hands now sit 17 cm out front and the lead elbow aims down
+  and forward: the forearm crosses in front of the chest, elbow down.
+- Close-up tool: `righty` alongside `lefty` (the default batter bats left).

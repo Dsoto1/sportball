@@ -58,7 +58,7 @@ static var STANCE := {
 	# rig), just in front of it, the back elbow up, so the bat rests back
 	# behind the head, as every hitter sets up.
 	"hand_r": P(0.27, 1.47, 0.04), "hand_l": P(0.23, 1.41, 0.08),
-	"elbow_r": P(1, 0.25, -0.45), "elbow_l": P(0, -1, 0.5),
+	"elbow_r": P(1, 0.25, -0.45), "elbow_l": P(-0.15, -1, 1.1),
 }
 static var STANCE_BOB := _with(STANCE, {"drop": 0.12, "hand_r": P(0.28, 1.49, 0.03), "hand_l": P(0.24, 1.43, 0.07)})
 static var STRIDE := _with(STANCE, {

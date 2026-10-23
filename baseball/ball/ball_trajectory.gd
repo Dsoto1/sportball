@@ -19,6 +19,11 @@ var apex_height: float = 0.0
 var hit_fence: bool = false
 ## Time the ball first came off the wall; INF if it never reached it.
 var fence_time: float = INF
+## The bag the ball glanced off (FieldLayout.FIRST..THIRD), or -1.
+var hit_base: int = -1
+## The ball's radius (m) and how lively it comes off a bag.
+const BALL_RADIUS := 0.037
+const BAG_RESTITUTION := 0.45
 
 var _fence_point: Vector3
 var _fence_velocity: Vector3
@@ -49,28 +54,59 @@ static func simulate(exit_velocity: float, launch_angle: float, spray_angle: flo
 			var accel := Vector3(0.0, -tuning.gravity, 0.0) - v * (drag * v.length())
 			v += accel * traj.step
 			p += v * traj.step
-			if p.y <= 0.0:
-				p.y = 0.0
+			# The ground is the mound where it rises, flat everywhere else.
+			var ground := FieldLayout.ground_height(p)
+			if p.y <= ground:
+				p.y = ground
 				if traj.first_bounce_time == INF:
 					traj.first_bounce_time = t
 					traj.landing_point = p
-				if -v.y > tuning.bounce_min_speed:
-					v.y = -v.y * tuning.bounce_restitution
-					var friction := FieldLayout.bounce_friction(tuning)
-					v.x *= friction
-					v.z *= friction
+				var n := FieldLayout.ground_normal(p)
+				var vn := v.dot(n)
+				if -vn > tuning.bounce_min_speed:
+					# Off the slope: the normal part reverses (losing energy),
+					# the rest keeps going, slowed by the turf.
+					var along := (v - n * vn) * FieldLayout.bounce_friction(tuning)
+					v = along - n * vn * tuning.bounce_restitution
 				else:
+					v = v - n * minf(vn, 0.0)
 					v.y = 0.0
 					airborne = false
 		else:
 			var flat := Vector2(v.x, v.z)
+			# Down the mound's slope, or slowed climbing it.
+			var n := FieldLayout.ground_normal(p)
+			flat += Vector2(n.x, n.z) * tuning.gravity * traj.step
 			var speed := flat.length()
-			if speed <= tuning.stop_speed:
+			if speed <= tuning.stop_speed and n.y > 0.999:
 				traj._append(t, p)
 				break
-			flat = flat * (maxf(speed - FieldLayout.roll_deceleration(tuning) * traj.step, 0.0) / speed)
+			if speed > 0.0:
+				flat = flat * (maxf(speed - FieldLayout.roll_deceleration(tuning) * traj.step, 0.0) / speed)
 			v = Vector3(flat.x, 0.0, flat.y)
 			p += v * traj.step
+			var lift := FieldLayout.ground_height(p) - p.y
+			p.y += lift
+			# Rolling up the mound's edge fast enough, it hops off its lip.
+			if lift > 0.0 and speed > 0.0 and lift / (speed * traj.step) > 0.3 and speed > 6.0:
+				v.y = speed * 0.25
+				airborne = true
+		# Off a bag at first, second or third: back the way it came through
+		# the face it hit, livelier off its side than its top.
+		var bag := FieldLayout.base_contact(p, BALL_RADIUS)
+		if not bag.is_empty():
+			var bn: Vector3 = bag["normal"]
+			p += bn * float(bag["depth"])
+			var bvn := v.dot(bn)
+			if bvn < 0.0:
+				v -= bn * bvn * (1.0 + BAG_RESTITUTION)
+				v -= (v - bn * v.dot(bn)) * 0.15
+				if bn.y < 0.5 or v.y > tuning.bounce_min_speed:
+					airborne = true
+					if traj.first_bounce_time == INF:
+						traj.first_bounce_time = t
+						traj.landing_point = p
+				traj.hit_base = int(bag["base"])
 		traj.apex_height = maxf(traj.apex_height, p.y)
 		if fair and traj._check_fence(p, v, tuning):
 			if traj.result == Result.HOME_RUN:

@@ -35,7 +35,7 @@ const PLATE_CLEAR := 0.5
 const BOX_TOWARD_PITCHER := -1.4
 const BOX_TOWARD_CATCHER := 0.42
 ## The lead hand sits at least this far in front of him (m) before the swing.
-const HANDS_OUT := 0.12
+const HANDS_OUT := 0.17
 ## Feet per style, fit to Statcast's batting-stance tracking (229 MLB
 ## hitters, Baseball Savant): stance width (m between the feet), stance
 ## angle (degrees open: the lead foot set back from the plate) and stride
@@ -203,7 +203,8 @@ static func poses(style: StringName) -> Dictionary:
 	extend = extend.duplicate(true)
 	finish = finish.duplicate(true)
 	# Hands: out in front of the chest while he waits, loads and strides, so
-	# the lead forearm crosses the chest with room instead of on it.
+	# the lead forearm crosses in front of the chest (its elbow down, in
+	# front of him) instead of wrapping round the outside of his body.
 	for pose: Dictionary in [stance, load, stride]:
 		var out := HANDS_OUT - (pose["hand_l"] as Vector3).z
 		if out > 0.0:

@@ -17,11 +17,22 @@ const MOWING := ["checker", "diamond", "stripes", "diagonal", "rings", "sunburst
 ## depth buffer keeps 3+ cm apart clean from the stands): tops in m.
 const GRASS_TOP := 0.0
 const TRACK_TOP := 0.03
-const ARC_TOP := 0.04
-const DIRT_TOP := 0.06
-const INFIELD_GRASS_TOP := 0.09
-const CUTOUT_TOP := 0.12
-const CHALK_TOP := 0.15
+## The infield's surfaces lie within 2 cm of the ground (players stand
+## and the ball rolls at 0): which one shows is settled by each layer's
+## pull toward the camera (LAYER_PULL), not by height.
+const ARC_TOP := 0.006
+const DIRT_TOP := 0.008
+const INFIELD_GRASS_TOP := 0.01
+const CUTOUT_TOP := 0.012
+const CHALK_TOP := 0.016
+const CHALK_SHADER := preload("res://presentation/stadium/chalk.gdshader")
+## Pull toward the camera per surface (by node name prefix), bottom to top.
+const LAYER_PULL := {
+	"InfieldArc": 0.0004, "InfieldDirt": 0.0006, "InfieldGrass": 0.0009,
+	"HomeCircle": 0.0012, "BaseCircle": 0.0012, "PlateClay": 0.0014, "Mound": 0.0014,
+	"HomePlateRim": 0.0017, "HomePlate": 0.002, "BoxLine": 0.0018, "CatcherBox": 0.0018,
+	"RunnersLane": 0.0018, "CoachBox": 0.0018, "OnDeckCircle": 0.0018, "FoulLine": 0.0018,
+}
 ## The batter's box, 6 ft long, centered on the plate.
 const BOX_LENGTH := 1.8288
 ## The plate's back point (toward the catcher), m behind its middle.
@@ -75,6 +86,7 @@ func build(tuning: BaseballTuning, park: StadiumDef = null) -> void:
 	_add_box("Grass", Vector3(320, 0.1, 320), Vector3(0, GRASS_TOP - 0.05, -110), GRASS).material_override = _grass_mat
 	_build_infield()
 	_build_foul_lines()
+	_layer_surfaces()
 	_build_fence()
 	_build_lighting()
 
@@ -94,7 +106,7 @@ func _build_infield() -> void:
 	grass.material_override = _infield_grass_mat
 	_add_disc("HomeCircle", 3.96, Vector3(0, CUTOUT_TOP - 0.01, 0), _dirt_mat)
 	# The packed clay round the plate: under both boxes and the catcher.
-	_add_disc("PlateClay", 2.1, Vector3(0, CUTOUT_TOP - 0.005, 0.35), _clay_mat)
+	_add_disc("PlateClay", 2.1, Vector3(0, CUTOUT_TOP - 0.008, 0.35), _clay_mat)
 	for base in [FieldLayout.FIRST, FieldLayout.SECOND, FieldLayout.THIRD]:
 		_add_disc("BaseCircle%d" % base, 2.6, FieldLayout.base_position(base) + Vector3(0, CUTOUT_TOP - 0.01, 0), _dirt_mat)
 	# The mound: 18 ft across, 10 in high, a flat table round the rubber
@@ -113,7 +125,7 @@ func _build_infield() -> void:
 			var pts := []
 			for rr: Array in [[r0, a0], [r1, a0], [r1, a1], [r0, a1]]:
 				var q := c + Vector3(cos(rr[1]) * rr[0], 0.0, sin(rr[1]) * rr[0])
-				q.y = FieldLayout.ground_height(q) + INFIELD_GRASS_TOP - 0.02
+				q.y = FieldLayout.ground_height(q) + CUTOUT_TOP - 0.004
 				pts.append(q)
 			for v: Vector3 in [pts[0], pts[2], pts[1], pts[0], pts[3], pts[2]]:
 				st.add_vertex(v)
@@ -127,7 +139,8 @@ func _build_infield() -> void:
 	_build_batters_boxes()
 	_build_field_marks()
 	for base in [FieldLayout.FIRST, FieldLayout.SECOND, FieldLayout.THIRD]:
-		var bag := _add_box("Base%d" % base, Vector3(0.6, 0.12, 0.6), FieldLayout.base_position(base) + Vector3(0, CHALK_TOP + 0.0, 0), CHALK)
+		# A bag 15 in square and 4 in tall, standing on the dirt.
+		var bag := _add_box("Base%d" % base, Vector3(FieldLayout.BASE_SIZE, FieldLayout.BASE_HEIGHT, FieldLayout.BASE_SIZE), FieldLayout.base_position(base) + Vector3(0, FieldLayout.BASE_HEIGHT * 0.5, 0), CHALK)
 		bag.rotation_degrees.y = 45.0
 
 
@@ -167,7 +180,7 @@ func _build_infield_arc() -> void:
 func _build_home_plate() -> void:
 	var w := 0.2159  # half of 17 in
 	var outline := [Vector2(-w, -w), Vector2(w, -w), Vector2(w, 0.0), Vector2(0.0, w), Vector2(-w, 0.0)]
-	for layer: Array in [[1.08, CHALK_TOP - 0.005, Color(0.08, 0.08, 0.09)], [1.0, CHALK_TOP + 0.012, CHALK]]:
+	for layer: Array in [[1.08, CHALK_TOP, Color(0.08, 0.08, 0.09)], [1.0, CHALK_TOP + 0.006, CHALK]]:
 		var scale: float = layer[0]
 		var top: float = layer[1]
 		var st := SurfaceTool.new()
@@ -475,6 +488,33 @@ func _build_lighting() -> void:
 	environment.adjustment_contrast = 1.1
 	env.environment = environment
 	add_child(env)
+
+
+## Gives each infield surface its pull toward the camera (LAYER_PULL, the
+## longest matching name prefix): the field's own materials get a copy
+## with the pull set, the flat marks a chalk material in their color.
+func _layer_surfaces() -> void:
+	for mi: MeshInstance3D in find_children("*", "MeshInstance3D", true, false):
+		var pull := -1.0
+		var best := 0
+		for prefix: String in LAYER_PULL:
+			if String(mi.name).begins_with(prefix) and prefix.length() > best:
+				best = prefix.length()
+				pull = LAYER_PULL[prefix]
+		if pull < 0.0:
+			continue
+		var m := mi.material_override
+		if m is ShaderMaterial and (m as ShaderMaterial).shader == SURFACE:
+			var copy: ShaderMaterial = m.duplicate()
+			copy.set_shader_parameter("pull", pull)
+			mi.material_override = copy
+		elif m is BaseMaterial3D:
+			var chalk := ShaderMaterial.new()
+			chalk.shader = CHALK_SHADER
+			chalk.set_shader_parameter("albedo", (m as BaseMaterial3D).albedo_color)
+			chalk.set_shader_parameter("roughness_value", (m as BaseMaterial3D).roughness)
+			chalk.set_shader_parameter("pull", pull)
+			mi.material_override = chalk
 
 
 ## Flat dirt or grass disc (thin cylinder) at a world position.

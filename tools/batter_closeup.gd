@@ -65,12 +65,13 @@ func _process(_d: float) -> bool:
 		return _swing_sequence(at)
 	if batter != null and _style != &"":
 		batter.style = _style
-	if batter != null and OS.get_cmdline_user_args().has("lefty") and not _view._bats_left:
-		# A lefty in the other box, as the match places one.
-		_view._bats_left = true
-		batter.set_lefty(true)
+	var want_left := OS.get_cmdline_user_args().has("lefty")
+	if batter != null and (want_left or OS.get_cmdline_user_args().has("righty")) and _view._bats_left != want_left:
+		# The other box, as the match places a hitter who bats that way.
+		_view._bats_left = want_left
+		batter.set_lefty(want_left)
 		batter.position = _view._batter_spot()
-		batter.face(batter.position + Vector3.LEFT)
+		batter.face(batter.position + (Vector3.LEFT if want_left else Vector3.RIGHT))
 		at = batter.global_position
 	# Nothing between the camera and the batter.
 	for f: Node3D in _view._fielders:

@@ -1254,8 +1254,8 @@ func _clear_runners() -> void:
 
 
 func _update_shadow() -> void:
-	# Over the mound a ball rolls up its surface rather than through it
-	# (presentation: play keeps the flat field).
+	# Over the mound the ball stays on its surface (play bounces and rolls
+	# off it too; this keeps the drawn ball's radius above it).
 	var floor_y := FieldLayout.ground_height(_ball.position)
 	if floor_y > 0.0:
 		_ball.position.y = maxf(_ball.position.y, floor_y + BALL_RADIUS * _ball.scale.x)

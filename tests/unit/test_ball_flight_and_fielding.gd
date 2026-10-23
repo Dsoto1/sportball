@@ -169,3 +169,23 @@ func test_home_run_flies_on_past_the_wall() -> void:
 	check(Vector2(later.x, later.z).length() > traj.distance(), "and keeps going over the stands")
 	var short := BallTrajectory.simulate(30.0, 25.0, 0.0, tuning())
 	check(short.tail_points.is_empty(), "anything else stops where it stops")
+
+
+func test_ball_never_goes_through_the_mound() -> void:
+	# A hard grounder up the middle skips over the mound, not through it.
+	var traj := _flight(32.0, -6.0, 0.0)
+	var over := 0
+	for p: Vector3 in traj.points:
+		check(p.y >= FieldLayout.ground_height(p) - 0.001, "above the mound's surface at %s" % p)
+		if FieldLayout.ground_height(p) > 0.05:
+			over += 1
+	check(over > 0, "the ball crossed the mound")
+
+
+func test_ball_can_ricochet_off_a_bag() -> void:
+	# Rolled straight at third base (just fair), it glances off the bag.
+	var at := FieldLayout.base_position(FieldLayout.THIRD)
+	var spray := FieldLayout.spray_angle_of(at)
+	spray += 0.3 if spray < 0.0 else -0.3
+	var traj := _flight(24.0, -1.0, spray)
+	check_eq(traj.hit_base, FieldLayout.THIRD, "hit the bag at third")

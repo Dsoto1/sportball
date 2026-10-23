@@ -29,8 +29,20 @@ uniform bool vertical_uv = false;
 
 varying vec3 world_pos;
 
+// Which surface draws on top where they overlap (dirt over grass, chalk
+// over dirt): each layer is pulled this fraction of the way toward the
+// camera. That leaves it where it is on screen and only wins the depth
+// test, so the layers can lie within millimetres of each other (players'
+// feet and the ball on the dirt, lines flat on it) without flickering.
+uniform float pull = 0.0;
+
 void vertex() {
 	world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	// Always written: a shader that writes POSITION anywhere loses the
+	// engine's own projection.
+	vec4 view = MODELVIEW_MATRIX * vec4(VERTEX, 1.0);
+	view.xyz *= 1.0 - pull;
+	POSITION = PROJECTION_MATRIX * view;
 }
 
 void fragment() {
