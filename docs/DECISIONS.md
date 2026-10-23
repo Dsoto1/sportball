@@ -1685,5 +1685,6 @@ behind the head at about 45 degrees. The last pass had the hands above
 the helmet and the bat straight up. The stance now holds the hands at
 shoulder height (about 1.44 m up the rig) and the bat back over the
 shoulder (classic 48 degrees up, yawed 118 toward the catcher; open and
-leg kick close to it). Lefties mirror it. tools/grip_test.gd `body`
+leg kick close to it). Lefties mirror it. Each style's slot depth was
+refit (slot_for_tilt) so the swing keeps its Statcast swing-path tilt. tools/grip_test.gd `body`
 shows the whole stance from four sides.
