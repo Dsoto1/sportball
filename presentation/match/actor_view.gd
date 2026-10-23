@@ -237,7 +237,7 @@ func set_player(id: String, number: int) -> void:
 ## Hands on the bat (batter at the plate): the IK holds both hands on the
 ## handle and places the bat, pointing along direction (world), hands gap
 ## meters apart. Pass bat = null to let go.
-func grip_bat(bat: Node3D, direction: Vector3 = Vector3.FORWARD, gap: float = 0.1, one_hand: bool = false, choke: float = 0.0) -> void:
+func grip_bat(bat: Node3D, direction: Vector3 = Vector3.FORWARD, gap: float = 0.1, one_hand: bool = false, choke: float = 0.0, anchor: Vector3 = Vector3.ZERO, anchor_weight: float = 0.0) -> void:
 	if bat == null:
 		if _grip_ik != null:
 			_grip_ik.active = false
@@ -253,6 +253,8 @@ func grip_bat(bat: Node3D, direction: Vector3 = Vector3.FORWARD, gap: float = 0.
 	_grip_ik.lefty = _lefty
 	_grip_ik.one_hand = one_hand
 	_grip_ik.choke = choke
+	_grip_ik.anchor = anchor
+	_grip_ik.anchor_weight = anchor_weight
 
 
 ## Crouching roles (catcher) idle in a crouch.

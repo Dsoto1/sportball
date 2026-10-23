@@ -584,7 +584,11 @@ func _resolve_swing(swing: SwingIntent) -> void:
 	if swing.type == SwingIntent.Type.BUNT:
 		_view.bunt_bat()
 	elif swing.type != SwingIntent.Type.NONE:
-		_view.swing_bat(swing.type == SwingIntent.Type.POWER)
+		# The bat meets the pitch where it crosses (a whiff swings under it).
+		var aim := _pitch.location
+		if _contact.outcome == ContactResult.Outcome.WHIFF:
+			aim.y -= 0.14
+		_view.swing_bat(swing.type == SwingIntent.Type.POWER, aim)
 
 
 func _apply_call() -> String:

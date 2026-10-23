@@ -1923,3 +1923,41 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   the outside. Hands now sit 17 cm out front and the lead elbow aims down
   and forward: the forearm crosses in front of the chest, elbow down.
 - Close-up tool: `righty` alongside `lefty` (the default batter bats left).
+
+## The swing mapped to Baseball Savant's bat tracking
+
+- The owner asked to map the swing to Savant's swing path visualization
+  (`leaderboard/bat-tracking/swing-path-attack-angle`). Its drawing script
+  is on a CDN this environment can't reach, but the leaderboard's CSV
+  (207 hitters: bat speed, swing path tilt, attack angle and direction,
+  contact point vs the plate and vs the batter, stance position) is what
+  it draws.
+- **Measured first.** `tools/swing_path.gd` records the bat's sweet spot
+  (6 in from the end) through a real swing in slow motion;
+  `tools/swing_path_plot.py` measures it the way Savant does (tilt of the
+  plane over the last 40 ms, the sweet spot's direction at contact, contact
+  vs the plate's front edge and vs the batter) and draws it from behind the
+  catcher, the side and above. The old swing came out at 84 deg tilt,
+  115 mph, contact 23 in behind the plate's front edge and 4 in in front of
+  the batter: the bat's angle at contact was being set to the attack angle,
+  and the whole arc ran in the 60 ms from the press.
+- **New: SwingPath.** Into contact the sweet spot now rides a circular arc
+  (radius 1.15 m) in a plane tilted to the hitter's own swing path tilt,
+  reaching the contact point at his bat speed travelling at his attack
+  angle and attack direction, easing in from wherever the bat was at the
+  press (over the first third, so the last 40 ms are the pure arc), the
+  barrel lagging the radius until contact. Bat speed builds through the
+  arc. After contact it hands back to the follow-through over 90 ms.
+  The grip (BatGrip `anchor`) puts the hands on the handle along it.
+- **Contact point:** at the pitch's side and height (a whiff passes
+  14 cm under it), in front of the plate by a per-hitter depth fit to the
+  leaderboard: inches = -0.27 - 0.382 x attack direction + 0.253 x attack
+  angle (pull and uppercut swings meet it farther out; residual 4 in).
+- **Contact pose:** each style's contact-pose hands are baked from its own
+  arc's handle at contact, so the body brings the hands to the bat.
+- **Results** (tool, real hitters' numbers): league average 32.5 tilt /
+  10.3 attack / -1.9 direction / 3.1 in vs plate / 30.9 in vs batter
+  (Savant: 32.5 / 10.2 / -2.0 / 3.1 / 31.0); a flat pull hitter and a
+  steep left-handed one match within 0.1 deg. Tests check the arc's
+  tilt, attack, direction, speed and contact for three profiles and both
+  sides, and the depth fit.

@@ -112,6 +112,10 @@ var _contact_tier := 0
 ## The batter's swing signature (PlayerSwing) and this swing's bat speed.
 var _swing_profile: Dictionary = {}
 var _swing_mph := 72.0
+var _swing_path: SwingPath
+## After contact the arc hands the bat back to the follow-through over this
+## long (s).
+const PATH_RELEASE := 0.09
 var _trail_mesh: ImmediateMesh
 var _trail_points: Array = []
 var _trail_color := Color(1, 1, 1, 0.55)
@@ -515,10 +519,16 @@ func contact_feedback(location: Vector2, tier: int) -> void:
 
 ## Plays the swing (on contact and on a miss alike): from his stride, the
 ## barrel reaches the zone CONTACT_AT into it, right on the press.
-func swing_bat(power: bool = false) -> void:
+func swing_bat(power: bool = false, aim: Vector2 = Vector2(0.0, SwingPath.DEFAULT_HEIGHT)) -> void:
 	_bat_swing_start = _view_clock
 	_swing_from = _bat_now
 	_swing_mph = PlayerSwing.swing_speed(_swing_profile, power) if not _swing_profile.is_empty() else PlayerSwing.LEAGUE_BAT_SPEED
+	# Into contact the sweet spot rides his Savant-shaped arc (SwingPath),
+	# from wherever the bat is now to the ball.
+	var xf := _bat_pivot.global_transform
+	var profile := _swing_profile if not _swing_profile.is_empty() else {"tilt": SwingProfile.LEAGUE_TILT, "attack_lift": 10.0, "attack_yaw": 0.0}
+	_swing_path = SwingPath.build(profile, SwingPath.contact_point(profile, aim), -1.0 if _bats_left else 1.0,
+		xf * Vector3(0, 0, -BatMesh.LENGTH + SwingPath.SWEET_FROM_TIP), -xf.basis.z, SWING_TIME * BattingStyles.CONTACT_AT, _swing_mph)
 	_trail_color = Color(1, 1, 1, 0.55)
 
 
@@ -950,9 +960,21 @@ func _update_bat() -> void:
 	var y := deg_to_rad(bat.x)
 	var e := deg_to_rad(bat.y)
 	var dir := Vector3(cos(e) * cos(y) * side, sin(e), cos(e) * sin(y))
+	var choke := float(BattingStyles.BAT[style]["choke"])
+	var anchor := Vector3.ZERO
+	var weight := 0.0
+	if _swing_path != null and _bat_swing_start >= 0.0 and not _bat_bunt:
+		var t := _view_clock - _bat_swing_start
+		var after := t - _swing_path.to_contact
+		if after < PATH_RELEASE:
+			var on: Dictionary = _swing_path.at(t)
+			weight = 1.0 - smoothstep(0.0, PATH_RELEASE, after)
+			var axis: Vector3 = on["axis"]
+			dir = axis.slerp(dir, 1.0 - weight).normalized() if axis.dot(dir) > -0.99 else axis
+			anchor = SwingPath.grip_for(on["sweet"], axis, choke)
 	if batter != null:
 		# His hands hold the handle; the grip places the bat.
-		batter.grip_bat(_bat_pivot, dir, gap, one_hand, float(BattingStyles.BAT[style]["choke"]))
+		batter.grip_bat(_bat_pivot, dir, gap, one_hand, choke, anchor, weight)
 	else:
 		_bat_pivot.position = _batter_spot() + Vector3(0.3 * side, 1.0, 0.05)
 		_bat_pivot.look_at(_bat_pivot.global_position + dir, Vector3.UP)

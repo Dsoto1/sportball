@@ -24,6 +24,11 @@ var one_hand := false
 ## Hands choked up the handle (m): the knob sits this far below the
 ## bottom hand.
 var choke := 0.0
+## Where the middle of the grip must be (world), and how much that wins
+## over where the animation brought the hands (0..1): the swing path's
+## hands on the way into contact.
+var anchor := Vector3.ZERO
+var anchor_weight := 0.0
 
 ## Where the handle crosses the palm, in the hand bone's frame (fingers
 ## along +Y, the index side +Z for the right hand): the base of the
@@ -55,6 +60,8 @@ func _process_modification_with_delta(_delta: float) -> void:
 	var top_at := sk.get_bone_global_pose(sk.find_bone("hand_" + top_side)).origin
 	var bottom_at := sk.get_bone_global_pose(sk.find_bone("hand_" + bottom_side)).origin
 	var mid := (top_at + bottom_at) * 0.5
+	if anchor_weight > 0.0:
+		mid = mid.lerp(xf.affine_inverse() * anchor, clampf(anchor_weight, 0.0, 1.0))
 	var d := (xf.basis.inverse() * direction).normalized()
 	var spread := gap / maxf((xf.basis * d).length(), 0.001)
 	var bottom_target := mid - d * spread * 0.5

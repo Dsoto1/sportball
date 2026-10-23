@@ -85,6 +85,12 @@ const BAT := {
 }
 
 
+## Where a right-handed batter stands (MatchView.BATTER_SPOT) and the
+## players' size over the rig's (ActorView.BUILD), for placing poses on
+## world-space paths; the wrist's distance from the handle (m).
+const BATTER_SPOT_RIGHTY := Vector3(-0.91, 0.0, 0.49)
+const BUILD := Vector3(1.15, 1.08, 1.15)
+const WRIST_OFF_HANDLE := 0.06
 ## Shoulders above the pelvis (m, mannequin) and the classic set-up's lean
 ## (hips plus chest pitch, degrees) the stance hands are written for.
 const SHOULDER_ABOVE_PELVIS := 0.5
@@ -232,8 +238,30 @@ static func poses(style: StringName) -> Dictionary:
 		pose.get_or_add("toe_l", LEAD_TOE)
 	stride.get_or_add("toe_r", 0.0)
 	_place_feet(style, stance, load, stride, contact, extend, finish)
+	_hands_on_path(style, contact)
 	var bob := _with(stance, {"drop": float(stance.get("drop", 0.0)) + 0.02})
 	return {"stance": stance, "bob": bob, "load": load, "stride": stride, "contact": contact, "extend": extend, "finish": finish}
+
+
+## At contact his hands hold the bat where the style's own Savant arc
+## (SwingPath, the style's typical attack and tilt, a middle-middle pitch)
+## puts the handle: the grip's middle, from the world spot a right-handed
+## batter stands on into his body's terms (rig size, before BUILD), the
+## bottom hand toward the knob, the top hand toward the barrel. A hitter's
+## own numbers move it a little; the grip reaches the rest.
+static func _hands_on_path(style: StringName, contact: Dictionary) -> void:
+	var s: Dictionary = SwingProfile.STYLES[style]
+	var profile := {"tilt": float(s["tilt"]), "attack_lift": float(s["attack_angle"]), "attack_yaw": -float(s["pull"])}
+	var at := SwingPath.contact_point(profile)
+	var path := SwingPath.build(profile, at, 1.0, at + Vector3(0, 0.6, 0.6), Vector3.UP, 0.06, 72.0)
+	var hit: Dictionary = path.at(path.to_contact)
+	var axis: Vector3 = hit["axis"]
+	var choke := float(BAT[style]["choke"])
+	var mid := SwingPath.grip_for(hit["sweet"], axis, choke)
+	for key: String in ["hand_l", "hand_r"]:
+		# The wrist sits a hand's width off the handle, toward the body.
+		var grip := mid + axis * (0.05 if key == "hand_r" else -0.05) - (mid - BATTER_SPOT_RIGHTY).normalized() * WRIST_OFF_HANDLE * Vector3(1, 0, 1)
+		contact[key] = P((grip.z - BATTER_SPOT_RIGHTY.z) / BUILD.z, grip.y / BUILD.y, (grip.x - BATTER_SPOT_RIGHTY.x) / BUILD.x)
 
 
 ## Feet from FEET (Statcast-measured): the stance is the style's width and
