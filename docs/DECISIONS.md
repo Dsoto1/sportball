@@ -1845,3 +1845,11 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
 - **Fewer repeats, more blossoms:** two rows of temple blocks (was three),
   and 104 more blossom trees round the bowl.
 - **Kitsune:** 1.3 to 1.6 scale, moved out to 37 degrees (right field).
+- **Landmarks stay out of the field.** The kitsune and Sakura's cliff
+  were placed by their middles, and at monumental size their footprints
+  reached over the outfield stands toward the field. Sculpted statues
+  now stand with their front edge behind the stands' back, on a rock
+  plinth from the ground (the sheet's fox stands on a cliff), and the
+  kitsune moves to 42 degrees, clear of the slogan board. Hero
+  landmarks keep their distance but their turned footprint's front
+  edge never comes within 2 m of the stands.

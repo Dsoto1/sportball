@@ -19,11 +19,34 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 	var figure := StringName(piece.param("figure"))
 	var modeled: StringName = {&"fox": &"kitsune_statue", &"titan": &"sea_king", &"knight": &"knight", &"scorpion": &"scorpion_idol"}.get(figure, &"")
 	if modeled != &"":
-		# A sculpted model on its own plinth (it replaces the pedestal).
+		# A sculpted model on its own plinth (it replaces the pedestal). At
+		# monumental scale its footprint is many meters deep, so it stands
+		# back from the stands' top with its front edge on the back wall,
+		# never reaching over the seats toward the field, on a rock plinth
+		# up from the ground (as the sheets' statues stand on cliffs).
 		pedestal.queue_free()
 		var model := ModelKit.spawn(modeled, 11.0, RandomNumberGenerator.new())
 		model.rotation.y = PI
 		root.add_child(model)
+		var box := ModelKit._aabb(model)
+		var k := root.scale.x * model.scale.x
+		var depth := box.size.z * k
+		var width := box.size.x * k
+		# Centered on its bounds (the model's origin need not be).
+		model.position = Vector3(box.get_center().x * model.scale.x, -box.position.y * model.scale.y, box.get_center().z * model.scale.z)
+		var back := stadium.stand_top(piece.angle)
+		var radius := maxf(top.x, back.x) + depth * 0.5 + 0.5
+		var base := stadium.point(piece.angle, radius, back.y + 0.6)
+		root.look_at_from_position(base, Vector3(0, base.y, -45.0), Vector3.UP)
+		root.scale = Vector3.ONE * piece.size * 2.2 * float(piece.param("scale"))
+		var plinth := MeshInstance3D.new()
+		var slab := BoxMesh.new()
+		slab.size = Vector3(width * 1.05, base.y, depth * 1.05)
+		plinth.mesh = slab
+		plinth.material_override = StadiumSurfaces.material(&"rock", stadium.def.structure_color.lerp(Color(0.45, 0.45, 0.48), 0.6), false, 2.0)
+		plinth.name = "Plinth"
+		stadium.add_child(plinth)
+		plinth.transform = Transform3D(root.transform.basis.orthonormalized(), base - Vector3(0, base.y * 0.5, 0))
 		return
 	match figure:
 		&"bull":

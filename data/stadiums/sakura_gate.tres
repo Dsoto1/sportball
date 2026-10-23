@@ -145,7 +145,7 @@ params = {
 [sub_resource type="Resource" id="Resource_vhmi4"]
 script = ExtResource("2_lnk5g")
 kind = &"statue"
-angle = 37.0
+angle = 42.0
 params = {
 "figure": &"fox",
 "scale": 1.6

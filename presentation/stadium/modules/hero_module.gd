@@ -20,7 +20,14 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	holder.name = stadium.unique_name("HeroSpot")
 	stadium.add_child(holder)
 	var top := stadium.stand_top(piece.angle)
-	holder.position = stadium.point(piece.angle, top.x + float(piece.param("distance")), top.y + float(piece.param("base")))
+	# Never reaching over the stands toward the field: however big the
+	# model, its front edge (its footprint turned by "turn") stays at
+	# least 2 m behind the stands' back.
+	var size := box.size * node.scale
+	var turn := deg_to_rad(float(piece.param("turn")))
+	var reach := absf(cos(turn)) * size.z * 0.5 + absf(sin(turn)) * size.x * 0.5
+	var radius := maxf(top.x + float(piece.param("distance")), top.x + 2.0 + reach)
+	holder.position = stadium.point(piece.angle, radius, top.y + float(piece.param("base")))
 	stadium.face_home(holder)
 	holder.rotation.y += deg_to_rad(float(piece.param("turn")))
 	node.position = Vector3(-box.get_center().x, -box.position.y, -box.get_center().z) * node.scale
