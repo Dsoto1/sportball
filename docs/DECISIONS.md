@@ -1824,3 +1824,24 @@ pv_sheet.sh: sheet panel beside the render, park by park):
   The set models are ~75k triangles each, too heavy to tile round the
   bowl, so this is boxes in three MultiMeshes. Sakura Gate's land was
   near black; lightened.
+
+## Sakura Gate pass
+
+Compared with its sheet (Fuji over green hills, blue sky with a pink
+glow, cherry blossoms everywhere, the giant kitsune in right field):
+- **Lathe winding fix (every park).** `Scenery.lathe` wound its faces
+  counter-clockwise, which Godot treats as back faces: normals pointed
+  in, so mountains, mesas and smokestacks were lit from inside (dark),
+  and snow caps (single-sided) didn't draw at all. Now clockwise from
+  outside. The Kiln's mesas, the Icebox's peaks and the Foundry's stacks
+  all light properly.
+- **Mountains:** new `spread` (base radius per height; Fuji 1.7) and
+  `snow` (snow line) settings, a smooth blue-gray flank on broad peaks,
+  and a `hills` style (low rounded forested domes). Sakura's ring of
+  gray cones became forested hills, and Fuji stands broad and snowy
+  behind center field.
+- **Sky:** sunset (purple) to golden (blue above, warm at the horizon),
+  as the sheet.
+- **Fewer repeats, more blossoms:** two rows of temple blocks (was three),
+  and 104 more blossom trees round the bowl.
+- **Kitsune:** 1.3 to 1.6 scale, moved out to 37 degrees (right field).

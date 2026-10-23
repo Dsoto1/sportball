@@ -92,20 +92,22 @@ static func lathe(parent: Node, profile: Array, sides: int, jitter: float, rng: 
 		var c1 := Color.WHITE.darkened((profile[r + 1] as Vector3).z)
 		var lo: Array[Vector3] = rings[r]
 		var hi: Array[Vector3] = rings[r + 1]
+		# Clockwise seen from outside (Godot's front faces), so the faces
+		# and their normals point out.
 		for s in sides:
 			var n := (s + 1) % sides
 			st.set_color(c0)
 			st.add_vertex(lo[s])
 			st.set_color(c1)
-			st.add_vertex(hi[s])
-			st.set_color(c1)
 			st.add_vertex(hi[n])
+			st.set_color(c1)
+			st.add_vertex(hi[s])
 			st.set_color(c0)
 			st.add_vertex(lo[s])
-			st.set_color(c1)
-			st.add_vertex(hi[n])
 			st.set_color(c0)
 			st.add_vertex(lo[n])
+			st.set_color(c1)
+			st.add_vertex(hi[n])
 	# Close the top.
 	var top: Array[Vector3] = rings[rings.size() - 1]
 	var center := Vector3(0, (profile[profile.size() - 1] as Vector3).y, 0)
@@ -113,8 +115,8 @@ static func lathe(parent: Node, profile: Array, sides: int, jitter: float, rng: 
 	for s in sides:
 		st.set_color(ct)
 		st.add_vertex(center)
-		st.add_vertex(top[(s + 1) % sides])
 		st.add_vertex(top[s])
+		st.add_vertex(top[(s + 1) % sides])
 	st.generate_normals()
 	var mi := MeshInstance3D.new()
 	mi.mesh = st.commit()

@@ -189,10 +189,10 @@ const CATALOG := {
 	},
 	&"mountains": {
 		"name": "Mountains", "category": &"backdrop", "unique": false, "placed": true,
-		"about": "A natural backdrop across span degrees: snowcapped peaks or red-rock mesas (with a natural arch).",
+		"about": "A natural backdrop across span degrees: snowcapped peaks (sharp or broad, with a snow line), red-rock mesas (with a natural arch) or low forested hills.",
 		"angle": -70.0, "angle_range": [-180.0, 180.0],
-		"params": {"style": [&"peaks"], "span": [140.0, -360.0, 360.0], "count": [9, 1, 30], "height": [90.0, 30.0, 220.0], "distance": [420.0, 200.0, 800.0], "arch": [false]},
-		"choices": {"style": [&"peaks", &"mesa", &"volcano"]},
+		"params": {"style": [&"peaks"], "span": [140.0, -360.0, 360.0], "count": [9, 1, 30], "height": [90.0, 30.0, 220.0], "distance": [420.0, 200.0, 800.0], "arch": [false], "spread": [0.75, 0.4, 2.5], "snow": [0.62, 0.2, 1.0]},
+		"choices": {"style": [&"peaks", &"mesa", &"volcano", &"hills"]},
 		"script": preload("res://presentation/stadium/modules/mountains_module.gd"),
 	},
 	&"rocket": {

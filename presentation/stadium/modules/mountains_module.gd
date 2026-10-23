@@ -2,7 +2,10 @@ extends StadiumModule
 ## A natural backdrop ringing the far side of the park, across "span"
 ## degrees from the piece's angle: snowcapped peaks, or red-rock mesas and
 ## buttes (with a natural arch when "arch" is on). Far enough out to frame
-## the skyline, close enough to loom over the outfield.
+## the skyline, close enough to loom over the outfield. "hills" are low
+## rounded forested hills instead. Peaks take a "spread" (base radius per
+## height: 0.75 a sharp alp, 1.6 a broad volcano like Fuji) and a "snow"
+## line (fraction of the height).
 
 
 func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef) -> void:
@@ -12,6 +15,9 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	root.name = stadium.unique_name("Mountains")
 	stadium.add_child(root)
 	var mesa := StringName(piece.param("style")) == &"mesa"
+	var hills := StringName(piece.param("style")) == &"hills"
+	var spread := float(piece.param("spread"))
+	var snow_line := float(piece.param("snow"))
 	if StringName(piece.param("style")) == &"volcano":
 		_volcano(stadium, root, piece)
 		return
@@ -22,7 +28,19 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 		var angle := piece.angle + float(piece.param("span")) * (i + rng.randf_range(0.2, 0.8)) / count
 		var spot := stadium.point(angle, float(piece.param("distance")) * rng.randf_range(0.85, 1.2), 0.0)
 		var h := tall * rng.randf_range(0.6, 1.15)
-		if mesa:
+		if hills:
+			# A forested hill: a low rounded dome, dark green, its crown a
+			# shade lighter where the sun reaches.
+			var w := h * rng.randf_range(1.8, 2.6)
+			var green := Color(0.3, 0.46, 0.22).darkened(rng.randf_range(0.0, 0.2))
+			var prof := []
+			for k in 8:
+				var t := k / 7.0
+				prof.append(Vector3(w * cos(t * PI * 0.5), h * pow(sin(t * PI * 0.5), 0.8), 0.0))
+			var hill := Scenery.lathe(root, prof, 20, 0.12, rng, StadiumSurfaces.material(&"rock", green, true, 1.0 + h / 40.0))
+			hill.position = spot
+			hill.rotation.y = rng.randf() * TAU
+		elif mesa:
 			# A butte: a talus apron, sheer eroded walls banded with strata
 			# (light and dark rings), a dark caprock overhanging the top.
 			var w := h * rng.randf_range(0.5, 1.1)
@@ -44,19 +62,24 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 		else:
 			# A peak: concave flanks, ridged by the per-side jitter, snow above
 			# the tree line (white vertex color on a snow-dusted rock texture).
-			var mat := StadiumSurfaces.material(&"rock", rock.darkened(rng.randf_range(0.0, 0.2)), true, 1.0 + h / 60.0)
+			# A broad volcano is smooth-sided and blue in the distance; an alp
+			# is craggy.
+			var broad := spread > 1.2
+			var jitter := 0.08 if broad else 0.22
+			var tone := Color(0.5, 0.58, 0.72) if broad else rock
+			var mat := StadiumSurfaces.material(&"rock", tone.darkened(rng.randf_range(0.0, 0.2)), true, 1.0 + h / 60.0)
 			var prof := []
 			for k in 9:
 				var t := k / 8.0
-				prof.append(Vector3(h * 0.75 * pow(1.0 - t, 1.35), h * t, 0.0))
-			var peak := Scenery.lathe(root, prof, 18, 0.22, rng, mat)
+				prof.append(Vector3(h * spread * pow(1.0 - t, 1.35), h * t, 0.0))
+			var peak := Scenery.lathe(root, prof, 18, jitter, rng, mat)
 			peak.position = spot
 			peak.rotation.y = rng.randf() * TAU
 			var snow_prof := []
 			for k in 4:
-				var t := 0.62 + 0.38 * k / 3.0
-				snow_prof.append(Vector3(h * 0.75 * pow(1.0 - t, 1.35) * 1.03, h * t, 0.0))
-			var snow := Scenery.lathe(root, snow_prof, 18, 0.22, rng, StadiumSurfaces.material(&"snow", Color(0.97, 0.98, 1.0), false, 3.0))
+				var t := snow_line + (1.0 - snow_line) * k / 3.0
+				snow_prof.append(Vector3(h * spread * pow(1.0 - t, 1.35) * (1.12 if broad else 1.06), h * t, 0.0))
+			var snow := Scenery.lathe(root, snow_prof, 18, jitter * 0.5, rng, StadiumSurfaces.material(&"snow", Color(0.97, 0.98, 1.0), false, 3.0))
 			snow.position = spot + Vector3.UP * 0.2
 			snow.rotation.y = peak.rotation.y
 	if mesa and bool(piece.param("arch")):
