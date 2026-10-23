@@ -1779,3 +1779,12 @@ pv_sheet.sh: sheet panel beside the render, park by park):
   hangs four from the first deck's front: the inner pair in the club's
   boldest color, the outer pair in its dark, each with trim, emblem and a
   swallow tail.
+- Stadium text sized to fit: the deck wordmarks have 0.8 m capitals and
+  sit in the fascia's lower half, under the bunting (now 0.75 m fans that
+  stay on the parapet), and only whole words are placed. The dugout sign's
+  capitals are 60% of its band, and the dugout ceiling no longer reaches
+  out in front of it.
+- The club's name behind home moved up from the backstop wall to the
+  first deck's fascia (the deck's other words stop 26 degrees short of
+  home), so it no longer sits right behind the batter in the pitcher's
+  view. The backstop keeps its plain dark band.

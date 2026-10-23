@@ -27,6 +27,12 @@ const DECK_JUMP := 2.6
 const OVERHANG := 2.2
 const FASCIA_DROP := 0.9
 const PARAPET := 0.9
+## Wordmarks on a deck's fascia: capital height, and where their middle
+## sits against the deck's tread (below the bunting from the parapet).
+const FASCIA_LETTER := 0.8
+const FASCIA_LETTER_Y := -0.4
+## Behind home the first deck's fascia carries the club's name alone.
+const HOME_NAME_SPAN := 26.0
 const ANGLE_STEP := 1.0
 ## Inner edge of the stands (meters from home) by |spray angle| past the
 ## foul poles; inside the poles the bleachers start just behind the wall.
@@ -867,8 +873,8 @@ func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
 		floor_slab.position = Vector3(0, floor_y - 0.05, 1.5)
 		var back := box(Vector3(w, DUGOUT_ROOF - floor_y, 0.3), inside, dugout, &"facade")
 		back.position = Vector3(0, (DUGOUT_ROOF + floor_y) * 0.5, 3.6)
-		var ceiling := box(Vector3(w + 0.6, 0.3, 4.6), inside.darkened(0.3), dugout)
-		ceiling.position = Vector3(0, DUGOUT_ROOF - 0.15, 1.4)
+		var ceiling := box(Vector3(w + 0.6, 0.3, 3.8), inside.darkened(0.3), dugout)
+		ceiling.position = Vector3(0, DUGOUT_ROOF - 0.15, 1.7)
 		for end: float in [-1.0, 1.0]:
 			var wall := box(Vector3(0.4, DUGOUT_ROOF - floor_y, 5.4), def.structure_color.darkened(0.2), dugout, &"facade")
 			wall.position = Vector3(end * (w * 0.5 + 0.2), (DUGOUT_ROOF + floor_y) * 0.5, 1.1)
@@ -899,7 +905,9 @@ func _build_dugouts(home: TeamDef, away: TeamDef) -> void:
 		sign.rotation.y = PI
 		sign.outline_size = 16
 		sign.outline_modulate = home.dark_color
-		# Fit the name between the badges.
+		# Fit the name inside the band: capitals about 60% of its height,
+		# and between the badges.
+		sign.pixel_size = band_h * 0.6 / (0.7 * sign.font_size)
 		var room := w - 3.0
 		var wide := sign.font.get_string_size(sign.text, HORIZONTAL_ALIGNMENT_LEFT, -1, sign.font_size).x * sign.pixel_size
 		if wide > room * 0.82:
@@ -1019,9 +1027,10 @@ func _build_backstop() -> void:
 	add_child(netting)
 
 
-## The club's banner across the wall behind home, as every sheet has it:
-## a band in the club's dark color along the top of the backstop wall, the
-## club name in big letters following its curve, an emblem either end.
+## The club's name behind home, as every sheet has it: a band in the
+## club's dark color along the top of the backstop wall (a plain backdrop
+## for the pitch), and the name with an emblem either end on the first
+## deck's fascia above it, out of the pitcher's line to the plate.
 func _build_backstop_banner(home: TeamDef) -> void:
 	var root := Node3D.new()
 	root.name = "BackstopBanner"
@@ -1050,24 +1059,28 @@ func _build_backstop_banner(home: TeamDef) -> void:
 	m.roughness = 0.6
 	mi.material_override = m
 	root.add_child(mi)
-	# The name, letter by letter round the curve, facing the field.
+	# The name itself stands up on the first deck's fascia behind home,
+	# above the pitcher's eye line rather than right behind the batter.
+	var k := rows_per_deck()
 	var text := home.team_name.to_upper()
-	var px := 0.03
-	var glyph := 150.0 * px * 0.66
-	var r := profile(180.0).x - 0.28
+	var px := FASCIA_LETTER / (0.7 * 110.0)
+	var glyph := 110.0 * px * 0.66
+	var r := deck_front(180.0, profile(180.0), k).x
 	var total := rad_to_deg(text.length() * glyph / r)
 	for i in text.length():
-		var ang := 180.0 - total * 0.5 + total * (i + 0.5) / text.length()
-		var letter := label(text[i], 150, home.highlight_color, root)
+		var ang := wrapf(180.0 - total * 0.5 + total * (i + 0.5) / text.length(), -180.0, 180.0)
+		var front := deck_front(ang, profile(ang), k)
+		var letter := label(text[i], 110, home.highlight_color, root)
 		letter.pixel_size = px
-		letter.outline_size = 14
-		letter.outline_modulate = home.primary_color.darkened(0.3)
-		letter.position = point(wrapf(ang, -180.0, 180.0), r, (lo + hi) * 0.5)
+		letter.outline_size = 10
+		letter.outline_modulate = home.dark_color
+		letter.position = point(ang, front.x - 0.15, front.y + FASCIA_LETTER_Y)
 		face_home(letter)
 	for side: float in [-1.0, 1.0]:
-		var ang := 180.0 + side * (total * 0.5 + 4.0)
-		var badge := Emblem.build(home, 1.6, 0.6)
-		badge.position = point(wrapf(ang, -180.0, 180.0), profile(wrapf(ang, -180.0, 180.0)).x - 0.3, (lo + hi) * 0.5)
+		var ang := wrapf(180.0 + side * (total * 0.5 + 2.5), -180.0, 180.0)
+		var front := deck_front(ang, profile(ang), k)
+		var badge := Emblem.build(home, 1.2, 0.4)
+		badge.position = point(ang, front.x - 0.2, front.y + FASCIA_LETTER_Y)
 		root.add_child(badge)
 		face_home(badge)
 
@@ -1163,42 +1176,44 @@ func _build_fascia(home: TeamDef) -> void:
 	var n := 0
 	for d in def.decks:
 		var k := d * rows_per_deck()
-		var pixel := 0.014 if d > 0 else 0.009
+		var pixel := FASCIA_LETTER / (0.7 * 110.0) if d > 0 else 0.009
 		# Letter by letter, each on the band at its own angle, so the words
 		# follow the curve of the stands. About 0.62 em per glyph.
 		var glyph := 110.0 * pixel * 0.62
+		var last := 180.0 - HOME_NAME_SPAN if d == 1 else 172.0
 		for side: float in [-1.0, 1.0]:
 			var a := 62.0
 			while true:
 				var text: String = words[n % 2]
 				var span := rad_to_deg((text.length() * glyph) / maxf(profile(a * side).x, 10.0))
-				if a + span > 172.0:
+				if a + span > last:
 					break
 				# The low wall opens onto the dugout: no words across it.
 				var gap := dugout_half_angle() + 1.0
 				if d == 0 and a < DUGOUT_ANGLE + gap and a + span > DUGOUT_ANGLE - gap:
 					a = DUGOUT_ANGLE + gap
 					continue
-				var placed := false
+				# Whole words only: none where the deck runs out under them.
+				var whole := true
 				for i in text.length():
+					if k >= int(profile((a + span * (i + 0.5) / text.length()) * side).z):
+						whole = false
+				for i in text.length() if whole else 0:
 					var angle := (a + span * (i + 0.5) / text.length()) * side
 					var p := profile(angle)
-					if k >= int(p.z):
-						continue
 					var height := (row_height(angle, p, k) + (0.0 if k == 0 else row_height(angle, p, k - 1))) * 0.5
 					var radius := p.x + k * ROW_DEPTH
 					if k > 0 and overhang(angle) > 0.05:
-						# On the overhanging deck's fascia.
+						# On the overhanging deck's fascia, under the bunting.
 						var front := deck_front(angle, p, k)
 						radius = front.x
-						height = front.y
+						height = front.y + FASCIA_LETTER_Y
 					# Seen from the field, the third-base words run toward home.
 					var letter := label(text[i] if side > 0.0 else text[text.length() - 1 - i], 110, home.dark_color if d > 0 else Color.WHITE, root)
 					letter.pixel_size = pixel
 					letter.position = point(angle, radius - 0.15, height)
 					face_home(letter)
-					placed = true
-				if placed:
+				if whole:
 					n += 1
 				a += span + rad_to_deg(6.0 / maxf(profile(a * side).x, 10.0))
 

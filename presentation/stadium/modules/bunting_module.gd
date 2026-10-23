@@ -30,7 +30,7 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 			# Three bands of a half disc hanging from its flat top edge.
 			for band in 3:
 				var half := MeshInstance3D.new()
-				half.mesh = _half_disc(1.1 - band * 0.33)
+				half.mesh = _half_disc(0.75 - band * 0.25)
 				half.material_override = GrayboxField._mat(colors[band])
 				half.position = Vector3(0, 0, 0.02 * band)
 				fan.add_child(half)
