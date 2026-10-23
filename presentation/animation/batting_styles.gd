@@ -76,10 +76,10 @@ const NAMES := {&"classic": "Classic", &"crouch": "Crouch", &"open": "Open", &"l
 ## lets the top hand go after contact. choke (m) moves the hands up the
 ## handle.
 const BAT := {
-	&"classic": {"slot_lift": -60.0, "yaw": 100.0, "lift": 66.0, "load_yaw": 15.0, "load_lift": 5.0, "waggle": 6.0, "finish_yaw": -170.0, "finish_lift": 40.0, "one_hand": false, "choke": 0.0},
+	&"classic": {"slot_lift": -60.0, "yaw": 118.0, "lift": 48.0, "load_yaw": 15.0, "load_lift": 5.0, "waggle": 6.0, "finish_yaw": -170.0, "finish_lift": 40.0, "one_hand": false, "choke": 0.0},
 	&"crouch": {"slot_lift": -59.0, "yaw": 105.0, "lift": 38.0, "load_yaw": 12.0, "load_lift": 0.0, "waggle": 4.0, "finish_yaw": -165.0, "finish_lift": 30.0, "one_hand": false, "choke": 0.0},
-	&"open": {"slot_lift": -57.0, "yaw": 92.0, "lift": 66.0, "load_yaw": 20.0, "load_lift": 2.0, "waggle": 9.0, "finish_yaw": -170.0, "finish_lift": 42.0, "one_hand": false, "choke": 0.0},
-	&"leg_kick": {"slot_lift": -70.0, "yaw": 100.0, "lift": 62.0, "load_yaw": 28.0, "load_lift": 8.0, "waggle": 3.0, "finish_yaw": -185.0, "finish_lift": 48.0, "one_hand": false, "choke": 0.0},
+	&"open": {"slot_lift": -57.0, "yaw": 112.0, "lift": 52.0, "load_yaw": 20.0, "load_lift": 2.0, "waggle": 9.0, "finish_yaw": -170.0, "finish_lift": 42.0, "one_hand": false, "choke": 0.0},
+	&"leg_kick": {"slot_lift": -70.0, "yaw": 115.0, "lift": 54.0, "load_yaw": 28.0, "load_lift": 8.0, "waggle": 3.0, "finish_yaw": -185.0, "finish_lift": 48.0, "one_hand": false, "choke": 0.0},
 	&"wrap": {"slot_lift": -80.0, "yaw": 145.0, "lift": 28.0, "load_yaw": 15.0, "load_lift": 0.0, "waggle": 2.0, "finish_yaw": -180.0, "finish_lift": 25.0, "one_hand": true, "choke": 0.0},
 	&"slap": {"slot_lift": -40.0, "yaw": 80.0, "lift": 32.0, "load_yaw": 6.0, "load_lift": 0.0, "waggle": 10.0, "finish_yaw": -110.0, "finish_lift": 12.0, "one_hand": false, "choke": 0.08},
 }

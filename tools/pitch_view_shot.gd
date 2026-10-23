@@ -8,6 +8,8 @@ var _out := ""
 var _director: Node
 var _picked := false
 var _batting := false
+## The frame saved (the batter is in his stance, the pitcher set).
+const SHOT_AT := 95
 
 
 func _initialize() -> void:
@@ -41,7 +43,7 @@ func _process(_d: float) -> bool:
 	if _frames == 70:
 		Input.action_release(&"aim_right")
 		Input.action_release(&"aim_up")
-	if _frames == 110:
+	if _frames == SHOT_AT:
 		root.get_texture().get_image().save_png(_out)
 		return true
 	return false

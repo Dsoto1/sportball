@@ -411,9 +411,12 @@ func _build_batting() -> void:
 	_bat_options.scroll_active = false
 	_bat_options.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_bat_options.add_theme_font_size_override("normal_font_size", 19)
+	_bat_options.add_theme_stylebox_override("normal", panel_style(Color(0.04, 0.05, 0.08, 0.72), 6))
+	_bat_options.fit_content = true
+	_bat_options.autowrap_mode = TextServer.AUTOWRAP_OFF
 	_bat_options.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	_bat_options.position = Vector2(LEFT + 6, -130)
-	_bat_options.size = Vector2(460, 120)
+	_bat_options.size = Vector2(300, 70)
 	add_child(_bat_options)
 	_steal_hint = RichTextLabel.new()
 	_steal_hint.bbcode_enabled = true
@@ -463,7 +466,7 @@ func _refresh_batting() -> void:
 	card.position = Vector2(size.x - 24 - 12 - card.size.x, 470) if _lefty else Vector2(LEFT + 12, 470)
 	# The swing controls and options swap too (mirror of the righty layout).
 	_swing_box.position = Vector2(LEFT, size.y - 196) if _lefty else Vector2(size.x - 372, size.y - 196)
-	_bat_options.position = Vector2(LEFT + 6, size.y - 270) if _lefty else Vector2(LEFT + 6, size.y - 130)
+	_bat_options.position = Vector2(LEFT + 6, 186) if _lefty else Vector2(LEFT + 6, size.y - 130)
 	(_banner["badge"] as Badge).set_letter(str(b.number), team)
 	_banner["title"].text = "#%d  %s" % [b.number, b.display_name.to_upper()]
 	_banner["pos"].text = String(position)

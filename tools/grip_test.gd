@@ -1,7 +1,8 @@
 extends SceneTree
 ## The batter's grip alone: one player in a batting stance holding the bat,
 ## plain light, cameras round his hands (front, top-hand side, behind,
-## above). Saves a 2x2 sheet. Needs a display:
+## above), or with `body` the whole stance from four sides. Saves a 2x2
+## sheet. Needs a display:
 ##   godot --path . --resolution 600x600 -s res://tools/grip_test.gd -- /tmp/grip.png [style] [lefty] [lift] [yaw]
 var _frames := 0
 var _out := ""
@@ -10,6 +11,7 @@ var _bat: Node3D
 var _cam: Camera3D
 var _style: StringName = &"classic"
 var _lefty := false
+var _body := false
 var _shots: Array[Image] = []
 
 
@@ -19,6 +21,7 @@ func _initialize() -> void:
 	if args.size() > 1:
 		_style = StringName(args[1])
 	_lefty = args.has("lefty")
+	_body = args.has("body")
 	var env := WorldEnvironment.new()
 	env.environment = Environment.new()
 	env.environment.background_mode = Environment.BG_COLOR
@@ -61,6 +64,13 @@ func _process(delta: float) -> bool:
 		return false
 	var g := _actor.grip_position()
 	var views := [Vector3(1.0 * side, 0.1, -0.15), Vector3(-0.2 * side, 0.15, -1.0), Vector3(-1.0 * side, 0.1, 0.2), Vector3(0.3, 1.0, 0.2)]
+	var dist := 0.55
+	if _body:
+		# The whole batter: from the pitcher, from behind the catcher (the
+		# broadcast side), from the first-base side, and the game's camera.
+		g = _actor.global_position + Vector3(0, 1.0, 0)
+		views = [Vector3(0, 0.1, -1.0), Vector3(0.35 * side, 0.15, 1.0), Vector3(1.0 * side, 0.1, 0.0), Vector3(-0.55 * side, 0.08, 1.0)]
+		dist = 3.6
 	var i := (_frames - 30) / 4
 	if i >= views.size():
 		var sheet := Image.create(1200, 1200, false, Image.FORMAT_RGB8)
@@ -71,8 +81,8 @@ func _process(delta: float) -> bool:
 			sheet.blit_rect(im, Rect2i(0, 0, 600, 600), Vector2i((k % 2) * 600, (k / 2) * 600))
 		sheet.save_png(_out)
 		return true
-	_cam.position = g + (views[i] as Vector3).normalized() * 0.55
-	_cam.look_at(g, Vector3.UP if i < 3 else Vector3.FORWARD)
+	_cam.position = g + (views[i] as Vector3).normalized() * dist
+	_cam.look_at(g, Vector3.UP if i < 3 or _body else Vector3.FORWARD)
 	if (_frames - 30) % 4 == 3:
 		_shots.append(root.get_texture().get_image())
 	return false

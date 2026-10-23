@@ -1675,3 +1675,15 @@ at extension, not deep in the palms with the wrists locked):
 
 Chalk: the foul lines start where they meet the batter's boxes, as on a
 real field, instead of running through them to the plate.
+
+## Stance: the bat back behind the shoulder
+
+After the owner's references (two real hitters and a broadcast-style
+game): every hitter sets up much the same way, hands at the back
+shoulder just in front of the chin, back elbow up, the bat resting back
+behind the head at about 45 degrees. The last pass had the hands above
+the helmet and the bat straight up. The stance now holds the hands at
+shoulder height (about 1.44 m up the rig) and the bat back over the
+shoulder (classic 48 degrees up, yawed 118 toward the catcher; open and
+leg kick close to it). Lefties mirror it. tools/grip_test.gd `body`
+shows the whole stance from four sides.
