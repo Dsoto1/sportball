@@ -1693,3 +1693,10 @@ Foul lines (follow-up): they now run from the plate's back point (the
 diamond's corner), not its middle, and are chalked only from the batter's
 boxes out, ending flush on each box's front line about two thirds of the
 way across, as on a real field.
+
+The rest of the rulebook's field marks (Official Baseball Rules 2.01 and
+its diagram), chalked at their sizes: the pitcher's rubber (24 x 6 in,
+front edge 60 ft 6 in from the plate's back point), the runner's lane up
+the last 45 ft of the first-base line (3 ft wide, foul side), both coach's
+boxes (20 x 10 ft, 15 ft off the lines, ending level with the bases) and
+both on-deck circles (5 ft across, 37 ft from home toward the dugouts).

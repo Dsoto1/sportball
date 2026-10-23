@@ -99,6 +99,7 @@ func _build_infield() -> void:
 	add_child(mound)
 	_build_home_plate()
 	_build_batters_boxes()
+	_build_field_marks()
 	for base in [FieldLayout.FIRST, FieldLayout.SECOND, FieldLayout.THIRD]:
 		var bag := _add_box("Base%d" % base, Vector3(0.6, 0.12, 0.6), FieldLayout.base_position(base) + Vector3(0, CHALK_TOP + 0.0, 0), CHALK)
 		bag.rotation_degrees.y = 45.0
@@ -165,6 +166,62 @@ func _build_batters_boxes() -> void:
 	var back := mid_z + length * 0.5
 	for x: float in [-0.546, 0.546]:
 		_add_box("CatcherBox", Vector3(line, 0.012, 2.44), Vector3(x, CHALK_TOP - 0.004, back + 1.22), CHALK)
+
+
+## The rest of the rulebook's marks (Official Baseball Rules, 2.01 and its
+## diagram): the pitcher's rubber, the runner's lane up the first-base
+## line, both coach's boxes and both on-deck circles.
+func _build_field_marks() -> void:
+	var ft := 0.3048
+	var chalk := 0.076
+	var y := CHALK_TOP - 0.004
+	# Pitcher's rubber: 24 x 6 in of whitened rubber, its front edge
+	# 60 ft 6 in from the plate's back point, on the mound's top.
+	var rubber := _add_box("PitchersRubber", Vector3(24 * 0.0254, 0.03, 6 * 0.0254), Vector3(0, 0.19, PLATE_POINT - 60.5 * ft - 3 * 0.0254), CHALK)
+	rubber.name = "PitchersRubber"
+	for side: float in [-1.0, 1.0]:
+		var along := FieldLayout.direction_for_spray(side * 45.0)
+		var out := Vector3(side * along.z * -1.0, 0.0, side * along.x) * -1.0
+		# `out` points into foul territory, square to this baseline.
+		if out.dot(Vector3(side, 0, 0)) < 0.0:
+			out = -out
+		var corner := Vector3(0.0, 0.0, PLATE_POINT)
+		var mark := func(node_name: String, from_ft: float, to_ft: float, off_ft: float) -> void:
+			var a := corner + along * from_ft * ft + out * off_ft * ft
+			var b := corner + along * to_ft * ft + out * off_ft * ft
+			var m := _add_box(node_name, Vector3(chalk, 0.012, a.distance_to(b)), (a + b) * 0.5 + Vector3(0, y, 0), CHALK)
+			m.look_at_from_position(m.position, m.position + (b - a), Vector3.UP)
+		var across := func(node_name: String, at_ft: float, from_off: float, to_off: float) -> void:
+			var a := corner + along * at_ft * ft + out * from_off * ft
+			var b := corner + along * at_ft * ft + out * to_off * ft
+			var m := _add_box(node_name, Vector3(chalk, 0.012, a.distance_to(b)), (a + b) * 0.5 + Vector3(0, y, 0), CHALK)
+			m.look_at_from_position(m.position, m.position + (b - a), Vector3.UP)
+		if side > 0.0:
+			# The runner's lane: the last 45 ft to first, 3 ft wide, on the
+			# foul side (the foul line is its inside edge).
+			mark.call("RunnersLane", 45.0, 90.0, 3.0)
+			across.call("RunnersLane", 45.0, 0.0, 3.0)
+		# Coach's box: 20 x 10 ft, 15 ft off the line, its far end level
+		# with the base.
+		mark.call("CoachBox", 70.0, 90.0, 15.0)
+		mark.call("CoachBox", 70.0, 90.0, 25.0)
+		across.call("CoachBox", 70.0, 15.0, 25.0)
+		across.call("CoachBox", 90.0, 15.0, 25.0)
+		# On-deck circle: 5 ft across, between the plate and this side's
+		# dugout, 37 ft from home.
+		var spot := FieldLayout.direction_for_spray(side * 118.0) * 37.0 * ft
+		var ring := MeshInstance3D.new()
+		ring.name = "OnDeckCircle"
+		var torus := TorusMesh.new()
+		torus.inner_radius = 2.5 * ft - chalk
+		torus.outer_radius = 2.5 * ft
+		torus.rings = 48
+		torus.ring_segments = 4
+		ring.mesh = torus
+		ring.scale = Vector3(1.0, 0.05, 1.0)
+		ring.position = Vector3(spot.x, y, spot.z)
+		ring.material_override = _mat(CHALK)
+		add_child(ring)
 
 
 func _build_foul_lines() -> void:
