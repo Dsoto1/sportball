@@ -1253,7 +1253,12 @@ func _clear_runners() -> void:
 
 
 func _update_shadow() -> void:
-	_ball_shadow.position = Vector3(_ball.position.x, 0.03, _ball.position.z)
+	# Over the mound a ball rolls up its surface rather than through it
+	# (presentation: play keeps the flat field).
+	var floor_y := FieldLayout.ground_height(_ball.position)
+	if floor_y > 0.0:
+		_ball.position.y = maxf(_ball.position.y, floor_y + BALL_RADIUS * _ball.scale.x)
+	_ball_shadow.position = Vector3(_ball.position.x, floor_y + 0.03, _ball.position.z)
 	_ball_shadow.scale = Vector3(_ball.scale.x, 1.0, _ball.scale.x)
 
 

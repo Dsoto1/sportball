@@ -93,15 +93,21 @@ static func base_name(base: int) -> String:
 # --- The mound (presentation: where feet stand; play stays on the flat) ---
 
 ## The pitcher's mound to the rulebook: 18 ft across, its center 59 ft
-## from the plate's back point, 10 in high, with a flat table round the
-## rubber (whose front edge is 60 ft 6 in from the point) sloping off to
-## the infield grass.
+## from the plate's back point, 10 in high at the rubber (whose front edge
+## is 60 ft 6 in from the point). Flat from behind the rubber to 6 in in
+## front of it, then falling 1 in per ft for 6 ft toward home, then rolling
+## off to the grass at its edge all round.
 const PLATE_POINT := 0.2159
 const MOUND_CENTER := Vector3(0.0, 0.0, PLATE_POINT - 17.983)
 const MOUND_RADIUS := 2.743
-const MOUND_TABLE := 0.95
 const MOUND_HEIGHT := 0.254
 const RUBBER_FRONT_Z := PLATE_POINT - 18.44
+## Flat this far in front of the rubber, then the 1 in/ft slope for 6 ft.
+const MOUND_FLAT := 0.1524
+const MOUND_SLOPE := 1.0 / 12.0
+const MOUND_SLOPE_RUN := 1.8288
+## The roll-off to the grass round the edge (m).
+const MOUND_ROLL := 0.75
 
 
 ## Height of the field's surface under a point (the mound; 0 elsewhere).
@@ -109,4 +115,11 @@ static func ground_height(at: Vector3) -> float:
 	var d := Vector2(at.x - MOUND_CENTER.x, at.z - MOUND_CENTER.z).length()
 	if d >= MOUND_RADIUS:
 		return 0.0
-	return MOUND_HEIGHT * smoothstep(MOUND_RADIUS, MOUND_TABLE, d)
+	# Toward home (+z) from the rubber's front edge.
+	var s := at.z - RUBBER_FRONT_Z
+	var h := MOUND_HEIGHT - clampf(s - MOUND_FLAT, 0.0, MOUND_SLOPE_RUN) * MOUND_SLOPE
+	if s > MOUND_FLAT + MOUND_SLOPE_RUN:
+		# Past the 6 ft slope: on down to the grass at the edge.
+		var rest := Vector2(at.x - MOUND_CENTER.x, at.z - MOUND_CENTER.z).length()
+		h = minf(h, h * smoothstep(MOUND_RADIUS, MOUND_RADIUS - MOUND_ROLL, rest))
+	return minf(h, MOUND_HEIGHT * smoothstep(MOUND_RADIUS, MOUND_RADIUS - MOUND_ROLL, d))

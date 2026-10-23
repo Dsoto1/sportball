@@ -45,6 +45,7 @@ var _player: AnimationPlayer
 var _mesh: MeshInstance3D
 ## Glove hand (left for a righty).
 var _hand: BoneAttachment3D
+var _plant: FootPlant
 var _glove: Node3D
 ## Throwing hand (right for a righty): holds the bat's handle and the ball.
 var _grip: BoneAttachment3D
@@ -79,6 +80,10 @@ func setup(color: Color, tag: String) -> void:
 	_player = _model.find_child("AnimationPlayer") as AnimationPlayer
 	var skeleton := _model.find_child("Skeleton3D") as Skeleton3D
 	_skeleton = skeleton
+	# Feet on the field's surface where each one stands (the mound's slope).
+	_plant = FootPlant.new()
+	_plant.name = "FootPlant"
+	skeleton.add_child(_plant)
 	# The library's mannequin only lends its skeleton and clips; the base
 	# character's body (same bones) is worn on it.
 	(_model.find_child("Mannequin") as MeshInstance3D).visible = false
@@ -258,6 +263,7 @@ func animate(pose: Pose, delta: float, speed: float = 0.0, juke: bool = false, p
 	_clock += delta
 	var fresh := pose != _pose
 	_pose = pose
+	_plant.pin = false
 	match pose:
 		Pose.IDLE, Pose.TURN:
 			_play(_idle_clip(), 1.0)
@@ -277,6 +283,8 @@ func animate(pose: Pose, delta: float, speed: float = 0.0, juke: bool = false, p
 			_scrub("Swing_%s" % style, 1.0, 1.0)
 		Pose.PITCH:
 			_scrub("Pitch", progress, BaseballMoves.PITCH_LENGTH)
+			# Planted through the stride; the kick leg (well up) stays free.
+			_plant.pin = progress > 0.05
 		Pose.BAT_STANCE:
 			_play(BaseballMoves.clip("Stance_%s" % style, _lefty), 1.0)
 		Pose.BUNT:

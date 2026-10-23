@@ -37,6 +37,7 @@ var _tuning: BaseballTuning
 var _grass_mat: ShaderMaterial
 var _infield_grass_mat: ShaderMaterial
 var _dirt_mat: ShaderMaterial
+var _clay_mat: ShaderMaterial
 var _park: StadiumDef
 
 
@@ -64,6 +65,11 @@ func build(tuning: BaseballTuning, park: StadiumDef = null) -> void:
 		for m in [_grass_mat, _infield_grass_mat]:
 			m.set_shader_parameter("detail_strength", 0.25)
 	_dirt_mat = _surface(dirt, DIRT_TEX, DIRT_NORMAL, 0.556, 3.0, 0.0)
+	# Packing clay: the darker, redder, firmer clay of the mound and the
+	# plate area (batter's boxes, catcher), as on every real field.
+	_clay_mat = _surface(dirt.darkened(0.18).lerp(Color(0.62, 0.26, 0.14), 0.25), DIRT_TEX, DIRT_NORMAL, 0.556, 3.0, 0.0)
+	_clay_mat.set_shader_parameter("pattern", 0)
+	_clay_mat.set_shader_parameter("detail_strength", 0.3)
 	_dirt_mat.set_shader_parameter("pattern", 0)
 	_dirt_mat.set_shader_parameter("detail_strength", 0.45)
 	_add_box("Grass", Vector3(320, 0.1, 320), Vector3(0, GRASS_TOP - 0.05, -110), GRASS).material_override = _grass_mat
@@ -87,6 +93,8 @@ func _build_infield() -> void:
 	grass.rotation_degrees.y = 45.0
 	grass.material_override = _infield_grass_mat
 	_add_disc("HomeCircle", 3.96, Vector3(0, CUTOUT_TOP - 0.01, 0), _dirt_mat)
+	# The packed clay round the plate: under both boxes and the catcher.
+	_add_disc("PlateClay", 2.1, Vector3(0, CUTOUT_TOP - 0.005, 0.35), _clay_mat)
 	for base in [FieldLayout.FIRST, FieldLayout.SECOND, FieldLayout.THIRD]:
 		_add_disc("BaseCircle%d" % base, 2.6, FieldLayout.base_position(base) + Vector3(0, CUTOUT_TOP - 0.01, 0), _dirt_mat)
 	# The mound: 18 ft across, 10 in high, a flat table round the rubber
@@ -94,8 +102,8 @@ func _build_infield() -> void:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var c := FieldLayout.MOUND_CENTER
-	var rings := 10
-	var sides := 48
+	var rings := 18
+	var sides := 72
 	for i in rings:
 		var r0 := FieldLayout.MOUND_RADIUS * i / rings
 		var r1 := FieldLayout.MOUND_RADIUS * (i + 1) / rings
@@ -113,7 +121,7 @@ func _build_infield() -> void:
 	var mound := MeshInstance3D.new()
 	mound.name = "Mound"
 	mound.mesh = st.commit()
-	mound.material_override = _dirt_mat
+	mound.material_override = _clay_mat
 	add_child(mound)
 	_build_home_plate()
 	_build_batters_boxes()

@@ -1717,3 +1717,29 @@ the rulebook (18 ft across, its center 59 ft from the plate's point,
 FieldLayout.ground_height is its surface: every player's feet are raised
 onto it each frame (presentation only; play stays on the flat). The
 rubber sits on the table.
+
+## Feet planted on the mound; two clays
+
+- The mound's shape is the rulebook's: flat round the rubber to 6 in in
+  front of it, then falling 1 in per ft for 6 ft toward home, rolling off
+  to the grass at its edge (FieldLayout.ground_height).
+- FootPlant (a skeleton modifier on every player): each foot is reached
+  (two-bone IK, knee bending as the animation bent it) onto the surface
+  right under it, so on the slope one foot is no longer floating or
+  buried; where a near-straight leg can't reach down the slope the hips
+  drop by what it lacks. For the pitcher it also pins: from the first
+  move, any foot within 25 cm of the ground is put on it, so his stride
+  foot stays planted from landing through the follow-through and his
+  back toe drags on the rubber; the leg kick stays free. Measured with
+  tools/pitch_motion_shot.gd: both feet within 1-2 cm of the dirt from
+  landing to follow-through, righty and lefty.
+- The delivery itself had the stride foot hanging 8-10 cm up even on
+  flat ground (the hips did not sit low enough for the long stride); the
+  stride, release and follow-through poses drop the hips 8-10 cm more.
+- The release point needed no change: the hand at release is 1.82 m up
+  (the deeper stride offsets the mound), the pitch leaves from 1.85.
+- A ball over the mound rides its surface, never through it; its shadow
+  follows the slope.
+- Two clays: the lighter infield mix (base paths, arc, cutouts) and the
+  darker, redder packing clay of the mound and the plate area, as on a
+  real field.

@@ -107,19 +107,21 @@ static var KICK := _with(SET, {
 	"hand_r": P(0.22, 1.32, 0.0), "hand_l": P(0.22, 1.34, 0.06),
 })
 static var COCK := _with(SET, {
-	"drop": 0.2, "hips": Vector3(5, -45, 0), "chest": Vector3(0, -45, 0), "head": Vector3(-5, 90, 0),
+	# Sitting into the stride: the hips drop enough for the lead leg to
+	# reach the ground (else the stride foot hangs in the air).
+	"drop": 0.3, "hips": Vector3(5, -45, 0), "chest": Vector3(0, -45, 0), "head": Vector3(-5, 90, 0),
 	"foot_l": P(0.02, 0.1, 0.78), "toe_l": -30.0, "knee_l": P(0, 0.2, 1),
 	"hand_r": P(0.42, 1.62, -0.38), "elbow_r": P(1, -0.4, -0.4),
 	"hand_l": P(-0.1, 1.38, 0.55), "elbow_l": P(-0.5, 0.3, 0),
 })
 static var RELEASE := _with(COCK, {
-	"drop": 0.26, "hips": Vector3(10, 0, 0), "chest": Vector3(25, 25, 0), "head": Vector3(-25, -20, 0),
+	"drop": 0.34, "hips": Vector3(10, 0, 0), "chest": Vector3(25, 25, 0), "head": Vector3(-25, -20, 0),
 	"foot_r": P(0.12, 0.22, -0.2), "toe_r": -40.0,
 	"hand_r": P(0.08, 1.55, 0.5), "elbow_r": P(1, 0.2, 0),
 	"hand_l": P(-0.22, 1.1, 0.2), "elbow_l": P(-1, -0.4, 0),
 })
 static var FOLLOW := _with(RELEASE, {
-	"drop": 0.32, "hips": Vector3(15, 20, 0), "chest": Vector3(40, 30, 0), "head": Vector3(-40, -20, 0),
+	"drop": 0.38, "hips": Vector3(15, 20, 0), "chest": Vector3(40, 30, 0), "head": Vector3(-40, -20, 0),
 	"foot_r": P(0.28, 0.2, 0.32), "toe_r": 0.0, "knee_r": P(0, 0, 1),
 	"hand_r": P(-0.3, 0.7, 0.42), "elbow_r": P(0, -0.2, 1),
 })
