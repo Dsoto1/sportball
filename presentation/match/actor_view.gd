@@ -64,6 +64,8 @@ var _chest: Node3D
 var _shins: Array[Node3D] = []
 var _mitt: Node3D
 var _catcher := false
+## The match's effects (dust when he slides or dives), if any.
+var fx: MatchFx
 var _glove_on := true
 var _cloth: MeshInstance3D
 var _cloth_mat: ShaderMaterial
@@ -291,6 +293,10 @@ func animate(pose: Pose, delta: float, speed: float = 0.0, juke: bool = false, p
 	_clock += delta
 	var fresh := pose != _pose
 	_pose = pose
+	if fresh and fx != null and pose in [Pose.SLIDE, Pose.DIVE]:
+		# Dirt kicked up where he hits the ground, a stride ahead.
+		var ahead := -global_transform.basis.z * 0.8
+		fx.dust(global_position + ahead + Vector3.UP * 0.05, 1.0 if pose == Pose.SLIDE else 0.8)
 	_plant.pin = false
 	match pose:
 		Pose.IDLE, Pose.TURN:

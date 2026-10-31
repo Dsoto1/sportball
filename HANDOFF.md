@@ -92,6 +92,10 @@ Wide mound view: `cam:0.6,2.6,-21,0,6,0 fov:62`. Reference sheets are in
 
 ## Recent work (newest first; details in DECISIONS.md)
 
+- **Owner's VFX packs** (Binbun3D, from their Drive `models/fx`): contact
+  bursts by tier, home-run fireworks, slide/dive dust (`MatchFx`). Unused
+  packs (skies, battle, status, etc.) remain in the Drive.
+
 - **Main menu, settings, pause, full screen** per the owner's UI/UX
   reference (navy/gold, Bebas Neue + Montserrat): `ui/menu/`,
   `app/game_settings.gd`, `app/menu_backdrop.gd`. The game boots to the

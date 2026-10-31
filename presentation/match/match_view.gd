@@ -147,7 +147,14 @@ var _punch_strength := 0.0
 var _shake_rng := RandomNumberGenerator.new()
 ## Accessibility (GameSettings): a gentler camera punch, no contact flash.
 var reduce_shake := false
-var reduce_flashes := false
+var reduce_flashes := false:
+	set(value):
+		reduce_flashes = value
+		if fx != null:
+			fx.reduce_flashes = value
+## Particle effects (MatchFx): contact bursts, home-run fireworks, dust.
+var fx: MatchFx
+var _batting_color := Color.WHITE
 var _animator := PlayAnimator.new()
 var _last_actor_pos := {}
 var _rundown_focus := Vector3.ZERO
@@ -160,6 +167,9 @@ func setup(p_tuning: BaseballTuning) -> void:
 	_field.name = "GrayboxField"
 	add_child(_field)
 	_field.build(tuning)
+	fx = MatchFx.new()
+	fx.name = "MatchFx"
+	add_child(fx)
 	_camera = Camera3D.new()
 	_camera.fov = 55.0
 	# Never this close to anything; the depth buffer keeps the layered
@@ -179,6 +189,7 @@ func setup(p_tuning: BaseballTuning) -> void:
 		var actor := ActorView.new()
 		add_child(actor)
 		actor.setup(HOME_COLOR, String(id).to_upper())
+		actor.fx = fx
 		_fielders.append(actor)
 	_build_zone()
 	_build_bat()
@@ -333,6 +344,11 @@ func step_flight(t: float) -> void:
 			_flight_burst.position = _flight_land + Vector3.UP * 0.5
 			_flight_burst.restart()
 			cheer(1.0)
+			# Fireworks over the outfield stands, in the hitting club's colors.
+			var colors: Array[Color] = [_batting_color, Color(1.0, 0.82, 0.3), Color.WHITE]
+			# High over the outfield architecture (the tallest pieces reach
+			# about 50 m), just beyond the wall.
+			fx.fireworks(Vector3.ZERO, FieldLayout.fence_distance(0.0, tuning) + 15.0, 75.0, colors)
 			var moment := _flight_moment.duplicate()
 			moment["distance"] = roundi(_flight.projected_distance() * 3.28084)
 			board_moment(&"home_run", moment)
@@ -407,6 +423,7 @@ func reset_for_pitch(state: MatchState) -> void:
 	_bats_left = hitter != null and hitter.bats_left()
 	batter.set_lefty(_bats_left)
 	# The bat's grip tape is the batting club's second color.
+	_batting_color = batting_color
 	var tape := batting_trim if batting_trim.a > 0.0 else batting_color.darkened(0.4)
 	(_bat_pivot.get_node("BatMesh").material_override as ShaderMaterial).set_shader_parameter("tape", tape)
 	var pitcher_index := tuning.fielder_ids.find(&"p")
@@ -505,6 +522,7 @@ func contact_feedback(location: Vector2, tier: int) -> void:
 	if tier != ContactFeedback.Tier.MISS:
 		# Wood under the synthesized crack: fuller the better the contact.
 		sfx.play(&"bat", -8.0 + 2.0 * tier, lerpf(0.85, 1.05, tier / 4.0))
+		fx.contact(Vector3(location.x, location.y, 0.1), tier, _batting_color)
 	_contact_tier = tier
 	if tier < ContactFeedback.Tier.SOLID:
 		return
@@ -514,7 +532,8 @@ func contact_feedback(location: Vector2, tier: int) -> void:
 	_punch_start = _view_clock
 	_punch_strength = (1.0 if tier == ContactFeedback.Tier.SWEET else 0.5) * (0.25 if reduce_shake else 1.0)
 	_flash.position = Vector3(location.x, location.y, 0.1)
-	_flash_size = (0.9 if tier == ContactFeedback.Tier.SWEET else 0.45) * (0.0 if reduce_flashes else 1.0)
+	# The contact burst (MatchFx) replaces the old white flash sphere.
+	_flash_size = 0.0
 	var color := Color(1.0, 0.9, 0.3, 0.9) if tier == ContactFeedback.Tier.SWEET else Color(1, 1, 1, 0.8)
 	(_flash.material_override as StandardMaterial3D).albedo_color = color
 	_flash_start = _view_clock
@@ -1260,6 +1279,7 @@ func _fielder_tag(state: MatchState, position: StringName) -> String:
 func _runner_actor(id: StringName, color: Color, trim: Color = Color(0, 0, 0, 0)) -> ActorView:
 	var actor := ActorView.new()
 	add_child(actor)
+	actor.fx = fx
 	var p := _roster.player(id) if _roster != null else null
 	actor.setup(color, String(id).get_slice("_", 1))
 	actor.set_glove_visible(false)

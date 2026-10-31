@@ -1991,3 +1991,36 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
 - Not yet restyled: the matchup card and the in-match HUD still use the
   older look; the reference's HUD snippets are the guide for that.
 - `tools/menu_shots.gd` renders every menu screen.
+
+## The owner's VFX packs (Binbun3D)
+
+- The owner shared a Drive folder (`models/fx`) of Godot effect packs they
+  hold licenses for: 34 zips (Binbun3D's hit, impact, explosion, smoke,
+  battle, status, magic, fire, electric, skies, loot, and more, plus model
+  and texture packs). Read through the Drive connector (it saves each
+  download as a file), unpacked in scratch, licenses checked: the hit,
+  explosion and battle packs say CC0; others ship no license file and are
+  taken as the owner's licence.
+- **In the game** (`MatchFx`, presentation only):
+  - **Contact:** Stylized Hit FX at the bat's contact point, by contact
+    tier: a small hit spark (weak), a bigger one (ok), an impact (solid),
+    a big impact with shockwave ring tinted gold toward the batting club's
+    color (sweet). It replaces the old white flash sphere. Sizes are set
+    for the batting camera.
+  - **Home run:** seven bursts over about 2.6 s high over the outfield
+    architecture (75 m up, just past the wall): the hit pack's star
+    bursts blown up and tinted the batting club's color, gold and white,
+    with an explosion-pack burst now and then.
+  - **Dust:** a soft dirt puff where a runner slides or a fielder dives.
+    Drawn in code: the Smoke VFX pack's shader rendered as flat white
+    blobs here and doesn't take a tint, so it isn't used.
+  - "Reduce flashes" turns off contact bursts and fireworks.
+- The packs stay at their own `res://assets/BinbunVFX_Vol2/` paths (their
+  scenes reference them). One hit-pack shader writes PREMUL_ALPHA_FACTOR,
+  which the Compatibility renderer lacks: that one layer (the impact
+  sphere) only shows in Forward+, the game's renderer.
+- Not used yet (kept in the owner's Drive): impact, battle, status, magic,
+  fire, electric, loot, portal and card effects, the skies pack (a
+  candidate for the per-park atmosphere pass), and the model packs.
+- `tools/fx_shots.gd` renders contact, fireworks and dust (needs
+  `--fixed-fps 30`: the renders run slower than the effects).
