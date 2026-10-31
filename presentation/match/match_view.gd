@@ -145,6 +145,9 @@ var _trail: Array[MeshInstance3D] = []
 var _punch_start := -10.0
 var _punch_strength := 0.0
 var _shake_rng := RandomNumberGenerator.new()
+## Accessibility (GameSettings): a gentler camera punch, no contact flash.
+var reduce_shake := false
+var reduce_flashes := false
 var _animator := PlayAnimator.new()
 var _last_actor_pos := {}
 var _rundown_focus := Vector3.ZERO
@@ -509,9 +512,9 @@ func contact_feedback(location: Vector2, tier: int) -> void:
 	_trail_color = Color(1.0, 0.85, 0.3, 0.9) if tier == ContactFeedback.Tier.SWEET else Color(1, 1, 1, 0.75)
 	# Camera punch: a quick zoom-in kick and shake, bigger on the barrel.
 	_punch_start = _view_clock
-	_punch_strength = 1.0 if tier == ContactFeedback.Tier.SWEET else 0.5
+	_punch_strength = (1.0 if tier == ContactFeedback.Tier.SWEET else 0.5) * (0.25 if reduce_shake else 1.0)
 	_flash.position = Vector3(location.x, location.y, 0.1)
-	_flash_size = 0.9 if tier == ContactFeedback.Tier.SWEET else 0.45
+	_flash_size = (0.9 if tier == ContactFeedback.Tier.SWEET else 0.45) * (0.0 if reduce_flashes else 1.0)
 	var color := Color(1.0, 0.9, 0.3, 0.9) if tier == ContactFeedback.Tier.SWEET else Color(1, 1, 1, 0.8)
 	(_flash.material_override as StandardMaterial3D).albedo_color = color
 	_flash_start = _view_clock

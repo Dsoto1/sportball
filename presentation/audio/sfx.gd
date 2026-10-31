@@ -46,15 +46,18 @@ func _ready() -> void:
 		_streams[name] = list
 	for i in VOICES:
 		var p := AudioStreamPlayer.new()
+		p.bus = &"Effects"
 		add_child(p)
 		_players.append(p)
 	_crowd = AudioStreamPlayer.new()
 	_crowd.stream = _crowd_loop()
 	_crowd.volume_db = -26.0
+	_crowd.bus = &"Crowd"
 	add_child(_crowd)
 	_crowd.play()
 	_cheer = AudioStreamPlayer.new()
 	_cheer.stream = _cheer_burst()
+	_cheer.bus = &"Crowd"
 	add_child(_cheer)
 
 

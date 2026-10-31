@@ -75,6 +75,7 @@ var _event_cursor := 0
 var use_wall_clock := true
 var _virtual_usec := 0
 var _last_frame_usec := -1
+var _paused_usec := 0
 var _frame_interval := 1.0 / 60.0
 var _pitch_release_usec := 0
 var _pending_swing := SwingIntent.Type.NONE
@@ -1147,7 +1148,27 @@ func _close_sub_menu() -> void:
 
 
 func _now_usec() -> int:
-	return Time.get_ticks_usec() if use_wall_clock else _virtual_usec
+	return Time.get_ticks_usec() - _paused_usec if use_wall_clock else _virtual_usec
+
+
+## The game was paused this long (s): the wall clock skips it, so a pitch
+## in the air when he paused is still in the air when he resumes.
+func add_pause(seconds: float) -> void:
+	_paused_usec += roundi(seconds * 1000000.0)
+	_last_frame_usec = -1
+
+
+## Leaves the match for the menu: nothing runs until the next start.
+func stop_match() -> void:
+	state = null
+	_hud.show_card([])
+	_hud.show_prompt("")
+	_hud.show_pitching(false)
+	_hud.show_batting(false, [])
+
+
+func is_running() -> bool:
+	return state != null
 
 
 func _tick_clock(delta: float) -> void:

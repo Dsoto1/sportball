@@ -12,7 +12,7 @@ var _cache := {}
 
 func _ready() -> void:
 	_rng.seed = 1
-	bus = &"Master"
+	bus = &"Effects"
 
 
 ## tier: ContactFeedback.Tier

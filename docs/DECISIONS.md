@@ -1961,3 +1961,33 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   steep left-handed one match within 0.1 deg. Tests check the arc's
   tilt, attack, direction, speed and contact for three profiles and both
   sides, and the depth fit.
+
+## Main menu, settings, pause, full screen (owner's UI/UX reference)
+
+- The owner supplied a UI/UX design reference (navy #0B1F3D and gold
+  #F5C23D, secondary blue, highlight, success/warning/danger/neutral;
+  Bebas Neue headings, Montserrat body; slanted panels with a carbon
+  weave; gold = selected). `ui/menu/menu_style.gd` holds it; everything is
+  drawn in code (panels, icons, the crest), so it scales to any window.
+- **Boot:** run as the game, `app/main.gd` opens on the main menu
+  (`MainMenu`) over a live park (`MenuBackdrop`: a random evening or
+  night park, its own club at home, a slow camera sweep behind the plate,
+  the crowd stirring). Loaded by a tool or test (not the current scene) it
+  still starts a match straight away, so every render tool works unchanged.
+- **Main menu:** PLAY NOW (the existing matchup card), CAREER (My Player,
+  My Franchise) and CREATOR STUDIO (Ballpark, Team, League creators) as
+  tile screens marked COMING SOON (owner's choice: shown, not hidden),
+  SETTINGS; profile (coming soon), mute and quit icons top right; our own
+  crest (shield, crossed bats, ball, swoosh), not the reference's art.
+- **Settings** (`SettingsPanel`, also in the pause menu): DISPLAY (full
+  screen, vsync), AUDIO (master, effects, crowd, mute: Effects and Crowd
+  buses are made at start-up and the sound players routed to them),
+  GAMEPLAY (rookie assist, reduce camera shake, reduce flashes), CONTROLS
+  (the bindings). Saved in `user://settings.cfg` (`GameSettings`).
+- **Full screen by default**; F11 or Alt+Enter toggles it (and saves).
+- **Pause menu** (Esc / Start; restart moved off Start into the menu):
+  RESUME, SETTINGS, RESTART MATCH, QUIT TO MENU. The tree pauses; the
+  director's wall clock skips the paused time so a pitch in flight resumes.
+- Not yet restyled: the matchup card and the in-match HUD still use the
+  older look; the reference's HUD snippets are the guide for that.
+- `tools/menu_shots.gd` renders every menu screen.

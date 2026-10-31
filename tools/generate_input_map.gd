@@ -39,7 +39,10 @@ const BINDINGS := {
 	&"switch_side": [["key", KEY_TAB], ["button", JOY_BUTTON_BACK]],
 	# MacBooks need fn for F-keys, so each also has a plain key.
 	&"toggle_debug": [["key", KEY_F1], ["key", KEY_QUOTELEFT], ["button", JOY_BUTTON_RIGHT_STICK]],
-	&"restart_match": [["key", KEY_F5], ["key", KEY_R], ["button", JOY_BUTTON_START]],
+	&"restart_match": [["key", KEY_F5], ["key", KEY_R]],
+	# The pause menu (Start on a pad; restart lives in it).
+	&"pause_menu": [["key", KEY_ESCAPE], ["button", JOY_BUTTON_START]],
+	&"toggle_fullscreen": [["key", KEY_F11]],
 	&"toggle_assist": [["key", KEY_T], ["button", JOY_BUTTON_LEFT_STICK]],
 }
 
