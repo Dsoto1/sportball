@@ -142,8 +142,8 @@ Wide mound view: `cam:0.6,2.6,-21,0,6,0 fov:62`. Reference sheets are in
 
 1. **Atmosphere:** skies are in; fog and post-processing per park still
    need a screenshot from the owner's machine (Forward+ renders differently).
-2. **Outfield walls:** done against the sheets; left: Foundry's rusted plates, the Icebox's
-   icicle fringe, more Warehouse Row murals.
+2. **Outfield walls:** done against all 18 sheets (rusted Foundry plates, Icebox icicles and
+   Warehouse Row murals included).
 3. Swing follow-through after contact wasn't remeasured against Savant;
    inside/outside pitch effects on contact depth aren't modelled from data.
 4. Sakura's waterfall is partly hidden by the towers from low angles.

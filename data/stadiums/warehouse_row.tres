@@ -184,7 +184,7 @@ script = ExtResource("2_3mioo")
 kind = &"wall_art"
 params = {
 "glow": 0.0,
-"layout": [[-42.0, &"club", 1.2], [-26.0, &"sign", 1.25, "IRONBRIDGE FREIGHT CO"], [-14.0, &"sign", 1.1, "RIVERTON RAILWAY", Color(0.2901961, 0.5411765, 0.5882353, 1)], [9.0, &"clock", 1.25], [20.0, &"freight", 1.35], [31.0, &"sign", 1.25, "ALL ABOARD!", Color(0.9098039, 0.7607843, 0.3529412, 1)], [42.0, &"crossed", 1.2]],
+"layout": [[-43.0, &"mural", 1.2], [-30.0, &"posters", 1.15], [-24.0, &"sign", 1.25, "IRONBRIDGE FREIGHT CO"], [-17.0, &"posters", 1.15], [-11.0, &"sign", 1.1, "RIVERTON RAILWAY", Color(0.2901961, 0.5411765, 0.5882353, 1)], [9.0, &"clock", 1.25], [19.0, &"freight", 1.35], [27.0, &"mural", 1.2], [32.0, &"sign", 1.25, "ALL ABOARD!", Color(0.9098039, 0.7607843, 0.3529412, 1)], [43.0, &"crossed", 1.2]],
 "numbers": Color(0.9098039, 0.72156864, 0.2901961, 1)
 }
 

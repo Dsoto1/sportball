@@ -2133,5 +2133,12 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   - a center-field gate model moves back until its low parts clear the
     wall (wide gates are deep: Firelight's reached 28 m onto the field,
     Cloudreach 13, Foundry 11, Forum 8.5, the Icebox 6).
-- Left for later: Foundry's rusted-plate wall texture, the Icebox's full
-  icicle fringe, and more of the Warehouse Row murals.
+- Then the rest:
+  - **Foundry Field:** a new `rusted` wall style: dark iron plates with
+    seams and rivet rows, and rust patches with drips on most plates
+    (a steady pick per plate), as its sheet.
+  - **The Icebox:** an `icicles` wall motif: long and short ice under a
+    snow lip on the cap, in four clusters along the alleys.
+  - **Warehouse Row:** a painted conductor portrait (`mural`) by the
+    left pole and by "All Aboard!", and clusters of vintage `posters`
+    either side of the Ironbridge Freight sign, in the sheet's order.

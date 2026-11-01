@@ -329,7 +329,7 @@ func _build_fence() -> void:
 			wall_mat.set_shader_parameter("vertical_uv", true)
 		&"brick", &"stone", &"wood", &"rock", &"marble":
 			wall_mat = StadiumSurfaces.material(style, wall_color, false, 0.6)
-		&"iron":
+		&"iron", &"rusted":
 			wall_mat = StadiumSurfaces.material(&"steel", wall_color, false, 0.7)
 		&"ice":
 			wall_mat = StadiumSurfaces.material(&"marble", wall_color.lerp(Color(0.8, 0.92, 1.0), 0.5), false, 0.8)
@@ -387,11 +387,49 @@ func _build_fence() -> void:
 			for band in [0.35, 0.7]:
 				var seam := _add_box("Seam", Vector3(length, 0.12, 0.56), mid + Vector3(0, h * band, 0), wall_color.lightened(0.25))
 				seam.rotation = wall.rotation
+		if style == &"rusted":
+			_rust(i, p0, p1, h, wall.rotation, wall_color)
 		# Warning track: a band of dirt in front of the wall.
 		var inward := -(mid.normalized()) * 2.2
 		var track := _add_box("WarningTrack", Vector3(length, 0.02, 4.4), mid + inward + Vector3(0, TRACK_TOP - 0.01, 0), DIRT)
 		track.rotation = wall.rotation
 		track.material_override = _dirt_mat
+
+
+## A rusted iron plate (the foundry's wall): plate seams across and up,
+## rivet rows along them, and rust blotches bleeding down the face in
+## orange and brown, different on every plate.
+func _rust(i: int, p0: Vector3, p1: Vector3, h: float, rot: Vector3, iron: Color) -> void:
+	var length := p0.distance_to(p1)
+	var out := -((p0 + p1) * 0.5).normalized()
+	var seam_color := iron.lightened(0.18)
+	for band: float in [0.33, 0.66]:
+		var seam := _add_box("Seam", Vector3(length, 0.1, 0.54), (p0 + p1) * 0.5 + Vector3(0, h * band, 0), seam_color)
+		seam.rotation = rot
+	var post := _add_box("Seam", Vector3(0.12, h, 0.54), p0 + Vector3(0, h * 0.5, 0), seam_color)
+	post.rotation = rot
+	for k in 6:
+		for band: float in [0.33, 0.66]:
+			var rivet := _add_box("Rivet", Vector3(0.1, 0.1, 0.58), p0.lerp(p1, (k + 0.5) / 6.0) + Vector3(0, h * band + 0.12, 0), seam_color.lightened(0.15))
+			rivet.rotation = rot
+	# Rust: a steady pseudo-random pick per plate.
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7919 * (i + 3)
+	# Most plates carry a patch or two; some are clean iron.
+	for k in rng.randi_range(0, 2):
+		var t := rng.randf_range(0.2, 0.8)
+		var y := rng.randf_range(0.45, 0.85) * h
+		var w := rng.randf_range(0.5, 1.2)
+		var tall := rng.randf_range(0.3, 0.7)
+		var rust := Color(0.42, 0.2, 0.09).lerp(Color(0.3, 0.15, 0.08), rng.randf())
+		var at := p0.lerp(p1, t) + out * 0.02
+		var blotch := _add_box("Rust", Vector3(w, tall, 0.52), at + Vector3(0, y, 0), rust)
+		blotch.rotation = rot
+		# Drips running down from it.
+		for d in rng.randi_range(0, 2):
+			var drip_len := rng.randf_range(0.5, y - tall * 0.5)
+			var drip := _add_box("Rust", Vector3(rng.randf_range(0.06, 0.16), drip_len, 0.515), p0.lerp(p1, t + rng.randf_range(-0.04, 0.04)) + out * 0.02 + Vector3(0, y - tall * 0.5 - drip_len * 0.5, 0), rust.darkened(0.2))
+			drip.rotation = rot
 
 
 ## Day: sun and a painted sky. Night: floodlights from high over the

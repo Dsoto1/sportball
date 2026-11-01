@@ -271,6 +271,47 @@ static func _draw_layout(stadium: Stadium, root: Node3D, motif: StringName, size
 				var p0: Vector2 = pts[i]
 				var p1: Vector2 = pts[i + 1]
 				_bar(root, (p0 + p1) * 0.5, p0.distance_to(p1) + r * 0.08, r * 0.13, (p1 - p0).angle(), line, maxf(glow, 1.0))
+		&"icicles":
+			# Ice hanging from the wall's cap under a lip of snow, long and
+			# short, across the piece's width.
+			var cap_y := floor_y + wall_h - 0.2
+			var span := r * 2.4
+			Emblem._layer(root, Emblem._poly(Emblem._ccw(_rect_pts(Vector2(0, cap_y - 0.12), span * 2.0 + r * 0.3, 0.32))), Color(0.97, 0.99, 1.0), glow * 0.3, 0.004)
+			var n := 14
+			for i in n:
+				var x := lerpf(-span, span, (i + 0.5) / n)
+				var long := r * (0.55 + 0.75 * float((i * 5) % 7) / 6.0)
+				var half := r * 0.16 * (1.0 + 0.4 * float(i % 2))
+				Emblem._layer(root, Emblem._poly(Emblem._ccw(PackedVector2Array([Vector2(x - half, cap_y), Vector2(x + half, cap_y), Vector2(x, cap_y - long)]))), Color(0.72, 0.88, 1.0), maxf(glow, 0.6), 0.008)
+				Emblem._layer(root, Emblem._poly(Emblem._ccw(PackedVector2Array([Vector2(x - half * 0.3, cap_y), Vector2(x + half * 0.1, cap_y), Vector2(x - half * 0.1, cap_y - long * 0.8)]))), Color(1, 1, 1), maxf(glow, 0.4), 0.012)
+		&"mural":
+			# A painted portrait (the rail yard's conductor): a framed panel,
+			# shoulders in a navy coat with brass buttons, a face, moustache,
+			# and the peaked cap with its gold band.
+			var frame := tint if tint.a > 0.0 else Color(0.18, 0.3, 0.36)
+			Emblem._layer(root, Emblem._poly(Emblem._ccw(_rect_pts(Vector2.ZERO, r * 1.7, r * 2.0))), frame.darkened(0.3), 0.0, 0.0)
+			Emblem._layer(root, Emblem._poly(Emblem._ccw(_rect_pts(Vector2.ZERO, r * 1.55, r * 1.85))), frame, 0.0, 0.004)
+			var coat := Color(0.12, 0.17, 0.32)
+			Emblem._layer(root, Emblem._poly(Emblem._ccw(PackedVector2Array([Vector2(-r * 0.72, -r * 0.92), Vector2(r * 0.72, -r * 0.92), Vector2(r * 0.6, -r * 0.3), Vector2(r * 0.2, -r * 0.15), Vector2(-r * 0.2, -r * 0.15), Vector2(-r * 0.6, -r * 0.3)]))), coat, 0.0, 0.008)
+			for b in 3:
+				Emblem._layer(root, Emblem._poly(_circle(Vector2(0, -r * 0.35 - b * r * 0.18), r * 0.05, 8)), Color(0.9, 0.72, 0.3), 0.0, 0.012)
+			var skin := Color(0.86, 0.66, 0.5)
+			Emblem._layer(root, Emblem._poly(Emblem._ellipse(r * 0.3, r * 0.36, 18)), skin, 0.0, 0.01)
+			root.get_child(root.get_child_count() - 1).position.y = r * 0.15
+			Emblem._layer(root, Emblem._poly(Emblem._ellipse(r * 0.18, r * 0.06, 10)), Color(0.35, 0.22, 0.14), 0.0, 0.014)
+			root.get_child(root.get_child_count() - 1).position.y = r * 0.06
+			Emblem._layer(root, Emblem._poly(Emblem._ccw(_rect_pts(Vector2(0, r * 0.5), r * 0.62, r * 0.24))), coat, 0.0, 0.014)
+			Emblem._layer(root, Emblem._poly(Emblem._ccw(_rect_pts(Vector2(0, r * 0.42), r * 0.62, r * 0.06))), Color(0.9, 0.72, 0.3), 0.0, 0.018)
+			Emblem._layer(root, Emblem._poly(Emblem._ccw(PackedVector2Array([Vector2(-r * 0.36, r * 0.36), Vector2(r * 0.3, r * 0.36), Vector2(r * 0.42, r * 0.3), Vector2(-r * 0.36, r * 0.3)]))), Color(0.05, 0.06, 0.08), 0.0, 0.018)
+		&"posters":
+			# A cluster of vintage bills pasted up: four plates in faded
+			# colors, each with a band of lettering-like stripes.
+			var colors := [Color(0.62, 0.22, 0.16), Color(0.85, 0.78, 0.58), Color(0.25, 0.45, 0.5), Color(0.78, 0.6, 0.25)]
+			for k in 4:
+				var c := Vector2((k % 2 - 0.5) * r * 1.05, (0.5 - k / 2) * r * 1.0)
+				Emblem._layer(root, Emblem._poly(Emblem._ccw(_rect_pts(c, r * 0.95, r * 0.88))), colors[k], 0.0, 0.004 * k)
+				for line in 3:
+					_bar(root, c + Vector2(0, r * (0.22 - line * 0.2)), r * (0.7 - line * 0.15), r * 0.07, 0.0, (colors[k] as Color).darkened(0.55) if k != 1 else Color(0.2, 0.15, 0.1), 0.0, 0.02)
 		&"waterfall":
 			# A painted cascade between two rock shoulders: bright water with
 			# white streaks over it and foam at the foot, from the wall's top
