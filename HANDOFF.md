@@ -95,6 +95,9 @@ Wide mound view: `cam:0.6,2.6,-21,0,6,0 fov:62`. Reference sheets are in
 
 ## Recent work (newest first; details in DECISIONS.md)
 
+- **Alley distances** on every wall (five real numbers: poles, alleys, center), art moved out
+  of the alleys, and nothing (landmarks, gates) standing in front of any wall.
+
 - **Outfield walls checked against every sheet's wall strip** (`stadium_tour.gd ... wall` +
   `tools/wall_strip.py`): bigger art, signs that fit, new motifs (waterfall, swan,
   scorpion, shark, garden), denser layouts, and nothing standing on the warning track.

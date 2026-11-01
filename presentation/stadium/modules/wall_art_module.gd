@@ -8,7 +8,7 @@ extends StadiumModule
 ## numbers. In the home club's colors; accents glow when "glow" is above 0.
 
 ## Angles the wall already uses (distance numbers and emblems).
-const TAKEN := [-43.0, -38.0, -20.0, 0.0, 20.0, 38.0, 43.0]
+const TAKEN := [-43.0, -37.0, -22.5, -12.0, 0.0, 12.0, 22.5, 37.0, 43.0]
 
 
 func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef) -> void:

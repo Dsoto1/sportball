@@ -67,6 +67,10 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 				ModelKit.single_sided(rear)
 				rear.position = Vector3(box.get_center().x * gate.scale.x, gate.position.y, box.get_center().z * gate.scale.z + gate.position.z + box.get_center().z * gate.scale.z)
 				board.add_child(rear)
+				# The rear copy can reach forward too: both step back together.
+				var more := _past_wall(stadium, rear)
+				gate.position.z -= more
+				rear.position.z -= more
 		_:
 			var legs := stadium.box(Vector3(30.0, 14.0, 1.0), frame_color, board, &"structure")
 			legs.position = Vector3(0, -15.0, -0.8)
@@ -233,7 +237,7 @@ static func _past_wall(stadium: Stadium, model: Node3D) -> float:
 			var step := maxi(1, verts.size() / 20000)
 			for i in range(0, verts.size(), step):
 				var p := to_stadium * verts[i]
-				if p.y > 6.0:
+				if p.y > 6.0 or p.y < -0.3:
 					continue
 				var angle := FieldLayout.spray_angle_of(p)
 				if absf(angle) > 50.0:

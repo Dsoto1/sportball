@@ -221,7 +221,7 @@ script = ExtResource("2_lnk5g")
 kind = &"wall_art"
 params = {
 "glow": 0.0,
-"layout": [[-42.0, &"blossom", 1.0], [-29.0, &"blossom", 1.0], [-21.0, &"blossom", 0.8], [-13.0, &"waterfall", 1.5], [-6.0, &"torii", 1.4], [8.0, &"blossom", 0.9], [15.0, &"waterfall", 1.5], [22.0, &"blossom", 0.8], [30.0, &"blossom", 1.0], [42.0, &"blossom", 1.0]],
+"layout": [[-42.0, &"blossom", 1.0], [-31.0, &"blossom", 1.0], [-26.0, &"blossom", 0.8], [-13.0, &"waterfall", 1.5], [-6.0, &"torii", 1.4], [8.0, &"blossom", 0.9], [15.0, &"waterfall", 1.5], [26.0, &"blossom", 0.8], [31.0, &"blossom", 1.0], [42.0, &"blossom", 1.0]],
 "numbers": Color(0.9098039, 0.7607843, 0.3529412, 1)
 }
 

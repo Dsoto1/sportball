@@ -144,7 +144,7 @@ script = ExtResource("2_nkemg")
 kind = &"wall_art"
 params = {
 "glow": 0.0,
-"layout": [[-42.0, &"snowflake", 1.0], [-30.0, &"icicles", 1.0], [-22.0, &"peaks", 1.1], [-12.0, &"icicles", 1.0], [12.0, &"icicles", 1.0], [22.0, &"peaks", 1.1], [30.0, &"icicles", 1.0], [42.0, &"snowflake", 1.0]],
+"layout": [[-42.0, &"snowflake", 1.0], [-30.0, &"peaks", 1.1], [-15.0, &"icicles", 1.0], [-8.0, &"icicles", 1.0], [8.0, &"icicles", 1.0], [15.0, &"icicles", 1.0], [30.0, &"peaks", 1.1], [42.0, &"snowflake", 1.0]],
 "numbers": Color(1, 1, 1, 1)
 }
 

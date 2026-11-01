@@ -2142,3 +2142,20 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   - **Warehouse Row:** a painted conductor portrait (`mural`) by the
     left pole and by "All Aboard!", and clusters of vintage `posters`
     either side of the Ironbridge Freight sign, in the sheet's order.
+
+## Alley distances on the walls
+
+- Owner: show the alley numbers. Every wall now carries five distances:
+  each pole's (just in from the pole), left- and right-center at 22.5
+  degrees, and center field. All are the real fence distances from the
+  park's shape, the same one the ball flight uses (the sheets' pole and
+  center numbers became the shapes on 2026-10-22; the alleys are the
+  shape's own).
+- Wall art moved out of the alleys (about +-4 degrees round 22.5) in the
+  parks that had a piece there, keeping each sheet's order.
+- The fallback emblems for parks without a sheet layout moved to +-12.
+- **Nothing in front of the wall, checked by vertex:** landmark blocks
+  stand back until their front clears the wall (Deepwater's Atlantis
+  block reached 5 m past it and hid the 374), and a center-field gate's
+  rear copy steps back with the gate. A check over all 18 parks finds no
+  mesh below 3.5 m inside the outfield wall.

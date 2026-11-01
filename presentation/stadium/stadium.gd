@@ -1405,6 +1405,11 @@ func _build_hanging_banners(home: TeamDef) -> void:
 		badge.position = Vector3(0, -length * 0.45, 0.06)
 		banner.add_child(badge)
 
+## Where the wall's distance numbers stand (degrees): pole numbers at
+## +-37 (showing the pole's distance), the alleys at +-22.5, center at 0.
+const ALLEY_MARKS := [-37.0, -22.5, 0.0, 22.5, 37.0]
+
+
 ## The wall's dressing: distances in big numbers (the foul-pole distances
 ## near each pole, as on the sheets, and center field) and the home club's
 ## emblem near each pole and in the alleys. A park whose wall art has a
@@ -1415,9 +1420,12 @@ func _build_markers(home: TeamDef) -> void:
 	var color := def.accent_color
 	if not art.is_empty() and Color(art[0].param("numbers")).a > 0.0:
 		color = Color(art[0].param("numbers"))
-	for spot_angle: float in [-37.0, 0.0, 37.0]:
-		var at_pole := signf(spot_angle) * 45.0
-		var d := FieldLayout.fence_distance(at_pole, tuning)
+	# The poles' distances shown just in from each pole, then the alleys'
+	# (left- and right-center, 22.5 degrees) and center field at their own
+	# spots: every number is the real distance there.
+	for spot_angle: float in ALLEY_MARKS:
+		var at := signf(spot_angle) * 45.0 if absf(spot_angle) > 30.0 else spot_angle
+		var d := FieldLayout.fence_distance(at, tuning)
 		var h := FieldLayout.fence_height(spot_angle, tuning)
 		var marker := label(str(roundi(d * 3.2808)), 200, color)
 		# Big gold numbers, most of the wall's height, as on the sheets.
@@ -1431,7 +1439,7 @@ func _build_markers(home: TeamDef) -> void:
 		marker.look_at_from_position(spot, spot - inward, Vector3.UP)
 	if laid_out:
 		return
-	for angle: float in [-43.0, -20.0, 20.0, 43.0]:
+	for angle: float in [-43.0, -12.0, 12.0, 43.0]:
 		var h := FieldLayout.fence_height(angle, tuning)
 		if h < 1.2:
 			continue

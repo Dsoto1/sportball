@@ -160,7 +160,7 @@ script = ExtResource("2_84kiu")
 kind = &"wall_art"
 params = {
 "glow": 0.0,
-"layout": [[-42.0, &"club", 1.0], [-21.0, &"waves", 1.1], [21.0, &"waves", 1.1], [42.0, &"club", 1.0]],
+"layout": [[-42.0, &"club", 1.0], [-30.0, &"waves", 1.0], [-12.0, &"waves", 1.0], [12.0, &"waves", 1.0], [30.0, &"waves", 1.0], [42.0, &"club", 1.0]],
 "numbers": Color(0.9490196, 0.8235294, 0.47843137, 1)
 }
 

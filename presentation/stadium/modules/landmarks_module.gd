@@ -83,11 +83,29 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 				node.free()
 				a += step * 0.5 * dir
 				continue
+			# Never past the outfield wall: a deep block stands back until
+			# its front (and its slight turn) clears the wall.
+			radius = maxf(radius, FieldLayout.fence_distance(a, stadium.tuning) + 2.0 + _reach(node) + width * 0.08)
 			node.position = stadium.point(a, radius, 0.0)
 			stadium.face_home(node)
 			node.rotation.y += _rng.randf_range(-0.12, 0.12)
 			root.add_child(node)
 			a += (step * 0.5 + _rng.randf_range(0.2, 1.6)) * dir
+
+
+## How far a landmark reaches from its origin across the ground (the
+## largest horizontal extent of its meshes), so it can stand clear.
+static func _reach(node: Node3D) -> float:
+	var reach := 0.0
+	for v: VisualInstance3D in node.find_children("*", "VisualInstance3D", true, false):
+		var t := Transform3D.IDENTITY
+		var n: Node = v
+		while n != null and n != node:
+			t = (n as Node3D).transform * t
+			n = n.get_parent()
+		var box := t * v.get_aabb()
+		reach = maxf(reach, maxf(absf(box.position.z), absf(box.end.z)))
+	return reach
 
 
 ## Within a signature landmark's clear zone (its "clear" degrees).
