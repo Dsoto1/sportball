@@ -22,7 +22,8 @@ godot --path .                      # random seed (printed to the console)
 godot --path . -- --seed=1234       # reproduce a logged match
 ```
 
-On the matchup card, ↑ / ↓ chooses a row and ← / → changes it: the away
+The game opens on the main menu (full screen; F11 or Alt+Enter toggles
+it). **Play Now** goes to the matchup card. On the matchup card, ↑ / ↓ chooses a row and ← / → changes it: the away
 club, the home club, and the venue (the home club's park unless you change
 it). Then pick your side: J / click / A for the Gearheads (you
 bat first), K / right-click / X for the Glitterati (you field first). Tab /
@@ -59,7 +60,8 @@ fast runners beat out grounders, good gloves bobble less.
 | Skip to next pitch after a play | J | A |
 | Switch team | Tab | Back |
 | Debug overlay | ` (backtick) or F1 | R-stick click |
-| New match | R or F5 | Start |
+| Pause menu (resume, settings, restart, quit to menu) | Esc | Start |
+| New match | R or F5 | (pause menu) |
 | Rookie assist on/off | T | L-stick click |
 | Pitching change (fielding) / pinch hitter (batting), between pitches | P | Y |
 | ...in the menu: choose / confirm / cancel | W S, J / P | Stick, A / Y |
