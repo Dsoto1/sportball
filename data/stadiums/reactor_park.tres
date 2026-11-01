@@ -157,7 +157,7 @@ script = ExtResource("2_smn81")
 kind = &"wall_art"
 params = {
 "glow": 1.2,
-"layout": [[-42.0, &"club", 1.0], [-21.0, &"zigzag", 1.1], [21.0, &"zigzag", 1.1], [42.0, &"club", 1.0]],
+"layout": [[-42.0, &"club", 1.0], [-22.0, &"zigzag", 1.5], [22.0, &"zigzag", 1.5], [42.0, &"club", 1.0]],
 "numbers": Color(0.95686275, 0.8235294, 0.23529412, 1)
 }
 

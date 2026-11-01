@@ -8,6 +8,11 @@ extends SceneTree
 ## stands all the way round, looking down across the bowl, to check the
 ## layout from every side. "mound" stands on the pitcher's mound and turns
 ## round at eye height (home plate first), then looks straight down.
+## "wall" walks the outfield wall from the left-field pole to the right,
+## straight on from 22 m in front, in thirteen frames (one centered on
+## center field) (render at 512x150,
+## stitch with tools/wall_strip.py) to set under the sheet's wall strip.
+var _wall := false
 var _frames := 0
 var _out := ""
 var _view: MatchView
@@ -50,6 +55,11 @@ func _initialize() -> void:
 			var a := TAU * k / 8.0
 			_shots.append([eye, eye + Vector3(sin(a) * 50.0, 1.0, cos(a) * 50.0)])
 		_shots.append([Vector3(0, 230, -40), Vector3(0, 0, -40.5)])
+	elif OS.get_cmdline_user_args().size() > 2 and OS.get_cmdline_user_args()[2] == "wall":
+		_wall = true
+		_bare = true
+		_fov = 12.0
+		_shots = []
 	elif OS.get_cmdline_user_args().size() > 2 and OS.get_cmdline_user_args()[2] == "orbit":
 		# The drone: radius 175 m round the middle of the park, 75 m up,
 		# starting behind home and going clockwise seen from above.
@@ -101,6 +111,13 @@ func _process(_d: float) -> bool:
 				(c as Node3D).visible = false
 	if _frames < 30:
 		return false
+	if _wall and _shots.is_empty():
+		var st: Stadium = _view._stadium
+		var t: BaseballTuning = st.tuning
+		for k in 13:
+			var a := -48.0 + 8.0 * k
+			var spot := st.point(a, FieldLayout.fence_distance(a, t), 2.1)
+			_shots.append([spot + st.wall_inward(a) * 22.0, spot])
 	if _i >= _shots.size():
 		return true
 	var cam := _view.get_node("Camera3D") if _view.has_node("Camera3D") else null

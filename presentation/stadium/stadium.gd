@@ -1420,7 +1420,8 @@ func _build_markers(home: TeamDef) -> void:
 		var d := FieldLayout.fence_distance(at_pole, tuning)
 		var h := FieldLayout.fence_height(spot_angle, tuning)
 		var marker := label(str(roundi(d * 3.2808)), 200, color)
-		marker.pixel_size = 0.012 * clampf(h / 3.0, 0.5, 1.0)
+		# Big gold numbers, most of the wall's height, as on the sheets.
+		marker.pixel_size = 0.016 * clampf(h / 4.0, 0.5, 1.0)
 		marker.outline_size = 12
 		marker.outline_modulate = Color(0, 0, 0, 0.6)
 		var inward := wall_inward(spot_angle)

@@ -55,13 +55,17 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 				gate.scale = Vector3.ONE * (w / maxf(box.size.x, 0.01))
 				gate.position = Vector3(-box.get_center().x, -box.position.y, -box.get_center().z) * gate.scale + Vector3(0, float(piece.param("frame_drop")), -3.0)
 				board.add_child(gate)
+				# A wide gate is deep too: whatever of its foot reaches past
+				# the outfield wall onto the field steps back behind it.
+				var shift := _past_wall(stadium, gate)
+				gate.position.z -= shift
 				# The model keeps only the faces seen from home: a second one,
 				# turned to face the city, makes it whole from behind.
 				var rear := ModelKit.spawn(role, 1.0, RandomNumberGenerator.new())
 				rear.scale = gate.scale
 				rear.rotation.y = PI
 				ModelKit.single_sided(rear)
-				rear.position = Vector3(box.get_center().x * gate.scale.x, gate.position.y, box.get_center().z * gate.scale.z - 3.0)
+				rear.position = Vector3(box.get_center().x * gate.scale.x, gate.position.y, box.get_center().z * gate.scale.z + gate.position.z + box.get_center().z * gate.scale.z)
 				board.add_child(rear)
 		_:
 			var legs := stadium.box(Vector3(30.0, 14.0, 1.0), frame_color, board, &"structure")
@@ -212,3 +216,41 @@ func _pillars(stadium: Stadium, board: Node3D, piece: StadiumPiece, home: TeamDe
 ## for a pairing; the home club's own park otherwise shows it twice).
 static func _away_for(stadium: Stadium, home: TeamDef) -> TeamDef:
 	return stadium.away_team if stadium.away_team != null else home
+
+
+## How far (m, along the board's depth) a model's low parts (below the
+## wall's top and a little over) stand in front of the outfield wall: the
+## model moves back by that much.
+static func _past_wall(stadium: Stadium, model: Node3D) -> float:
+	var worst := 0.0
+	for mi: MeshInstance3D in model.find_children("*", "MeshInstance3D", true, false):
+		if mi.mesh == null:
+			continue
+		var to_stadium := _to(stadium, mi)
+		var toward := (_to(stadium, model).basis.z).normalized()
+		for surface in mi.mesh.get_surface_count():
+			var verts: PackedVector3Array = mi.mesh.surface_get_arrays(surface)[Mesh.ARRAY_VERTEX]
+			var step := maxi(1, verts.size() / 20000)
+			for i in range(0, verts.size(), step):
+				var p := to_stadium * verts[i]
+				if p.y > 6.0:
+					continue
+				var angle := FieldLayout.spray_angle_of(p)
+				if absf(angle) > 50.0:
+					continue
+				var wall := FieldLayout.fence_distance(angle, stadium.tuning) + 1.5
+				var r := Vector2(p.x, p.z).length()
+				if r < wall:
+					# Moving back along the board's depth (toward -z of the
+					# board, away from home) by d moves it out by about d.
+					worst = maxf(worst, (wall - r) / maxf(absf(Vector2(toward.x, toward.z).normalized().dot(Vector2(p.x, p.z).normalized())), 0.3))
+	return worst
+
+
+static func _to(stadium: Node3D, node: Node3D) -> Transform3D:
+	var t := Transform3D.IDENTITY
+	var n: Node = node
+	while n != null and n != stadium:
+		t = (n as Node3D).transform * t
+		n = n.get_parent()
+	return t

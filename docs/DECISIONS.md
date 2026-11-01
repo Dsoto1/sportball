@@ -2101,3 +2101,37 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   frog, pilot, monkey, wolf, wizard, goblin, cat, medieval) are in the
   same Drive folder; the same route (simplify locally, rig in Meshy,
   BodyDouble) fits them. Owner: no more characters for now.
+
+## Outfield walls against the sheets' wall strips
+
+- **Check tool:** `stadium_tour.gd -- <dir> <park> wall` walks the wall
+  pole to pole straight on (13 frames at 512x150) and `tools/wall_strip.py`
+  stitches them under the sheet's "outfield wall reference" strip. The
+  sheets draw the wall about 2.5x taller than its real proportions, so
+  compare content, order and color there, and size from the field.
+- Distances already matched every sheet (2026-10-22); this pass was the art.
+- **Size:** layout pieces fill most of the wall (82%, up to 3.5 m; club
+  badges a little more, their disc being 0.6 of their size), distance
+  numbers about half its height.
+- **Flat art on a curved wall:** a long piece's ends sank into the wall
+  (the wall curves away behind it), which clipped sign lettering. Each
+  piece now moves out until all its corners clear the wall; signs past
+  12 letters stack on two lines, as the sheets letter them.
+- **New motifs:** waterfall (a painted cascade with foam), swan, scorpion,
+  shark, garden (a flower bed along the foot), a tinted glowing zigzag;
+  gold gaslamp posts; brighter peaks; light waves.
+- **Layouts rebuilt from the strips:** Fountain Gardens (beds, swans,
+  fountains), Amber Gate (scorpions, waterfalls), Firelight (volcanoes,
+  waterfalls), Sakura Gate (waterfalls, bigger torii), Cloudreach (rocks,
+  waterfalls), Deepwater (sharks, coral, fish), the Vault (bigger door
+  and banners), the Kiln (a mesa skyline), Reactor (bright traces).
+  The Icebox wall is navy padding, as its sheet, not frosted ice.
+- **Nothing at field level beyond the wall:**
+  - lamp posts and braziers stand only on real stands (not where the
+    open outfield leaves the wall as the skyline): Firelight's stood on
+    the warning track;
+  - a center-field gate model moves back until its low parts clear the
+    wall (wide gates are deep: Firelight's reached 28 m onto the field,
+    Cloudreach 13, Foundry 11, Forum 8.5, the Icebox 6).
+- Left for later: Foundry's rusted-plate wall texture, the Icebox's full
+  icicle fringe, and more of the Warehouse Row murals.

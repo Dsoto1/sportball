@@ -184,7 +184,7 @@ script = ExtResource("2_2pjeu")
 kind = &"wall_art"
 params = {
 "glow": 0.0,
-"layout": [[-42.0, &"rocks", 1.0, Color(0.7882353, 0.6039216, 0.38431373, 1)], [-24.0, &"club", 1.0], [25.0, &"club", 1.0], [42.0, &"club", 1.0]],
+"layout": [[-42.0, &"rocks", 1.2, Color(0.7882353, 0.6039216, 0.38431373, 1)], [-28.0, &"scorpion", 1.0], [-15.0, &"waterfall", 1.5], [15.0, &"waterfall", 1.5], [28.0, &"scorpion", 1.0], [43.0, &"scorpion", 0.9]],
 "numbers": Color(0.9411765, 0.8784314, 0.6901961, 1)
 }
 

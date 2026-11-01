@@ -22,7 +22,8 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 		for entry: Array in layout:
 			var at := float(entry[0])
 			var h := FieldLayout.fence_height(at, stadium.tuning)
-			var size := minf(h * 0.7, 2.6) * piece.size * (float(entry[2]) if entry.size() > 2 else 1.0)
+			# As on the sheets, a piece fills most of the wall's height.
+			var size := minf(h * 0.82, 3.5) * piece.size * (float(entry[2]) if entry.size() > 2 else 1.0)
 			var mark := Node3D.new()
 			root.add_child(mark)
 			var inward := stadium.wall_inward(at)
@@ -33,6 +34,7 @@ func build(stadium: Stadium, piece: StadiumPiece, home: TeamDef, _away: TeamDef)
 			if entry.size() > 4 and entry[4] is Color:
 				extra = [entry[3], entry[4]]
 			_draw_layout(stadium, mark, StringName(entry[1]), size, home, glow, extra, h)
+			_clear_wall(stadium, mark, inward)
 		return
 	var every := float(piece.param("every"))
 	var a := -45.0 + every * 0.5
@@ -61,16 +63,20 @@ static func _draw(root: Node3D, motif: StringName, size: float, home: TeamDef, g
 	var second := home.highlight_color
 	match motif:
 		&"waves":
+			# Two light swells cresting toward the middle (the sheets paint
+			# them pale blue and white on the dark wall).
 			for row in 2:
 				var pts := PackedVector2Array()
-				var n := 24
+				var n := 32
+				var lift := (0.5 - row) * r * 0.5
 				for i in n + 1:
-					var x := lerpf(-r * 2.2, r * 2.2, float(i) / n)
-					pts.append(Vector2(x, sin(x / r * PI * 1.5) * r * 0.22 + (row - 0.5) * r * 0.55))
+					var x := lerpf(-r * 2.4, r * 2.4, float(i) / n)
+					pts.append(Vector2(x, sin(x / r * PI * 0.9) * r * 0.35 + lift))
 				for i in range(n, -1, -1):
-					var x := lerpf(-r * 2.2, r * 2.2, float(i) / n)
-					pts.append(Vector2(x, sin(x / r * PI * 1.5) * r * 0.22 + (row - 0.5) * r * 0.55 - r * 0.16))
-				Emblem._layer(root, Emblem._poly(pts), main if row == 0 else second, glow, 0.0)
+					var x := lerpf(-r * 2.4, r * 2.4, float(i) / n)
+					var taper := 1.0 - absf(x) / (r * 2.4)
+					pts.append(Vector2(x, sin(x / r * PI * 0.9) * r * 0.35 + lift - r * (0.08 + 0.22 * taper)))
+				Emblem._layer(root, Emblem._poly(pts), Color(0.62, 0.82, 0.96) if row == 0 else Color(0.94, 0.97, 1.0), glow, 0.005 * row)
 		&"snowflake":
 			for k in 3:
 				_bar(root, Vector2.ZERO, r * 2.0, r * 0.12, PI * k / 3.0, second, glow)
@@ -146,14 +152,16 @@ static func _draw_layout(stadium: Stadium, root: Node3D, motif: StringName, size
 	var floor_y := -minf(wall_h * 0.5, 2.0) + 0.15
 	match motif:
 		&"club":
-			root.add_child(Emblem.build(home, size, 0.3))
+			# The badge's own disc is about 0.6 of its size: a little over
+			# size makes the whole badge most of the wall's height.
+			root.add_child(Emblem.build(home, size * 1.15, 0.3))
 		&"peaks":
 			var snow := tint if tint.a > 0.0 else Color(0.92, 0.96, 1.0)
 			for k in 3:
 				var cx := (k - 1) * r * 1.3
 				var hh := r * (1.6 if k == 1 else 1.1)
 				var base_w := hh * 1.3
-				Emblem._layer(root, Emblem._poly(Emblem._ccw(PackedVector2Array([Vector2(cx - base_w, floor_y), Vector2(cx + base_w, floor_y), Vector2(cx, floor_y + hh)]))), snow.darkened(0.25 + 0.1 * k), glow, 0.0)
+				Emblem._layer(root, Emblem._poly(Emblem._ccw(PackedVector2Array([Vector2(cx - base_w, floor_y), Vector2(cx + base_w, floor_y), Vector2(cx, floor_y + hh)]))), snow.darkened(0.08 + 0.06 * k).lerp(Color(0.55, 0.7, 0.9), 0.35), glow, 0.0)
 				Emblem._layer(root, Emblem._poly(Emblem._ccw(PackedVector2Array([Vector2(cx - base_w * 0.35, floor_y + hh * 0.65), Vector2(cx + base_w * 0.35, floor_y + hh * 0.65), Vector2(cx, floor_y + hh)]))), snow, glow, 0.01)
 		&"mesa":
 			# A stepped desert skyline: buttes and a tall mesa, flat-topped.
@@ -181,8 +189,11 @@ static func _draw_layout(stadium: Stadium, root: Node3D, motif: StringName, size
 					blob.append(c + Vector2(cos(a) * r * 0.65, maxf(sin(a), -0.2) * r * (0.6 + 0.2 * (k % 2))))
 				Emblem._layer(root, Emblem._poly(Emblem._ccw(blob)), rock.darkened(0.12 * k), glow, 0.005 * k)
 		&"lamp":
-			_bar(root, Vector2(0, -r * 0.3), r * 1.6, r * 0.1, PI * 0.5, Color(0.12, 0.12, 0.14), 0.0)
-			_bar(root, Vector2(0, r * 0.55), r * 0.5, r * 0.08, 0.0, Color(0.12, 0.12, 0.14), 0.0)
+			# A gaslamp post painted in gold (the sheets' lamp-lined walls).
+			var post := tint if tint.a > 0.0 else Color(0.82, 0.66, 0.32)
+			_bar(root, Vector2(0, -r * 0.3), r * 1.6, r * 0.12, PI * 0.5, post, 0.0)
+			_bar(root, Vector2(0, r * 0.55), r * 0.5, r * 0.08, 0.0, post, 0.0)
+			_bar(root, Vector2(0, -r * 1.05), r * 0.45, r * 0.12, 0.0, post, 0.0)
 			Emblem._layer(root, Emblem._poly(Emblem._ccw(PackedVector2Array([Vector2(-r * 0.22, r * 0.5), Vector2(r * 0.22, r * 0.5), Vector2(r * 0.3, r * 0.95), Vector2(-r * 0.3, r * 0.95)]))), Color(1.0, 0.82, 0.45), maxf(glow, 1.2), 0.01)
 		&"clock":
 			Emblem._layer(root, Emblem._poly(_circle(Vector2.ZERO, r * 0.95, 32)), Color(0.15, 0.13, 0.1), 0.0, 0.0)
@@ -194,12 +205,20 @@ static func _draw_layout(stadium: Stadium, root: Node3D, motif: StringName, size
 			_bar(root, Vector2(r * 0.2, 0), r * 0.4, r * 0.05, 0.0, Color(0.1, 0.1, 0.1), 0.0)
 		&"sign":
 			var text := String(extra) if extra is String else home.team_name.to_upper()
-			var w := r * (0.55 * text.length() + 0.6)
+			# Long names stack on two lines, as the sheets letter them.
+			var lines := _two_lines(text)
+			var longest := 0
+			for line: String in lines:
+				longest = maxi(longest, line.length())
+			var tall := lines.size() > 1
+			var w := r * (0.5 * longest + 0.6) * (0.8 if tall else 1.0)
+			var plate_h := r * (1.55 if tall else 1.2)
 			var plate := tint if tint.a > 0.0 else Color(0.9, 0.86, 0.74)
-			Emblem._layer(root, Emblem._poly(Emblem._ccw(_rect_pts(Vector2.ZERO, w, r * 1.2))), plate.darkened(0.5), 0.0, 0.0)
-			Emblem._layer(root, Emblem._poly(Emblem._ccw(_rect_pts(Vector2.ZERO, w - r * 0.15, r * 1.05))), plate, glow * 0.3, 0.01)
-			var label := stadium.label(text, 64, plate.darkened(0.75), root)
-			label.pixel_size = r * 0.0095
+			Emblem._layer(root, Emblem._poly(Emblem._ccw(_rect_pts(Vector2.ZERO, w, plate_h))), plate.darkened(0.5), 0.0, 0.0)
+			Emblem._layer(root, Emblem._poly(Emblem._ccw(_rect_pts(Vector2.ZERO, w - r * 0.15, plate_h - r * 0.15))), plate, glow * 0.3, 0.01)
+			var label := stadium.label("\n".join(lines), 64, plate.darkened(0.75), root)
+			label.pixel_size = r * (0.0076 if tall else 0.0095)
+			label.line_spacing = -6.0
 			label.position = Vector3(0, 0, 0.05)
 		&"freight":
 			for k in 2:
@@ -244,6 +263,85 @@ static func _draw_layout(stadium: Stadium, root: Node3D, motif: StringName, size
 			Emblem._layer(root, Emblem._poly(Emblem._ccw(_rect_pts(Vector2(0, r * 0.25), r * 1.0, r * 0.18))), stone, 0.0, 0.01)
 			for k in 3:
 				_bar(root, Vector2((k - 1) * r * 0.35, r * 0.65), r * 0.75, r * 0.07, PI * 0.5 + (k - 1) * 0.3, Color(0.6, 0.85, 1.0), maxf(glow, 0.6))
+		&"zigzag":
+			# A glowing trace (the reactor's monitor line), in its own color.
+			var line := tint if tint.a > 0.0 else Color(0.35, 1.0, 0.45)
+			var pts := [Vector2(-r * 2.4, 0), Vector2(-r * 1.6, r * 0.6), Vector2(-r * 0.8, -r * 0.6), Vector2(0, r * 0.7), Vector2(r * 0.8, -r * 0.6), Vector2(r * 1.6, r * 0.6), Vector2(r * 2.4, 0)]
+			for i in pts.size() - 1:
+				var p0: Vector2 = pts[i]
+				var p1: Vector2 = pts[i + 1]
+				_bar(root, (p0 + p1) * 0.5, p0.distance_to(p1) + r * 0.08, r * 0.13, (p1 - p0).angle(), line, maxf(glow, 1.0))
+		&"waterfall":
+			# A painted cascade between two rock shoulders: bright water with
+			# white streaks over it and foam at the foot, from the wall's top
+			# to its floor.
+			var top := floor_y + minf(wall_h - 0.35, r * 2.3)
+			var mid := (top + floor_y) * 0.5
+			var tall := top - floor_y
+			var rock := tint if tint.a > 0.0 else Color(0.42, 0.36, 0.3)
+			for side: float in [-1.0, 1.0]:
+				var blob := PackedVector2Array()
+				for i in 10:
+					var a := TAU * i / 10.0
+					blob.append(Vector2(side * r * 1.2 + cos(a) * r * 0.32, mid + sin(a) * tall * 0.52))
+				Emblem._layer(root, Emblem._poly(Emblem._ccw(blob)), rock.darkened(0.08 * (side + 1.0)), 0.0, 0.0)
+			Emblem._layer(root, Emblem._poly(Emblem._ccw(_rect_pts(Vector2(0, mid), r * 2.0, tall))), Color(0.42, 0.74, 1.0), maxf(glow, 0.35), 0.008)
+			var streaks := [[-0.75, 0.12], [-0.45, 0.22], [-0.12, 0.12], [0.15, 0.24], [0.48, 0.14], [0.74, 0.1]]
+			for st: Array in streaks:
+				_bar(root, Vector2(float(st[0]) * r, mid), tall, float(st[1]) * r, PI * 0.5, Color(0.96, 0.99, 1.0), maxf(glow, 0.5), 0.014)
+			Emblem._layer(root, Emblem._poly(Emblem._ellipse(r * 1.2, r * 0.24, 18)), Color(0.97, 0.99, 1.0), maxf(glow, 0.5), 0.02)
+			root.get_child(root.get_child_count() - 1).position.y = floor_y + r * 0.14
+		&"swan":
+			var white := Color(0.97, 0.96, 0.92)
+			Emblem._layer(root, Emblem._poly(Emblem._ellipse(r * 0.85, r * 0.38, 22)), white, glow * 0.3, 0.0)
+			root.get_child(root.get_child_count() - 1).position = Vector3(r * 0.15, -r * 0.35, 0)
+			# The raised wing and the S of the neck.
+			Emblem._layer(root, Emblem._poly(Emblem._ccw(PackedVector2Array([Vector2(-r * 0.2, -r * 0.2), Vector2(r * 0.85, -r * 0.25), Vector2(r * 0.55, r * 0.35), Vector2(r * 0.1, r * 0.15)]))), white.darkened(0.12), glow * 0.3, 0.01)
+			var neck := [Vector2(-r * 0.55, -r * 0.3), Vector2(-r * 0.75, r * 0.1), Vector2(-r * 0.6, r * 0.45), Vector2(-r * 0.4, r * 0.7), Vector2(-r * 0.55, r * 0.9)]
+			for i in neck.size() - 1:
+				var a: Vector2 = neck[i]
+				var b: Vector2 = neck[i + 1]
+				_bar(root, (a + b) * 0.5, a.distance_to(b) + r * 0.08, r * 0.16, (b - a).angle(), white, glow * 0.3)
+			Emblem._layer(root, Emblem._poly(Emblem._ccw(PackedVector2Array([Vector2(-r * 0.6, r * 0.95), Vector2(-r * 0.6, r * 0.82), Vector2(-r * 0.98, r * 0.86)]))), Color(0.95, 0.55, 0.15), glow * 0.3, 0.02)
+		&"scorpion":
+			var gold := tint if tint.a > 0.0 else Color(0.86, 0.68, 0.3)
+			for k in 3:
+				Emblem._layer(root, Emblem._poly(Emblem._ellipse(r * (0.32 - k * 0.04), r * 0.22, 14)), gold.darkened(0.08 * k), glow * 0.3, 0.0)
+				root.get_child(root.get_child_count() - 1).position = Vector3(-r * 0.3 + k * r * 0.42, -r * 0.45, 0)
+			# The tail curls up over the back to the sting.
+			var tail := [Vector2(r * 0.55, -r * 0.4), Vector2(r * 0.85, -r * 0.1), Vector2(r * 0.9, r * 0.3), Vector2(r * 0.7, r * 0.62), Vector2(r * 0.4, r * 0.7)]
+			for i in tail.size() - 1:
+				var a: Vector2 = tail[i]
+				var b: Vector2 = tail[i + 1]
+				_bar(root, (a + b) * 0.5, a.distance_to(b) + r * 0.05, r * (0.2 - i * 0.025), (b - a).angle(), gold, glow * 0.3)
+			Emblem._layer(root, Emblem._poly(Emblem._ccw(PackedVector2Array([Vector2(r * 0.42, r * 0.78), Vector2(r * 0.42, r * 0.6), Vector2(r * 0.18, r * 0.62)]))), gold.lightened(0.2), glow * 0.5, 0.01)
+			for side: float in [-1.0, 1.0]:
+				_bar(root, Vector2(-r * 0.8, -r * 0.45 + side * r * 0.22), r * 0.5, r * 0.1, side * 0.5, gold, glow * 0.3)
+				Emblem._layer(root, Emblem._poly(Emblem._ellipse(r * 0.18, r * 0.1, 10)), gold, glow * 0.3, 0.01)
+				root.get_child(root.get_child_count() - 1).position = Vector3(-r * 1.08, -r * 0.45 + side * r * 0.4, 0)
+				for leg in 3:
+					_bar(root, Vector2(-r * 0.15 + leg * r * 0.3, -r * 0.45 + side * r * 0.3), r * 0.35, r * 0.06, side * (1.2 + leg * 0.15), gold.darkened(0.15), 0.0)
+		&"shark":
+			var grey := tint if tint.a > 0.0 else Color(0.55, 0.66, 0.72)
+			Emblem._layer(root, Emblem._poly(Emblem._ccw(PackedVector2Array([Vector2(-r * 1.4, 0), Vector2(-r * 0.6, r * 0.32), Vector2(r * 0.8, r * 0.18), Vector2(r * 1.2, 0), Vector2(r * 0.8, -r * 0.2), Vector2(-r * 0.6, -r * 0.28)]))), grey, glow * 0.3, 0.0)
+			Emblem._layer(root, Emblem._poly(Emblem._ccw(PackedVector2Array([Vector2(-r * 0.4, -r * 0.05), Vector2(r * 0.6, -r * 0.08), Vector2(r * 0.6, -r * 0.18), Vector2(-r * 0.4, -r * 0.22)]))), Color(0.92, 0.94, 0.95), 0.0, 0.01)
+			Emblem._layer(root, Emblem._poly(Emblem._ccw(PackedVector2Array([Vector2(-r * 0.2, r * 0.28), Vector2(r * 0.25, r * 0.22), Vector2(r * 0.05, r * 0.75)]))), grey.darkened(0.15), glow * 0.3, 0.01)
+			Emblem._layer(root, Emblem._poly(Emblem._ccw(PackedVector2Array([Vector2(r * 1.1, 0), Vector2(r * 1.55, r * 0.5), Vector2(r * 1.4, 0), Vector2(r * 1.55, -r * 0.45)]))), grey.darkened(0.1), glow * 0.3, 0.01)
+			Emblem._layer(root, Emblem._poly(_circle(Vector2(-r * 1.0, r * 0.08), r * 0.05, 8)), Color(0.05, 0.05, 0.06), 0.0, 0.02)
+		&"garden":
+			# A flower bed painted along the wall's foot: a hedge of round
+			# bushes with blossoms on them (the sheet's flowered walls).
+			var bloom := tint if tint.a > 0.0 else Color(0.97, 0.62, 0.78)
+			var span := r * 2.4
+			var bushes := 7
+			for i in bushes:
+				var x := lerpf(-span, span, float(i) / (bushes - 1))
+				var rr := r * (0.42 + 0.12 * float((i * 7) % 3))
+				Emblem._layer(root, Emblem._poly(_circle(Vector2(x, floor_y + rr * 0.8), rr, 14)), Color(0.18, 0.42, 0.2).lightened(0.06 * float(i % 2)), 0.0, 0.0)
+				for f in 4:
+					var fa := TAU * f / 4.0 + i
+					var fc := Vector2(x + cos(fa) * rr * 0.55, floor_y + rr * 0.8 + sin(fa) * rr * 0.5)
+					Emblem._layer(root, Emblem._poly(_circle(fc, r * 0.11, 8)), bloom if f % 2 == 0 else Color(0.98, 0.95, 0.9), glow * 0.3, 0.01)
 		&"shield":
 			var c := tint if tint.a > 0.0 else home.primary_color
 			Emblem._layer(root, Emblem._poly(Emblem._ccw(Emblem._outline(&"shield", r * 0.9))), home.accent_color, 0.0, 0.0)
@@ -257,11 +355,11 @@ static func _rect_pts(c: Vector2, w: float, h: float) -> PackedVector2Array:
 	return PackedVector2Array([c + Vector2(-w * 0.5, -h * 0.5), c + Vector2(w * 0.5, -h * 0.5), c + Vector2(w * 0.5, h * 0.5), c + Vector2(-w * 0.5, h * 0.5)])
 
 
-static func _bar(root: Node3D, center: Vector2, length: float, width: float, angle: float, color: Color, glow: float) -> void:
+static func _bar(root: Node3D, center: Vector2, length: float, width: float, angle: float, color: Color, glow: float, z: float = 0.0) -> void:
 	var d := Vector2(cos(angle), sin(angle)) * length * 0.5
 	var n := Vector2(-d.y, d.x).normalized() * width * 0.5
 	var pts := PackedVector2Array([center - d - n, center + d - n, center + d + n, center - d + n])
-	Emblem._layer(root, Emblem._poly(Emblem._ccw(pts)), color, glow, 0.0)
+	Emblem._layer(root, Emblem._poly(Emblem._ccw(pts)), color, glow, z)
 
 
 static func _circle(c: Vector2, r: float, n: int = 20) -> PackedVector2Array:
@@ -276,3 +374,48 @@ static func _scaled(pts: PackedVector2Array, k: float) -> PackedVector2Array:
 	for p in pts:
 		out.append(p * k)
 	return out
+
+
+## A sign's text on one line, or two (split at the space nearest the
+## middle) when it runs past 12 letters.
+static func _two_lines(text: String) -> PackedStringArray:
+	if text.length() <= 12 or not text.contains(" "):
+		return PackedStringArray([text])
+	var mid := text.length() / 2
+	var best := -1
+	for i in text.length():
+		if text[i] == " " and (best < 0 or absi(i - mid) < absi(best - mid)):
+			best = i
+	return PackedStringArray([text.substr(0, best), text.substr(best + 1)])
+
+
+## Flat art against the curved wall: its ends would sink into the wall
+## (the wall curves away behind a straight panel), so the piece moves out
+## from the wall until both ends, and every corner, stand clear of it.
+static func _clear_wall(stadium: Stadium, mark: Node3D, inward: Vector3) -> void:
+	var box := AABB()
+	var first := true
+	for v: VisualInstance3D in mark.find_children("*", "VisualInstance3D", true, false):
+		var local := _relative(mark, v) * v.get_aabb()
+		box = local if first else box.merge(local)
+		first = false
+	if first:
+		return
+	var worst := 0.0
+	for x: float in [box.position.x, box.end.x]:
+		for y: float in [box.position.y, box.end.y]:
+			var p := mark.transform * Vector3(x, y, 0.0)
+			var angle := FieldLayout.spray_angle_of(p)
+			var wall := FieldLayout.fence_distance(angle, stadium.tuning)
+			worst = maxf(worst, Vector2(p.x, p.z).length() - (wall - 0.12))
+	if worst > 0.0:
+		mark.position += inward * worst
+
+
+static func _relative(root: Node3D, node: Node3D) -> Transform3D:
+	var t := Transform3D.IDENTITY
+	var n: Node = node
+	while n != null and n != root:
+		t = (n as Node3D).transform * t
+		n = n.get_parent()
+	return t

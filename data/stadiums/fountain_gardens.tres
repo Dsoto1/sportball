@@ -194,7 +194,7 @@ script = ExtResource("2_wib25")
 kind = &"wall_art"
 params = {
 "glow": 0.0,
-"layout": [[-42.0, &"blossom", 1.0], [-27.0, &"club", 1.0], [-13.0, &"fountain", 1.0], [-7.0, &"blossom", 0.7], [7.0, &"blossom", 0.7], [13.0, &"fountain", 1.0], [27.0, &"club", 1.0], [42.0, &"blossom", 1.0]],
+"layout": [[-43.0, &"garden", 0.9], [-30.0, &"swan", 1.0], [-22.0, &"garden", 1.0], [-13.0, &"fountain", 1.1], [-6.0, &"garden", 0.6], [6.0, &"garden", 0.6], [13.0, &"fountain", 1.1], [22.0, &"garden", 1.0], [30.0, &"swan", 1.0], [43.0, &"garden", 0.9]],
 "numbers": Color(0.9098039, 0.7607843, 0.3529412, 1)
 }
 

@@ -142,7 +142,7 @@ script = ExtResource("2_i0spf")
 kind = &"wall_art"
 params = {
 "glow": 0.0,
-"layout": [[-42.0, &"coral", 1.0], [-22.0, &"fish", 0.9], [-10.0, &"coral", 0.8], [10.0, &"coral", 0.8], [22.0, &"fish", 0.9], [42.0, &"coral", 1.0]],
+"layout": [[-42.0, &"coral", 1.2], [-26.0, &"shark", 1.1], [-16.0, &"coral", 1.0], [-8.0, &"fish", 0.8], [8.0, &"coral", 1.0], [18.0, &"shark", 1.1], [28.0, &"fish", 0.9], [42.0, &"coral", 1.2]],
 "numbers": Color(1, 1, 1, 1)
 }
 

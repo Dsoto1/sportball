@@ -13,6 +13,12 @@ func build(stadium: Stadium, piece: StadiumPiece, _home: TeamDef, _away: TeamDef
 	var brazier := StringName(piece.param("style")) == &"brazier"
 	var fire := Stadium.glow(Color(1.0, 0.55, 0.15), 3.5)
 	for angle in Scenery.spread(piece.angle, float(piece.param("span")), int(piece.param("count"))):
+		# Only on top of stands: where the outfield is open (no stands behind
+		# the wall) the skyline is the wall itself, and a post there would
+		# stand on the warning track.
+		var stands := stadium.skyline_top(angle)
+		if stands.x < FieldLayout.fence_distance(angle, stadium.tuning) + 8.0 or stands.y < 5.0:
+			continue
 		if brazier:
 			var t := stadium.skyline_top(angle)
 			var at := stadium.point(angle, t.x - 0.3, t.y + 0.6)
