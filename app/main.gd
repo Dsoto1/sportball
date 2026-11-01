@@ -111,14 +111,40 @@ func _apply_gameplay_settings() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	var alt_enter: bool = event is InputEventKey and event.pressed and not event.echo and event.alt_pressed and event.keycode in [KEY_ENTER, KEY_KP_ENTER]
 	if event.is_action_pressed(&"toggle_fullscreen") or alt_enter:
-		GameSettings.toggle_fullscreen()
 		get_viewport().set_input_as_handled()
+		if Engine.is_embedded_in_editor():
+			_notice("Full screen needs the game in its own window: in the editor's Game tab, turn off\n\"Embed Game on Next Play\" (the  ⋮  menu), then press Play again. Or run:  godot --path .")
+			return
+		GameSettings.toggle_fullscreen()
 		return
 	if _pause == null:
 		return
 	if event.is_action_pressed(&"pause_menu") and not _pause.visible and not _menu.visible and _director.is_running():
 		get_viewport().set_input_as_handled()
 		_pause_game()
+
+
+## A short note across the top of the screen for a few seconds.
+func _notice(text: String) -> void:
+	var ui := get_node("UI")
+	var old := ui.get_node_or_null("Notice")
+	if old != null:
+		old.free()
+	var label := Label.new()
+	label.name = "Notice"
+	label.text = text
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.add_theme_font_override("font", MenuStyle.body(600))
+	label.add_theme_font_size_override("font_size", 20)
+	label.add_theme_color_override("font_color", MenuStyle.GOLD)
+	label.add_theme_color_override("font_outline_color", MenuStyle.DEEP)
+	label.add_theme_constant_override("outline_size", 8)
+	label.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	label.offset_top = 24.0
+	ui.add_child(label)
+	get_tree().create_timer(6.0).timeout.connect(func() -> void:
+		if is_instance_valid(label):
+			label.queue_free())
 
 
 func _seed_from_args() -> int:

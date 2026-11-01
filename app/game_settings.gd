@@ -47,11 +47,15 @@ static func set_value(key: String, value: Variant) -> void:
 
 static func apply() -> void:
 	ensure_buses()
-	if DisplayServer.get_name() != "headless":
+	# Run from the editor with the game embedded in its Game tab, a full
+	# screen request would take over the editor's own window instead: the
+	# window mode is left alone there (main.gd says how to get a window).
+	if DisplayServer.get_name() != "headless" and not Engine.is_embedded_in_editor():
 		var full := bool(get_value("fullscreen"))
 		var mode := DisplayServer.WINDOW_MODE_FULLSCREEN if full else DisplayServer.WINDOW_MODE_WINDOWED
 		if DisplayServer.window_get_mode() != mode:
 			DisplayServer.window_set_mode(mode)
+	if DisplayServer.get_name() != "headless":
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if bool(get_value("vsync")) else DisplayServer.VSYNC_DISABLED)
 	var muted := bool(get_value("muted"))
 	_volume(&"Master", float(get_value("master")), muted)

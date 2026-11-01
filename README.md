@@ -23,7 +23,10 @@ godot --path . -- --seed=1234       # reproduce a logged match
 ```
 
 The game opens on the main menu (full screen; F11 or Alt+Enter toggles
-it). **Play Now** goes to the matchup card. On the matchup card, ↑ / ↓ chooses a row and ← / → changes it: the away
+it). Run from the editor, Godot 4.4+ embeds the game in its Game tab,
+where a game can't go full screen (it would take the editor's window
+instead). For full screen, turn off "Embed Game on Next Play" in the Game
+tab's ⋮ menu, or run `godot --path .` from a terminal. **Play Now** goes to the matchup card. On the matchup card, ↑ / ↓ chooses a row and ← / → changes it: the away
 club, the home club, and the venue (the home club's park unless you change
 it). Then pick your side: J / click / A for the Gearheads (you
 bat first), K / right-click / X for the Glitterati (you field first). Tab /

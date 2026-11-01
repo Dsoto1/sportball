@@ -2159,3 +2159,12 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   block reached 5 m past it and hid the 374), and a center-field gate's
   rear copy steps back with the gate. A check over all 18 parks finds no
   mesh below 3.5 m inside the outfield wall.
+
+## Full screen when run from the editor
+
+- The owner ran the game from the Godot editor, where Godot 4.4+ embeds it
+  in the Game tab: the game's full-screen request took over the editor's
+  window instead of the game's. Embedded (`Engine.is_embedded_in_editor()`),
+  the game now leaves the window mode alone, and F11 / Alt+Enter show a
+  note: turn off "Embed Game on Next Play" in the Game tab's menu, or run
+  `godot --path .`. Run on its own (or exported), full screen is as before.
