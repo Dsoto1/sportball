@@ -2100,4 +2100,4 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
 - The owner's other new T-pose characters (officer, bear, elder, alien,
   frog, pilot, monkey, wolf, wizard, goblin, cat, medieval) are in the
   same Drive folder; the same route (simplify locally, rig in Meshy,
-  BodyDouble) fits them.
+  BodyDouble) fits them. Owner: no more characters for now.

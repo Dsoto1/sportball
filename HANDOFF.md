@@ -96,7 +96,7 @@ Wide mound view: `cam:0.6,2.6,-21,0,6,0 fov:62`. Reference sheets are in
 
 - **The owner's robot player** (Meshy-rigged) is the Sentinels' #25: it
   rides the player skeleton through `BodyDouble`, so every animation and
-  IK works. Other owner T-pose characters can follow the same route.
+  IK works. The owner's other T-pose characters are on hold (owner: no more for now).
   Mini field top right redrawn.
 
 - **HUD, matchup card and final card restyled** to the owner's UI
