@@ -38,6 +38,25 @@ func _scene(path: String) -> PackedScene:
 	return _scenes[path]
 
 
+## Loads every effect now and draws each once, far too small to see, just
+## in front of `camera`: their scenes load and their shaders compile here,
+## at start-up, instead of the first time the bat meets the ball (a hitch
+## right at contact) or the first home run.
+func warm_up(camera: Camera3D) -> void:
+	if camera == null or not camera.is_inside_tree():
+		return
+	var paths: Array = []
+	for spec: Array in CONTACT:
+		paths.append(spec[0])
+	paths.append_array(FIREWORKS)
+	var spot := camera.global_transform * Vector3(0, 0, -1.5)
+	for path: String in paths:
+		var fx := _spawn(path, spot, 0.002)
+		if fx != null:
+			_tint(fx, GOLD, GOLD)
+	dust(spot, 0.002)
+
+
 ## The bat meeting the ball at `at`, `tier` 0..3 (sweet), tinted toward
 ## `color` (the batting club's).
 func contact(at: Vector3, tier: int, color: Color) -> void:

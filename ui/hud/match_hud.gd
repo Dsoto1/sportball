@@ -49,6 +49,9 @@ var _final: FinalCard
 var _menu_box: PanelContainer
 var _callout: Label
 var _detail: Label
+## The callout's panel, off to the right under the little field, out of
+## the view of the pitch and the play.
+var _callout_box: PanelContainer
 var _prompt: RichTextLabel
 var _prompt_text := ""
 var _callout_timer := 0.0
@@ -108,8 +111,26 @@ func _ready() -> void:
 	_build_controls()
 	_build_batting()
 
-	_callout = _wide_label(92, Control.PRESET_TOP_WIDE, 240.0)
-	_detail = _wide_label(24, Control.PRESET_TOP_WIDE, 345.0)
+	_callout_box = PanelContainer.new()
+	_callout_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	skin(_callout_box, GOLD)
+	add_child(_callout_box)
+	_callout_box.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	_callout_box.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_callout_box.offset_right = -24.0
+	_callout_box.offset_top = 250.0
+	var stack := VBoxContainer.new()
+	stack.add_theme_constant_override("separation", -2)
+	stack.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_callout_box.add_child(stack)
+	_callout = _label(stack, 46)
+	_callout.add_theme_constant_override("outline_size", 0)
+	_callout.add_theme_color_override("font_color", GOLD)
+	_detail = _label(stack, 15)
+	_detail.add_theme_constant_override("outline_size", 0)
+	_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_detail.custom_minimum_size.x = 360.0
+	_callout_box.modulate.a = 0.0
 	_prompt = RichTextLabel.new()
 	_prompt.bbcode_enabled = true
 	_prompt.fit_content = true
@@ -737,8 +758,7 @@ func _title_up(up: bool) -> void:
 
 func _hide_callout() -> void:
 	_callout_timer = 0.0
-	_callout.modulate.a = 0.0
-	_detail.modulate.a = 0.0
+	_callout_box.modulate.a = 0.0
 
 
 ## Seconds left on the pitch clock; shown in the last few seconds (<0 hides).
@@ -771,9 +791,10 @@ func update_menu(lines: Array, selected: int) -> void:
 func show_callout(text: String, detail: String = "", seconds: float = 1.4) -> void:
 	_callout.text = text
 	_detail.text = detail
+	_detail.visible = detail != ""
+	_callout_box.reset_size()
 	_callout_timer = seconds
-	_callout.modulate.a = 1.0
-	_detail.modulate.a = 1.0
+	_callout_box.modulate.a = 1.0
 
 
 ## text may hold {action} tokens; they become key or button icons.
@@ -797,9 +818,7 @@ func set_gamepad(value: bool) -> void:
 func _process(delta: float) -> void:
 	if _callout_timer > 0.0:
 		_callout_timer -= delta
-		var a := clampf(_callout_timer / 0.4, 0.0, 1.0)
-		_callout.modulate.a = a
-		_detail.modulate.a = a
+		_callout_box.modulate.a = clampf(_callout_timer / 0.4, 0.0, 1.0)
 
 
 func _wide_label(font_size: int, preset: Control.LayoutPreset, y: float) -> Label:

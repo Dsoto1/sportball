@@ -12,7 +12,8 @@ const AI_PRE_PITCH_DELAY := 1.8
 # The last part of the pre-pitch is the pitcher's visible windup.
 const WINDUP_TIME := 0.7
 ## Hit pause by contact tier (seconds the play clock holds after contact).
-const HIT_STOP := {ContactFeedback.Tier.SOLID: 0.05, ContactFeedback.Tier.SWEET: 0.11}
+## A barely-there beat on the barrel (longer read as the game freezing).
+const HIT_STOP := {ContactFeedback.Tier.SOLID: 0.03, ContactFeedback.Tier.SWEET: 0.05}
 const CALL_PAUSE := 0.8
 ## Crowd reaction (0..1) to how a plate appearance ended.
 ## Extra seconds a home run plays out after it clears the wall: the landing,

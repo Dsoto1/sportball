@@ -2168,3 +2168,24 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   the game now leaves the window mode alone, and F11 / Alt+Enter show a
   note: turn off "Embed Game on Next Play" in the Game tab's menu, or run
   `godot --path .`. Run on its own (or exported), full screen is as before.
+
+## Contact freeze, throw-in stutter, callout placement (owner's playtest)
+
+- **Contact:** the hit effects loaded and compiled on first use, at the
+  moment of contact. `MatchFx.warm_up` loads every effect at start-up and
+  draws each once, too small to see, in front of the camera. The hit stop
+  is a barely-there beat (0.03 / 0.05 s, was 0.05 / 0.11), and the flight
+  camera's rise and chase grow out of the batting camera as one quick
+  move instead of two hard cuts in the first half second; the wall, trot
+  and foul shots stay cuts.
+- **Video board:** a 1280x720 off-screen board redrawn (and its screen's
+  mipmaps rebuilt) every frame; it now redraws when its content changes
+  and every frame only while a moment animates. A frame probe
+  (`tools/hitch_probe.gd`) showed most of the in-play spikes going with it.
+- **Throw-ins:** the field camera aims between the ball and the
+  controlled fielder; when a throw was caught that point jumped by half
+  the throw. The camera now follows an eased focus (a critically damped
+  spring, about 0.28 s), so the jump is a glide.
+- **Callouts** ("STRIKE THREE", the play result and its detail) moved
+  from the middle of the screen to a HUD panel on the right, under the
+  little field.

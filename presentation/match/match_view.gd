@@ -53,6 +53,12 @@ var _pitch_marker: MeshInstance3D
 var _control_ring: MeshInstance3D
 var _landing_hint: MeshInstance3D
 var _field_focus := Vector3(0.0, 0.0, -42.0)
+## What the field camera actually aims at: the focus eased in with a
+## critically damped spring, so a jump in the focus (a throw caught, the
+## control passing to another fielder) is a glide, not a lurch.
+var _focus_eased := Vector3(0.0, 0.0, -42.0)
+var _focus_speed := Vector3.ZERO
+const FOCUS_EASE := 0.28
 ## The long-ball camera: a deep fly or a home run, followed from the bat
 ## to where it comes down (into the seats for a homer), then the trot.
 var _flight: BallTrajectory
@@ -178,6 +184,8 @@ func setup(p_tuning: BaseballTuning) -> void:
 	add_child(_camera)
 	_camera.current = true
 	_snap_camera()
+	# Hit effects compile now, not at the first contact.
+	fx.warm_up.call_deferred(_camera)
 	# Close to a real ball (3.7 cm radius); _update_shadow grows it with
 	# distance from the camera so it stays readable far off, never huge.
 	_ball = _sphere(BALL_RADIUS, Color(1, 1, 1), true)
@@ -455,6 +463,8 @@ func reset_for_pitch(state: MatchState) -> void:
 	_landing_hint.visible = false
 	_throw_target.visible = false
 	_field_focus = Vector3(0.0, 0.0, -42.0)
+	_focus_eased = _field_focus
+	_focus_speed = Vector3.ZERO
 	_zone.visible = true
 
 
@@ -828,7 +838,8 @@ func _process(delta: float) -> void:
 		target.x = -target.x
 	if _camera_mode == CameraMode.FIELD:
 		# A rundown pulls the camera in tight on the runner and the ball.
-		var focus := _rundown_focus if _rundown_zoom else _field_focus
+		_ease_focus(_rundown_focus if _rundown_zoom else _field_focus, delta)
+		var focus := _focus_eased
 		var flat := Vector3(focus.x, 0.0, focus.z)
 		if _rundown_zoom:
 			goal *= 0.45
@@ -844,6 +855,18 @@ func _process(delta: float) -> void:
 	var wanted := (target - _camera.position).normalized()
 	var look := forward.slerp(wanted, weight)
 	_camera.look_at(_camera.position + look, Vector3.UP)
+
+
+## Moves the eased focus toward `goal` (a smooth-damp spring: no
+## overshoot, settles in about FOCUS_EASE seconds).
+func _ease_focus(goal: Vector3, delta: float) -> void:
+	var omega := 2.0 / FOCUS_EASE
+	var x := omega * delta
+	var decay := 1.0 / (1.0 + x + 0.48 * x * x + 0.235 * x * x * x)
+	var change := _focus_eased - goal
+	var temp := (_focus_speed + change * omega) * delta
+	_focus_speed = (_focus_speed - temp * omega) * decay
+	_focus_eased = goal + (change + temp) * decay
 
 
 ## The long-ball shots. 0 rise: from behind and above the plate as it leaves
@@ -899,12 +922,15 @@ func _flight_camera(delta: float, kick: float) -> void:
 		goal = Vector3(0, 0, 0) - dir * 6.0 + side * 9.0 + Vector3.UP * 7.0
 		look = ball.lerp(_flight_land, 0.35)
 		fov = 58.0
-	var weight := 1.0 - exp(-delta * (2.5 if shot == 1 or shot == 4 else 5.0))
+	var weight := 1.0 - exp(-delta * (2.5 if shot == 1 or shot == 4 else (7.0 if shot == 0 else 5.0)))
 	if shot != _flight_shot:
-		# A cut, not a pan: each shot starts framed.
-		weight = 1.0
+		# The rise and the chase grow out of the batting camera as one quick
+		# move (a cut there, right off the bat, read as the game skipping);
+		# the wall, the trot and a foul's pan are cuts, each starting framed.
+		if shot >= 2:
+			weight = 1.0
+			_camera.fov = fov
 		_flight_shot = shot
-		_camera.fov = fov
 	_camera.fov = lerpf(_camera.fov, fov - 5.0 * kick, 1.0 - exp(-delta * 4.0))
 	_camera.position = _camera.position.lerp(goal, weight)
 	var forward := -_camera.global_transform.basis.z

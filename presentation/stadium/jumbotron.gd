@@ -34,7 +34,10 @@ func setup(home: TeamDef, away: TeamDef) -> void:
 	_home = home
 	_away = away
 	size = Vector2i(W, H)
-	render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	# Drawn only when something on it changes (a new count, batter, score)
+	# and every frame while a moment animates: redrawing a 1280x720 board
+	# (and its screen's mipmaps) every frame stalled the game at contact.
+	render_target_update_mode = SubViewport.UPDATE_ONCE
 	transparent_bg = false
 	_root = Control.new()
 	_root.size = Vector2(W, H)
@@ -86,6 +89,13 @@ func show_state(state: MatchState, roster: MatchRoster) -> void:
 		var row: Array = _dots[k]
 		for i in row.size():
 			(row[i] as Panel).modulate = Color.WHITE if i < counts[k] else Color(1, 1, 1, 0.12)
+	_redraw()
+
+
+## One more frame of the board (it doesn't redraw on its own).
+func _redraw() -> void:
+	if _moment_kind == &"":
+		render_target_update_mode = SubViewport.UPDATE_ONCE
 
 
 ## Takes the board over for a celebration. data: name, number, team (the
@@ -118,6 +128,7 @@ func play_moment(kind: StringName, data: Dictionary = {}) -> void:
 	title.add_theme_color_override("font_outline_color", club.dark_color)
 	_moment.visible = true
 	_board.visible = false
+	render_target_update_mode = SubViewport.UPDATE_ALWAYS
 
 
 func _process(delta: float) -> void:
@@ -153,6 +164,7 @@ func _process(delta: float) -> void:
 		_moment_kind = &""
 		_moment.visible = false
 		_board.visible = true
+		render_target_update_mode = SubViewport.UPDATE_ONCE
 
 
 func _build_board() -> void:
