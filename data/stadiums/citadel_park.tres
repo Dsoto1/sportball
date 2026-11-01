@@ -159,6 +159,7 @@ outfield_open = 30.0
 decks = 3
 away_fan_share = 0.2
 attendance = 0.9
+sky_preset = "basic/cold_material_02"
 mowing_width = 11.0
 grandstand = {
 "banners": true,

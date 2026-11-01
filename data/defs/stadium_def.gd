@@ -51,6 +51,10 @@ extends Resource
 ## afternoon), &"sunset", &"dusk" (lights on, last light in the sky),
 ## &"night" or &"underwater" (a teal ocean dome); empty follows `night`.
 @export var sky: StringName = &""
+## The sky dome (the owner's Binbun Skies pack): a material under
+## assets/BinbunSky/src/material/ ("stylized/stylized_warm_material_01"),
+## shown at this park's time of day (sky_kind). Empty: the plain gradient.
+@export var sky_preset: String = ""
 
 
 func sky_kind() -> StringName:

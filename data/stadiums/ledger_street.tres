@@ -215,6 +215,7 @@ decks = 2
 home_fan_share = 0.5
 away_fan_share = 0.3
 attendance = 0.95
+sky_preset = "stylized/stylized_material_01"
 grandstand = {
 "roof": &"gable",
 "roof_color": Color(0.43529412, 0.54901963, 0.4862745, 1),

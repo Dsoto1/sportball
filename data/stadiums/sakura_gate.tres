@@ -274,6 +274,7 @@ decks = 3
 away_fan_share = 0.2
 attendance = 0.9
 sky = &"golden"
+sky_preset = "stylized/stylized_material_01"
 mowing = "diagonal"
 mowing_width = 6.0
 grandstand = {

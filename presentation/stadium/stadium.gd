@@ -544,8 +544,7 @@ func city_from() -> float:
 func horizon_color() -> Color:
 	if def.is_roofed():
 		return Color(0.05, 0.05, 0.07)
-	var look: Array = GrayboxField.SKIES.get(def.sky_kind(), GrayboxField.SKIES[&"day"])
-	return look[1]
+	return GrayboxField.horizon_for(def)
 
 
 func _quad(st: SurfaceTool, p0: Vector3, p1: Vector3, p2: Vector3, p3: Vector3, color: Color) -> void:

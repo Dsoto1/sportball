@@ -160,6 +160,7 @@ decks = 3
 away_fan_share = 0.2
 attendance = 0.9
 sky = &"sunset"
+sky_preset = "experimental/red_material"
 mowing = "stripes"
 grandstand = {
 "banners": true,

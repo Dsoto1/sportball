@@ -182,6 +182,7 @@ decks = 2
 home_fan_share = 0.45
 away_fan_share = 0.35
 attendance = 0.88
+sky_preset = "stylized/stylized_cloudy_material_01"
 mowing = "diagonal"
 mowing_width = 7.0
 grandstand = {

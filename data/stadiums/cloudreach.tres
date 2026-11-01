@@ -152,6 +152,7 @@ outfield_open = 32.0
 decks = 3
 home_fan_share = 0.55
 away_fan_share = 0.25
+sky_preset = "stylized/stylized_cloudy_material_02"
 mowing = "sunburst"
 grandstand = {
 "banners": true,

@@ -187,6 +187,7 @@ away_fan_share = 0.25
 attendance = 0.7
 night = true
 sky = &"night"
+sky_preset = "experimental/dark_material"
 turf = true
 mowing = "diamond"
 grandstand = {

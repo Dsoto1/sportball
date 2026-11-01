@@ -185,6 +185,7 @@ decks = 3
 home_fan_share = 0.62
 attendance = 0.9
 sky = &"sunset"
+sky_preset = "stylized/stylized_warm_material_02"
 mowing = "sunburst"
 grandstand = {
 "roof": &"barrel",

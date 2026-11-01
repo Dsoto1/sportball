@@ -1,7 +1,7 @@
 # Handoff
 
 State of the project and how to keep working on it, for the next agent
-(or a later session of the same one). Last updated 2026-10-28.
+(or a later session of the same one). Last updated 2026-11-01.
 
 Read this first, then `docs/00_AGENT_START_HERE.md` for the vision and the
 full doc order. `docs/DECISIONS.md` is the running log of every decision,
@@ -92,9 +92,13 @@ Wide mound view: `cam:0.6,2.6,-21,0,6,0 fov:62`. Reference sheets are in
 
 ## Recent work (newest first; details in DECISIONS.md)
 
+- **Per-park skies** from the owner's Binbun3D skies pack
+  (`StadiumDef.sky_preset`, `GrayboxField.sky_material()`), blended by
+  the park's time of day; the haze and ambient follow the sky.
+
 - **Owner's VFX packs** (Binbun3D, from their Drive `models/fx`): contact
   bursts by tier, home-run fireworks, slide/dive dust (`MatchFx`). Unused
-  packs (skies, battle, status, etc.) remain in the Drive.
+  packs (battle, status, etc.) remain in the Drive.
 
 - **Main menu, settings, pause, full screen** per the owner's UI/UX
   reference (navy/gold, Bebas Neue + Montserrat): `ui/menu/`,
@@ -121,8 +125,8 @@ Wide mound view: `cam:0.6,2.6,-21,0,6,0 fov:62`. Reference sheets are in
 
 ## Open work
 
-1. **Atmosphere pass per park:** blocked on a screenshot from the owner's
-   machine (Forward+ renders differently). Ask for one.
+1. **Atmosphere:** skies are in; fog and post-processing per park still
+   need a screenshot from the owner's machine (Forward+ renders differently).
 2. **Outfield walls exactly per sheet** (dimensions and art) for all 18 parks.
 3. Swing follow-through after contact wasn't remeasured against Savant;
    inside/outside pitch effects on contact depth aren't modelled from data.

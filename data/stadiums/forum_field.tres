@@ -216,6 +216,7 @@ outfield_open = 30.0
 decks = 3
 away_fan_share = 0.2
 attendance = 0.95
+sky_preset = "basic/warm_material_01"
 mowing = "diamond"
 mowing_width = 10.0
 grandstand = {

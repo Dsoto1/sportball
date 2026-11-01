@@ -175,6 +175,7 @@ away_fan_share = 0.3
 attendance = 0.9
 night = true
 sky = &"dusk"
+sky_preset = "stylized/stylized_cold_material_02"
 mowing_width = 7.0
 grandstand = {
 "roof": &"barrel",

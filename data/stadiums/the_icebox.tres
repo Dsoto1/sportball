@@ -172,6 +172,7 @@ outfield_open = 30.0
 decks = 2
 home_fan_share = 0.5
 away_fan_share = 0.25
+sky_preset = "stylized/stylized_cold_material_01"
 mowing = "stripes"
 mowing_width = 6.0
 grandstand = {

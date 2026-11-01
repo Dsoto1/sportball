@@ -411,6 +411,45 @@ const SKIES := {
 }
 
 
+## Where each sky kind sits on the Binbun sky's day-night blend (1 noon,
+## 0 sunset, -1 night with stars).
+const SKY_BLEND := {&"day": 1.0, &"golden": 0.45, &"sunset": 0.12, &"dusk": -0.15, &"night": -1.0}
+const SKY_DIR := "res://assets/BinbunSky/src/material/"
+
+
+## The park's painted sky (its sky_preset from the owner's Binbun Skies
+## pack) at its time of day, or null for the plain gradient (no preset,
+## a roof, the underwater dome). Its own copy: the blend is per park.
+static func sky_material(park: StadiumDef) -> ShaderMaterial:
+	if park == null or park.sky_preset == "" or park.is_roofed() or not SKY_BLEND.has(park.sky_kind()):
+		return null
+	var path := SKY_DIR + park.sky_preset + ".tres"
+	if not ResourceLoader.exists(path):
+		return null
+	var m: ShaderMaterial = (load(path) as ShaderMaterial).duplicate()
+	# Fixed time of day (not from the sun light: our sun sits behind home
+	# plate for the field's sake, not where the sky's sun would be).
+	m.set_shader_parameter("use_directional_light", false)
+	m.set_shader_parameter("day_night_mix", SKY_BLEND[park.sky_kind()])
+	return m
+
+
+## The sky's color at the horizon, for the haze the land fades into and
+## the ambient light: the painted sky's own (as its shader mixes it at
+## eye level), else the SKIES table's.
+static func horizon_for(park: StadiumDef) -> Color:
+	var kind: StringName = park.sky_kind() if park != null else &"day"
+	var m := sky_material(park)
+	if m == null:
+		return SKIES.get(kind, SKIES[&"day"])[1]
+	var blend: float = SKY_BLEND[kind]
+	var day: Color = m.get_shader_parameter("horizon_day")
+	var sunset: Color = m.get_shader_parameter("horizon_sunset")
+	var night: Color = m.get_shader_parameter("horizon_night")
+	var c := sunset.lerp(day, clampf(blend, 0.0, 1.0))
+	return night.lerp(c, pow(clampf(1.0 + blend, 0.0, 1.0), 4.0))
+
+
 ## The park's sky (see SKIES) and its light: the sun low and warm at golden
 ## hour and sunset; floodlights (and a softer fill) whenever the lights are
 ## on, at dusk and night, with glow so lamps bloom. Dome: floods, no sky.
@@ -445,21 +484,25 @@ func _build_lighting() -> void:
 		add_child(fill)
 	var env := WorldEnvironment.new()
 	var environment := Environment.new()
-	var sky_mat := ProceduralSkyMaterial.new()
-	sky_mat.sky_top_color = look[0]
-	sky_mat.sky_horizon_color = look[1]
-	sky_mat.sky_curve = 0.12
-	sky_mat.ground_bottom_color = (look[1] as Color).darkened(0.7)
-	sky_mat.ground_horizon_color = look[1]
-	sky_mat.sun_angle_max = 20.0
 	var sky := Sky.new()
-	sky.sky_material = sky_mat
+	var painted := sky_material(_park)
+	if painted != null:
+		sky.sky_material = painted
+	else:
+		var sky_mat := ProceduralSkyMaterial.new()
+		sky_mat.sky_top_color = look[0]
+		sky_mat.sky_horizon_color = look[1]
+		sky_mat.sky_curve = 0.12
+		sky_mat.ground_bottom_color = (look[1] as Color).darkened(0.7)
+		sky_mat.ground_horizon_color = look[1]
+		sky_mat.sun_angle_max = 20.0
+		sky.sky_material = sky_mat
 	environment.background_mode = Environment.BG_SKY
 	environment.sky = sky
 	# Ambient from a soft neutral of the horizon, not the blue sky dome, so
 	# the grass stays green rather than mint.
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_color = (look[1] as Color).lerp(Color(0.85, 0.85, 0.8), 0.6)
+	environment.ambient_light_color = horizon_for(_park).lerp(Color(0.85, 0.85, 0.8), 0.6)
 	environment.ambient_light_energy = look[6]
 	if lights_on or roof:
 		environment.glow_enabled = true

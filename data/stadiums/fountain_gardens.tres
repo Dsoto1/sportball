@@ -251,6 +251,7 @@ decks = 2
 home_fan_share = 0.5
 away_fan_share = 0.25
 attendance = 0.8
+sky_preset = "stylized/stylized_material_02"
 mowing = "rings"
 mowing_width = 8.0
 grandstand = {

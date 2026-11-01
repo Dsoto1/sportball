@@ -2024,3 +2024,21 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   candidate for the per-park atmosphere pass), and the model packs.
 - `tools/fx_shots.gd` renders contact, fireworks and dust (needs
   `--fixed-fps 30`: the renders run slower than the effects).
+
+## 2026-11-01 — Atmosphere pass: the owner's skies pack per park
+
+- Each open-air park gets one of the Binbun3D Stylized Skies presets
+  (`StadiumDef.sky_preset`, set in `tools/generate_parks.gd`): stylized
+  clouds for the bright parks, overcast for the industrial ones, cold for
+  the Icebox, Citadel and Horseshoe, warm for the desert and kilns, the
+  experimental red sky at Firelight, purple at Reactor Park and the dark
+  starfield at The Vault. Deepwater (underwater) and roofed parks keep
+  their own skies.
+- The pack shader's `day_night_mix` follows the park's sky kind
+  (`GrayboxField.SKY_BLEND`: day 1, golden 0.45, sunset 0.12, dusk -0.15,
+  night -1, which shows the stars). The park's sun keeps lighting the
+  field; the sky's own sun disc is off (`use_directional_light = false`).
+- Ambient light and the stands' horizon color come from the preset's own
+  horizon colors (`GrayboxField.horizon_for`), so a park's haze matches
+  its sky.
+- The pack stays at `res://assets/BinbunSky/` (its materials reference it).
