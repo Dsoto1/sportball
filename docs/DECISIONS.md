@@ -2251,3 +2251,28 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
 - With the later drop each style reaches its Savant tilt with a much
   shallower slot: 38-50 degrees below level (was 57-76). Tilt, attack
   angle and contact are unchanged.
+
+## Batting from motion capture (Mixamo)
+
+- Owner: the swing's arms kept breaking (twisted wrists, an arm through
+  the body) and asked for one solid right-handed swing mirrored for
+  lefties. Cause: the arms were solved every frame from guessed elbow
+  directions over hand-posed keys, and the solution flipped when the
+  hands crossed the chest.
+- The owner supplied Mixamo's baseball motion capture (18 clips, in
+  `assets/third_party/mixamo/`). `MixamoRetarget` bakes a clip onto the
+  players' skeleton: each bone takes its Mixamo twin's turn from the
+  T-pose rest, limbs lined up rest-to-rest; the pelvis follows the hips.
+  Lefty clips are baked from the same capture reflected left for right,
+  so they are exact mirrors (test_mocap checks it to 2 cm).
+- **Batter:** stance loops `Baseball_Idle`; the load and stride are
+  `Baseball_Hit` 0-1.12 s; the swing is 1.12-1.75 s, its contact frame
+  (0.18 s after the launch) timed onto the game's contact. The bat's
+  aim still follows the Savant swing path; the captured hands carry it.
+- **Grip:** the wrists still close onto the handle (our arms are a little
+  different from the performer's), but each elbow now bends the way the
+  capture bends it (`BatGrip.follow_elbows`), so it can't flip.
+- All six styles share the one captured swing for now (their bat angles
+  and Savant numbers still differ); the other two hit captures and the
+  bunt, pitching, catcher and umpire clips are there for the next steps.
+- `tools/mocap_check.gd` shows any clip baked onto a player.

@@ -296,8 +296,9 @@ func grip_bat(bat: Node3D, direction: Vector3 = Vector3.FORWARD, gap: float = 0.
 	_grip_ik.choke = choke
 	_grip_ik.anchor = anchor
 	_grip_ik.anchor_weight = anchor_weight
-	_grip_ik.set_up = set_up
+	_grip_ik.set_up = 0.0 if BaseballMoves.has_mocap() else set_up
 	_grip_ik.cocked = cocked
+	_grip_ik.follow_elbows = BaseballMoves.has_mocap()
 
 
 ## Crouching roles (catcher) idle in a crouch.
@@ -350,18 +351,27 @@ func animate(pose: Pose, delta: float, speed: float = 0.0, juke: bool = false, p
 		Pose.THROW:
 			_scrub("Throw", progress, 1.0)
 		Pose.SWING:
-			_scrub("Swing_%s" % style, progress, 1.0)
+			if BaseballMoves.has_mocap():
+				_scrub("Bat_Swing", _swing_time(progress), BaseballMoves.MOCAP_SWING)
+			else:
+				_scrub("Swing_%s" % style, progress, 1.0)
 		Pose.APPROACH:
-			_scrub("Approach_%s" % style, progress, 1.0)
+			if BaseballMoves.has_mocap():
+				_scrub("Bat_Approach", progress * BaseballMoves.MOCAP_APPROACH, BaseballMoves.MOCAP_APPROACH)
+			else:
+				_scrub("Approach_%s" % style, progress, 1.0)
 		Pose.FINISH:
 			# Admiring it: holds the end of his swing.
-			_scrub("Swing_%s" % style, 1.0, 1.0)
+			if BaseballMoves.has_mocap():
+				_scrub("Bat_Swing", BaseballMoves.MOCAP_SWING, BaseballMoves.MOCAP_SWING)
+			else:
+				_scrub("Swing_%s" % style, 1.0, 1.0)
 		Pose.PITCH:
 			_scrub("Pitch", progress, BaseballMoves.PITCH_LENGTH)
 			# Planted through the stride; the kick leg (well up) stays free.
 			_plant.pin = progress > 0.05
 		Pose.BAT_STANCE:
-			_play(BaseballMoves.clip("Stance_%s" % style, _lefty), 1.0)
+			_play(BaseballMoves.clip("Bat_Stance" if BaseballMoves.has_mocap() else "Stance_%s" % style, _lefty), 1.0)
 		Pose.BUNT:
 			_play(BaseballMoves.clip("Bunt", _lefty), 1.6)
 		Pose.LEAD:
@@ -506,6 +516,15 @@ func _scrub(move: String, progress: float, length: float) -> void:
 	# scrubbed clip stands still, so it would never finish blending in.
 	_play(BaseballMoves.clip(move, _lefty), 0.0, 0.0)
 	_player.seek(clampf(progress, 0.0, length), true)
+
+
+## Swing progress (0..1, contact at BattingStyles.CONTACT_AT) to the
+## captured swing's time, so its contact frame lands on contact.
+static func _swing_time(p: float) -> float:
+	var c := BattingStyles.CONTACT_AT
+	if p <= c:
+		return p / c * BaseballMoves.MOCAP_CONTACT
+	return lerpf(BaseballMoves.MOCAP_CONTACT, BaseballMoves.MOCAP_SWING, (p - c) / (1.0 - c))
 
 
 ## Standing still: catchers squat, gloved fielders sit in their ready

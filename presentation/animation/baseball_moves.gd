@@ -35,7 +35,31 @@ static func library(skeleton: Skeleton3D, player: AnimationPlayer) -> AnimationL
 		for k: Array in keys:
 			mirrored.append([k[0], PoseBaker.mirror(k[1])])
 		_library.add_animation(StringName(move + "_L"), baker.bake(mirrored, loop, length))
+	# Motion capture (the owner's Mixamo clips): the batter's stance, load
+	# and swing, and the lefty versions mirrored from the same capture.
+	for spec: Array in MOCAP:
+		for lefty: bool in [false, true]:
+			var anim := MixamoRetarget.bake(spec[1], skeleton, spec[2], spec[3], spec[4], lefty)
+			if anim != null:
+				_library.add_animation(StringName(String(spec[0]) + ("_L" if lefty else "")), anim)
 	return _library
+
+
+## Captured clips: [name, Mixamo file, from s, to s, loop]. Bat_Swing
+## starts at the launch; its contact frame is MOCAP_CONTACT in.
+const MOCAP := [
+	["Bat_Stance", "Baseball_Idle", 0.0, -1.0, true],
+	["Bat_Approach", "Baseball_Hit", 0.0, 1.12, false],
+	["Bat_Swing", "Baseball_Hit", 1.12, 1.75, false],
+]
+const MOCAP_CONTACT := 0.18
+const MOCAP_SWING := 0.63
+const MOCAP_APPROACH := 1.12
+
+
+## Whether the captured batting clips are in (the Mixamo files exist).
+static func has_mocap() -> bool:
+	return ResourceLoader.exists(MixamoRetarget.DIR + "Baseball_Hit.fbx")
 
 
 static func clip(move: String, lefty: bool = false) -> StringName:

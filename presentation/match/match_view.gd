@@ -1033,6 +1033,9 @@ func _update_bat() -> void:
 			var axis: Vector3 = on["axis"]
 			dir = axis.slerp(dir, 1.0 - weight).normalized() if axis.dot(dir) > -0.99 else axis
 			anchor = SwingPath.grip_for(on["sweet"], axis, choke)
+			if BaseballMoves.has_mocap():
+				# The captured hands carry the bat; the path only aims it.
+				weight = 0.0
 	if batter != null:
 		# His hands hold the handle; the grip places the bat.
 		batter.grip_bat(_bat_pivot, dir, gap, one_hand, choke, anchor, weight, set_up, cocked)

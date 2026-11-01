@@ -38,6 +38,10 @@ var anchor_weight := 0.0
 ##   swing: back elbow drops and tucks to his side, the "L" (Fig. 4-38).
 var set_up := 0.0
 var cocked := 0.0
+## The arms are motion capture: each elbow bends the way the animation
+## already bends it (the wrist only moves onto the handle), so it can't
+## flip or fold into the body.
+var follow_elbows := false
 
 ## Where the handle crosses the palm, in the hand bone's frame (fingers
 ## along +Y, the index side +Z for the right hand): the base of the
@@ -185,6 +189,13 @@ func _reach(sk: Skeleton3D, side: String, target: Vector3) -> void:
 		else:
 			waiting = -up + front * 0.6 + out * 0.1
 		pole = pole.normalized().slerp(waiting.normalized(), clampf(set_up, 0.0, 1.0))
+	if follow_elbows:
+		# The captured elbow's side of the shoulder-to-wrist line.
+		var line := (target - s).normalized()
+		var off := gl.origin - s
+		off -= line * off.dot(line)
+		if off.length() > 0.01:
+			pole = off.normalized()
 	var elbow := PoseBaker.bend(s, target, a, b, pole, [spine, neck, across, front])
 	var parent_g := sk.get_bone_global_pose(sk.get_bone_parent(upper))
 	var new_upper := Basis(Quaternion((gl.origin - s).normalized(), (elbow - s).normalized())) * gu.basis
