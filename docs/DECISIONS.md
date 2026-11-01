@@ -2228,3 +2228,14 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   styles; it had been the other way round (front 98, back 166).
 - The swing's slot starts from a fixed barrel-back yaw (`SLOT_FROM`) and
   each style's slot depth was refit so its Savant tilt is unchanged.
+
+## The launch: no arms folded behind the back
+
+- Owner: the frame right after the swing starts "always looks off", the
+  arms folded behind him. Frame by frame (`batter_closeup.gd ... launch`):
+  at the press the swing path took the hands at full weight at once, and
+  its start lies behind his back hip, so for one frame the hands jumped
+  from the load (by the ear) to behind him and the bat vanished behind his
+  body. The path now eases in from wherever the hands are over the first
+  70% of the time to contact (`MatchView.PATH_TAKEOVER`); contact is
+  unchanged.

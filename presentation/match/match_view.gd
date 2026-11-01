@@ -121,6 +121,9 @@ var _swing_mph := 72.0
 var _swing_path: SwingPath
 ## After contact the arc hands the bat back to the follow-through over this
 ## long (s).
+## Share of the time to contact over which the swing path takes over the
+## hands from the load.
+const PATH_TAKEOVER := 0.7
 const PATH_RELEASE := 0.09
 var _trail_mesh: ImmediateMesh
 var _trail_points: Array = []
@@ -1023,7 +1026,10 @@ func _update_bat() -> void:
 		var after := t - _swing_path.to_contact
 		if after < PATH_RELEASE:
 			var on: Dictionary = _swing_path.at(t)
-			weight = 1.0 - smoothstep(0.0, PATH_RELEASE, after)
+			# Eased in from where his hands are (the load) so they never jump
+			# to the path's start, which lies behind his back hip; in full by
+			# the last stretch into contact, eased out after.
+			weight = smoothstep(0.0, _swing_path.to_contact * PATH_TAKEOVER, t) * (1.0 - smoothstep(0.0, PATH_RELEASE, after))
 			var axis: Vector3 = on["axis"]
 			dir = axis.slerp(dir, 1.0 - weight).normalized() if axis.dot(dir) > -0.99 else axis
 			anchor = SwingPath.grip_for(on["sweet"], axis, choke)

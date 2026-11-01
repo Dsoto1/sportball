@@ -142,6 +142,9 @@ func _swing_sequence(at: Vector3) -> bool:
 	if _frames == PRESS:
 		_view.swing_bat()
 	var shots: Array = FLIP_SHOTS if _flip else SHOTS
+	if OS.get_cmdline_user_args().has("launch"):
+		# Every frame from the press to contact.
+		shots = [PRESS - 1, PRESS, PRESS + 1, PRESS + 2, PRESS + 3, PRESS + 4, PRESS + 5]
 	if OS.get_cmdline_user_args().has("slowmo"):
 		# Quarter speed from just before the press: the whip, frame by frame.
 		Engine.time_scale = 0.25 if _frames >= PRESS - 1 else 1.0

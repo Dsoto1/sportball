@@ -38,9 +38,9 @@ func _process(_d: float) -> bool:
 		_view._pitch_u = 0.6
 	if _frames == 176:
 		_view.swing_bat()
-	var marks := [80, 148, 175, 181, 215]
+	var marks := [80, 148, 175, 177, 178, 179, 180, 181, 215]
 	if marks.has(_frames):
-		_report(b, ["STANCE", "LOAD", "STRIDE", "CONTACT", "FINISH"][marks.find(_frames)])
+		_report(b, ["STANCE", "LOAD", "STRIDE", "LAUNCH+1", "LAUNCH+2", "LAUNCH+3", "LAUNCH+4", "CONTACT", "FINISH"][marks.find(_frames)])
 	return _frames > 216
 
 
