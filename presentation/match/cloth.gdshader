@@ -34,6 +34,16 @@ float noise(vec2 p) {
 void fragment() {
 	int r = int(round(v_region));
 	vec3 p = v_rest;
+	// The region blends across a triangle, and one spanning the jersey and
+	// the pants passed through the trim and belt colors on the way (a
+	// jagged gold and brown band at the waist). Off the sleeves, the torso
+	// and legs go by rest height instead: jersey, belt band, pants.
+	if (r != 1 || abs(p.x) < 0.3) {
+		// The belt sits at the waist above the seat, slim: lower, a crouch
+		// stretched it over the whole seat.
+		r = p.y >= 1.025 ? 0 : (p.y >= 0.99 ? 2 : 3);
+		if (r == 0 && abs(p.x) > 0.3) { r = int(round(v_region)) == 1 ? 1 : 0; }
+	}
 	vec3 col = jersey.rgb;
 	float rough = 0.82;
 	if (r == 1) { col = trim.rgb; }
@@ -62,8 +72,12 @@ void fragment() {
 	// A fine woven grain.
 	float grain = noise(vec2(p.x + p.z, p.y) * 900.0) - 0.5;
 	col *= 1.0 + grain * 0.06;
+	// Seen from behind: inside a sleeve or pant leg, a little shaded; and
+	// where a deep bend (the seat in a crouch, behind the knee) folds the
+	// cloth over, the fold must still read as the same cloth (darker read
+	// as a brown patch on the pants).
 	if (!FRONT_FACING) {
-		col *= 0.35;
+		col *= 0.8;
 	}
 	ALBEDO = col;
 	ROUGHNESS = rough;

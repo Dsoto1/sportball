@@ -2189,3 +2189,16 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
 - **Callouts** ("STRIKE THREE", the play result and its detail) moved
   from the middle of the screen to a HUD panel on the right, under the
   little field.
+
+## The uniform at the waist (owner: "#19's pants and shirt look strange")
+
+- The cloth's region (jersey, trim, belt, pants) blended across each
+  triangle, so one spanning the jersey and the pants passed through the
+  trim and belt colors: a jagged gold and brown band at the waist. Off the
+  sleeves the cloth now colors the torso and legs by rest height.
+- The belt stood off the body 1.2 cm while the jersey and pants stood
+  about 3 cm off, pinching the cloth in; it is level with them now.
+- The belt band sat at 0.94-0.99 m, across the top of the seat on this
+  body, and the pitcher's crouch stretched it over the whole seat (a big
+  brown patch). It is now a slim band at the waist, 0.99-1.025 m.
+- `tools/body_check.gd ... back` renders the pitch pose from behind.

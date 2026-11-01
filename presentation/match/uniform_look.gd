@@ -138,7 +138,9 @@ static func shell_for(source: MeshInstance3D) -> ArrayMesh:
 static func _stand_off(region: int, bone: String, rest: Vector3) -> float:
 	match region:
 		Region.BELT:
-			return 0.012
+			# Level with the jersey bloused above and the pants below: a
+			# narrower belt pinched the cloth in and turned it inside out.
+			return 0.03
 		Region.TRIM:
 			return 0.03
 		Region.PANTS:
