@@ -2,12 +2,15 @@ extends SceneTree
 ## Screenshot of the user pitching (camera over the pitcher's shoulder, the
 ## pitching HUD): starts a match as the home club (who pitch first), waits
 ## for the first pitch, aims a little, and saves the frame. Needs a display:
-##   godot --path . --resolution 1600x900 -s res://tools/pitch_view_shot.gd -- /tmp/out.png [aim_x aim_y] [batting]
+##   godot --path . --resolution 1600x900 -s res://tools/pitch_view_shot.gd -- /tmp/out.png [aim_x aim_y] [batting] [card]
+## `card` saves the pregame matchup card instead (nothing is picked);
+## `final` the final card and `callout` a callout, over the pitching view.
 var _frames := 0
 var _out := ""
 var _director: Node
 var _picked := false
 var _batting := false
+var _card := false
 ## The frame saved (the batter is in his stance, the pitcher set).
 const SHOT_AT := 95
 
@@ -15,6 +18,7 @@ const SHOT_AT := 95
 func _initialize() -> void:
 	_out = OS.get_cmdline_user_args()[0]
 	_batting = OS.get_cmdline_user_args().has("batting")
+	_card = OS.get_cmdline_user_args().has("card")
 	root.add_child(load("res://app/main.tscn").instantiate())
 
 
@@ -22,6 +26,11 @@ func _process(_d: float) -> bool:
 	_frames += 1
 	if _director == null:
 		_director = root.get_node_or_null("Main/MatchDirector")
+		return false
+	if _card:
+		if _frames == 40:
+			root.get_texture().get_image().save_png(_out)
+			return true
 		return false
 	if not _picked and _frames > 20:
 		# The matchup card: home pitches first, away bats first.
@@ -43,6 +52,14 @@ func _process(_d: float) -> bool:
 	if _frames == 70:
 		Input.action_release(&"aim_right")
 		Input.action_release(&"aim_up")
+	var args := OS.get_cmdline_user_args()
+	if _frames == SHOT_AT - 5 and (args.has("final") or args.has("callout")):
+		var hud: MatchHud = root.find_children("*", "MatchHud", true, false)[0]
+		var teams := [hud._roster.teams[0], hud._roster.teams[1]]
+		if args.has("final"):
+			hud.show_final("FINAL", teams, [[3, 7, 1], [5, 9, 0]], 1)
+		else:
+			hud.show_callout("STRIKE THREE", "Caught looking on the outside corner", 3.0)
 	if _frames == SHOT_AT:
 		root.get_texture().get_image().save_png(_out)
 		return true

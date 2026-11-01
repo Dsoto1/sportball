@@ -156,20 +156,15 @@ func _show_pregame_card() -> void:
 	var dims := ""
 	if shape != null:
 		dims = "LF %d · CF %d · RF %d ft" % [roundi(shape.distance_at(-45) * 3.2808), roundi(shape.distance_at(0) * 3.2808), roundi(shape.distance_at(45) * 3.2808)]
-	var pick := func(row: int, text: String) -> String:
-		return "<  %s  >" % text if row == _card_row else text
-	_hud.show_card([
-		[pick.call(0, away.full_name().to_upper()), MatchHud.text_color(away), 54],
-		[away.identity.get_slice(".", 0), Color(0.9, 0.9, 0.9), 18],
-		["at", Color.WHITE, 26],
-		[pick.call(1, home.full_name().to_upper()), MatchHud.text_color(home), 54],
-		[home.identity.get_slice(".", 0), Color(0.9, 0.9, 0.9), 18],
-		["", Color.WHITE, 12],
-		[pick.call(2, venue.to_upper()), MatchHud.text_color(home) if park == home.stadium_def else Color(0.95, 0.95, 0.85), 30],
-		["%s%s" % [park.blurb if park != null else "", ("   ·   " + dims) if dims != "" else ""], Color(0.9, 0.9, 0.9), 18],
-		["Exhibition · %d innings · %s rules" % [content.rules.innings, content.rules.display_name], Color.WHITE, 20],
-		["Mercy rule at %d runs after %d · runner on second in extras · %ds pitch clock" % [content.rules.mercy_runs, content.rules.mercy_after_inning, roundi(content.rules.pitch_clock)], Color(0.85, 0.85, 0.85), 16],
-	])
+	_hud.show_matchup({
+		"away": away, "home": home, "row": _card_row,
+		"venue": venue,
+		"venue_color": MatchHud.text_color(home) if park == home.stadium_def else Color(0.95, 0.95, 0.85),
+		"blurb": park.blurb if park != null else "",
+		"dims": dims,
+		"rules": "%d innings  ·  %s rules" % [content.rules.innings, content.rules.display_name],
+		"fine_print": "Mercy rule at %d runs after %d  ·  runner on second in extras  ·  %ds pitch clock" % [content.rules.mercy_runs, content.rules.mercy_after_inning, roundi(content.rules.pitch_clock)],
+	})
 	_hud.show_prompt("Play as the %s (bat first) {swing_contact}        Play as the %s (field first) {swing_power}        Pick away, home, venue {move}" % [away.team_name.to_upper(), home.team_name.to_upper()])
 
 
@@ -798,15 +793,10 @@ func _enter_game_over() -> void:
 	_view.set_camera_mode(MatchView.CameraMode.FIELD)
 	_hud.show_pitching(false)
 	var reason: StringName = state.events[state.events.size() - 1].data.get("reason", &"")
-	var lines := [["FINAL%s" % (" · MERCY RULE" if reason == &"mercy" else ""), Color.WHITE, 60]]
-	if state.winner() >= 0:
-		var club := roster.teams[state.winner()]
-		lines.append(["%s WIN" % club.full_name().to_upper(), MatchHud.text_color(club), 40])
-	lines.append(["", Color.WHITE, 10])
-	lines.append(["        R    H    E", Color(0.85, 0.85, 0.85), 26])
+	var rhe := []
 	for team in [MatchState.AWAY, MatchState.HOME]:
-		lines.append(["%s   %2d   %2d   %2d" % [roster.teams[team].abbreviation, state.score[team], state.hits[team], state.errors[team]], MatchHud.text_color(roster.teams[team]), 30])
-	_hud.show_card(lines)
+		rhe.append([state.score[team], state.hits[team], state.errors[team]])
+	_hud.show_final("FINAL%s" % ("  ·  MERCY RULE" if reason == &"mercy" else ""), [roster.teams[0], roster.teams[1]], rhe, state.winner())
 	_hud.show_prompt("New match {restart_match}")
 	print("[match] final %s  line %s" % [state.score, state.line_score])
 

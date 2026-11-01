@@ -20,8 +20,7 @@ func _draw() -> void:
 	for i in 3:
 		var p: Vector2 = spots[i]
 		var square := PackedVector2Array([p + Vector2(0, -12), p + Vector2(12, 0), p + Vector2(0, 12), p + Vector2(-12, 0), p + Vector2(0, -12)])
+		draw_colored_polygon(square, MenuStyle.GOLD if occupied[i] else Color(MenuStyle.DEEP, 0.9))
+		draw_polyline(square, MenuStyle.GOLD.lightened(0.3) if occupied[i] else Color(MenuStyle.NEUTRAL, 0.7), 2.0)
 		if occupied[i]:
-			draw_colored_polygon(square, Color(1.0, 0.82, 0.2))
-		draw_polyline(square, Color.WHITE, 2.0)
-		if occupied[i]:
-			draw_string(font, p + Vector2(-6, 30), str(i + 1), HORIZONTAL_ALIGNMENT_CENTER, -1, 14, Color.WHITE)
+			draw_string(font, p + Vector2(-5, 30), str(i + 1), HORIZONTAL_ALIGNMENT_CENTER, -1, 13, MenuStyle.GOLD)

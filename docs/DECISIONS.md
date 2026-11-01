@@ -1988,8 +1988,6 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
 - **Pause menu** (Esc / Start; restart moved off Start into the menu):
   RESUME, SETTINGS, RESTART MATCH, QUIT TO MENU. The tree pauses; the
   director's wall clock skips the paused time so a pitch in flight resumes.
-- Not yet restyled: the matchup card and the in-match HUD still use the
-  older look; the reference's HUD snippets are the guide for that.
 - `tools/menu_shots.gd` renders every menu screen.
 
 ## The owner's VFX packs (Binbun3D)
@@ -2042,3 +2040,31 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   horizon colors (`GrayboxField.horizon_for`), so a park's haze matches
   its sky.
 - The pack stays at `res://assets/BinbunSky/` (its materials reference it).
+
+## Matchup card and in-match HUD in the UI reference's look
+
+- The owner's UI/UX reference sheet is now in the repo:
+  `docs/ui_reference.jpg` (palette, type, panels, HUD snippets).
+- **One panel look for the whole HUD** (`MatchHud.skin` /
+  `draw_hud_panel`): a navy panel leaning 12 px across its height, a
+  blue rim, gold when featured or selected, optional gold header band
+  with a navy Bebas title (pitch card, PITCH / SWING boxes). Bungee and
+  M PLUS are gone from the HUD: Bebas Neue for names, numbers and
+  callouts, Montserrat for text.
+- **Scorebug** (drawn, after the reference's snippet): a row per club
+  (color chip, badge, letters, runs; the batting row lit; the player's
+  club marked with a gold person icon), three gold base diamonds, the
+  inning with an up/down arrow, the count, and two outs dots. The B/S
+  lamps went: the count says it.
+- **Pitch list:** the selected pitch is a gold row with navy text (the
+  reference's primary button); the rest navy.
+- **Matchup card** (`MatchupCard`, `show_matchup`): EXHIBITION and the
+  rules on a gold band; away and home side by side with shield badges,
+  city, name and identity line, VS between; the venue under them with
+  its blurb and dimensions; the fine print at the foot. The selected line
+  is rimmed in gold with arrows.
+- **Final card** (`FinalCard`, `show_final`): FINAL (and MERCY RULE) on
+  the band, who won, and R H E per club with the winner's row in gold.
+- The player cards step aside while a title card is up.
+- Meter and base diamonds: gold fill on navy.
+- Renders: `tools/pitch_view_shot.gd -- out.png [batting|card|final|callout]`.

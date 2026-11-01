@@ -64,6 +64,7 @@ deterministic rules/physics core (`baseball/`) with presentation on top
 | `batter_closeup.gd -- <out_dir> [style:<name>] [righty\|lefty] [hands]` | Batter stills from the pitcher, chest side, back side and high behind (catcher and umpire hidden). `swing <style> [slowmo\|pitcher\|flip]` for a swing sequence. The default match batter bats **left**. |
 | `swing_path.gd -- out.json <style> [righty\|lefty] [savant:tilt,attack,dir,mph]` + `swing_path_plot.py out.png a.json [b.json ...]` | Records the bat's sweet spot through a real swing and measures it the way Baseball Savant does (tilt, attack angle, attack direction, contact depth), with 3 views. |
 | `pitch_view_shot.gd`, `pitch_motion_shot.gd`, `grip_test.gd`, `flight_shots.gd`, `board_shots.gd`, `model_sheet.gd` | Pitching camera + HUD, pitcher feet on the mound, grip close-ups, ball flights, scoreboards, a sheet of GLB models. |
+| `pitch_view_shot.gd -- out.png [batting\|card\|final\|callout]` | The match HUD: pitching (default), batting, the matchup card, the final card, a callout. |
 | `menu_shots.gd -- <out_dir>` | Every menu screen, the matchup card and the pause menu (windowed). |
 | `generate_parks.gd`, `generate_teams.gd` | Write the park and club data. |
 | `repack_glb.py`, `cull_back.py`, `regrade_glb.py` | Shrink and clean generated models (pipeline in DECISIONS: weld, cull_back, simplify, repack). |
@@ -92,6 +93,10 @@ Wide mound view: `cam:0.6,2.6,-21,0,6,0 fov:62`. Reference sheets are in
 
 ## Recent work (newest first; details in DECISIONS.md)
 
+- **HUD, matchup card and final card restyled** to the owner's UI
+  reference (`docs/ui_reference.jpg`): `MatchHud.skin()` panels,
+  drawn `ScoreBug`, `MatchupCard`, `FinalCard`.
+
 - **Per-park skies** from the owner's Binbun3D skies pack
   (`StadiumDef.sky_preset`, `GrayboxField.sky_material()`), blended by
   the park's time of day; the haze and ambient follow the sky.
@@ -104,8 +109,7 @@ Wide mound view: `cam:0.6,2.6,-21,0,6,0 fov:62`. Reference sheets are in
   reference (navy/gold, Bebas Neue + Montserrat): `ui/menu/`,
   `app/game_settings.gd`, `app/menu_backdrop.gd`. The game boots to the
   menu only when `main.tscn` is the current scene; tools still get a
-  match. Career and Creator Studio are "coming soon" tiles. Next: restyle
-  the matchup card and in-match HUD to match. Renders: `tools/menu_shots.gd`.
+  match. Career and Creator Studio are "coming soon" tiles. Renders: `tools/menu_shots.gd`.
 
 - **Swing mapped to Savant bat tracking.** `SwingPath` drives the sweet spot
   into contact on an arc in the hitter's tilted plane at his attack angle,
