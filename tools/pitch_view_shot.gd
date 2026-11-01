@@ -2,9 +2,11 @@ extends SceneTree
 ## Screenshot of the user pitching (camera over the pitcher's shoulder, the
 ## pitching HUD): starts a match as the home club (who pitch first), waits
 ## for the first pitch, aims a little, and saves the frame. Needs a display:
-##   godot --path . --resolution 1600x900 -s res://tools/pitch_view_shot.gd -- /tmp/out.png [aim_x aim_y] [batting] [card]
+##   godot --path . --resolution 1600x900 -s res://tools/pitch_view_shot.gd -- /tmp/out.png [aim_x aim_y] [batting] [card] [runners]
 ## `card` saves the pregame matchup card instead (nothing is picked);
 ## `final` the final card and `callout` a callout, over the pitching view.
+## `away:<club id>` puts that club away (batting first) and `up:<n>` sends
+## its n-th hitter (0-based) to the plate first.
 var _frames := 0
 var _out := ""
 var _director: Node
@@ -26,6 +28,8 @@ func _process(_d: float) -> bool:
 	_frames += 1
 	if _director == null:
 		_director = root.get_node_or_null("Main/MatchDirector")
+		if _director != null:
+			_pick_lineup()
 		return false
 	if _card:
 		if _frames == 40:
@@ -53,6 +57,12 @@ func _process(_d: float) -> bool:
 		Input.action_release(&"aim_right")
 		Input.action_release(&"aim_up")
 	var args := OS.get_cmdline_user_args()
+	if _frames == SHOT_AT - 4 and args.has("runners"):
+		# Runners on first and third (the HUD reads them from the state).
+		var st: MatchState = _director.state
+		var order: Array = st.lineups[st.batting_team()]
+		st.bases[0] = order[5]
+		st.bases[2] = order[6]
 	if _frames == SHOT_AT - 5 and (args.has("final") or args.has("callout")):
 		var hud: MatchHud = root.find_children("*", "MatchHud", true, false)[0]
 		var teams := [hud._roster.teams[0], hud._roster.teams[1]]
@@ -64,3 +74,18 @@ func _process(_d: float) -> bool:
 		root.get_texture().get_image().save_png(_out)
 		return true
 	return false
+
+
+func _pick_lineup() -> void:
+	for a: String in OS.get_cmdline_user_args():
+		if a.begins_with("away:"):
+			var want := StringName(a.substr(5))
+			for i in _director.content.teams.size():
+				if _director.content.teams[i].id == want:
+					_director._away_index = i
+					_director._home_index = 0 if i != 0 else 1
+			_director.start_match(7)
+	for a: String in OS.get_cmdline_user_args():
+		if a.begins_with("up:"):
+			_director.state.lineup_index[0] = int(a.substr(3))
+			_director._view.reset_for_pitch(_director.state)

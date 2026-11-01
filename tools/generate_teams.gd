@@ -94,6 +94,12 @@ const LINEUP_TEMPLATE := [
 	[[&"c", &"1b"], 50, 48, 46, 30, 64, 58],
 ]
 const LINEUP_SLOTS := [&"cf", &"ss", &"rf", &"1b", &"3b", &"dh", &"lf", &"2b", &"c"]
+## Players who take the field in a body of their own (PlayerDef.body):
+## club -> lineup slot, name, nickname, body. The owner's robot bats
+## cleanup for the Sentinels.
+const SPECIAL_BODIES := {
+	&"sentinels": [3, "Axle Ironside", "The Machine", &"robot"],
+}
 # Pitcher slots: velocity, control, stuff, stamina (starter, then bullpen,
 # the closer last).
 const STAFF_TEMPLATE := [[60, 64, 62, 75], [58, 60, 60, 40], [56, 62, 58, 38], [60, 58, 64, 36], [68, 60, 64, 28]]
@@ -336,9 +342,13 @@ func _init() -> void:
 		team.stadium = t["stadium"]
 		team.identity = t["identity"]
 		team.rival = t["rival"]
-		for h in t["hitters"]:
+		var special: Array = SPECIAL_BODIES.get(t["id"], [])
+		for slot in t["hitters"].size():
+			var h: Array = t["hitters"][slot]
 			var p := PlayerDef.new()
 			p.id = h[0]; p.display_name = h[1]; p.nickname = h[2]; p.number = h[3]
+			if not special.is_empty() and special[0] == slot:
+				p.display_name = special[1]; p.nickname = special[2]; p.body = special[3]
 			p.bats = h[4]; p.throws = h[5]
 			p.positions.assign(h[6])
 			p.contact = h[7]; p.power = h[8]; p.eye = h[9]; p.speed = h[10]; p.arm = h[11]; p.glove = h[12]

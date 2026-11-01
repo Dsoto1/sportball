@@ -99,8 +99,8 @@ func _ready() -> void:
 	_batter_card = _build_card(Vector2(LEFT, 182), "AT BAT")
 	_field = MiniField.new()
 	_field.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	_field.position = Vector2(-236, 6)
-	_field.size = Vector2(216, 200)
+	_field.position = Vector2(-240, 18)
+	_field.size = Vector2(216, 176)
 	_field.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_field)
 	_build_pitch_list()
@@ -937,8 +937,9 @@ class BreakGrid extends Control:
 		draw_circle(c, 2.5, Color.WHITE)
 
 
-## The little field top right: the diamond with the runners on it, the lead
-## runner's speed, and the steal hint when the user is batting.
+## The little field top right, seen from above with home at the bottom:
+## the outfield fan, the infield dirt and grass, the foul lines, and the
+## bases (gold with a runner on), the lead runner's speed in the corner.
 class MiniField extends Control:
 	var bases: Array[StringName] = [&"", &"", &""]
 	var lead_speed := -1
@@ -956,33 +957,53 @@ class MiniField extends Control:
 		batting = state.batting_team() == user_team
 		queue_redraw()
 
+	## A wedge from `home` out to `r` across fair territory.
+	static func _fan(home: Vector2, r: float, steps: int = 24) -> PackedVector2Array:
+		var pts := PackedVector2Array([home])
+		for i in steps + 1:
+			var ang := deg_to_rad(-135.0 + 90.0 * i / steps)
+			pts.append(home + Vector2(cos(ang), sin(ang)) * r)
+		return pts
+
 	func _draw() -> void:
-		var c := Vector2(size.x * 0.5, size.y * 0.52)
-		var r := minf(size.x, size.y) * 0.42
-		var home := c + Vector2(0, r)
-		var first := c + Vector2(r, 0)
-		var second := c + Vector2(0, -r)
-		var third := c + Vector2(-r, 0)
-		draw_colored_polygon(PackedVector2Array([home, first, second, third]), Color(0.16, 0.42, 0.2, 0.92))
-		draw_colored_polygon(PackedVector2Array([home, home.lerp(first, 0.62) + Vector2(0, -r * 0.08), c, home.lerp(third, 0.62) + Vector2(0, -r * 0.08)]), Color(0.66, 0.42, 0.26, 0.9))
-		draw_polyline(PackedVector2Array([home, first, second, third, home]), Color(1, 1, 1, 0.9), 2.0)
+		MatchHud.draw_hud_panel(self, Rect2(Vector2.ZERO, size), MatchHud.PANEL, MatchHud.RIM)
+		var home := Vector2(size.x * 0.5, size.y - 22.0)
+		var a := 38.0
+		var reach := size.y - 52.0
+		var first := home + Vector2(a, -a)
+		var second := home + Vector2(0, -2.0 * a)
+		var third := home + Vector2(-a, -a)
+		var mid := home + Vector2(0, -a)
+		draw_colored_polygon(_fan(home, reach), Color(0.12, 0.36, 0.18))
+		draw_arc(home, reach - 3.0, deg_to_rad(-135.0), deg_to_rad(-45.0), 24, Color(0.55, 0.4, 0.27), 5.0, true)
+		draw_colored_polygon(_fan(home, a * 2.0 * 1.12), Color(0.66, 0.45, 0.29))
+		var inset := 0.72
+		draw_colored_polygon(PackedVector2Array([mid + (home - mid) * inset, mid + (first - mid) * inset, mid + (second - mid) * inset, mid + (third - mid) * inset]), Color(0.17, 0.46, 0.23))
+		draw_circle(mid + Vector2(0, 2), 5.0, Color(0.66, 0.45, 0.29))
+		for side: float in [-1.0, 1.0]:
+			draw_line(home, home + Vector2(side, -1.0).normalized() * reach, Color(1, 1, 1, 0.85), 1.5, true)
+		draw_polyline(PackedVector2Array([home, first, second, third, home]), Color(1, 1, 1, 0.45), 1.0, true)
 		var spots := [first, second, third]
 		for i in 3:
 			var p: Vector2 = spots[i]
-			var sq := PackedVector2Array([p + Vector2(0, -9), p + Vector2(9, 0), p + Vector2(0, 9), p + Vector2(-9, 0)])
-			draw_colored_polygon(sq, MatchHud.GOLD if bases[i] != &"" else Color.WHITE)
-			if bases[i] != &"":
-				draw_circle(p + Vector2(0, -16), 6.0, MatchHud.GOLD)
-		draw_colored_polygon(PackedVector2Array([home + Vector2(-7, -4), home + Vector2(7, -4), home + Vector2(7, 3), home, home + Vector2(-7, 3)]), Color.WHITE)
-		var font := MatchHud.DISPLAY_FONT
+			var on := bases[i] != &""
+			var k := 9.0 if on else 6.5
+			var d := PackedVector2Array([p + Vector2(0, -k), p + Vector2(k, 0), p + Vector2(0, k), p + Vector2(-k, 0)])
+			draw_colored_polygon(d, MatchHud.GOLD if on else Color.WHITE)
+			if on:
+				var loop := d.duplicate()
+				loop.append(d[0])
+				draw_polyline(loop, MatchHud.NAVY, 1.5, true)
+		draw_colored_polygon(PackedVector2Array([home + Vector2(-5, -3), home + Vector2(5, -3), home + Vector2(5, 2), home + Vector2(0, 5), home + Vector2(-5, 2)]), Color.WHITE)
 		if lead_speed >= 0:
-			var at := second + Vector2(0, -26)
-			draw_circle(at, 15.0, Color(0.1, 0.1, 0.12))
-			draw_arc(at, 15.0, 0.0, TAU, 24, MatchHud.GOLD, 2.0)
+			var font := MatchHud.DISPLAY_FONT
+			var at := Vector2(size.x - 34.0, size.y - 30.0)
+			draw_circle(at, 17.0, Color(MenuStyle.DEEP, 0.95))
+			draw_arc(at, 17.0, 0.0, TAU, 28, MatchHud.GOLD, 2.0, true)
 			var t := str(lead_speed)
-			var w := font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
-			draw_string(font, at + Vector2(-w * 0.5, 5), t, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color.WHITE)
-			draw_string(font, at + Vector2(-13, -18), "SPD", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, MatchHud.GOLD)
+			var w := font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, 20).x
+			draw_string(font, at + Vector2(-w * 0.5, 7), t, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color.WHITE)
+			draw_string(MenuStyle.body(700), at + Vector2(-11, -21), "SPD", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, MatchHud.GOLD)
 
 
 ## The scorebug (the reference's HUD snippet): both clubs with their color

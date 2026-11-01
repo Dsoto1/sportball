@@ -2068,3 +2068,36 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
 - The player cards step aside while a title card is up.
 - Meter and base diamonds: gold fill on navy.
 - Renders: `tools/pitch_view_shot.gd -- out.png [batting|card|final|callout]`.
+
+## The owner's robot player; the mini field
+
+- **Robot player.** The owner made a robotic baseball player in Meshy
+  (image-to-3D, T-pose, 3.1M triangles, unrigged) and asked for it as a
+  regular player. Meshy's remesh came back untextured (5 credits, not
+  used), so the model was simplified locally to 30k triangles keeping
+  its UVs and textures (pymeshlab quadric with texture) and only the
+  rigging ran on Meshy (5 credits; 24-bone humanoid).
+- **How it plays: `BodyDouble`.** The robot keeps its own skeleton and
+  proportions. It rides the player's skeleton as the last
+  SkeletonModifier3D (after FootPlant and BatGrip): every frame each robot
+  bone takes its twin's turn from rest, with the limbs first lined up to
+  our rest pose (its T-pose arms hang lower, its legs stand wider), and
+  the hips follow the pelvis, lifted for its longer legs. So every
+  animation, the batting styles, the swing path and the IK work as they
+  are; the glove and bat stay on our hand bones.
+- `PlayerDef.body` (&"" person, &"robot"); `ActorView.set_body` swaps the
+  kit, hair and headwear out for the robot. The Sentinels' cleanup
+  hitter (#25, 1B) is the robot: Axle Ironside, "The Machine"
+  (`tools/generate_teams.gd` SPECIAL_BODIES).
+- `tools/body_check.gd` (a row of poses, robot in front, person behind)
+  and `tools/glb_turn.gd` (any GLB from four sides) check new bodies;
+  `pitch_view_shot.gd` takes `away:<club> up:<n>` to put a hitter at the
+  plate, and `runners` for runners on first and third.
+- **Mini field** top right redrawn as a field seen from above (outfield
+  fan, track, infield dirt and grass, foul lines, gold bases with a
+  runner on, the lead runner's speed in the corner) on a HUD panel; the
+  old one read as a tilted square.
+- The owner's other new T-pose characters (officer, bear, elder, alien,
+  frog, pilot, monkey, wolf, wizard, goblin, cat, medieval) are in the
+  same Drive folder; the same route (simplify locally, rig in Meshy,
+  BodyDouble) fits them.

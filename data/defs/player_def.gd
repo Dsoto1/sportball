@@ -12,6 +12,9 @@ extends Resource
 @export var throws: StringName = &"R"
 ## Positions this player can field, primary first. &"p" for pitchers.
 @export var positions: Array[StringName] = []
+## Who takes the field: &"" a person in the club's kit, &"robot" the
+## robot player (BodyDouble). Presentation only.
+@export var body: StringName = &""
 
 @export_group("Hitting and Running")
 ## How he stands and swings (BattingStyles: classic, crouch, open, leg_kick,

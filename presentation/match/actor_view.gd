@@ -79,6 +79,10 @@ var _sway := 0.0
 var _crouched := false
 var _pose := -1
 var _clip := &""
+## A body worn over the skeleton instead of the person in the kit (the
+## robot), and which one.
+var _double: BodyDouble
+var _body := &""
 
 
 func setup(color: Color, tag: String) -> void:
@@ -161,8 +165,8 @@ func set_glove_visible(value: bool) -> void:
 	_glove_on = value
 	_glove.visible = value and not _catcher
 	_mitt.visible = value and _catcher
-	_cap.visible = value and not _catcher
-	_helmet.visible = not value and not _catcher
+	_cap.visible = value and not _catcher and _body == &""
+	_helmet.visible = not value and not _catcher and _body == &""
 	_kit.set_shader_parameter("gloved", not value)
 	if _pose <= Pose.IDLE:
 		_play(_idle_clip(), 1.0, 0.0)
@@ -223,7 +227,8 @@ func set_look(color: Color, tag: String, trim: Color = Color(0, 0, 0, 0), home: 
 
 ## Who wears the kit: skin tone, hair color and beard from his id, number
 ## on his back.
-func set_player(id: String, number: int) -> void:
+func set_player(id: String, number: int, body: StringName = &"") -> void:
+	set_body(body)
 	_kit.set_shader_parameter("skin", UniformLook.skin_for(id))
 	var hair_mat := StandardMaterial3D.new()
 	hair_mat.albedo_color = UniformLook.hair_for(id)
@@ -232,8 +237,39 @@ func set_player(id: String, number: int) -> void:
 		if mi != null:
 			mi.material_override = hair_mat
 	if _beard != null:
-		_beard.visible = float(absi(hash(id + "beard")) % 100) / 100.0 < BEARD_SHARE
+		_beard.visible = _body == &"" and float(absi(hash(id + "beard")) % 100) / 100.0 < BEARD_SHARE
 	_back.text = str(number) if number >= 0 else ""
+
+
+## Who takes the field: &"" the person in the kit, &"robot" the robot
+## player, worn over the same skeleton (BodyDouble) so it moves with every
+## animation and IK. The robot brings its own cap and plating: the kit,
+## hair and headwear step aside; the glove, bat and number stay.
+func set_body(kind: StringName) -> void:
+	if kind == _body:
+		return
+	if kind != &"" and _double == null:
+		_double = BodyDouble.make(kind, _skeleton)
+		if _double == null:
+			return
+		_model.add_child(_double.body)
+		_skeleton.add_child(_double)
+	_body = kind
+	var robot := kind != &""
+	if _double != null:
+		_double.body.visible = robot
+		_double.active = robot
+	for mi in [_mesh, _cloth, _hair]:
+		if mi != null:
+			mi.visible = not robot
+	if _beard != null and robot:
+		_beard.visible = false
+	if robot:
+		_cap.visible = false
+		_helmet.visible = false
+	else:
+		set_glove_visible(_glove_on)
+		set_catcher(_catcher)
 
 
 ## Hands on the bat (batter at the plate): the IK holds both hands on the
@@ -248,6 +284,9 @@ func grip_bat(bat: Node3D, direction: Vector3 = Vector3.FORWARD, gap: float = 0.
 		_grip_ik = BatGrip.new()
 		_grip_ik.name = "BatGrip"
 		_skeleton.add_child(_grip_ik)
+		# The worn body copies the pose last, after the IK.
+		if _double != null:
+			_skeleton.move_child(_double, -1)
 	_grip_ik.active = true
 	_grip_ik.bat = bat
 	_grip_ik.direction = direction
@@ -404,7 +443,7 @@ func set_catcher(value: bool) -> void:
 		gear.visible = value
 	_glove.visible = _glove_on and not value
 	_mitt.visible = _glove_on and value
-	if value:
+	if value or _body != &"":
 		_cap.visible = false
 		_helmet.visible = false
 

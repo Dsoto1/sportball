@@ -27,8 +27,8 @@ deterministic rules/physics core (`baseball/`) with presentation on top
   price, and get an explicit yes before every generation. Log every spend in
   `docs/ARTLIST_CREDITS.md` and every asset in `docs/13_ASSET_MANIFEST.md`.
   Never ask the owner to paste API keys. No AI-generated reference images.
-  Meshy balance after the last batch: **5,510 credits** (30 per text-to-3D
-  model).
+  Meshy balance on 2026-11-01: **5,048 credits** (30 per text-to-3D
+  model, 5 per remesh, 5 per rig).
 - **Branding:** take layout and feel from the inspiration games, never their
   names, logos or art.
 - **Before calling anything done:** render it and look at the render, and run
@@ -65,6 +65,7 @@ deterministic rules/physics core (`baseball/`) with presentation on top
 | `swing_path.gd -- out.json <style> [righty\|lefty] [savant:tilt,attack,dir,mph]` + `swing_path_plot.py out.png a.json [b.json ...]` | Records the bat's sweet spot through a real swing and measures it the way Baseball Savant does (tilt, attack angle, attack direction, contact depth), with 3 views. |
 | `pitch_view_shot.gd`, `pitch_motion_shot.gd`, `grip_test.gd`, `flight_shots.gd`, `board_shots.gd`, `model_sheet.gd` | Pitching camera + HUD, pitcher feet on the mound, grip close-ups, ball flights, scoreboards, a sheet of GLB models. |
 | `pitch_view_shot.gd -- out.png [batting\|card\|final\|callout]` | The match HUD: pitching (default), batting, the matchup card, the final card, a callout. |
+| `body_check.gd -- out.png [robot] [side]`, `glb_turn.gd -- res://model.glb out.png` | A worn body in six poses beside a person; any GLB from four sides. |
 | `menu_shots.gd -- <out_dir>` | Every menu screen, the matchup card and the pause menu (windowed). |
 | `generate_parks.gd`, `generate_teams.gd` | Write the park and club data. |
 | `repack_glb.py`, `cull_back.py`, `regrade_glb.py` | Shrink and clean generated models (pipeline in DECISIONS: weld, cull_back, simplify, repack). |
@@ -92,6 +93,11 @@ Wide mound view: `cam:0.6,2.6,-21,0,6,0 fov:62`. Reference sheets are in
 - `ui/hud/match_hud.gd`: broadcast HUD. `app/match_director.gd`: the match loop.
 
 ## Recent work (newest first; details in DECISIONS.md)
+
+- **The owner's robot player** (Meshy-rigged) is the Sentinels' #25: it
+  rides the player skeleton through `BodyDouble`, so every animation and
+  IK works. Other owner T-pose characters can follow the same route.
+  Mini field top right redrawn.
 
 - **HUD, matchup card and final card restyled** to the owner's UI
   reference (`docs/ui_reference.jpg`): `MatchHud.skin()` panels,

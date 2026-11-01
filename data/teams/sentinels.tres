@@ -51,10 +51,11 @@ glove = 76
 [sub_resource type="Resource" id="Resource_g57pe"]
 script = ExtResource("1_pdyb5")
 id = &"iss_mcallister"
-display_name = "Nell McAllister"
-nickname = "Keep"
+display_name = "Axle Ironside"
+nickname = "The Machine"
 number = 25
 positions = Array[StringName]([&"1b"])
+body = &"robot"
 contact = 73
 power = 84
 eye = 60

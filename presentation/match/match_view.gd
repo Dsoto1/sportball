@@ -409,7 +409,7 @@ func reset_for_pitch(state: MatchState) -> void:
 		_fielders[i].set_look(fielding_color, _fielder_tag(state, tuning.fielder_ids[i]), fielding_trim, state.fielding_team() == MatchState.HOME)
 		var fielder_id: StringName = state.defense[state.fielding_team()].get(tuning.fielder_ids[i], &"") if _roster != null else &""
 		var fielder_def := _roster.player(fielder_id) if fielder_id != &"" else null
-		_fielders[i].set_player(String(fielder_id) if fielder_def != null else String(tuning.fielder_ids[i]), fielder_def.number if fielder_def != null else -1)
+		_fielders[i].set_player(String(fielder_id) if fielder_def != null else String(tuning.fielder_ids[i]), fielder_def.number if fielder_def != null else -1, fielder_def.body if fielder_def != null else &"")
 		_fielders[i].position = FieldLayout.fielder_spot(i, tuning)
 		_fielders[i].face(Vector3.ZERO)
 		_fielders[i].set_crouch(tuning.fielder_ids[i] == &"c")
@@ -1287,7 +1287,7 @@ func _runner_actor(id: StringName, color: Color, trim: Color = Color(0, 0, 0, 0)
 		actor.set_look(color, "#%d %s" % [p.number, p.display_name.to_upper()], trim, _batting_home)
 	else:
 		actor.set_look(color, String(id).get_slice("_", 1), trim, _batting_home)
-	actor.set_player(String(id), p.number if p != null else -1)
+	actor.set_player(String(id), p.number if p != null else -1, p.body if p != null else &"")
 	_runners[id] = actor
 	return actor
 

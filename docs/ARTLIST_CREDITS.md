@@ -160,3 +160,5 @@ The owner approved 11 models on 2026-10-23 (gear, dugout props, two waterfalls):
 | 2026-10-23 | Dugout drinks cooler (text-to-3d) | preview + refine | 30 | | preview 01a168b3-5303-731f-b707-0600903e7a2c, refine 01a168b4-02a3-7313-bcba-2b6dca699561 |
 | 2026-10-23 | Blossom waterfall cliff (Sakura Gate) (text-to-3d) | preview + refine | 30 | | preview 01a168b3-5b60-72fa-af8c-8cc463988023, refine 01a168b4-ff65-7400-8b4b-51aaa294edd7 |
 | 2026-10-23 | Marble terraced cascade (Fountain Gardens) (text-to-3d) | preview + refine | 30 | 5,510 | preview 01a168b3-6302-73ed-989e-b6587cf1211e, refine 01a168b4-63db-7267-a865-d95b4aed22b7 |
+| 2026-11-01 | Robot player: remesh of the owner's image-to-3D robot (task 44b15a56-1172-5aeb-be1f-f537b4dbe05d) | remesh | 5 | | remesh 01a194c0-f7d6-751c-a865-9be0f3ced9a9 (came back untextured; not used) |
+| 2026-11-01 | Robot player: auto-rig (locally simplified 30k-triangle textured GLB) | rigging | 5 | 5,048 (incl. the owner's own use) | rigging 01a194c5-ad14-702b-b5af-2c4c4292635b |
