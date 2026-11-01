@@ -15,7 +15,13 @@ extends RefCounted
 ## BAT slot_lift (degrees below level). The slot depths are tuned so the
 ## swing path's tilt into contact (swing_tilt) lands on each style's tilt
 ## (style_tilt): MLB average 32, compact swings 30, big power 36.
-const SLOT_AT := 0.55
+## Where the barrel is deepest in the slot (share of the time to contact).
+## Before it, the barrel stays above the hands until LEVEL_AT, flattening
+## to LEVEL_LIFT as it turns back (VanSuch Fig. 4-38: laid back behind the
+## head through the launch), then drops; after it, it whips up to the ball.
+const SLOT_AT := 0.78
+const LEVEL_AT := 0.5
+const LEVEL_LIFT := 8.0
 const SLOT_YAW_SHARE := 0.35
 
 ## Approach clock: the load peaks at the pitcher's release, the stride
@@ -80,12 +86,12 @@ const NAMES := {&"classic": "Classic", &"crouch": "Crouch", &"open": "Open", &"l
 ## lets the top hand go after contact. choke (m) moves the hands up the
 ## handle.
 const BAT := {
-	&"classic": {"slot_lift": -68.5, "yaw": 132.0, "lift": 52.0, "load_yaw": 75.0, "load_lift": -32.0, "waggle": 6.0, "finish_yaw": -170.0, "finish_lift": 40.0, "one_hand": false, "choke": 0.0},
-	&"crouch": {"slot_lift": -64.3, "yaw": 140.0, "lift": 50.0, "load_yaw": 70.0, "load_lift": -22.0, "waggle": 4.0, "finish_yaw": -165.0, "finish_lift": 30.0, "one_hand": false, "choke": 0.0},
-	&"open": {"slot_lift": -69.1, "yaw": 150.0, "lift": 62.0, "load_yaw": 70.0, "load_lift": -30.0, "waggle": 9.0, "finish_yaw": -170.0, "finish_lift": 42.0, "one_hand": false, "choke": 0.0},
-	&"leg_kick": {"slot_lift": -75.8, "yaw": 145.0, "lift": 62.0, "load_yaw": 80.0, "load_lift": -34.0, "waggle": 3.0, "finish_yaw": -185.0, "finish_lift": 48.0, "one_hand": false, "choke": 0.0},
-	&"wrap": {"slot_lift": -64.5, "yaw": 205.0, "lift": 28.0, "load_yaw": 15.0, "load_lift": -3.0, "waggle": 2.0, "finish_yaw": -180.0, "finish_lift": 25.0, "one_hand": true, "choke": 0.0},
-	&"slap": {"slot_lift": -57.1, "yaw": 95.0, "lift": 40.0, "load_yaw": 20.0, "load_lift": -8.0, "waggle": 10.0, "finish_yaw": -110.0, "finish_lift": 12.0, "one_hand": false, "choke": 0.08},
+	&"classic": {"slot_lift": -44.4, "yaw": 132.0, "lift": 52.0, "load_yaw": 75.0, "load_lift": -32.0, "waggle": 6.0, "finish_yaw": -170.0, "finish_lift": 40.0, "one_hand": false, "choke": 0.0},
+	&"crouch": {"slot_lift": -41.7, "yaw": 140.0, "lift": 50.0, "load_yaw": 70.0, "load_lift": -22.0, "waggle": 4.0, "finish_yaw": -165.0, "finish_lift": 30.0, "one_hand": false, "choke": 0.0},
+	&"open": {"slot_lift": -44.6, "yaw": 150.0, "lift": 62.0, "load_yaw": 70.0, "load_lift": -30.0, "waggle": 9.0, "finish_yaw": -170.0, "finish_lift": 42.0, "one_hand": false, "choke": 0.0},
+	&"leg_kick": {"slot_lift": -49.5, "yaw": 145.0, "lift": 62.0, "load_yaw": 80.0, "load_lift": -34.0, "waggle": 3.0, "finish_yaw": -185.0, "finish_lift": 48.0, "one_hand": false, "choke": 0.0},
+	&"wrap": {"slot_lift": -42.8, "yaw": 205.0, "lift": 28.0, "load_yaw": 15.0, "load_lift": -3.0, "waggle": 2.0, "finish_yaw": -180.0, "finish_lift": 25.0, "one_hand": true, "choke": 0.0},
+	&"slap": {"slot_lift": -38.5, "yaw": 95.0, "lift": 40.0, "load_yaw": 20.0, "load_lift": -8.0, "waggle": 10.0, "finish_yaw": -110.0, "finish_lift": 12.0, "one_hand": false, "choke": 0.08},
 }
 
 
@@ -389,8 +395,10 @@ static func swing_bat(style: StringName, p: float, start: Vector2, profile: Dict
 		# catcher as the launch begins (VanSuch Fig. 2-49b, 4-48b).
 		var slot := Vector2(lerpf(minf(start.x, SLOT_FROM), attack.x, SLOT_YAW_SHARE), float(b["slot_lift"]))
 		if u < SLOT_AT:
-			var k := smoothstep(0.0, 1.0, u / SLOT_AT)
-			return Vector2(lerpf(start.x, slot.x, k), lerpf(start.y, slot.y, k))
+			var x := lerpf(start.x, slot.x, smoothstep(0.0, 1.0, u / SLOT_AT))
+			if u < LEVEL_AT:
+				return Vector2(x, lerpf(start.y, minf(LEVEL_LIFT, start.y), smoothstep(0.0, 1.0, u / LEVEL_AT)))
+			return Vector2(x, lerpf(minf(LEVEL_LIFT, start.y), slot.y, smoothstep(0.0, 1.0, (u - LEVEL_AT) / (SLOT_AT - LEVEL_AT))))
 		var w := (u - SLOT_AT) / (1.0 - SLOT_AT)
 		return Vector2(lerpf(slot.x, attack.x, w * w), lerpf(slot.y, attack.y, w))
 	var v := (p - CONTACT_AT) / (1.0 - CONTACT_AT)

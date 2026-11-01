@@ -2239,3 +2239,15 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   body. The path now eases in from wherever the hands are over the first
   70% of the time to contact (`MatchView.PATH_TAKEOVER`); contact is
   unchanged.
+
+## The barrel drop
+
+- The barrel used to dive into the slot from the first frame (deepest at
+  55% of the way to contact, 64-76 degrees below the hands). It now stays
+  above the hands and flattens as it turns back behind his head through
+  the first half of the launch (`LEVEL_AT` 0.5, `LEVEL_LIFT` 8 degrees),
+  drops only in the next stretch, and is deepest at 78% (`SLOT_AT`),
+  just before it whips up to the ball (VanSuch Fig. 4-38, 4-48b).
+- With the later drop each style reaches its Savant tilt with a much
+  shallower slot: 38-50 degrees below level (was 57-76). Tilt, attack
+  angle and contact are unchanged.
