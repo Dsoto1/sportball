@@ -2202,3 +2202,29 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   body, and the pitcher's crouch stretched it over the whole seat (a big
   brown patch). It is now a slim band at the waist, 0.99-1.025 m.
 - `tools/body_check.gd ... back` renders the pitch pose from behind.
+
+## Batting poses rebuilt from VanSuch, *Baseball Swing Mechanics*
+
+- The owner judged the stance's bat and elbows wrong and supplied the book
+  (real photos of one hitter, phase by phase, front, rear and side). The
+  figures used are listed in `docs/swing_mechanics_refs/README.md` (the
+  photos stay out of the repo: the book forbids reproduction).
+- Measured, not eyeballed: `tools/stance_probe.gd` prints hands, elbows,
+  head and the bat in the hitter's frame and the elbow angles at the
+  stance, load, stride, contact and finish.
+- **Stance:** hands at shoulder height, 10-12 in in front of the body over
+  the back foot (book 1-1, 1-2), both elbows down; bat about 52 degrees up,
+  back toward the catcher and away from the plate.
+- **Load:** hands up to the rear ear (+0.14 m), back elbow lifted out near
+  shoulder height (abduction, 2-11), front arm across the chest; the bat
+  cocks over the head toward the pitcher, about 20 degrees up, and stays
+  cocked through the stride (the book: furthest backswing as the launch
+  begins, 3-1d).
+- **Elbows by phase in the grip IK** (`BatGrip.set_up`, `cocked`): stance
+  back elbow down and back, load out and up, swing tucked at the side (the
+  "L", 4-38).
+- **Contact:** chest open to the pitcher and upright (5-6a, 4-43): front
+  arm 161-176 degrees (straight), back elbow 98-140 (bent) across the
+  styles; it had been the other way round (front 98, back 166).
+- The swing's slot starts from a fixed barrel-back yaw (`SLOT_FROM`) and
+  each style's slot depth was refit so its Savant tilt is unchanged.

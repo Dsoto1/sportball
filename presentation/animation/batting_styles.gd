@@ -62,6 +62,10 @@ const WEIGHT_SHIFT := 0.45
 ## How open the lead foot lands at the plant (degrees toward the pitcher).
 const LEAD_TOE := 30.0
 
+## Where the barrel falls back to as the launch begins (yaw: back toward
+## the catcher, a little away from the plate) before it drops into the slot.
+const SLOT_FROM := 120.0
+
 ## Style ids, in the order a roster's styles are handed out when a player
 ## sets none.
 const ORDER := [&"classic", &"crouch", &"open", &"leg_kick", &"wrap", &"slap"]
@@ -76,12 +80,12 @@ const NAMES := {&"classic": "Classic", &"crouch": "Crouch", &"open": "Open", &"l
 ## lets the top hand go after contact. choke (m) moves the hands up the
 ## handle.
 const BAT := {
-	&"classic": {"slot_lift": -70.5, "yaw": 118.0, "lift": 48.0, "load_yaw": 15.0, "load_lift": 5.0, "waggle": 6.0, "finish_yaw": -170.0, "finish_lift": 40.0, "one_hand": false, "choke": 0.0},
-	&"crouch": {"slot_lift": -59.0, "yaw": 105.0, "lift": 38.0, "load_yaw": 12.0, "load_lift": 0.0, "waggle": 4.0, "finish_yaw": -165.0, "finish_lift": 30.0, "one_hand": false, "choke": 0.0},
-	&"open": {"slot_lift": -69.0, "yaw": 112.0, "lift": 52.0, "load_yaw": 20.0, "load_lift": 2.0, "waggle": 9.0, "finish_yaw": -170.0, "finish_lift": 42.0, "one_hand": false, "choke": 0.0},
-	&"leg_kick": {"slot_lift": -80.0, "yaw": 115.0, "lift": 54.0, "load_yaw": 28.0, "load_lift": 8.0, "waggle": 3.0, "finish_yaw": -185.0, "finish_lift": 48.0, "one_hand": false, "choke": 0.0},
-	&"wrap": {"slot_lift": -80.0, "yaw": 145.0, "lift": 28.0, "load_yaw": 15.0, "load_lift": 0.0, "waggle": 2.0, "finish_yaw": -180.0, "finish_lift": 25.0, "one_hand": true, "choke": 0.0},
-	&"slap": {"slot_lift": -40.0, "yaw": 80.0, "lift": 32.0, "load_yaw": 6.0, "load_lift": 0.0, "waggle": 10.0, "finish_yaw": -110.0, "finish_lift": 12.0, "one_hand": false, "choke": 0.08},
+	&"classic": {"slot_lift": -68.5, "yaw": 132.0, "lift": 52.0, "load_yaw": 75.0, "load_lift": -32.0, "waggle": 6.0, "finish_yaw": -170.0, "finish_lift": 40.0, "one_hand": false, "choke": 0.0},
+	&"crouch": {"slot_lift": -64.3, "yaw": 140.0, "lift": 50.0, "load_yaw": 70.0, "load_lift": -22.0, "waggle": 4.0, "finish_yaw": -165.0, "finish_lift": 30.0, "one_hand": false, "choke": 0.0},
+	&"open": {"slot_lift": -69.1, "yaw": 150.0, "lift": 62.0, "load_yaw": 70.0, "load_lift": -30.0, "waggle": 9.0, "finish_yaw": -170.0, "finish_lift": 42.0, "one_hand": false, "choke": 0.0},
+	&"leg_kick": {"slot_lift": -75.8, "yaw": 145.0, "lift": 62.0, "load_yaw": 80.0, "load_lift": -34.0, "waggle": 3.0, "finish_yaw": -185.0, "finish_lift": 48.0, "one_hand": false, "choke": 0.0},
+	&"wrap": {"slot_lift": -64.5, "yaw": 205.0, "lift": 28.0, "load_yaw": 15.0, "load_lift": -3.0, "waggle": 2.0, "finish_yaw": -180.0, "finish_lift": 25.0, "one_hand": true, "choke": 0.0},
+	&"slap": {"slot_lift": -57.1, "yaw": 95.0, "lift": 40.0, "load_yaw": 20.0, "load_lift": -8.0, "waggle": 10.0, "finish_yaw": -110.0, "finish_lift": 12.0, "one_hand": false, "choke": 0.08},
 }
 
 
@@ -133,7 +137,7 @@ static func poses(style: StringName) -> Dictionary:
 	var stance: Dictionary = m.STANCE
 	var load := _with(m.STANCE, {
 		"drop": 0.12, "shift": P(0.05, 0, 0), "hips": Vector3(8, -15, 0), "chest": Vector3(12, -30, 0),
-		"foot_l": P(-0.32, 0.13, 0.05), "hand_r": P(0.26, 1.42, 0.04), "hand_l": P(0.2, 1.36, 0.08),
+		"foot_l": P(-0.32, 0.13, 0.05), "hand_r": P(0.32, 1.59, 0.08), "hand_l": P(0.27, 1.54, 0.11),
 	})
 	var stride: Dictionary = m.STRIDE
 	var contact: Dictionary = m.CONTACT
@@ -144,9 +148,9 @@ static func poses(style: StringName) -> Dictionary:
 			stance = _with(stance, {
 				"drop": 0.17, "hips": Vector3(14, -5, 0), "chest": Vector3(24, -18, 0),
 				"foot_l": P(-0.42, 0.1, 0.05), "foot_r": P(0.42, 0.1, -0.02),
-				"hand_r": P(0.24, 1.46, 0.08), "hand_l": P(0.19, 1.39, 0.11),
+				"hand_r": P(0.2, 1.42, 0.24), "hand_l": P(0.15, 1.37, 0.27),
 			})
-			load = _with(stance, {"drop": 0.24, "shift": P(0.04, 0, 0), "hips": Vector3(14, -14, 0), "chest": Vector3(26, -28, 0), "hand_r": P(0.28, 1.48, 0.05), "hand_l": P(0.22, 1.41, 0.08)})
+			load = _with(stance, {"drop": 0.24, "shift": P(0.04, 0, 0), "hips": Vector3(14, -14, 0), "chest": Vector3(26, -28, 0), "hand_r": P(0.32, 1.56, 0.08), "hand_l": P(0.27, 1.51, 0.11)})
 			stride = _with(stride, {"drop": 0.24, "foot_l": P(-0.6, 0.1, 0.07), "foot_r": P(0.42, 0.1, -0.02), "hips": Vector3(14, 8, 0), "chest": Vector3(26, -24, 0)})
 			contact = _with(contact, {"drop": 0.22, "foot_l": P(-0.6, 0.1, 0.07)})
 			extend = _with(extend, {"drop": 0.2, "foot_l": P(-0.6, 0.1, 0.07)})
@@ -167,10 +171,10 @@ static func poses(style: StringName) -> Dictionary:
 			load = _with(load, {
 				"drop": 0.04, "shift": P(0.07, 0, 0), "hips": Vector3(6, -25, 0), "chest": Vector3(8, -38, 0),
 				"foot_l": P(-0.1, 0.52, 0.14), "knee_l": P(0, 0.6, 1),
-				"hand_r": P(0.28, 1.5, 0.0), "hand_l": P(0.22, 1.44, 0.04),
+				"hand_r": P(0.32, 1.6, 0.06), "hand_l": P(0.27, 1.55, 0.09),
 			})
 			stride = _with(stride, {"drop": 0.22, "foot_l": P(-0.64, 0.1, 0.06)})
-			contact = _with(contact, {"drop": 0.22, "foot_l": P(-0.64, 0.1, 0.06), "hips": Vector3(8, 58, 0), "chest": Vector3(18, -24, 0), "head": Vector3(-5, -4, 0)})
+			contact = _with(contact, {"drop": 0.22, "foot_l": P(-0.64, 0.1, 0.06), "hips": Vector3(8, 58, 0), "chest": Vector3(0, 30, -14), "head": Vector3(-5, -4, 0)})
 			extend = _with(extend, {"drop": 0.24, "foot_l": P(-0.64, 0.1, 0.06)})
 			# The big turn carries the hands farther out, so the arms fold
 			# outside the body.
@@ -194,7 +198,7 @@ static func poses(style: StringName) -> Dictionary:
 			})
 			load = _with(stance, {"hips": Vector3(10, -8, 0), "chest": Vector3(16, -20, 0), "hand_r": P(0.22, 1.42, 0.11), "hand_l": P(0.16, 1.36, 0.14)})
 			stride = _with(stride, {"drop": 0.15, "foot_l": P(-0.4, 0.1, 0.08), "foot_r": P(0.3, 0.1, -0.02), "hand_r": P(0.16, 1.18, 0.2), "hand_l": P(0.1, 1.13, 0.23)})
-			contact = _with(contact, {"foot_l": P(-0.4, 0.1, 0.08), "hips": Vector3(8, 40, 0), "chest": Vector3(16, -8, 0), "head": Vector3(-5, -2, 0)})
+			contact = _with(contact, {"foot_l": P(-0.4, 0.1, 0.08), "hips": Vector3(8, 40, 0), "chest": Vector3(4, 36, -10), "head": Vector3(-5, -2, 0)})
 			extend = _with(extend, {"foot_l": P(-0.4, 0.1, 0.08), "hips": Vector3(6, 55, 0), "chest": Vector3(12, 0, 0), "head": Vector3(-5, -25, 0)})
 			# Compact: hands stay level and out front, he's already leaving the box.
 			finish = _with(contact, {
@@ -326,7 +330,9 @@ static func moves() -> Dictionary:
 ## Bat (yaw, lift) during the approach (a = 0..1) for a style.
 static func approach_bat(style: StringName, a: float, clock: float) -> Vector2:
 	var b: Dictionary = BAT[style]
-	var load := smoothstep(0.0, LOAD_AT, a) * (1.0 - 0.6 * smoothstep(LOAD_AT, STRIDE_AT, a))
+	# Cocked by the end of the load and held through the stride: the barrel
+	# reaches its furthest backswing as the launch begins (VanSuch, Fig. 3-1d).
+	var load := smoothstep(0.0, LOAD_AT, a)
 	var waggle := sin(clock * 3.0) * float(b["waggle"]) * (1.0 - smoothstep(0.0, 0.3, a))
 	return Vector2(float(b["yaw"]) + float(b["load_yaw"]) * load + waggle, float(b["lift"]) + float(b["load_lift"]) * load)
 
@@ -378,7 +384,10 @@ static func swing_bat(style: StringName, p: float, start: Vector2, profile: Dict
 		# Bat lag: the hands lead and the barrel drops into the slot behind
 		# them (knob at the ball), then whips through to the ball.
 		var u := p / CONTACT_AT
-		var slot := Vector2(lerpf(start.x, attack.x, SLOT_YAW_SHARE), float(b["slot_lift"]))
+		# The slot from the stance's bat, not the cocked one: the barrel cocked
+		# over his head toward the pitcher falls back behind him toward the
+		# catcher as the launch begins (VanSuch Fig. 2-49b, 4-48b).
+		var slot := Vector2(lerpf(minf(start.x, SLOT_FROM), attack.x, SLOT_YAW_SHARE), float(b["slot_lift"]))
 		if u < SLOT_AT:
 			var k := smoothstep(0.0, 1.0, u / SLOT_AT)
 			return Vector2(lerpf(start.x, slot.x, k), lerpf(start.y, slot.y, k))

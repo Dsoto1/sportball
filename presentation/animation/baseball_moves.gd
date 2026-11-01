@@ -54,24 +54,27 @@ static var STANCE := {
 	"foot_l": P(-0.34, 0.1, 0.05), "foot_r": P(0.34, 0.1, -0.02),
 	# Knees over the feet, a touch out: an athletic set, not a squat.
 	"knee_l": P(-0.15, 0, 1), "knee_r": P(0.15, 0, 1),
-	# Hands at the back shoulder (the shoulders sit about 1.44 m up the
-	# rig), just in front of it, the back elbow up, so the bat rests back
-	# behind the head, as every hitter sets up.
-	"hand_r": P(0.27, 1.47, 0.04), "hand_l": P(0.23, 1.41, 0.08),
-	"elbow_r": P(1, 0.25, -0.45), "elbow_l": P(-0.15, -1, 1.1),
+	# Hands at about shoulder height (the shoulders sit about 1.44 m up the
+	# rig), over the back foot, 10-12 in out in front of the body, the back
+	# elbow down (VanSuch, Baseball Swing Mechanics, Fig. 1-1, 1-2, 2-14a).
+	"hand_r": P(0.2, 1.41, 0.26), "hand_l": P(0.15, 1.36, 0.29),
+	"elbow_r": P(0.6, -1, -0.4), "elbow_l": P(-0.15, -1, 0.8),
 }
-static var STANCE_BOB := _with(STANCE, {"drop": 0.12, "hand_r": P(0.28, 1.49, 0.03), "hand_l": P(0.24, 1.43, 0.07)})
+static var STANCE_BOB := _with(STANCE, {"drop": 0.12, "hand_r": P(0.21, 1.46, 0.25), "hand_l": P(0.16, 1.41, 0.28)})
 static var STRIDE := _with(STANCE, {
 	"drop": 0.14, "hips": Vector3(8, 8, 0), "chest": Vector3(12, -26, 0), "head": Vector3(-8, 85, 0),
-	"foot_l": P(-0.52, 0.1, 0.07), "hand_r": P(0.18, 1.3, 0.06), "hand_l": P(0.12, 1.24, 0.1),
+	"foot_l": P(-0.52, 0.1, 0.07), "hand_r": P(0.27, 1.46, 0.13), "hand_l": P(0.22, 1.41, 0.16),
 })
 static var CONTACT := _with(STANCE, {
-	# Hips lead, shoulders lag (hip-shoulder separation): hips 50 degrees open,
-	# shoulders 35, so the arms extend out in front instead of across the
-	# chest. Eyes on the contact point.
-	"drop": 0.14, "hips": Vector3(8, 50, 0), "chest": Vector3(18, -15, 0), "head": Vector3(-5, -5, 0),
+	# The chest open to the pitcher and upright, tilted back off the plate
+	# (VanSuch Fig. 4-43, 5-6a): the front arm reaches straight to the ball
+	# (about 174 degrees at the elbow) and the back elbow stays bent (about
+	# 130), not the other way round. Eyes on the contact point.
+	"drop": 0.14, "hips": Vector3(8, 50, 0), "chest": Vector3(4, 32, -10), "head": Vector3(-5, -5, 0),
 	"foot_l": P(-0.52, 0.1, 0.07), "foot_r": P(0.3, 0.14, -0.02), "toe_r": 50.0,
-	"hand_r": P(-0.05, 1.08, 0.48), "hand_l": P(-0.1, 1.05, 0.44),
+	# Hands out in front toward the pitcher, below the chest, where the grip
+	# puts them on the ball (tools/stance_probe.gd).
+	"hand_r": P(-0.4, 1.12, 0.3), "hand_l": P(-0.45, 1.09, 0.26),
 	"elbow_r": P(0.5, -1, 0), "elbow_l": P(-0.5, -1, 0),
 })
 static var EXTEND := _with(CONTACT, {

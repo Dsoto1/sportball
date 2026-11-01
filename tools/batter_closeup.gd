@@ -8,6 +8,7 @@ extends SceneTree
 ## (BattingStyles.ORDER) overrides the batter's own. Pass `flip` as the
 ## style argument's neighbour (swing <style> flip) to barrel it and watch
 ## the bat flip after contact, `pitcher` to watch from the mound, or
+## `chest` or `rear` for the swing from the book's camera angles,
 ## `slowmo` for the whip from the press to contact at quarter speed.
 ## `style:<name>` overrides the batter's style for the stills too;
 ## `hands` frames the grip tight instead of the whole batter.
@@ -111,9 +112,26 @@ func _swing_sequence(at: Vector3) -> bool:
 	var from := SWING_FROM * Vector3(-1.0 if _view._bats_left else 1.0, 1.0, 1.0)
 	if OS.get_cmdline_user_args().has("pitcher"):
 		from = Vector3(0.9 if _view._bats_left else -0.9, 1.4, -3.4)
-	_cam.position = at + from
-	_cam.look_at(at + Vector3(0, 1.1, 0))
 	var batter: ActorView = _view._runners.get(_view._batter_id)
+	# The book's views (docs/swing_mechanics_refs): "chest" square to his
+	# chest from across the plate (Fig. 1-1, 2-14), "rear" from behind him
+	# toward the pitcher (Fig. 2-15).
+	if batter != null and (OS.get_cmdline_user_args().has("chest") or OS.get_cmdline_user_args().has("rear")):
+		var fwd := -batter.global_transform.basis.z
+		fwd = Vector3(fwd.x, 0.0, fwd.z).normalized()
+		if OS.get_cmdline_user_args().has("chest"):
+			from = fwd * 3.0 + Vector3(0, 0.2, 0)
+		else:
+			from = Vector3(0, 0.35, 2.6) - fwd * 1.0
+		# Only him: no guides, catcher or umpire in the way.
+		for n: Node3D in [_view._zone, _view._timing_ring, _view._aim]:
+			if n != null:
+				n.visible = false
+		for f: Node3D in _view._fielders:
+			if f.global_position.distance_to(at) < 4.0:
+				f.visible = false
+	_cam.position = at + from
+	_cam.look_at(at + Vector3(0, 1.05, 0))
 	if batter != null and _style != &"":
 		batter.style = _style
 	if _frames >= WINDUP_FROM and _frames < PITCH_FROM:

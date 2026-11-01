@@ -29,6 +29,15 @@ var choke := 0.0
 ## hands on the way into contact.
 var anchor := Vector3.ZERO
 var anchor_weight := 0.0
+## The elbows' shape by phase (VanSuch, Baseball Swing Mechanics): `set_up`
+## 1 while he waits, loads and strides, 0 once the swing is under way;
+## `cocked` 0 in the stance, 1 at the top of the load.
+##   stance: back elbow down, pointing down and back; front elbow down;
+##   load: back elbow lifted out to the side near shoulder height
+##     (abducted, Fig. 2-11), front arm across the chest, its elbow down;
+##   swing: back elbow drops and tucks to his side, the "L" (Fig. 4-38).
+var set_up := 0.0
+var cocked := 0.0
 
 ## Where the handle crosses the palm, in the hand bone's frame (fingers
 ## along +Y, the index side +Z for the right hand): the base of the
@@ -161,9 +170,21 @@ func _reach(sk: Skeleton3D, side: String, target: Vector3) -> void:
 	var across := (sk.get_bone_global_pose(sk.find_bone("upperarm_l")).origin - sk.get_bone_global_pose(sk.find_bone("upperarm_r")).origin).normalized()
 	var up := (neck - spine).normalized()
 	var front := across.cross(up).normalized()
-	# Elbows hang down and out to their own side, a little behind the body,
-	# and swing clear of the chest if that would bury them.
-	var pole := across * (0.6 if side == "l" else -0.6) - up - front * 0.2
+	# Front is toward the plate (the rig faces +Z), lefties too.
+	if front.z < 0.0:
+		front = -front
+	var out := across * (1.0 if side == "l" else -1.0)
+	var rear := side == ("l" if lefty else "r")
+	# In the swing: the back elbow tucks down at his side (the "L"), the
+	# front one hangs down and a little out toward the pitcher.
+	var pole := (out * 0.25 - up - front * 0.15) if rear else (out * 0.6 - up - front * 0.2)
+	if set_up > 0.0:
+		var waiting: Vector3
+		if rear:
+			waiting = (out * 0.55 - up - front * 0.45).normalized().slerp((out + up * 0.45 - front * 0.3).normalized(), clampf(cocked, 0.0, 1.0))
+		else:
+			waiting = -up + front * 0.6 + out * 0.1
+		pole = pole.normalized().slerp(waiting.normalized(), clampf(set_up, 0.0, 1.0))
 	var elbow := PoseBaker.bend(s, target, a, b, pole, [spine, neck, across, front])
 	var parent_g := sk.get_bone_global_pose(sk.get_bone_parent(upper))
 	var new_upper := Basis(Quaternion((gl.origin - s).normalized(), (elbow - s).normalized())) * gu.basis

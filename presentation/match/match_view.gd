@@ -986,13 +986,20 @@ func _update_bat() -> void:
 	var bat := BattingStyles.approach_bat(style, _approach, _view_clock)
 	var gap := SWING_GRIP
 	var one_hand := false
+	# The elbows hold the stance and load's shape until the swing is under
+	# way, then slot (BatGrip.set_up / cocked).
+	var set_up := 1.0
+	var cocked := smoothstep(0.0, BattingStyles.LOAD_AT, _approach)
 	if _bat_bunt:
 		bat = Vector2(0.0, 6.0)  # flat across the front of the plate
 		gap = BUNT_GRIP
+		set_up = 0.0
 		if batter != null:
 			batter.animate(ActorView.Pose.BUNT, delta)
 	elif _bat_swing_start >= 0.0:
 		var p := _swing_progress()
+		set_up = 1.0 - smoothstep(0.0, BattingStyles.CONTACT_AT * 0.6, p)
+		cocked = 1.0
 		bat = BattingStyles.swing_bat(style, p, _swing_from, _swing_profile)
 		one_hand = bool(BattingStyles.BAT[style]["one_hand"]) and p > BattingStyles.ONE_HAND_RELEASE
 		if batter != null:
@@ -1022,7 +1029,7 @@ func _update_bat() -> void:
 			anchor = SwingPath.grip_for(on["sweet"], axis, choke)
 	if batter != null:
 		# His hands hold the handle; the grip places the bat.
-		batter.grip_bat(_bat_pivot, dir, gap, one_hand, choke, anchor, weight)
+		batter.grip_bat(_bat_pivot, dir, gap, one_hand, choke, anchor, weight, set_up, cocked)
 	else:
 		_bat_pivot.position = _batter_spot() + Vector3(0.3 * side, 1.0, 0.05)
 		_bat_pivot.look_at(_bat_pivot.global_position + dir, Vector3.UP)
