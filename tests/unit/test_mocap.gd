@@ -53,3 +53,20 @@ func test_captured_swing_keeps_the_arms_off_the_body() -> void:
 			check(c > 0.6, "t=%.2f: %s elbow/forearm off the body (%.2f)" % [t, side, c])
 		t += 1.0 / 15.0
 	sk.get_parent().get_parent().free()
+
+
+## Squared to bunt, his hips and shoulders turn from side-on (stance) to
+## facing the pitcher: the hip line (left minus right thigh) ends near
+## 180 degrees; a lefty's, reflected left for right, near 0.
+func test_bunt_squares_to_the_pitcher() -> void:
+	if not BaseballMoves.has_mocap():
+		return
+	var sk := _rig()
+	for lefty: bool in [false, true]:
+		var anim := MixamoRetarget.bake("Baseball_Bunt", sk, BaseballMoves.BUNT_FROM, BaseballMoves.BUNT_TO, false, lefty, BaseballMoves.BAT_YAW)
+		var g := _pose_at(sk, anim, anim.length)
+		var hips: Vector3 = (g[sk.find_bone("thigh_l")] as Transform3D).origin - (g[sk.find_bone("thigh_r")] as Transform3D).origin
+		var yaw := rad_to_deg(atan2(hips.x, hips.z))
+		var want := 0.0 if lefty else 180.0
+		check(absf(wrapf(yaw - want, -180.0, 180.0)) < 25.0, "lefty=%s: squared hip line at %.0f degrees" % [lefty, yaw])
+	sk.get_parent().get_parent().free()

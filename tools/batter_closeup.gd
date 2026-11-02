@@ -9,6 +9,7 @@ extends SceneTree
 ## style argument's neighbour (swing <style> flip) to barrel it and watch
 ## the bat flip after contact, `pitcher` to watch from the mound, or
 ## `chest` or `rear` for the swing from the book's camera angles,
+## `bunt` to square around and bunt instead of swinging,
 ## `slowmo` for the whip from the press to contact at quarter speed.
 ## `style:<name>` overrides the batter's style for the stills too;
 ## `hands` frames the grip tight instead of the whole batter.
@@ -20,6 +21,8 @@ const WINDUP_FROM := 60
 const PITCH_FROM := 120
 const PRESS := 136
 const SHOTS := [70, 104, 132, 137, 140, 146, 160]
+## With `bunt`: squaring around from the press, held squared.
+const BUNT_SHOTS := [132, 138, 142, 146, 150, 156, 166]
 var _out := ""
 var _frames := 0
 var _cam: Camera3D
@@ -146,9 +149,15 @@ func _swing_sequence(at: Vector3) -> bool:
 	elif _frames >= PITCH_FROM:
 		_view._windup = -1.0
 		_view._pitch_u = minf(float(_frames - PITCH_FROM) / 30.0, 0.6)
+	var bunt := OS.get_cmdline_user_args().has("bunt")
 	if _frames == PRESS:
-		_view.swing_bat()
+		if bunt:
+			_view.bunt_bat()
+		else:
+			_view.swing_bat()
 	var shots: Array = FLIP_SHOTS if _flip else SHOTS
+	if bunt:
+		shots = BUNT_SHOTS
 	if OS.get_cmdline_user_args().has("launch"):
 		# Every frame from the press to contact.
 		shots = [PRESS - 1, PRESS, PRESS + 1, PRESS + 2, PRESS + 3, PRESS + 4, PRESS + 5]

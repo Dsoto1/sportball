@@ -32,6 +32,8 @@ const BACK_FONT := preload("res://assets/third_party/fonts/bungee/Bungee-Regular
 const BACK_NUMBER_AT := Vector3(0.0, 1.3, -0.2)
 const CROWN := Vector3(0.0, 1.68, 0.0)
 const BLEND := 0.12
+## The bunt capture plays this much faster than captured (squared in ~0.4 s).
+const BUNT_SPEED := 2.4
 ## Arcade proportions: a little broader and bigger than life, so players
 ## read from the high field camera (the base character is already athletic).
 const BUILD := Vector3(1.15, 1.08, 1.15)
@@ -382,7 +384,11 @@ func animate(pose: Pose, delta: float, speed: float = 0.0, juke: bool = false, p
 		Pose.BAT_STANCE:
 			_play(BaseballMoves.clip("Bat_Stance" if BaseballMoves.has_mocap() else "Stance_%s" % style, _lefty), 1.0)
 		Pose.BUNT:
-			_play(BaseballMoves.clip("Bunt", _lefty), 1.6)
+			if BaseballMoves.has_mocap():
+				# The capture squares around in about 0.4 s, then holds.
+				_play(BaseballMoves.clip("Bunt_Mocap", _lefty), BUNT_SPEED)
+			else:
+				_play(BaseballMoves.clip("Bunt", _lefty), 1.6)
 		Pose.LEAD:
 			_play(BaseballMoves.clip("Lead", _lefty), 1.0)
 		Pose.TAG, Pose.SLIDE, Pose.SCOOP, Pose.CATCH_HIGH, Pose.DIVE:

@@ -2,7 +2,7 @@ extends SceneTree
 ## A Mixamo clip baked onto a player (MixamoRetarget), seen from his chest
 ## side (top row) and from the pitcher (bottom row) at evenly spaced
 ## times; prints where his hands are. Needs a display:
-##   godot --path . --resolution 1800x700 -s res://tools/mocap_check.gd -- out.png Baseball_Hit [frames=8]
+##   godot --path . --resolution 1800x700 -s res://tools/mocap_check.gd -- out.png Baseball_Hit [frames=8] [yaw:<deg>]
 var _frames := 0
 var _out := ""
 var _actors: Array = []
@@ -21,7 +21,7 @@ func _initialize() -> void:
 	var clip := args[1] if args.size() > 1 else "Baseball_Hit"
 	if args.size() > 2:
 		_n = int(args[2])
-	if args.size() > 4:
+	if args.size() > 4 and not args[3].begins_with("yaw:"):
 		_from = float(args[3])
 		_to = float(args[4])
 	var world := Node3D.new()
@@ -40,7 +40,11 @@ func _initialize() -> void:
 	world.add_child(a)
 	a.setup(Color(0.75, 0.2, 0.12), "")
 	a.set_glove_visible(false)
-	_anim = MixamoRetarget.bake(clip, a._skeleton)
+	var yaw := 0.0
+	for arg: String in args:
+		if arg.begins_with("yaw:"):
+			yaw = float(arg.substr(4))
+	_anim = MixamoRetarget.bake(clip, a._skeleton, 0.0, -1.0, false, false, yaw)
 	var lib := AnimationLibrary.new()
 	lib.add_animation(&"clip", _anim)
 	a._player.add_animation_library(&"mocap", lib)

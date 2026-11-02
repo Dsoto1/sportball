@@ -57,6 +57,10 @@ const SWINGS := {
 	&"compact": ["Baseball_Hit_3", 0.76, 0.22, 0.56],
 }
 const STYLE_SWING := {&"classic": &"hit", &"crouch": &"hit", &"open": &"hit", &"leg_kick": &"power", &"wrap": &"power", &"slap": &"compact"}
+## The bunt capture's square-around: from the stance to squared up,
+## before he runs off (Baseball_Bunt, seconds).
+const BUNT_FROM := 0.4
+const BUNT_TO := 1.35
 ## Captured clips: [name, Mixamo file, from s, to s, loop, yaw].
 static var MOCAP := _mocap_specs()
 const MOCAP_RELEASE := 1.63
@@ -68,7 +72,9 @@ static func _mocap_specs() -> Array:
 		# The delivery: set, kick, stride, release (MOCAP_RELEASE), follow-through.
 		["Pitch_Mocap", "Baseball_Pitching_2", 0.0, MOCAP_PITCH, false, 0.0],
 		# The catcher's squat behind the plate.
-		["Catcher_Mocap", "Baseball_Catcher", 0.0, 2.8, true, 0.0]]
+		["Catcher_Mocap", "Baseball_Catcher", 0.0, 2.8, true, 0.0],
+		# Squaring around to bunt, held squared (a batting capture).
+		["Bunt_Mocap", "Baseball_Bunt", BUNT_FROM, BUNT_TO, false, BAT_YAW]]
 	for key: StringName in SWINGS:
 		var s: Array = SWINGS[key]
 		out.append(["Bat_Approach_%s" % key, s[0], 0.0, s[1], false, BAT_YAW])

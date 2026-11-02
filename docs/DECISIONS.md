@@ -2292,3 +2292,15 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   `Baseball_Hit_2`; slap swings the shorter `Baseball_Hit_3`
   (`BaseballMoves.STYLE_SWING` / `swing_for`). Each has its own launch,
   contact and length, timed onto the game's contact.
+- **Bunt from the capture (2026-11-02):** squaring around is
+  `Baseball_Bunt` 0.4-1.35 s (stance to squared, before he runs off),
+  turned like the other batting captures (`BAT_YAW`), played 2.4x so he
+  is squared about 0.4 s after the bunt press, then held. The grip IK
+  still spreads the hands on the handle (`BUNT_GRIP`). Lefties use the
+  mirrored bake (`test_bunt_squares_to_the_pitcher`).
+- **Idle 2 is not a fielder's ready pose:** rendered, `Baseball_Idle_2`
+  is a lower, crouched batting stance (hands at the chest, no bat), and
+  none of the 18 clips is a fielder's ready crouch, so fielders keep the
+  hand-made `Ready`. Idle 2 could become the crouch style's stance later.
+- `tools/mocap_check.gd` takes `yaw:<deg>`; `tools/batter_closeup.gd`
+  takes `bunt` to square around instead of swinging.
