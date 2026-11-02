@@ -2304,3 +2304,21 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   hand-made `Ready`. Idle 2 could become the crouch style's stance later.
 - `tools/mocap_check.gd` takes `yaw:<deg>`; `tools/batter_closeup.gd`
   takes `bunt` to square around instead of swinging.
+- **Full windup with the bases empty (2026-11-02):** the pitcher winds up
+  from `Baseball_Pitching` (hands together, rock, kick; release at 2.1 s,
+  end 2.9 s) when nobody is on, and pitches from the stretch
+  (`Baseball_Pitching_2`) otherwise (`ActorView.full_windup`, set in
+  `MatchView.reset_for_pitch`). Both map their release frame onto the
+  game's release. `tools/pitch_motion_shot.gd ... windup` shows it.
+- **Fielders hands on knees between pitches:** the umpire capture opens
+  and closes on a hands-on-knees set (0-0.45 s, played back and forth),
+  which is the infielders' and outfielders' stance before the pitch
+  (`ActorView.relaxed`); when the windup starts they drop into their ready
+  crouch over 0.35 s. Pitcher and catcher keep their own poses.
+- **Clips not used yet, and why:** the umpire's calls (0.6-1.9 s of
+  `Baseball_Umpire`) and `Baseball_Strike` need a home-plate umpire, which
+  the game doesn't have; Step In / Out, Walk In / Out and Step Up To Bat
+  need a walk-up between batters (the next batter appears in the box
+  now); Batter On Deck and Milling Idle need an on-deck circle or dugout
+  players; Idle 2 (a crouched batting stance) would pop into the swing's
+  approach, which starts from Hit's own stance.

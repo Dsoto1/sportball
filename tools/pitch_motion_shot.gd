@@ -2,7 +2,7 @@ extends SceneTree
 ## The pitcher's delivery on the mound, from the side (first-base line),
 ## at six points from set to follow-through: checks his feet stay on the
 ## mound's surface through the stride. Saves a 3x2 sheet. Needs a display:
-##   godot --path . --resolution 600x600 -s res://tools/pitch_motion_shot.gd -- /tmp/pitch.png [lefty]
+##   godot --path . --resolution 600x600 -s res://tools/pitch_motion_shot.gd -- /tmp/pitch.png [lefty] [windup]
 const AT := [0.0, 0.5, 0.8, 1.0, 1.2, 1.5]
 var _frames := 0
 var _out := ""
@@ -30,6 +30,7 @@ func _initialize() -> void:
 	root.add_child(_actor)
 	_actor.setup(Color(0.5, 0.2, 0.7), "")
 	_actor.set_lefty(OS.get_cmdline_user_args().has("lefty"))
+	_actor.full_windup = OS.get_cmdline_user_args().has("windup")
 	_cam = Camera3D.new()
 	_cam.fov = 40.0
 	root.add_child(_cam)

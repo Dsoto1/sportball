@@ -40,6 +40,9 @@ static func library(skeleton: Skeleton3D, player: AnimationPlayer) -> AnimationL
 	for spec: Array in MOCAP:
 		for lefty: bool in [false, true]:
 			var anim := MixamoRetarget.bake(spec[1], skeleton, spec[2], spec[3], spec[4], lefty, spec[5])
+			if anim != null and spec.size() > 6 and spec[6]:
+				# A short hold played back and forth, so it never pops.
+				anim.loop_mode = Animation.LOOP_PINGPONG
 			if anim != null:
 				_library.add_animation(StringName(String(spec[0]) + ("_L" if lefty else "")), anim)
 	return _library
@@ -61,7 +64,10 @@ const STYLE_SWING := {&"classic": &"hit", &"crouch": &"hit", &"open": &"hit", &"
 ## before he runs off (Baseball_Bunt, seconds).
 const BUNT_FROM := 0.4
 const BUNT_TO := 1.35
-## Captured clips: [name, Mixamo file, from s, to s, loop, yaw].
+## The full windup (bases empty; Baseball_Pitching): release and end.
+const WINDUP_RELEASE := 2.1
+const WINDUP_END := 2.9
+## Captured clips: [name, Mixamo file, from s, to s, loop, yaw, pingpong].
 static var MOCAP := _mocap_specs()
 const MOCAP_RELEASE := 1.63
 const MOCAP_PITCH := 2.43
@@ -74,7 +80,12 @@ static func _mocap_specs() -> Array:
 		# The catcher's squat behind the plate.
 		["Catcher_Mocap", "Baseball_Catcher", 0.0, 2.8, true, 0.0],
 		# Squaring around to bunt, held squared (a batting capture).
-		["Bunt_Mocap", "Baseball_Bunt", BUNT_FROM, BUNT_TO, false, BAT_YAW]]
+		["Bunt_Mocap", "Baseball_Bunt", BUNT_FROM, BUNT_TO, false, BAT_YAW],
+		# From the windup (bases empty): hands together, rock, kick, release.
+		["Windup_Mocap", "Baseball_Pitching", 0.0, WINDUP_END, false, 0.0],
+		# Fielders between pitches, hands on knees (the umpire capture's
+		# set, before his call).
+		["Knees_Mocap", "Baseball_Umpire", 0.0, 0.45, true, 0.0, true]]
 	for key: StringName in SWINGS:
 		var s: Array = SWINGS[key]
 		out.append(["Bat_Approach_%s" % key, s[0], 0.0, s[1], false, BAT_YAW])

@@ -441,6 +441,13 @@ func reset_for_pitch(state: MatchState) -> void:
 	var pitcher_def := _roster.player(state.pitcher(state.fielding_team())) if _roster != null else null
 	if pitcher_index >= 0:
 		_fielders[pitcher_index].set_lefty(pitcher_def != null and pitcher_def.throws == &"L")
+		# Bases empty: the full windup; anyone on, from the stretch.
+		_fielders[pitcher_index].full_windup = state.runner_on(1) == &"" and state.runner_on(2) == &"" and state.runner_on(3) == &""
+	# Between pitches the fielders stand hands on knees (not the pitcher
+	# or catcher), until the windup starts.
+	for i in _fielders.size():
+		var role := StringName(tuning.fielder_ids[i])
+		_fielders[i].relaxed = role != &"p" and role != &"c"
 	batter.position = _batter_spot()
 	batter.face(batter.position + (Vector3.LEFT if _bats_left else Vector3.RIGHT))  # square to the plate
 	set_bat(true)
@@ -570,6 +577,9 @@ func swing_bat(power: bool = false, aim: Vector2 = Vector2(0.0, SwingPath.DEFAUL
 ## Pitcher's windup, 0..1, or -1 when not winding up. The ball sits in his
 ## glove until the pitch is released.
 func show_windup(progress: float) -> void:
+	if progress >= 0.0 and _windup < 0.0:
+		for f: ActorView in _fielders:
+			f.relaxed = false
 	if progress < 0.0 and _windup >= 0.0:
 		_follow_start = _view_clock
 	_windup = progress

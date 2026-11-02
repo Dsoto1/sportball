@@ -34,6 +34,8 @@ const CROWN := Vector3(0.0, 1.68, 0.0)
 const BLEND := 0.12
 ## The bunt capture plays this much faster than captured (squared in ~0.4 s).
 const BUNT_SPEED := 2.4
+## Hands off the knees into the ready crouch.
+const READY_BLEND := 0.35
 ## Arcade proportions: a little broader and bigger than life, so players
 ## read from the high field camera (the base character is already athletic).
 const BUILD := Vector3(1.15, 1.08, 1.15)
@@ -79,6 +81,17 @@ var _tag: Label3D
 var _clock := 0.0
 var _sway := 0.0
 var _crouched := false
+## Fielders between pitches stand hands on knees, then drop into their
+## ready crouch as the pitcher starts (MatchView clears it).
+var relaxed := false:
+	set(value):
+		if value == relaxed:
+			return
+		relaxed = value
+		if _pose == -1 or _pose == Pose.IDLE:
+			_play(_idle_clip(), 1.0, READY_BLEND)
+## The pitcher winds up (bases empty) instead of pitching from the stretch.
+var full_windup := false
 var _pose := -1
 var _clip := &""
 ## A body worn over the skeleton instead of the person in the kit (the
@@ -374,9 +387,11 @@ func animate(pose: Pose, delta: float, speed: float = 0.0, juke: bool = false, p
 		Pose.PITCH:
 			if BaseballMoves.has_mocap():
 				# Release (progress 1) on the capture's release frame.
-				var t := progress * BaseballMoves.MOCAP_RELEASE if progress <= BaseballMoves.PITCH_RELEASE \
-					else lerpf(BaseballMoves.MOCAP_RELEASE, BaseballMoves.MOCAP_PITCH, (progress - BaseballMoves.PITCH_RELEASE) / (BaseballMoves.PITCH_LENGTH - BaseballMoves.PITCH_RELEASE))
-				_scrub("Pitch_Mocap", t, BaseballMoves.MOCAP_PITCH)
+				var release := BaseballMoves.WINDUP_RELEASE if full_windup else BaseballMoves.MOCAP_RELEASE
+				var end := BaseballMoves.WINDUP_END if full_windup else BaseballMoves.MOCAP_PITCH
+				var t := progress * release if progress <= BaseballMoves.PITCH_RELEASE \
+					else lerpf(release, end, (progress - BaseballMoves.PITCH_RELEASE) / (BaseballMoves.PITCH_LENGTH - BaseballMoves.PITCH_RELEASE))
+				_scrub("Windup_Mocap" if full_windup else "Pitch_Mocap", t, end)
 			else:
 				_scrub("Pitch", progress, BaseballMoves.PITCH_LENGTH)
 			# Planted through the stride; the kick leg (well up) stays free.
@@ -548,6 +563,8 @@ func _idle_clip() -> StringName:
 	if _crouched:
 		return BaseballMoves.clip("Catcher_Mocap" if BaseballMoves.has_mocap() else "Catcher", _lefty)
 	if _glove != null and _glove.visible:
+		if relaxed and BaseballMoves.has_mocap():
+			return BaseballMoves.clip("Knees_Mocap", _lefty)
 		return BaseballMoves.clip("Ready", _lefty)
 	return &"Idle"
 
