@@ -352,18 +352,21 @@ func animate(pose: Pose, delta: float, speed: float = 0.0, juke: bool = false, p
 			_scrub("Throw", progress, 1.0)
 		Pose.SWING:
 			if BaseballMoves.has_mocap():
-				_scrub("Bat_Swing", _swing_time(progress), BaseballMoves.MOCAP_SWING)
+				var sw := BaseballMoves.swing_for(style)
+				_scrub("Bat_Swing_%s" % sw[0], _swing_time(progress, sw[2], sw[3]), sw[3])
 			else:
 				_scrub("Swing_%s" % style, progress, 1.0)
 		Pose.APPROACH:
 			if BaseballMoves.has_mocap():
-				_scrub("Bat_Approach", progress * BaseballMoves.MOCAP_APPROACH, BaseballMoves.MOCAP_APPROACH)
+				var sw := BaseballMoves.swing_for(style)
+				_scrub("Bat_Approach_%s" % sw[0], progress * float(sw[1]), sw[1])
 			else:
 				_scrub("Approach_%s" % style, progress, 1.0)
 		Pose.FINISH:
 			# Admiring it: holds the end of his swing.
 			if BaseballMoves.has_mocap():
-				_scrub("Bat_Swing", BaseballMoves.MOCAP_SWING, BaseballMoves.MOCAP_SWING)
+				var sw := BaseballMoves.swing_for(style)
+				_scrub("Bat_Swing_%s" % sw[0], sw[3], sw[3])
 			else:
 				_scrub("Swing_%s" % style, 1.0, 1.0)
 		Pose.PITCH:
@@ -526,11 +529,11 @@ func _scrub(move: String, progress: float, length: float) -> void:
 
 ## Swing progress (0..1, contact at BattingStyles.CONTACT_AT) to the
 ## captured swing's time, so its contact frame lands on contact.
-static func _swing_time(p: float) -> float:
+static func _swing_time(p: float, contact: float, length: float) -> float:
 	var c := BattingStyles.CONTACT_AT
 	if p <= c:
-		return p / c * BaseballMoves.MOCAP_CONTACT
-	return lerpf(BaseballMoves.MOCAP_CONTACT, BaseballMoves.MOCAP_SWING, (p - c) / (1.0 - c))
+		return p / c * contact
+	return lerpf(contact, length, (p - c) / (1.0 - c))
 
 
 ## Standing still: catchers squat, gloved fielders sit in their ready

@@ -38,7 +38,11 @@ const MAP := {
 ## `mirror`: the left-handed version, the mocap reflected left for right
 ## (each side's bones take the other side's turn, reflected across the
 ## body's mid plane), so lefties are an exact mirror.
-static func bake(name: String, target: Skeleton3D, from: float = 0.0, to: float = -1.0, loop: bool = false, mirror: bool = false) -> Animation:
+## `yaw` (degrees) turns the whole capture about the vertical first: the
+## batting captures face about 87 degrees off the way the players' clips
+## are built (chest to the plate), the pitching and catching ones don't.
+static func bake(name: String, target: Skeleton3D, from: float = 0.0, to: float = -1.0, loop: bool = false, mirror: bool = false, yaw: float = 0.0) -> Animation:
+	var spin := Quaternion(Vector3.UP, deg_to_rad(yaw))
 	var path := DIR + name + ".fbx"
 	if not ResourceLoader.exists(path):
 		return null
@@ -76,6 +80,7 @@ static func bake(name: String, target: Skeleton3D, from: float = 0.0, to: float 
 				var pair: Array = bones[i]
 				var s: int = pair[0]
 				var turn := (src_g[s] as Transform3D).basis.get_rotation_quaternion() * src.get_bone_global_rest(s).basis.get_rotation_quaternion().inverse()
+				turn = spin * turn
 				if mirror:
 					# Reflected across the X = 0 plane.
 					turn = Quaternion(turn.x, -turn.y, -turn.z, turn.w)
@@ -84,7 +89,7 @@ static func bake(name: String, target: Skeleton3D, from: float = 0.0, to: float 
 			else:
 				g = parent_g * target.get_bone_rest(i).basis.get_rotation_quaternion()
 			globals[i] = g
-		var moved := ((src_g[hips] as Transform3D).origin - src.get_bone_global_rest(hips).origin) * scale
+		var moved := spin * (((src_g[hips] as Transform3D).origin - src.get_bone_global_rest(hips).origin) * scale)
 		if mirror:
 			moved.x = -moved.x
 		var root_g := target.get_bone_global_rest(target.get_bone_parent(pelvis))

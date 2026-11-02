@@ -39,28 +39,48 @@ static func library(skeleton: Skeleton3D, player: AnimationPlayer) -> AnimationL
 	# and swing, and the lefty versions mirrored from the same capture.
 	for spec: Array in MOCAP:
 		for lefty: bool in [false, true]:
-			var anim := MixamoRetarget.bake(spec[1], skeleton, spec[2], spec[3], spec[4], lefty)
+			var anim := MixamoRetarget.bake(spec[1], skeleton, spec[2], spec[3], spec[4], lefty, spec[5])
 			if anim != null:
 				_library.add_animation(StringName(String(spec[0]) + ("_L" if lefty else "")), anim)
 	return _library
 
 
-## Captured clips: [name, Mixamo file, from s, to s, loop]. Bat_Swing
-## starts at the launch; its contact frame is MOCAP_CONTACT in.
-const MOCAP := [
-	["Bat_Stance", "Baseball_Idle", 0.0, -1.0, true],
-	["Bat_Approach", "Baseball_Hit", 0.0, 1.12, false],
-	["Bat_Swing", "Baseball_Hit", 1.12, 1.75, false],
-	# The delivery: set, kick, stride, release (MOCAP_RELEASE), follow-through.
-	["Pitch_Mocap", "Baseball_Pitching_2", 0.0, 2.43, false],
-	# The catcher's squat behind the plate.
-	["Catcher_Mocap", "Baseball_Catcher", 0.0, 2.8, true],
-]
+## The batting captures face this far (degrees) off the players' clips.
+const BAT_YAW := 87.0
+## Captured swings per batting style: [Mixamo file, launch s, contact s
+## after the launch, swing end s after the launch]. Classic, crouch and
+## open swing Hit; the power styles the bigger load and coil of Hit 2; the
+## slap the short, compact Hit 3.
+const SWINGS := {
+	&"hit": ["Baseball_Hit", 1.12, 0.21, 0.66],
+	&"power": ["Baseball_Hit_2", 1.12, 0.21, 0.73],
+	&"compact": ["Baseball_Hit_3", 0.76, 0.22, 0.56],
+}
+const STYLE_SWING := {&"classic": &"hit", &"crouch": &"hit", &"open": &"hit", &"leg_kick": &"power", &"wrap": &"power", &"slap": &"compact"}
+## Captured clips: [name, Mixamo file, from s, to s, loop, yaw].
+static var MOCAP := _mocap_specs()
 const MOCAP_RELEASE := 1.63
 const MOCAP_PITCH := 2.43
-const MOCAP_CONTACT := 0.18
-const MOCAP_SWING := 0.63
-const MOCAP_APPROACH := 1.12
+
+
+static func _mocap_specs() -> Array:
+	var out := [["Bat_Stance", "Baseball_Idle", 0.0, -1.0, true, BAT_YAW],
+		# The delivery: set, kick, stride, release (MOCAP_RELEASE), follow-through.
+		["Pitch_Mocap", "Baseball_Pitching_2", 0.0, MOCAP_PITCH, false, 0.0],
+		# The catcher's squat behind the plate.
+		["Catcher_Mocap", "Baseball_Catcher", 0.0, 2.8, true, 0.0]]
+	for key: StringName in SWINGS:
+		var s: Array = SWINGS[key]
+		out.append(["Bat_Approach_%s" % key, s[0], 0.0, s[1], false, BAT_YAW])
+		out.append(["Bat_Swing_%s" % key, s[0], s[1], float(s[1]) + float(s[3]), false, BAT_YAW])
+	return out
+
+
+## A style's captured swing: [clip key, launch, contact after, swing length].
+static func swing_for(style: StringName) -> Array:
+	var key: StringName = STYLE_SWING.get(style, &"hit")
+	var s: Array = SWINGS[key]
+	return [key, s[1], s[2], s[3]]
 
 
 ## Whether the captured batting clips are in (the Mixamo files exist).

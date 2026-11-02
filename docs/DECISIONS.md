@@ -2281,3 +2281,14 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   follow-through), the game's release frame mapped onto the capture's;
   the catcher waits in `Baseball_Catcher`'s squat (0-2.8 s, looped).
   Lefty pitchers use the mirrored capture.
+- **Batting captures turned 87 degrees (2026-11-02):** the owner's pitcher
+  view showed the batter's back number. The batting captures face about
+  87 degrees off our convention (shoulder/hip line measured: old stance
+  85, raw capture -2), so every batting bake (`Bat_Stance`,
+  `Bat_Approach_*`, `Bat_Swing_*`) gets `BaseballMoves.BAT_YAW` before the
+  mirror. The pitching and catching captures need no turn.
+- **One swing capture per style family:** classic, crouch and open swing
+  `Baseball_Hit`; the power styles (leg kick, wrap) swing
+  `Baseball_Hit_2`; slap swings the shorter `Baseball_Hit_3`
+  (`BaseballMoves.STYLE_SWING` / `swing_for`). Each has its own launch,
+  contact and length, timed onto the game's contact.
