@@ -78,6 +78,9 @@ const WALKUP_FROM := 0.4
 const WALKUP_TO := 4.6
 const WALKUP_SPEED := 1.75
 const WALKUP_TIME := (WALKUP_TO - WALKUP_FROM) / WALKUP_SPEED
+## The umpire's called strike (Baseball_Umpire from his set to the end,
+## 2.17 s) as played (ActorView.UMP_CALL_SPEED).
+const UMP_CALL_TIME := 2.17 / 1.3
 ## Captured clips: [name, Mixamo file, from s, to s, loop, yaw, pingpong].
 static var MOCAP := _mocap_specs()
 const MOCAP_RELEASE := 1.63
@@ -97,6 +100,9 @@ static func _mocap_specs() -> Array:
 		# Fielders between pitches, hands on knees (the umpire capture's
 		# set, before his call).
 		["Knees_Mocap", "Baseball_Umpire", 0.0, 0.45, true, 0.0, true],
+		# The home-plate umpire's called strike: from his set, the punch
+		# out and back to the set.
+		["Ump_Call", "Baseball_Umpire", 0.45, -1.0, false, 0.0],
 		# The next batter walking up into the box (after Bat_Stance, which
 		# it ends on).
 		["Bat_WalkUp", "Baseball_Walk_In", WALKUP_FROM, WALKUP_TO, false, BAT_YAW]]

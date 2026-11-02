@@ -41,6 +41,13 @@ var _bats_left := false
 var _batter_id: StringName = &""
 ## When the current batter's walk-up into the box ends (view clock).
 var _walkup_until := -1.0
+## The home-plate umpire (the owner's Meshy model over a player skeleton),
+## and when his called-strike signal ends.
+var _umpire: ActorView
+var _ump_call_until := -1.0
+## Behind the catcher, on the batter's side of him (m).
+const UMPIRE_BACK := 0.95
+const UMPIRE_INSIDE := 0.3
 var _runners := {}
 var _zone: Node3D
 var _cursor: MeshInstance3D
@@ -204,6 +211,7 @@ func setup(p_tuning: BaseballTuning) -> void:
 		actor.setup(HOME_COLOR, String(id).to_upper())
 		actor.fx = fx
 		_fielders.append(actor)
+	_build_umpire()
 	_build_zone()
 	_build_bat()
 	_build_aim_and_flash()
@@ -455,6 +463,7 @@ func reset_for_pitch(state: MatchState) -> void:
 		_fielders[i].relaxed = role != &"p" and role != &"c"
 	batter.position = _batter_spot()
 	batter.face(batter.position + (Vector3.LEFT if _bats_left else Vector3.RIGHT))  # square to the plate
+	_place_umpire()
 	set_bat(true)
 	_pitch_u = -1.0
 	_contact_tier = 0
@@ -493,6 +502,45 @@ func set_bat(visible_now: bool) -> void:
 		_drop_bat()
 	_bat_swing_start = -1.0
 	_bat_bunt = false
+
+
+func _build_umpire() -> void:
+	if not ResourceLoader.exists(BodyDouble.UMPIRE):
+		return
+	_umpire = ActorView.new()
+	_umpire.name = "Umpire"
+	add_child(_umpire)
+	_umpire.setup(Color(0.12, 0.13, 0.16), "UMP")
+	_umpire.set_glove_visible(false)
+	_umpire.set_body(&"umpire")
+	_umpire.set_tag_visible(false)
+	_umpire.umpire = true
+
+
+## Stands the umpire in the slot behind the catcher, inside toward the
+## batter, facing the pitcher.
+func _place_umpire() -> void:
+	if _umpire == null:
+		return
+	var c := tuning.fielder_ids.find(&"c")
+	var behind := FieldLayout.fielder_spot(c, tuning) if c >= 0 else Vector3(0, 0, 1.2)
+	_umpire.position = behind + Vector3((UMPIRE_INSIDE if _bats_left else -UMPIRE_INSIDE), 0.0, UMPIRE_BACK)
+	_umpire.face(Vector3(0.0, 0.0, FieldLayout.MOUND_CENTER.z))
+	_ump_call_until = -1.0
+	_umpire.reset_pose()
+
+
+## A called strike: the umpire punches it out.
+func umpire_call_strike() -> void:
+	if _umpire != null and BaseballMoves.has_mocap():
+		_ump_call_until = _view_clock + BaseballMoves.UMP_CALL_TIME
+
+
+func _update_umpire(delta: float) -> void:
+	if _umpire == null:
+		return
+	_umpire.visible = _camera_mode != CameraMode.BAT
+	_umpire.animate(ActorView.Pose.UMP_CALL if _view_clock < _ump_call_until else ActorView.Pose.IDLE, delta)
 
 
 ## The new batter is still walking up to the plate (the pitch waits).
@@ -848,6 +896,7 @@ func _process(delta: float) -> void:
 		_camera.fov = CAMERA_FOV[_camera_mode] - 5.0 * kick
 	_update_bat()
 	_update_windup(delta)
+	_update_umpire(delta)
 	_spin_ball()
 	if _camera_mode == CameraMode.FLIGHT and _flight != null:
 		_flight_camera(delta, kick)

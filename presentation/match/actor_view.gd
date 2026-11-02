@@ -7,7 +7,7 @@ extends Node3D
 ## Gameplay decides where everyone is; this only picks a clip per pose,
 ## matches run cycles to speed and keeps the glove on the hand. Visual only.
 
-enum Pose { IDLE, RUN, TURN, CHASE, TAG, THROW, DOWN, SLIDE, BAT_STANCE, SWING, CELEBRATE, BUNT, PITCH, SCOOP, CATCH_HIGH, DIVE, LEAD, APPROACH, FINISH, WALK_UP }
+enum Pose { IDLE, RUN, TURN, CHASE, TAG, THROW, DOWN, SLIDE, BAT_STANCE, SWING, CELEBRATE, BUNT, PITCH, SCOOP, CATCH_HIGH, DIVE, LEAD, APPROACH, FINISH, WALK_UP, UMP_CALL }
 
 const BODY := preload("res://assets/third_party/quaternius/universal-animation-library/UAL1_Standard.glb")
 ## The player's body: Quaternius Universal Base Characters (CC0), on the
@@ -34,6 +34,8 @@ const CROWN := Vector3(0.0, 1.68, 0.0)
 const BLEND := 0.12
 ## The bunt capture plays this much faster than captured (squared in ~0.4 s).
 const BUNT_SPEED := 2.4
+## The umpire's called strike, a little quicker than captured (~1.7 s).
+const UMP_CALL_SPEED := 1.3
 ## Hands off the knees into the ready crouch.
 const READY_BLEND := 0.35
 ## Arcade proportions: a little broader and bigger than life, so players
@@ -90,6 +92,8 @@ var relaxed := false:
 		relaxed = value
 		if _pose == -1 or _pose == Pose.IDLE:
 			_play(_idle_clip(), 1.0, READY_BLEND)
+## The home-plate umpire: idles in his hands-on-knees set.
+var umpire := false
 ## The pitcher winds up (bases empty) instead of pitching from the stretch.
 var full_windup := false
 var _pose := -1
@@ -396,6 +400,9 @@ func animate(pose: Pose, delta: float, speed: float = 0.0, juke: bool = false, p
 				_scrub("Pitch", progress, BaseballMoves.PITCH_LENGTH)
 			# Planted through the stride; the kick leg (well up) stays free.
 			_plant.pin = progress > 0.05
+		Pose.UMP_CALL:
+			if fresh:
+				_play(BaseballMoves.clip("Ump_Call"), UMP_CALL_SPEED, BLEND, true)
 		Pose.WALK_UP:
 			# The next batter walks into the box and settles (held at its end).
 			# (Also if something swapped his clip mid-walk, e.g. a switch of
@@ -569,6 +576,8 @@ static func _swing_time(p: float, contact: float, length: float) -> float:
 func _idle_clip() -> StringName:
 	if _crouched:
 		return BaseballMoves.clip("Catcher_Mocap" if BaseballMoves.has_mocap() else "Catcher", _lefty)
+	if umpire and BaseballMoves.has_mocap():
+		return BaseballMoves.clip("Knees_Mocap")
 	if _glove != null and _glove.visible:
 		if relaxed and BaseballMoves.has_mocap():
 			return BaseballMoves.clip("Knees_Mocap", _lefty)

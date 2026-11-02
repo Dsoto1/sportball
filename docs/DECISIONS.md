@@ -2333,3 +2333,16 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   pre-pitch clock: the AI's windup, the pitch clock, pickoffs, steals
   and the user's pitch all wait (`MatchView.walking_up()`).
   `tools/batter_closeup.gd ... walkup [righty]` shows it.
+- **Home-plate umpire (2026-11-02):** the owner's Meshy umpire (rigged in
+  Meshy's app, Mixamo bone names; MSH-089) stands in the slot behind the
+  catcher, 0.3 m to the batter's side, facing the pitcher. He is a
+  player skeleton wearing the model (`BodyDouble` now also reads
+  Mixamo-named rigs, with or without the `mixamorig_` prefix), idles in
+  the umpire capture's hands-on-knees set and punches out called
+  strikes (`Ump_Call`, `Baseball_Umpire` 0.45 s to the end, 1.3x;
+  `MatchView.umpire_call_strike()`). Like the catcher he is hidden in
+  the batting camera, where he would stand between the camera and the
+  plate. The rigged GLB came from the Drive by direct download (the
+  connector caps files at 10 MB); `tools/glb_shrink_textures.py` brings
+  the 27.6 MB file to 2.2 MB. `tools/batter_closeup.gd ... umpire`
+  shows his set and call.

@@ -9,6 +9,7 @@ extends SceneTree
 ## style argument's neighbour (swing <style> flip) to barrel it and watch
 ## the bat flip after contact, `pitcher` to watch from the mound, or
 ## `chest` or `rear` for the swing from the book's camera angles,
+## `umpire` for the home-plate umpire's set and strike call,
 ## `walkup` for the next batter walking into the box,
 ## `bunt` to square around and bunt instead of swinging,
 ## `slowmo` for the whip from the press to contact at quarter speed.
@@ -22,6 +23,9 @@ const WINDUP_FROM := 60
 const PITCH_FROM := 120
 const PRESS := 136
 const SHOTS := [70, 104, 132, 137, 140, 146, 160]
+## With `umpire`: the umpire's set and a called strike (shot frames,
+## the call pressed at 90), from the mound side then from first base.
+const UMP_SHOTS := [80, 100, 115, 130, 150, 175, 200]
 ## With `walkup`: a new batter walking up into the box (no pitch).
 const WALKUP_SHOTS := [61, 80, 98, 116, 134, 152, 175, 240]
 ## With `bunt`: squaring around from the press, held squared.
@@ -147,6 +151,19 @@ func _swing_sequence(at: Vector3) -> bool:
 	_cam.look_at(at + Vector3(0, 1.05, 0))
 	if batter != null and _style != &"":
 		batter.style = _style
+	if OS.get_cmdline_user_args().has("umpire") and _view._umpire != null:
+		# The umpire from the mound side and from first base: his set, then
+		# a called strike.
+		var ump: ActorView = _view._umpire
+		var side := 1.0 if (_frames / 400) % 2 == 0 else 0.0
+		_cam.position = ump.global_position + (Vector3(0.0, 1.4, -3.6) if side > 0.0 else Vector3(3.4, 1.3, 0.0))
+		_cam.look_at(ump.global_position + Vector3(0, 0.95, 0))
+		if _frames == 90 or _frames == 490:
+			_view.umpire_call_strike()
+		var shot := _frames % 400
+		if shot in UMP_SHOTS:
+			root.get_texture().get_image().save_png(_out.path_join("ump_%d_%d.png" % [_frames / 400, UMP_SHOTS.find(shot)]))
+		return _frames > 400 + UMP_SHOTS[-1]
 	if OS.get_cmdline_user_args().has("walkup"):
 		# A new batter walks up into the box; no pitch. Wide, from the
 		# mound side, so the whole walk is in frame.

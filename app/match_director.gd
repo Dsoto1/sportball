@@ -602,6 +602,8 @@ func _apply_call() -> String:
 		MatchState.PitchCall.FOUL_BUNT: "FOUL BUNT",
 	}[call]
 	_hud.show_callout(text, _timing_detail(), 1.0)
+	if call == MatchState.PitchCall.CALLED_STRIKE:
+		_view.umpire_call_strike()
 	state.apply_pitch_call(call)
 	_set_phase(Phase.CALL)
 	return text

@@ -12,6 +12,10 @@ extends SkeletonModifier3D
 
 ## The robot player (Meshy image-to-3D, rigged by Meshy).
 const ROBOT := "res://assets/generated/meshy/robot_player/robot_player.glb"
+## The home-plate umpire (the owner's Meshy model, rigged in Meshy's app
+## on a Mixamo-named skeleton; textures shrunk by tools/glb_shrink_textures.py).
+const UMPIRE := "res://assets/generated/meshy/umpire/umpire.glb"
+const BODIES := {&"robot": ROBOT, &"umpire": UMPIRE}
 
 ## Body bone -> player (Quaternius UAL) bone.
 const MAP := {
@@ -22,6 +26,9 @@ const MAP := {
 	"LeftUpLeg": "thigh_l", "LeftLeg": "calf_l", "LeftFoot": "foot_l", "LeftToeBase": "ball_l",
 	"RightUpLeg": "thigh_r", "RightLeg": "calf_r", "RightFoot": "foot_r", "RightToeBase": "ball_r",
 }
+## The same for a Mixamo-named skeleton ("mixamorig:" prefix dropped):
+## the spine counts up from the hips instead of down from the neck.
+const MIXAMO_SPINE := {"Spine": "spine_01", "Spine1": "spine_02", "Spine2": "spine_03", "Neck": "neck_01"}
 ## Limb bones lined up with the player's rest: the segment each is
 ## measured along, [body from, body to, player from, player to]. Hands and
 ## toes line up as their forearm and foot do; the torso keeps its rest.
@@ -59,15 +66,17 @@ var _scale := 1.0
 var _lift := 0.0
 # Scratch: each body bone's turn in skeleton space this frame.
 var _global: Array[Quaternion] = []
+## The body's skeleton uses Mixamo's names ("mixamorig:Hips", ...).
+var _mixamo := false
 
 
-## A body of `kind` (&"robot") to wear on `source`, or null if unknown.
+## A body of `kind` (BODIES) to wear on `source`, or null if unknown.
 static func make(kind: StringName, source: Skeleton3D) -> BodyDouble:
-	if kind != &"robot" or not ResourceLoader.exists(ROBOT):
+	if not BODIES.has(kind) or not ResourceLoader.exists(BODIES[kind]):
 		return null
 	var double := BodyDouble.new()
 	double.name = "BodyDouble"
-	double.body = (load(ROBOT) as PackedScene).instantiate()
+	double.body = (load(BODIES[kind]) as PackedScene).instantiate()
 	double.target = double.body.find_children("*", "Skeleton3D", true, false)[0]
 	# The model's own clips stay off; the player's skeleton drives it.
 	for player: AnimationPlayer in double.body.find_children("*", "AnimationPlayer", true, false):
@@ -78,6 +87,7 @@ static func make(kind: StringName, source: Skeleton3D) -> BodyDouble:
 
 
 func _bind(source: Skeleton3D) -> void:
+	_mixamo = target.find_bone("mixamorig:Hips") >= 0 or target.find_bone("mixamorig_Hips") >= 0
 	var order: Array = []
 	for i in target.get_bone_count():
 		order.append(i)
@@ -86,10 +96,15 @@ func _bind(source: Skeleton3D) -> void:
 	order.sort_custom(func(a: int, b: int) -> bool: return _depth(a) < _depth(b))
 	_global.resize(target.get_bone_count())
 	for i: int in order:
-		var name := target.get_bone_name(i)
-		if not MAP.has(name):
+		var name := _plain(target.get_bone_name(i))
+		var player_bone: String = ""
+		if _mixamo and MIXAMO_SPINE.has(name):
+			player_bone = MIXAMO_SPINE[name]
+		elif MAP.has(name) and not (_mixamo and name in ["Spine02", "Spine01", "neck"]):
+			player_bone = MAP[name]
+		if player_bone == "":
 			continue
-		var j := source.find_bone(MAP[name])
+		var j := source.find_bone(player_bone)
 		if j < 0:
 			continue
 		var align := Quaternion()
@@ -102,7 +117,7 @@ func _bind(source: Skeleton3D) -> void:
 		var body_rest := target.get_bone_global_rest(i).basis.get_rotation_quaternion()
 		var player_rest := source.get_bone_global_rest(j).basis.get_rotation_quaternion()
 		_bones.append([i, j, target.get_bone_parent(i), player_rest.inverse(), align * body_rest])
-	_hips = target.find_bone("Hips")
+	_hips = _find(target, "Hips")
 	_pelvis = source.find_bone("pelvis")
 	_hips_rest = target.get_bone_global_rest(_hips).origin
 	_pelvis_rest = source.get_bone_global_rest(_pelvis).origin
@@ -124,7 +139,21 @@ func _depth(i: int) -> int:
 
 
 static func _pos(skeleton: Skeleton3D, bone: String) -> Vector3:
-	return skeleton.get_bone_global_rest(skeleton.find_bone(bone)).origin
+	return skeleton.get_bone_global_rest(_find(skeleton, bone)).origin
+
+
+## A bone by its plain name, with or without Mixamo's prefix.
+static func _find(skeleton: Skeleton3D, bone: String) -> int:
+	# (Godot's import may turn the colon into an underscore.)
+	for name: String in [bone, "mixamorig:" + bone, "mixamorig_" + bone]:
+		var i := skeleton.find_bone(name)
+		if i >= 0:
+			return i
+	return -1
+
+
+static func _plain(bone: String) -> String:
+	return bone.trim_prefix("mixamorig:").trim_prefix("mixamorig_")
 
 
 func _process_modification() -> void:
