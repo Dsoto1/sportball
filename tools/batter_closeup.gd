@@ -9,6 +9,7 @@ extends SceneTree
 ## style argument's neighbour (swing <style> flip) to barrel it and watch
 ## the bat flip after contact, `pitcher` to watch from the mound, or
 ## `chest` or `rear` for the swing from the book's camera angles,
+## `walkup` for the next batter walking into the box,
 ## `bunt` to square around and bunt instead of swinging,
 ## `slowmo` for the whip from the press to contact at quarter speed.
 ## `style:<name>` overrides the batter's style for the stills too;
@@ -21,6 +22,8 @@ const WINDUP_FROM := 60
 const PITCH_FROM := 120
 const PRESS := 136
 const SHOTS := [70, 104, 132, 137, 140, 146, 160]
+## With `walkup`: a new batter walking up into the box (no pitch).
+const WALKUP_SHOTS := [61, 80, 98, 116, 134, 152, 175, 240]
 ## With `bunt`: squaring around from the press, held squared.
 const BUNT_SHOTS := [132, 138, 142, 146, 150, 156, 166]
 var _out := ""
@@ -144,6 +147,20 @@ func _swing_sequence(at: Vector3) -> bool:
 	_cam.look_at(at + Vector3(0, 1.05, 0))
 	if batter != null and _style != &"":
 		batter.style = _style
+	if OS.get_cmdline_user_args().has("walkup"):
+		# A new batter walks up into the box; no pitch. Wide, from the
+		# mound side, so the whole walk is in frame.
+		_cam.position = at + Vector3(0.0, 2.2, -6.5)
+		_cam.look_at(at + Vector3(0, 0.9, 0))
+		if _frames == WINDUP_FROM:
+			_view._walkup_until = _view._view_clock + BaseballMoves.WALKUP_TIME
+		var walker: ActorView = _view._runners.get(_view._batter_id)
+		if walker != null and _frames % 20 == 1:
+			var sk: Skeleton3D = walker._skeleton
+			print("WALK f=%d pelvis %s spot %s" % [_frames, (sk.global_transform * sk.get_bone_global_pose(sk.find_bone("pelvis")).origin).snapped(Vector3.ONE * 0.01), walker.global_position.snapped(Vector3.ONE * 0.01)])
+		if _frames in WALKUP_SHOTS:
+			root.get_texture().get_image().save_png(_out.path_join("walkup_%d.png" % WALKUP_SHOTS.find(_frames)))
+		return _frames > WALKUP_SHOTS[-1]
 	if _frames >= WINDUP_FROM and _frames < PITCH_FROM:
 		_view._windup = float(_frames - WINDUP_FROM) / (PITCH_FROM - WINDUP_FROM)
 	elif _frames >= PITCH_FROM:

@@ -2322,3 +2322,14 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   now); Batter On Deck and Milling Idle need an on-deck circle or dugout
   players; Idle 2 (a crouched batting stance) would pop into the swing's
   approach, which starts from Hit's own stance.
+- **Batter walk-up between at-bats (2026-11-02):** each new batter
+  (a new id at `MatchView.reset_for_pitch`, pinch hitters included)
+  walks into the box with the `Baseball_Walk_In` capture (0.4-4.6 s,
+  turned like the other batting captures, played 1.75x: about 2.4 s),
+  carrying the bat, and settles into his stance. The clip's hips are
+  shifted so its last frame stands exactly where `Bat_Stance` does, so
+  there is no snap at the hand-off (the pelvis keys are in the root
+  bone's Z-up frame). While he walks up the director holds the
+  pre-pitch clock: the AI's windup, the pitch clock, pickoffs, steals
+  and the user's pitch all wait (`MatchView.walking_up()`).
+  `tools/batter_closeup.gd ... walkup [righty]` shows it.

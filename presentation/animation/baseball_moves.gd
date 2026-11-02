@@ -43,6 +43,10 @@ static func library(skeleton: Skeleton3D, player: AnimationPlayer) -> AnimationL
 			if anim != null and spec.size() > 6 and spec[6]:
 				# A short hold played back and forth, so it never pops.
 				anim.loop_mode = Animation.LOOP_PINGPONG
+			if anim != null and String(spec[0]) == "Bat_WalkUp":
+				# He walks into his stance spot: the walk ends where the
+				# stance's hips stand.
+				_end_at(anim, _library.get_animation(StringName("Bat_Stance" + ("_L" if lefty else ""))))
 			if anim != null:
 				_library.add_animation(StringName(String(spec[0]) + ("_L" if lefty else "")), anim)
 	return _library
@@ -67,6 +71,13 @@ const BUNT_TO := 1.35
 ## The full windup (bases empty; Baseball_Pitching): release and end.
 const WINDUP_RELEASE := 2.1
 const WINDUP_END := 2.9
+## The next batter's walk-up (Baseball_Walk_In): about a metre from
+## outside the box into his stance, hands up; played WALKUP_SPEED times
+## faster than captured.
+const WALKUP_FROM := 0.4
+const WALKUP_TO := 4.6
+const WALKUP_SPEED := 1.75
+const WALKUP_TIME := (WALKUP_TO - WALKUP_FROM) / WALKUP_SPEED
 ## Captured clips: [name, Mixamo file, from s, to s, loop, yaw, pingpong].
 static var MOCAP := _mocap_specs()
 const MOCAP_RELEASE := 1.63
@@ -85,12 +96,38 @@ static func _mocap_specs() -> Array:
 		["Windup_Mocap", "Baseball_Pitching", 0.0, WINDUP_END, false, 0.0],
 		# Fielders between pitches, hands on knees (the umpire capture's
 		# set, before his call).
-		["Knees_Mocap", "Baseball_Umpire", 0.0, 0.45, true, 0.0, true]]
+		["Knees_Mocap", "Baseball_Umpire", 0.0, 0.45, true, 0.0, true],
+		# The next batter walking up into the box (after Bat_Stance, which
+		# it ends on).
+		["Bat_WalkUp", "Baseball_Walk_In", WALKUP_FROM, WALKUP_TO, false, BAT_YAW]]
 	for key: StringName in SWINGS:
 		var s: Array = SWINGS[key]
 		out.append(["Bat_Approach_%s" % key, s[0], 0.0, s[1], false, BAT_YAW])
 		out.append(["Bat_Swing_%s" % key, s[0], s[1], float(s[1]) + float(s[3]), false, BAT_YAW])
 	return out
+
+
+## Shifts a clip's pelvis track so its last frame stands
+## where `to`'s first frame does.
+static func _end_at(anim: Animation, to: Animation) -> void:
+	var a := _pelvis_track(anim)
+	var b := _pelvis_track(to)
+	if a < 0 or b < 0 or anim.track_get_key_count(a) == 0:
+		return
+	var last: Vector3 = anim.track_get_key_value(a, anim.track_get_key_count(a) - 1)
+	# (The keys are in the root bone's frame, which is Z-up; the walk ends
+	# at the stance's own hip height, so the whole offset is along the
+	# ground.)
+	var shift: Vector3 = to.track_get_key_value(b, 0) - last
+	for k in anim.track_get_key_count(a):
+		anim.track_set_key_value(a, k, (anim.track_get_key_value(a, k) as Vector3) + shift)
+
+
+static func _pelvis_track(anim: Animation) -> int:
+	for tr in anim.get_track_count():
+		if anim.track_get_type(tr) == Animation.TYPE_POSITION_3D and String(anim.track_get_path(tr).get_concatenated_subnames()) == "pelvis":
+			return tr
+	return -1
 
 
 ## A style's captured swing: [clip key, launch, contact after, swing length].

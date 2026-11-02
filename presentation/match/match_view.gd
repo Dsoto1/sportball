@@ -39,6 +39,8 @@ var _roster: MatchRoster
 ## Current batter hits left-handed: he stands in the other box.
 var _bats_left := false
 var _batter_id: StringName = &""
+## When the current batter's walk-up into the box ends (view clock).
+var _walkup_until := -1.0
 var _runners := {}
 var _zone: Node3D
 var _cursor: MeshInstance3D
@@ -428,6 +430,9 @@ func reset_for_pitch(state: MatchState) -> void:
 	_clear_runners()
 	_batting_home = state.batting_team() == MatchState.HOME
 	var batter := _runner_actor(state.current_batter(), batting_color, batting_trim)
+	if state.current_batter() != _batter_id and BaseballMoves.has_mocap():
+		# A new batter: he walks up into the box first.
+		_walkup_until = _view_clock + BaseballMoves.WALKUP_TIME
 	_batter_id = state.current_batter()
 	batter.set_tag_visible(_camera_mode == CameraMode.FIELD or _camera_mode == CameraMode.FLIGHT)
 	var hitter := _roster.player(state.current_batter()) if _roster != null else null
@@ -488,6 +493,11 @@ func set_bat(visible_now: bool) -> void:
 		_drop_bat()
 	_bat_swing_start = -1.0
 	_bat_bunt = false
+
+
+## The new batter is still walking up to the plate (the pitch waits).
+func walking_up() -> bool:
+	return _view_clock < _walkup_until
 
 
 ## Squares around: the bat held flat out over the plate.
@@ -1018,7 +1028,9 @@ func _update_bat() -> void:
 		if batter != null:
 			batter.animate(ActorView.Pose.SWING, delta, 0.0, false, p)
 	elif batter != null:
-		if _approach > 0.001:
+		if walking_up():
+			batter.animate(ActorView.Pose.WALK_UP, delta)
+		elif _approach > 0.001:
 			batter.animate(ActorView.Pose.APPROACH, delta, 0.0, false, _approach)
 		else:
 			batter.animate(ActorView.Pose.BAT_STANCE, delta)

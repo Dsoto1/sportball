@@ -7,7 +7,7 @@ extends Node3D
 ## Gameplay decides where everyone is; this only picks a clip per pose,
 ## matches run cycles to speed and keeps the glove on the hand. Visual only.
 
-enum Pose { IDLE, RUN, TURN, CHASE, TAG, THROW, DOWN, SLIDE, BAT_STANCE, SWING, CELEBRATE, BUNT, PITCH, SCOOP, CATCH_HIGH, DIVE, LEAD, APPROACH, FINISH }
+enum Pose { IDLE, RUN, TURN, CHASE, TAG, THROW, DOWN, SLIDE, BAT_STANCE, SWING, CELEBRATE, BUNT, PITCH, SCOOP, CATCH_HIGH, DIVE, LEAD, APPROACH, FINISH, WALK_UP }
 
 const BODY := preload("res://assets/third_party/quaternius/universal-animation-library/UAL1_Standard.glb")
 ## The player's body: Quaternius Universal Base Characters (CC0), on the
@@ -396,6 +396,13 @@ func animate(pose: Pose, delta: float, speed: float = 0.0, juke: bool = false, p
 				_scrub("Pitch", progress, BaseballMoves.PITCH_LENGTH)
 			# Planted through the stride; the kick leg (well up) stays free.
 			_plant.pin = progress > 0.05
+		Pose.WALK_UP:
+			# The next batter walks into the box and settles (held at its end).
+			# (Also if something swapped his clip mid-walk, e.g. a switch of
+			# sides.)
+			var walk := BaseballMoves.clip("Bat_WalkUp", _lefty)
+			if fresh or _clip != walk:
+				_play(walk, BaseballMoves.WALKUP_SPEED, BLEND, true)
 		Pose.BAT_STANCE:
 			_play(BaseballMoves.clip("Bat_Stance" if BaseballMoves.has_mocap() else "Stance_%s" % style, _lefty), 1.0)
 		Pose.BUNT:
