@@ -367,7 +367,13 @@ func animate(pose: Pose, delta: float, speed: float = 0.0, juke: bool = false, p
 			else:
 				_scrub("Swing_%s" % style, 1.0, 1.0)
 		Pose.PITCH:
-			_scrub("Pitch", progress, BaseballMoves.PITCH_LENGTH)
+			if BaseballMoves.has_mocap():
+				# Release (progress 1) on the capture's release frame.
+				var t := progress * BaseballMoves.MOCAP_RELEASE if progress <= BaseballMoves.PITCH_RELEASE \
+					else lerpf(BaseballMoves.MOCAP_RELEASE, BaseballMoves.MOCAP_PITCH, (progress - BaseballMoves.PITCH_RELEASE) / (BaseballMoves.PITCH_LENGTH - BaseballMoves.PITCH_RELEASE))
+				_scrub("Pitch_Mocap", t, BaseballMoves.MOCAP_PITCH)
+			else:
+				_scrub("Pitch", progress, BaseballMoves.PITCH_LENGTH)
 			# Planted through the stride; the kick leg (well up) stays free.
 			_plant.pin = progress > 0.05
 		Pose.BAT_STANCE:
@@ -531,7 +537,7 @@ static func _swing_time(p: float) -> float:
 ## stance, everyone else stands.
 func _idle_clip() -> StringName:
 	if _crouched:
-		return BaseballMoves.clip("Catcher", _lefty)
+		return BaseballMoves.clip("Catcher_Mocap" if BaseballMoves.has_mocap() else "Catcher", _lefty)
 	if _glove != null and _glove.visible:
 		return BaseballMoves.clip("Ready", _lefty)
 	return &"Idle"

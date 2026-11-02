@@ -51,7 +51,13 @@ const MOCAP := [
 	["Bat_Stance", "Baseball_Idle", 0.0, -1.0, true],
 	["Bat_Approach", "Baseball_Hit", 0.0, 1.12, false],
 	["Bat_Swing", "Baseball_Hit", 1.12, 1.75, false],
+	# The delivery: set, kick, stride, release (MOCAP_RELEASE), follow-through.
+	["Pitch_Mocap", "Baseball_Pitching_2", 0.0, 2.43, false],
+	# The catcher's squat behind the plate.
+	["Catcher_Mocap", "Baseball_Catcher", 0.0, 2.8, true],
 ]
+const MOCAP_RELEASE := 1.63
+const MOCAP_PITCH := 2.43
 const MOCAP_CONTACT := 0.18
 const MOCAP_SWING := 0.63
 const MOCAP_APPROACH := 1.12

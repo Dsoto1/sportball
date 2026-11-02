@@ -2276,3 +2276,8 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   and Savant numbers still differ); the other two hit captures and the
   bunt, pitching, catcher and umpire clips are there for the next steps.
 - `tools/mocap_check.gd` shows any clip baked onto a player.
+- **Pitcher and catcher from the capture too:** the delivery is
+  `Baseball_Pitching_2` 0-2.43 s (set, kick, stride, release at 1.63 s,
+  follow-through), the game's release frame mapped onto the capture's;
+  the catcher waits in `Baseball_Catcher`'s squat (0-2.8 s, looped).
+  Lefty pitchers use the mirrored capture.
