@@ -2491,3 +2491,9 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
 - **The owner's Meshy bat (MSH-090):** `BatMesh.build()` returns it when
   present (else the lathe bat); it carries its own material, so the
   club's grip-tape colour no longer applies.
+- **Front arm in the stance (2026-11-03, owner: "what is going on with
+  that left arm"):** reaching across the chest to the back-shoulder grip
+  with the captured elbow (set for hands at the chest) folded the front
+  arm into the body. In the stance its elbow now points down and out in
+  front (`STANCE_FRONT_ELBOW`, blended by `stance`), and the grip sits
+  30 cm in front of the back shoulder (was 24) for clearance.

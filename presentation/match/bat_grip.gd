@@ -57,7 +57,10 @@ var _have_rest := false
 ## The stance spot from the back shoulder (m): x in toward the chest, y up,
 ## z in front; and the bat's tilt (per unit up): x back over the shoulder,
 ## y behind the head.
-const STANCE_HANDS := Vector3(0.06, -0.04, 0.24)
+const STANCE_HANDS := Vector3(0.06, -0.04, 0.3)
+## The front elbow's direction in the stance: x in front, y down, z out
+## toward the pitcher.
+const STANCE_FRONT_ELBOW := Vector3(0.75, 0.6, 0.15)
 const STANCE_BAT := Vector2(0.75, 0.3)
 ## The stance grip stays within this share of each arm's length.
 const STANCE_REACH := 0.82
@@ -383,6 +386,13 @@ func _reach(sk: Skeleton3D, side: String, target: Vector3) -> void:
 		off -= line * off.dot(line)
 		if off.length() > 0.01:
 			pole = off.normalized()
+		if stance > 0.0 and not rear:
+			# In the stance the front arm reaches across the chest to the back
+			# shoulder: its elbow points down and out in front of him (the
+			# captured elbow, set for hands at the chest, folds it into the
+			# body).
+			var front_pole := (front * STANCE_FRONT_ELBOW.x - up * STANCE_FRONT_ELBOW.y + out * STANCE_FRONT_ELBOW.z).normalized()
+			pole = pole.slerp(front_pole, clampf(stance, 0.0, 1.0)).normalized()
 	var elbow := PoseBaker.bend(s, target, a, b, pole, [spine, neck, across, front])
 	var parent_g := sk.get_bone_global_pose(sk.get_bone_parent(upper))
 	var new_upper := Basis(Quaternion((gl.origin - s).normalized(), (elbow - s).normalized())) * gu.basis
