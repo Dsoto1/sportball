@@ -2455,3 +2455,14 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   - Left: the top hand still rolls over the handle as captured. Fixing it
     well needs a better-gripped capture or a hand-posed top hand.
   - `tools/mocap_check.gd ... hands` shows the raw captured hands.
+- **Bottom hand posed onto the grip (2026-11-03, owner):** measured, the
+  capture's *top* hand is right (knuckles and palm toward the pitcher)
+  and the *bottom* hand is wrong (knuckles toward the catcher). On the
+  chest-side camera the bottom (left) arm sits on the viewer's right,
+  which is what read as the "right" wrist. For the clips with both hands
+  on the bat (`BaseballMoves._two_hands_on_bat`: stance, approaches,
+  swings, bunt) `MixamoRetarget._pose_bottom_hand` gives the bottom hand
+  the top hand's knuckle direction round the handle (thumbs and index
+  fingers up the bat, palms facing), keeps its grip point on the bat's
+  line and reaches its arm there. Skipped when the hands are spread
+  (over 0.2 m). Lefties get it mirrored (their right hand).

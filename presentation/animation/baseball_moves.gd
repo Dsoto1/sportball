@@ -39,7 +39,7 @@ static func library(skeleton: Skeleton3D, player: AnimationPlayer) -> AnimationL
 	# and swing, and the lefty versions mirrored from the same capture.
 	for spec: Array in MOCAP:
 		for lefty: bool in [false, true]:
-			var anim := MixamoRetarget.bake(spec[1], skeleton, spec[2], spec[3], spec[4], lefty, spec[5])
+			var anim := MixamoRetarget.bake(spec[1], skeleton, spec[2], spec[3], spec[4], lefty, spec[5], _two_hands_on_bat(String(spec[0])))
 			if anim != null and spec.size() > 6 and spec[6]:
 				# A short hold played back and forth, so it never pops.
 				anim.loop_mode = Animation.LOOP_PINGPONG
@@ -170,6 +170,12 @@ static func _pelvis_track(anim: Animation) -> int:
 		if anim.track_get_type(tr) == Animation.TYPE_POSITION_3D and String(anim.track_get_path(tr).get_concatenated_subnames()) == "pelvis":
 			return tr
 	return -1
+
+
+## The clips where both hands hold the bat (their bottom hand is posed
+## onto the grip; not the walk-up, step-out or on-deck clips).
+static func _two_hands_on_bat(name: String) -> bool:
+	return name == "Bat_Stance" or name == "Bunt_Mocap" or name.begins_with("Bat_Approach_") or name.begins_with("Bat_Swing_")
 
 
 ## A style's captured swing: [clip key, launch, contact after, swing length].

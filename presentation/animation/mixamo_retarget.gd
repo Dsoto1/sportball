@@ -11,6 +11,11 @@ extends RefCounted
 
 const DIR := "res://assets/third_party/mixamo/"
 const FPS := 30.0
+## The grip (as BatGrip): where the handle crosses the hand, and hands
+## farther apart than GRIP_SPREAD aren't stacked on a handle.
+const GRIP_PALM := Vector3(0.0, 0.115, 0.0)
+const GRIP_DEPTH := 0.03
+const GRIP_SPREAD := 0.2
 ## How much of the hand's roll about the forearm the forearm takes.
 const FOREARM_ROLL := 0.85
 
@@ -43,7 +48,9 @@ const MAP := {
 ## `yaw` (degrees) turns the whole capture about the vertical first: the
 ## batting captures face about 87 degrees off the way the players' clips
 ## are built (chest to the plate), the pitching and catching ones don't.
-static func bake(name: String, target: Skeleton3D, from: float = 0.0, to: float = -1.0, loop: bool = false, mirror: bool = false, yaw: float = 0.0) -> Animation:
+## `grip`: both hands on a bat (the batting clips): the bottom hand is
+## posed to hold the handle with the top one (_pose_bottom_hand).
+static func bake(name: String, target: Skeleton3D, from: float = 0.0, to: float = -1.0, loop: bool = false, mirror: bool = false, yaw: float = 0.0, grip: bool = false) -> Animation:
 	var spin := Quaternion(Vector3.UP, deg_to_rad(yaw))
 	var path := DIR + name + ".fbx"
 	if not ResourceLoader.exists(path):
@@ -100,6 +107,8 @@ static func bake(name: String, target: Skeleton3D, from: float = 0.0, to: float 
 		# our arms): copied joint turns alone put them apart, the players'
 		# shoulders being wider and higher than his.
 		_place_hands(target, src, src_g, globals, pelvis, pelvis_local, arms, spin, mirror)
+		if grip:
+			_pose_bottom_hand(target, globals, pelvis, pelvis_local, arms, mirror)
 		for i: int in tracks:
 			var parent := target.get_bone_parent(i)
 			var parent_g: Quaternion = globals[parent] if parent >= 0 else Quaternion()
@@ -165,6 +174,53 @@ static func _place_hands(target: Skeleton3D, src: Skeleton3D, src_g: Dictionary,
 		if mirror:
 			v.x = -v.x
 		_reach(target, globals, p, arm, ours_mid + v * float(arm[5]))
+
+
+## The captures' bottom hand holds the bat wrongly (its knuckles toward
+## the catcher, its palm a quarter turn off the top hand's); the top hand
+## is right. On a real grip the hands are stacked alike: thumbs and index
+## fingers up the bat, knuckles the same way, palms facing each other. So
+## the bottom hand takes the top hand's turn about the handle (its own
+## handedness makes its palm face the other way), its grip stays where it
+## was on the bat's line, and its arm reaches to where that puts its wrist.
+static func _pose_bottom_hand(target: Skeleton3D, globals: Dictionary, pelvis: int, pelvis_local: Vector3, arms: Array, mirror: bool) -> void:
+	if arms.size() < 2:
+		return
+	var top: Array = arms[0 if mirror else 1]
+	var bottom: Array = arms[1 if mirror else 0]
+	var p := _positions(target, globals, pelvis, pelvis_local)
+	var wt: Vector3 = p[top[2]]
+	var wb: Vector3 = p[bottom[2]]
+	if wt.distance_to(wb) > GRIP_SPREAD:
+		return  # hands apart (a bunt, one hand off): leave them
+	var ht := Basis(globals[top[2]] as Quaternion)
+	var hb := Basis(globals[bottom[2]] as Quaternion)
+	var ts := _hand_sides(target, top[2])
+	var bs := _hand_sides(target, bottom[2])
+	# The bat runs along the top fist (pinky to index side).
+	var d := (ht.z * ts.y).normalized()
+	# The top hand's knuckles, square to the bat; the bottom's the same.
+	var y := ht.y - d * ht.y.dot(d)
+	if y.length() < 0.01:
+		return
+	y = y.normalized()
+	var z := d * bs.y
+	var x := y.cross(z).normalized()
+	var new_basis := Basis(x, y, z).orthonormalized()
+	# Its grip point stays on the handle where it was.
+	var grip := wb + hb * (GRIP_PALM + Vector3(GRIP_DEPTH * bs.x, 0.0, 0.0))
+	var new_wrist := grip - new_basis * (GRIP_PALM + Vector3(GRIP_DEPTH * bs.x, 0.0, 0.0))
+	var turn := (new_basis.get_rotation_quaternion() * (globals[bottom[2]] as Quaternion).inverse()).normalized()
+	globals[bottom[2]] = new_basis.get_rotation_quaternion()
+	for k: int in bottom[6]:
+		globals[k] = (turn * (globals[k] as Quaternion)).normalized()
+	_reach(target, globals, p, bottom, new_wrist)
+
+
+## A hand's (palm side along its X, index side along its Z) signs.
+static func _hand_sides(target: Skeleton3D, hand: int) -> Vector2:
+	var side := target.get_bone_name(hand).right(1)
+	return Vector2(signf(target.get_bone_rest(target.find_bone("thumb_01_" + side)).origin.x), signf(target.get_bone_rest(target.find_bone("index_01_" + side)).origin.z))
 
 
 ## One arm reaching its wrist to `goal` (two-bone; see _place_hands); the
