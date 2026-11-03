@@ -61,6 +61,8 @@ const MAX_BEND := [95.0, 110.0, 90.0]
 ## Wrist extension: the hand bent back from the forearm line (degrees).
 const EXTENSION := 28.0
 const FINGERS := ["index", "middle", "ring", "pinky"]
+## How much of the hand's roll about the forearm the forearm takes.
+const FOREARM_ROLL := 0.8
 
 
 func _process_modification_with_delta(_delta: float) -> void:
@@ -114,6 +116,16 @@ func _grip(sk: Skeleton3D, side: String, on_axis: Vector3, d: Vector3) -> void:
 	var palm := basis * (PALM + Vector3(PALM_DEPTH * palm_side, 0.0, 0.0))
 	_reach(sk, side, on_axis - palm)
 	var parent_g := sk.get_bone_global_pose(lower)
+	# The hand's roll about the forearm goes mostly to the forearm itself
+	# (turning about its own length, so the wrist stays put): this rig has
+	# no twist bones, so a whole roll at the wrist wrings its skin.
+	var local := (parent_g.basis.inverse() * basis).get_rotation_quaternion()
+	var axis := sk.get_bone_rest(hand).origin.normalized()
+	var twist := _twist(local, axis)
+	var roll := twist.get_angle() * signf(Vector3(twist.x, twist.y, twist.z).dot(axis))
+	var lower_rot := sk.get_bone_pose_rotation(lower) * Quaternion(axis, wrapf(roll, -PI, PI) * FOREARM_ROLL)
+	sk.set_bone_pose_rotation(lower, lower_rot.normalized())
+	parent_g = sk.get_bone_global_pose(lower)
 	sk.set_bone_pose_rotation(hand, (parent_g.basis.inverse() * basis).get_rotation_quaternion())
 	# Fingers and thumb wrap the handle: each joint bends until the next
 	# knuckle sits on the handle's surface (handle plus finger thickness
@@ -125,6 +137,16 @@ func _grip(sk: Skeleton3D, side: String, on_axis: Vector3, d: Vector3) -> void:
 	# keeps the bend that wraps it best (over the fingers, round the handle).
 	for j in 3:
 		_wrap(sk, "thumb_%02d_%s" % [j + 1, side], "thumb_%02d%s_%s" % [j + 2, "_leaf" if j == 2 else "", side], on_axis, d, Vector3.ZERO, -80.0, 80.0, 1.2)
+
+
+## The part of rotation q that turns about `axis` (swing-twist split).
+static func _twist(q: Quaternion, axis: Vector3) -> Quaternion:
+	var v := Vector3(q.x, q.y, q.z)
+	var p := axis * v.dot(axis)
+	var t := Quaternion(p.x, p.y, p.z, q.w)
+	if t.length_squared() < 1e-9:
+		return Quaternion()
+	return t.normalized()
 
 
 ## Bends one joint (about its local `axis`, between lo and hi degrees off

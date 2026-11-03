@@ -153,8 +153,17 @@ func _swing_sequence(at: Vector3) -> bool:
 				f.visible = false
 	_cam.position = at + from
 	_cam.look_at(at + Vector3(0, 1.05, 0))
+	if OS.get_cmdline_user_args().has("hands") and batter != null:
+		# Tight on both hands through the swing, from his chest side.
+		var mid := (batter.grip_position() + batter.hand_position()) * 0.5
+		var chest := -batter.global_transform.basis.z
+		_cam.position = mid + Vector3(chest.x, 0.0, chest.z).normalized() * 1.1 + Vector3(0, 0.15, 0)
+		_cam.look_at(mid)
 	if batter != null and _style != &"":
 		batter.style = _style
+	if not OS.get_cmdline_user_args().has("walkup"):
+		# (The match opens with the leadoff man walking up; skip it.)
+		_view._walkup_until = -1.0
 	if OS.get_cmdline_user_args().has("sideline") and _view._on_deck != null:
 		# The on-deck batter warming up (four times, 3 s apart), then each
 		# dugout's rail.

@@ -3,7 +3,9 @@ extends SceneTree
 ## whole director loop (pitch -> swing -> ball in play -> throw -> reset)
 ## is exercised end to end. Optionally saves screenshots.
 ##   godot --path . -s res://tools/playtest_bot.gd -- [seconds] [screenshot_dir] [home]
-## Pass `home` to control the home team (field first).
+## Pass `home` to control the home team (field first). With `windup` (and a
+## screenshot dir) it shoots the user's first pitch: the pitcher's set,
+## then every few frames through the meter and his windup.
 ## Headless works for logic; screenshots need a rendering display.
 
 const FRAME := 1.0 / 60.0
@@ -14,6 +16,7 @@ var _pressed: Array[StringName] = []
 var _sim_seconds := 120.0
 var _shot_dir := ""
 var _shots_taken := 0
+var _windup_frames := 0
 var _elapsed := 0.0
 var _swing_offset := 0.0
 var _planned_pitch: PitchResult
@@ -111,10 +114,16 @@ func _drive() -> void:
 			if not batting and entered and _director.state.can_pickoff() and _rng.randf() < 0.15:
 				_press(&"pickoff")  # throw over first
 				return
+			if not batting and OS.get_cmdline_user_args().has("windup") and _director.state.pitch_count == 0 and _shots_taken == 0 and _director.phase_time() > 0.2:
+				_screenshot("set")
 			if not batting and _director.phase_time() > 0.3:
 				_director.debug_set_cursor(Vector2(_rng.randf_range(-0.3, 0.3), _rng.randf_range(0.5, 1.1)))
 				_press(&"pitch_primary")
 		MatchDirector.Phase.METER:
+			if OS.get_cmdline_user_args().has("windup") and _director.state.pitch_count == 0:
+				_windup_frames += 1
+				if _windup_frames % 6 == 1:
+					_screenshot("windup")
 			if absf(_director.meter_value() - _director.tuning.pitch_meter_sweet_spot) < 0.03 + _rng.randf() * 0.05:
 				_press(&"pitch_primary")
 		MatchDirector.Phase.PITCH_FLIGHT:

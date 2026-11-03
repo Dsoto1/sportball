@@ -11,6 +11,9 @@ enum Phase { PREGAME, PRE_PITCH, METER, PITCH_FLIGHT, CALL, BALL_IN_PLAY, GAME_O
 const AI_PRE_PITCH_DELAY := 1.8
 # The last part of the pre-pitch is the pitcher's visible windup.
 const WINDUP_TIME := 0.7
+## After an early meter press, the rest of the windup takes this share of
+## WINDUP_TIME per full windup (so at most ~0.2 s).
+const WINDUP_FINISH_SHARE := 0.3
 ## Hit pause by contact tier (seconds the play clock holds after contact).
 ## A barely-there beat on the barrel (longer read as the game freezing).
 const HIT_STOP := {ContactFeedback.Tier.SOLID: 0.03, ContactFeedback.Tier.SWEET: 0.05}
@@ -49,6 +52,10 @@ var _view: MatchView
 var _hud: MatchHud
 var _debug: DebugOverlay
 var _phase := Phase.PRE_PITCH
+## The user's pitch: the windup progress driven by the meter, and the
+## pitch locked in by the press while the windup finishes.
+var _user_windup := 0.0
+var _meter_intent: PitchIntent
 var _phase_time := 0.0
 ## Hit pause: the play clock holds for this long after solid contact.
 var _hit_stop := 0.0
@@ -454,6 +461,8 @@ func _process_pre_pitch(delta: float) -> void:
 	if Input.is_action_just_pressed(&"pitch_primary"):
 		_hud.set_clock(-1.0)
 		_set_phase(Phase.METER)
+		_meter_intent = null
+		_user_windup = 0.0
 		_hud.show_prompt("Release in the white band {pitch_primary}")
 
 
@@ -462,12 +471,24 @@ func _process_meter(delta: float) -> void:
 	_view.set_cursor(_cursor, 0.07, 0.0, Color(0.3, 0.95, 1.0))
 	_meter = minf(_meter + delta / tuning.pitch_meter_sweep_time, 1.0)
 	_hud.set_meter(_meter, tuning.pitch_meter_sweet_spot)
+	if _meter_intent != null:
+		# Pressed: the rest of his windup plays quickly, then the release.
+		_user_windup = minf(_user_windup + delta / (WINDUP_TIME * WINDUP_FINISH_SHARE), 1.0)
+		_view.show_windup(_user_windup)
+		if _user_windup >= 1.0:
+			var intent := _meter_intent
+			_meter_intent = null
+			_throw_pitch(intent)
+		return
+	# He winds up as the meter sweeps: the sweet spot is his release frame.
+	_user_windup = clampf(_meter / tuning.pitch_meter_sweet_spot, 0.0, 1.0)
+	_view.show_windup(minf(_user_windup, 0.999))
 	if Input.is_action_just_pressed(&"pitch_primary") or _meter >= 1.0:
 		var family := _repertoire()[_selected_pitch]
 		var error := PitchResolver.meter_error(_meter, tuning)
 		var intent := PitchIntent.new(family.id, _cursor, error)
 		intent.slide_step = _slide_step
-		_throw_pitch(intent)
+		_meter_intent = intent
 
 
 func _throw_pitch(intent: PitchIntent) -> void:

@@ -103,7 +103,9 @@ static func _mocap_specs() -> Array:
 		# The delivery: set, kick, stride, release (MOCAP_RELEASE), follow-through.
 		["Pitch_Mocap", "Baseball_Pitching_2", 0.0, MOCAP_PITCH, false, 0.0],
 		# The catcher's squat behind the plate.
-		["Catcher_Mocap", "Baseball_Catcher", 0.0, 2.8, true, 0.0],
+		# (Only its first second: from 1.1 s he stands up and raises both
+		# hands, as for a pop-up; played back and forth.)
+		["Catcher_Mocap", "Baseball_Catcher", 0.0, 1.0, true, 0.0, true],
 		# Squaring around to bunt, held squared (a batting capture).
 		["Bunt_Mocap", "Baseball_Bunt", BUNT_FROM, BUNT_TO, false, BAT_YAW],
 		# From the windup (bases empty): hands together, rock, kick, release.

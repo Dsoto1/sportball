@@ -156,6 +156,9 @@ var _toss_spin := Vector3.ZERO
 var _view_clock := 0.0
 var _timing_ring: MeshInstance3D
 var _windup := -1.0
+## Before the pitch the pitcher stands in his set on the rubber, the ball
+## in his glove (until the windup starts, or a play takes him off it).
+var _pitcher_set := false
 ## View clock when the pitcher let go (his follow-through), or -1.
 var _follow_start := -1.0
 var _last_ball_position := Vector3.ZERO
@@ -236,6 +239,9 @@ const CAMERA_FOV := {CameraMode.BAT: 42.0, CameraMode.PITCH: 23.0, CameraMode.FI
 
 func set_camera_mode(mode: CameraMode) -> void:
 	_camera_mode = mode
+	if mode == CameraMode.FIELD or mode == CameraMode.FLIGHT:
+		# A play (a pickoff, the ball in play) takes him out of his set.
+		_pitcher_set = false
 	# The HUD names the batter; over his head the tag would cover the pitcher.
 	# At the plate and on the mound the HUD names everyone; floating tags
 	# would only cover the pitcher, batter and catcher through the long lens.
@@ -486,6 +492,7 @@ func reset_for_pitch(state: MatchState) -> void:
 	_swing_profile = PlayerSwing.for_player(hitter, batter.style)
 	set_aim_preview(false)
 	_windup = -1.0
+	_pitcher_set = true
 	_follow_start = -1.0
 	_pitch_spin = []
 	_timing_ring.visible = false
@@ -750,6 +757,8 @@ func swing_bat(power: bool = false, aim: Vector2 = Vector2(0.0, SwingPath.DEFAUL
 ## Pitcher's windup, 0..1, or -1 when not winding up. The ball sits in his
 ## glove until the pitch is released.
 func show_windup(progress: float) -> void:
+	if progress >= 0.0:
+		_pitcher_set = false
 	if progress >= 0.0 and _windup < 0.0:
 		for f: ActorView in _fielders:
 			f.relaxed = false
@@ -1159,10 +1168,14 @@ func _update_bat() -> void:
 	var batter: ActorView = _runners.get(_batter_id)
 	var delta := get_process_delta_time()
 	var bat_mesh := _bat_pivot.get_node("BatMesh") as Node3D
-	if reacting() and batter != null:
-		# Stepped out after a called strike: the bat in his top hand, both
-		# hands off the handle while he turns away and back.
-		batter.animate(ActorView.Pose.TAKE_STRIKE, delta, 0.0, false, _view_clock - _react_start)
+	if (reacting() or walking_up()) and batter != null:
+		# Walking up, or stepped out after a called strike: the bat in his
+		# top hand, both hands off the handle (a two-hand grip at the
+		# stance's angle would drive the bat through him as he walks).
+		if walking_up():
+			batter.animate(ActorView.Pose.WALK_UP, delta)
+		else:
+			batter.animate(ActorView.Pose.TAKE_STRIKE, delta, 0.0, false, _view_clock - _react_start)
 		batter.grip_bat(null)
 		batter.carry_bat(true)
 		bat_mesh.visible = false
@@ -1331,6 +1344,12 @@ func _update_windup(delta: float) -> void:
 	if _windup < 0.0:
 		# After the release: the arm sweeps through and he lands ready.
 		if _follow_start < 0.0:
+			if _pitcher_set:
+				# In his set, the ball in his glove, waiting to start.
+				actor.face(Vector3.ZERO)
+				actor.animate(ActorView.Pose.PITCH, delta, 0.0, false, 0.0)
+				_ball.position = actor.hand_position()
+				_update_shadow()
 			return
 		var u := (_view_clock - _follow_start) / FOLLOW_TIME
 		if u >= 1.0:

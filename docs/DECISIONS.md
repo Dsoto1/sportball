@@ -2387,3 +2387,29 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   `.godot/editor/filesystem_cache*` and re-import, or Godot keeps the
   old mapping.) What remains is one exit-time warning when the bot quits
   mid-sound (a crowd AudioStream still playing), not a game issue.
+- **Owner playtest fixes (2026-11-03):**
+  - *Catcher stays down:* his idle looped `Baseball_Catcher` 0-2.8 s,
+    but from 1.1 s that capture stands up and raises both hands (a
+    pop-up). The squat is now its first second only, played back and
+    forth. (The rise is there for a pop-up later.)
+  - *The user's pitch has a windup:* it used to go from the meter
+    straight to the ball in flight. Now the windup follows the meter
+    (the sweet spot is the release frame); after an early press the
+    rest of it plays quickly (`WINDUP_FINISH_SHARE`) before the release.
+  - *The pitcher's set, the ball in his glove:* before the pitch he
+    stood in the fielders' ready crouch with the ball floating at the
+    release point. He now holds frame 0 of his delivery on the rubber,
+    the ball in his glove, until the windup starts or a play (pickoff,
+    ball in play) takes him off it (`MatchView._pitcher_set`).
+  - *Walk-up bat:* the two-hand grip held the bat at the stance's
+    angle while he walked, so it went through his chest. He now
+    carries it in his top hand, as when he steps out after a strike.
+  - *Twisted wrist:* the grip turned the whole hand's roll about the
+    forearm at the wrist (the rig has no twist bones). Most of it
+    (`BatGrip.FOREARM_ROLL` 0.8) now goes to the forearm, turning about
+    its own length. Righties and lefties are exact mirrors; the top
+    hand still bends sideways mid-swing, from squaring it to the bat.
+  - `tools/batter_closeup.gd` skips the match's opening walk-up unless
+    `walkup` is passed, and frames the grip with `swing ... hands`;
+    `tools/playtest_bot.gd ... home windup` shoots the user's first
+    pitch.
