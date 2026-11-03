@@ -12,6 +12,7 @@ extends SceneTree
 ## `sideline` for the on-deck batter and the dugouts,
 ## `umpire` for the home-plate umpire's set and strike call,
 ## `walkup` for the next batter walking into the box,
+## `strike` for his reaction to a called strike,
 ## `bunt` to square around and bunt instead of swinging,
 ## `slowmo` for the whip from the press to contact at quarter speed.
 ## `style:<name>` overrides the batter's style for the stills too;
@@ -29,6 +30,8 @@ const SHOTS := [70, 104, 132, 137, 140, 146, 160]
 const UMP_SHOTS := [80, 100, 115, 130, 150, 175, 200]
 ## With `walkup`: a new batter walking up into the box (no pitch).
 const WALKUP_SHOTS := [61, 80, 98, 116, 134, 152, 175, 240]
+## With `strike`: a called strike at the press, his reaction to it.
+const STRIKE_SHOTS := [134, 170, 205, 240, 275, 310, 345, 380]
 ## With `bunt`: squaring around from the press, held squared.
 const BUNT_SHOTS := [132, 138, 142, 146, 150, 156, 166]
 var _out := ""
@@ -202,14 +205,19 @@ func _swing_sequence(at: Vector3) -> bool:
 		_view._windup = -1.0
 		_view._pitch_u = minf(float(_frames - PITCH_FROM) / 30.0, 0.6)
 	var bunt := OS.get_cmdline_user_args().has("bunt")
+	var strike := OS.get_cmdline_user_args().has("strike")
 	if _frames == PRESS:
-		if bunt:
+		if strike:
+			_view.batter_react_strike()
+		elif bunt:
 			_view.bunt_bat()
 		else:
 			_view.swing_bat()
 	var shots: Array = FLIP_SHOTS if _flip else SHOTS
 	if bunt:
 		shots = BUNT_SHOTS
+	if strike:
+		shots = STRIKE_SHOTS
 	if OS.get_cmdline_user_args().has("launch"):
 		# Every frame from the press to contact.
 		shots = [PRESS - 1, PRESS, PRESS + 1, PRESS + 2, PRESS + 3, PRESS + 4, PRESS + 5]

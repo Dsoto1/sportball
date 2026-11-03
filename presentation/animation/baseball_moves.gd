@@ -47,6 +47,9 @@ static func library(skeleton: Skeleton3D, player: AnimationPlayer) -> AnimationL
 				# He walks into his stance spot: the walk ends where the
 				# stance's hips stand.
 				_end_at(anim, _library.get_animation(StringName("Bat_Stance" + ("_L" if lefty else ""))))
+			if anim != null and String(spec[0]) == "Bat_Strike":
+				# Starts on the stance; eased so it ends back on its spot too.
+				_end_at(anim, _library.get_animation(StringName("Bat_Stance" + ("_L" if lefty else ""))), true)
 			if anim != null and String(spec[0]) == "Milling_Mocap":
 				# Standing about on one spot (at the dugout rail): no drift.
 				_in_place(anim)
@@ -84,6 +87,11 @@ const WALKUP_TIME := (WALKUP_TO - WALKUP_FROM) / WALKUP_SPEED
 ## The umpire's called strike (Baseball_Umpire from his set to the end,
 ## 2.17 s) as played (ActorView.UMP_CALL_SPEED).
 const UMP_CALL_TIME := 2.17 / 1.3
+## The batter's reaction to a called strike (Baseball_Strike: turns away,
+## steps out, back into his stance), played STRIKE_SPEED times faster.
+const STRIKE_TO := 6.5
+const STRIKE_SPEED := 1.8
+const STRIKE_TIME := STRIKE_TO / STRIKE_SPEED
 ## Captured clips: [name, Mixamo file, from s, to s, loop, yaw, pingpong].
 static var MOCAP := _mocap_specs()
 const MOCAP_RELEASE := 1.63
@@ -111,6 +119,8 @@ static func _mocap_specs() -> Array:
 		["OnDeck_Mocap", "Batter_On_Deck", 0.0, -1.0, true, BAT_YAW],
 		# Players standing about at the dugout rail.
 		["Milling_Mocap", "Baseball_Milling_Idle", 0.0, -1.0, true, BAT_YAW],
+		# A called strike: the batter turns away, steps out and back in.
+		["Bat_Strike", "Baseball_Strike", 0.0, STRIKE_TO, false, BAT_YAW],
 		# The next batter walking up into the box (after Bat_Stance, which
 		# it ends on).
 		["Bat_WalkUp", "Baseball_Walk_In", WALKUP_FROM, WALKUP_TO, false, BAT_YAW]]
@@ -122,8 +132,9 @@ static func _mocap_specs() -> Array:
 
 
 ## Shifts a clip's pelvis track so its last frame stands
-## where `to`'s first frame does.
-static func _end_at(anim: Animation, to: Animation) -> void:
+## where `to`'s first frame does (`eased`: gradually, from none at its
+## first frame).
+static func _end_at(anim: Animation, to: Animation, eased: bool = false) -> void:
 	var a := _pelvis_track(anim)
 	var b := _pelvis_track(to)
 	if a < 0 or b < 0 or anim.track_get_key_count(a) == 0:
@@ -133,8 +144,11 @@ static func _end_at(anim: Animation, to: Animation) -> void:
 	# at the stance's own hip height, so the whole offset is along the
 	# ground.)
 	var shift: Vector3 = to.track_get_key_value(b, 0) - last
-	for k in anim.track_get_key_count(a):
-		anim.track_set_key_value(a, k, (anim.track_get_key_value(a, k) as Vector3) + shift)
+	var n := anim.track_get_key_count(a)
+	for k in n:
+		# Eased: the shift grows over the clip, so its first frame stays put.
+		var w := float(k) / maxf(n - 1, 1) if eased else 1.0
+		anim.track_set_key_value(a, k, (anim.track_get_key_value(a, k) as Vector3) + shift * w)
 
 
 ## Keeps a clip's hips over their first spot (their height still moves).

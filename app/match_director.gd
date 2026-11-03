@@ -294,9 +294,10 @@ func _process(delta: float) -> void:
 	_tick_clock(delta)
 	if _phase == Phase.BALL_IN_PLAY and _hit_stop > 0.0:
 		_hit_stop -= delta  # the ball hangs off the bat for a beat
-	elif not (_phase == Phase.PRE_PITCH and _view.walking_up()):
-		# (Held while the next batter walks up: the pitch clock and the
-		# AI's windup wait for him.)
+	elif not (_phase == Phase.PRE_PITCH and _view.batter_busy()):
+		# (Held while the next batter walks up or the batter steps out
+		# after a called strike: the pitch clock and the AI's windup wait
+		# for him.)
 		_phase_time += delta
 	_handle_global_input()
 	match _phase:
@@ -305,7 +306,7 @@ func _process(delta: float) -> void:
 		Phase.PRE_PITCH:
 			if not _sub_options.is_empty():
 				_process_sub_menu()
-			elif _view.walking_up():
+			elif _view.batter_busy():
 				_show_leads()
 			else:
 				_process_pre_pitch(delta)
@@ -602,9 +603,13 @@ func _apply_call() -> String:
 		MatchState.PitchCall.FOUL_BUNT: "FOUL BUNT",
 	}[call]
 	_hud.show_callout(text, _timing_detail(), 1.0)
+	var batter_before := state.current_batter()
 	if call == MatchState.PitchCall.CALLED_STRIKE:
 		_view.umpire_call_strike()
 	state.apply_pitch_call(call)
+	# Still up after a called strike (not strike three): he steps out.
+	if call == MatchState.PitchCall.CALLED_STRIKE and state.current_batter() == batter_before:
+		_view.batter_react_strike()
 	_set_phase(Phase.CALL)
 	return text
 

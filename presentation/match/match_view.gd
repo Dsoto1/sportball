@@ -41,6 +41,8 @@ var _bats_left := false
 var _batter_id: StringName = &""
 ## When the current batter's walk-up into the box ends (view clock).
 var _walkup_until := -1.0
+## When the batter's reaction to a called strike started (view clock).
+var _react_start := -1.0
 ## The home-plate umpire (the owner's Meshy model over a player skeleton),
 ## and when his called-strike signal ends.
 var _umpire: ActorView
@@ -452,6 +454,7 @@ func reset_for_pitch(state: MatchState) -> void:
 	if state.current_batter() != _batter_id and BaseballMoves.has_mocap():
 		# A new batter: he walks up into the box first.
 		_walkup_until = _view_clock + BaseballMoves.WALKUP_TIME
+		_react_start = -1.0
 	_batter_id = state.current_batter()
 	batter.set_tag_visible(_camera_mode == CameraMode.FIELD or _camera_mode == CameraMode.FLIGHT)
 	var hitter := _roster.player(state.current_batter()) if _roster != null else null
@@ -643,6 +646,21 @@ func _update_umpire(delta: float) -> void:
 ## The new batter is still walking up to the plate (the pitch waits).
 func walking_up() -> bool:
 	return _view_clock < _walkup_until
+
+
+## A called strike: the batter turns away, steps out and back in.
+func batter_react_strike() -> void:
+	if BaseballMoves.has_mocap():
+		_react_start = _view_clock
+
+
+func reacting() -> bool:
+	return _react_start >= 0.0 and _view_clock < _react_start + BaseballMoves.STRIKE_TIME
+
+
+## The batter isn't ready for the pitch yet (walking up, or stepped out).
+func batter_busy() -> bool:
+	return walking_up() or reacting()
 
 
 ## Squares around: the bat held flat out over the plate.
@@ -1140,6 +1158,18 @@ func _update_bat() -> void:
 		return
 	var batter: ActorView = _runners.get(_batter_id)
 	var delta := get_process_delta_time()
+	var bat_mesh := _bat_pivot.get_node("BatMesh") as Node3D
+	if reacting() and batter != null:
+		# Stepped out after a called strike: the bat in his top hand, both
+		# hands off the handle while he turns away and back.
+		batter.animate(ActorView.Pose.TAKE_STRIKE, delta, 0.0, false, _view_clock - _react_start)
+		batter.grip_bat(null)
+		batter.carry_bat(true)
+		bat_mesh.visible = false
+		return
+	bat_mesh.visible = true
+	if batter != null:
+		batter.carry_bat(false)
 	var style: StringName = batter.style if batter != null else &"classic"
 	var side := -1.0 if _bats_left else 1.0
 	# The approach: he loads as the pitcher delivers and strides as the ball

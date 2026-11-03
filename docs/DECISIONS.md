@@ -2365,3 +2365,13 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   that are dark, keeping their shading); collar, belt, mask, skin and
   slacks keep their colors. Rebuild: umpire_shirt.py on the rigged GLB,
   then glb_shrink_textures.py.
+- **Batter steps out after a called strike (2026-11-03):** on a called
+  strike that isn't strike three, the batter reacts with the
+  `Baseball_Strike` capture (0-6.5 s: turns away, steps out, back into
+  his stance; 1.8x, about 3.6 s), the bat in his top hand while he turns
+  (`ActorView.carry_bat`; the grip lets go), then back on the handle.
+  The clip starts on the stance pose and is eased to end on its spot.
+  The pre-pitch clock holds while he's out, as for the walk-up
+  (`MatchView.batter_busy()`). It spans the reset between pitches (the
+  new batter actor catches up to the reaction's time).
+  `tools/batter_closeup.gd ... strike` shows it.

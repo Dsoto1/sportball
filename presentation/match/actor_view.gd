@@ -7,7 +7,7 @@ extends Node3D
 ## Gameplay decides where everyone is; this only picks a clip per pose,
 ## matches run cycles to speed and keeps the glove on the hand. Visual only.
 
-enum Pose { IDLE, RUN, TURN, CHASE, TAG, THROW, DOWN, SLIDE, BAT_STANCE, SWING, CELEBRATE, BUNT, PITCH, SCOOP, CATCH_HIGH, DIVE, LEAD, APPROACH, FINISH, WALK_UP, UMP_CALL }
+enum Pose { IDLE, RUN, TURN, CHASE, TAG, THROW, DOWN, SLIDE, BAT_STANCE, SWING, CELEBRATE, BUNT, PITCH, SCOOP, CATCH_HIGH, DIVE, LEAD, APPROACH, FINISH, WALK_UP, UMP_CALL, TAKE_STRIKE }
 
 const BODY := preload("res://assets/third_party/quaternius/universal-animation-library/UAL1_Standard.glb")
 ## The player's body: Quaternius Universal Base Characters (CC0), on the
@@ -444,6 +444,13 @@ func animate(pose: Pose, delta: float, speed: float = 0.0, juke: bool = false, p
 				_scrub("Pitch", progress, BaseballMoves.PITCH_LENGTH)
 			# Planted through the stride; the kick leg (well up) stays free.
 			_plant.pin = progress > 0.05
+		Pose.TAKE_STRIKE:
+			# Reacting to a called strike; `progress` is the seconds since
+			# the call (the actor may be new since: catch up).
+			var react := BaseballMoves.clip("Bat_Strike", _lefty)
+			if fresh or _clip != react:
+				_play(react, BaseballMoves.STRIKE_SPEED, BLEND, true)
+				_player.seek(progress * BaseballMoves.STRIKE_SPEED, true)
 		Pose.UMP_CALL:
 			if fresh:
 				_play(BaseballMoves.clip("Ump_Call"), UMP_CALL_SPEED, BLEND, true)
