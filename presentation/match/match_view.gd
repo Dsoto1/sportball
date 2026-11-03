@@ -469,7 +469,9 @@ func reset_for_pitch(state: MatchState) -> void:
 	# The bat's grip tape is the batting club's second color.
 	_batting_color = batting_color
 	var tape := batting_trim if batting_trim.a > 0.0 else batting_color.darkened(0.4)
-	(_bat_pivot.get_node("BatMesh").material_override as ShaderMaterial).set_shader_parameter("tape", tape)
+	var bat_mat := _bat_pivot.get_node("BatMesh").material_override as ShaderMaterial
+	if bat_mat != null:
+		bat_mat.set_shader_parameter("tape", tape)
 	var pitcher_index := tuning.fielder_ids.find(&"p")
 	var pitcher_def := _roster.player(state.pitcher(state.fielding_team())) if _roster != null else null
 	if pitcher_index >= 0:

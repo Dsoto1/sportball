@@ -12,9 +12,28 @@ const LENGTH := 0.95
 const PROFILE := [[0.0, 0.0], [0.004, 0.032], [0.018, 0.038], [0.035, 0.03], [0.05, 0.021],
 	[0.3, 0.023], [0.45, 0.03], [0.6, 0.045], [0.72, 0.055], [0.93, 0.057], [0.97, 0.054], [0.99, 0.045], [1.0, 0.0]]
 const SIDES := 24
+## The owner's Meshy bat (tools/bat_from_meshy.py: laid along -Z, knob at
+## the origin, LENGTH long), used when present instead of the lathe bat.
+const MODEL := "res://assets/generated/meshy/bat/bat.glb"
+static var _model: Mesh
 
 
-static func build() -> ArrayMesh:
+static func has_model() -> bool:
+	return ResourceLoader.exists(MODEL)
+
+
+static func build() -> Mesh:
+	if has_model():
+		if _model == null:
+			var scene: Node = (load(MODEL) as PackedScene).instantiate()
+			var mi: MeshInstance3D = scene.find_children("*", "MeshInstance3D", true, false)[0]
+			_model = mi.mesh
+			scene.free()
+		return _model
+	return _lathe()
+
+
+static func _lathe() -> ArrayMesh:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for i in PROFILE.size() - 1:
@@ -37,7 +56,10 @@ static func build() -> ArrayMesh:
 	return st.commit()
 
 
+## The lathe bat's material (null with the model: it carries its own).
 static func material() -> ShaderMaterial:
+	if has_model():
+		return null
 	var m := ShaderMaterial.new()
 	m.shader = SHADER
 	return m

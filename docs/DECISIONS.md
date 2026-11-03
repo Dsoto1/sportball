@@ -2477,3 +2477,17 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   reaches there with the elbow on the captured side, the forearm taking
   most of the roll, and the fingers wrap. Arms, elbows and wrists bend to
   hold the bat instead of the bat following two loose hands.
+- **Hitter's stance at the back shoulder (2026-11-03, owner):** the
+  capture's stance holds the hands low in front of the chest with the
+  bat upright, which no pair of locked hands can grip with straight
+  wrists. `BatGrip._stance_shift` moves the grip to the back shoulder
+  (`STANCE_HANDS`: 6 cm in, 4 cm down, 24 cm in front of it) and tilts
+  the bat back over it (`STANCE_BAT`), adding the capture's own movement
+  since its stance (so the load still shows), kept within 82% of each
+  arm's reach (`STANCE_REACH`; past that the front hand came off the
+  bat). Weighted by `stance` = the match's set-up value: 1 waiting and
+  loading, easing to 0 by 60% of the way to contact, so the swing itself
+  is the capture's. Not applied to the bunt or with the hands spread.
+- **The owner's Meshy bat (MSH-090):** `BatMesh.build()` returns it when
+  present (else the lathe bat); it carries its own material, so the
+  club's grip-tape colour no longer applies.

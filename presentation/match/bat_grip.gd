@@ -46,7 +46,21 @@ var follow_elbows := false
 ## nothing moves the arms or turns the hands; the bat is fitted to them,
 ## along the line through both grips, and only the fingers close round it.
 var from_hands := false
+## How much the hitter's stance (hands at the back shoulder, the bat over
+## it) replaces the captured hands: 1 waiting and loading, easing to 0 as
+## the swing gets going.
+var stance := 0.0
+var _rest_mid := Vector3.ZERO
+var _rest_d := Vector3.UP
+var _have_rest := false
 
+## The stance spot from the back shoulder (m): x in toward the chest, y up,
+## z in front; and the bat's tilt (per unit up): x back over the shoulder,
+## y behind the head.
+const STANCE_HANDS := Vector3(0.06, -0.04, 0.24)
+const STANCE_BAT := Vector2(0.75, 0.3)
+## The stance grip stays within this share of each arm's length.
+const STANCE_REACH := 0.82
 ## Locked grip: the handle's angle across the fingers off square (deg),
 ## the wrists' cock back (deg), the hands' spots apart on the handle (m).
 const GRIP_DIAGONAL := 35.0
@@ -125,6 +139,10 @@ func _lock_to_bat(sk: Skeleton3D) -> void:
 	elif not one_hand:
 		d = (d + _fist_axis(sk, bottom_side)).normalized()
 	var mid := (bottom + top) * 0.5 if not one_hand else bottom
+	if stance > 0.0 and not spread and not one_hand:
+		var moved := _stance_shift(sk, mid, d)
+		mid = mid.lerp(moved[0], stance)
+		d = d.slerp(moved[1], stance).normalized()
 	# The way the fingers wrap the handle: the top hand's (it holds right).
 	var wrap_side := top_side if not one_hand else bottom_side
 	var fingers := sk.get_bone_global_pose(sk.find_bone("hand_" + wrap_side)).basis.y.normalized()
@@ -138,6 +156,43 @@ func _lock_to_bat(sk: Skeleton3D) -> void:
 	var world_d := (xf.basis * d).normalized()
 	var up := Vector3.UP if absf(world_d.dot(Vector3.UP)) < 0.98 else Vector3.FORWARD
 	bat.global_transform = Transform3D(Basis.looking_at(world_d, up), xf * (spots[bottom_side] as Vector3) - world_d * (choke + KNOB_ROOM))
+
+
+## The hitter's stance (VanSuch): hands up by the back shoulder, a hand's
+## width in front of it, the bat tilted back over that shoulder. The
+## capture holds them low in front of the chest with the bat upright, which
+## no pair of hands can grip with straight wrists. Returns [grip middle,
+## bat direction]: the stance spot plus the capture's own movement since
+## its stance (so the load still shows), the bat turned likewise.
+func _stance_shift(sk: Skeleton3D, mid: Vector3, d: Vector3) -> Array:
+	var rear_side := "l" if lefty else "r"
+	var spine := sk.get_bone_global_pose(sk.find_bone("spine_01")).origin
+	var neck := sk.get_bone_global_pose(sk.find_bone("neck_01")).origin
+	var shoulder := sk.get_bone_global_pose(sk.find_bone("upperarm_" + rear_side)).origin
+	var other := sk.get_bone_global_pose(sk.find_bone("upperarm_" + ("r" if lefty else "l"))).origin
+	var up := (neck - spine).normalized()
+	var rear := (shoulder - other).normalized()
+	var front := rear.cross(up).normalized()
+	if front.z < 0.0:
+		front = -front
+	var spot := shoulder + front * STANCE_HANDS.z + up * STANCE_HANDS.y - rear * STANCE_HANDS.x
+	var tilt := (up + rear * STANCE_BAT.x - front * STANCE_BAT.y).normalized()
+	# The capture's stance frame, learned while he stands in it.
+	if not _have_rest or (stance >= 0.999 and cocked < 0.02):
+		_rest_mid = mid
+		_rest_d = d
+		_have_rest = true
+	var turn := Quaternion(_rest_d, d) if _rest_d.dot(d) > -0.99 else Quaternion()
+	var goal := spot + (mid - _rest_mid)
+	# Within both arms' reach (the front arm crosses the chest to it).
+	for side: String in ["l", "r"]:
+		var sh := sk.get_bone_global_pose(sk.find_bone("upperarm_" + side)).origin
+		var lo := sk.get_bone_global_pose(sk.find_bone("lowerarm_" + side)).origin
+		var hd := sk.get_bone_global_pose(sk.find_bone("hand_" + side)).origin
+		var reach := (sh.distance_to(lo) + lo.distance_to(hd)) * STANCE_REACH
+		if goal.distance_to(sh) > reach:
+			goal = sh + (goal - sh).normalized() * reach
+	return [goal, (turn * tilt).normalized()]
 
 
 ## The bat along the captured hands: through the middle of both grips,
