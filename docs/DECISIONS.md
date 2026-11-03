@@ -2513,3 +2513,15 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   front, wrist bend 8 deg. Note: the raw capture (no grip layer) already
   holds the hands up by the back shoulder; the transfer onto our wider
   shoulders and the grip corrections are what moved them.
+- **Stripped back to the raw capture (2026-11-03, owner):** the stance
+  shift, the hands locked to fixed grip spots and every stance elbow/wrist
+  correction are gone (`_lock_to_bat`, `_stance_shift`, `stance`,
+  `STANCE_*`, `GRIP_DIAGONAL`, `LOCKED_EXTENSION`, `HANDS_STACKED`). Each
+  had been patching the one before. With the captured clips `BatGrip`
+  now only fits the bat to the captured fists (`_fit_to_hands`) and
+  closes the fingers; arms, elbows and wrists are the capture's. What
+  stays from the transfer (`MixamoRetarget`): the wrists placed relative
+  to the shoulders (so the hands stay together on our wider shoulders),
+  the forearm taking the hand's roll, and the bottom hand turned onto the
+  grip. Rendered side by side with the raw capture, the stance and swing
+  match.
