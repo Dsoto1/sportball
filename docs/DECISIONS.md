@@ -2466,3 +2466,14 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   fingers up the bat, palms facing), keeps its grip point on the bat's
   line and reaches its arm there. Skipped when the hands are spread
   (over 0.2 m). Lefties get it mirrored (their right hand).
+- **Hands locked to grip spots on the bat (2026-11-03, owner's idea):**
+  with the captured clips `BatGrip._lock_to_bat` now leads with the bat:
+  it takes the captured hands' path (along the fists, through the
+  middle of the grips, rolled the way the top hand wraps), then each hand
+  is set in a real grip at its spot (bottom at the knob, top stacked
+  `HANDS_STACKED` 0.095 m above; spread as captured for a bunt), the
+  handle on the diagonal across the fingers (`GRIP_DIAGONAL` 35 deg, heel
+  toward the knob), the wrist cocked `LOCKED_EXTENSION` 8 deg; the arm
+  reaches there with the elbow on the captured side, the forearm taking
+  most of the roll, and the fingers wrap. Arms, elbows and wrists bend to
+  hold the bat instead of the bat following two loose hands.

@@ -47,6 +47,11 @@ var follow_elbows := false
 ## along the line through both grips, and only the fingers close round it.
 var from_hands := false
 
+## Locked grip: the handle's angle across the fingers off square (deg),
+## the wrists' cock back (deg), the hands' spots apart on the handle (m).
+const GRIP_DIAGONAL := 35.0
+const LOCKED_EXTENSION := 8.0
+const HANDS_STACKED := 0.095
 ## Hands farther apart than this (m) are spread along the bat (a bunt):
 ## the bat runs through both, not along the fists.
 const SPREAD_HANDS := 0.18
@@ -77,7 +82,7 @@ func _process_modification_with_delta(_delta: float) -> void:
 	if sk == null or bat == null or direction.length() < 0.001:
 		return
 	if from_hands:
-		_fit_to_hands(sk)
+		_lock_to_bat(sk)
 		return
 	var top_side := "l" if lefty else "r"
 	var bottom_side := "r" if lefty else "l"
@@ -97,6 +102,42 @@ func _process_modification_with_delta(_delta: float) -> void:
 	var up := Vector3.UP if absf(direction.normalized().dot(Vector3.UP)) < 0.98 else Vector3.FORWARD
 	# The knob just below the bottom hand (its palm is centered on the axis).
 	bat.global_transform = Transform3D(Basis.looking_at(direction, up), xf * bottom_target - direction.normalized() * (choke + KNOB_ROOM))
+
+
+## Grip spots on the bat, the hands locked to them: the bat takes the
+## captured hands' path (along the fists, through the middle of the two
+## grips, rolled the way the top hand wraps it); each hand is set in a real
+## grip at its spot (bottom hand at the knob, top hand stacked above it,
+## the handle on the diagonal across the fingers) and its arm reaches there,
+## the elbow on the captured side. So the bat leads; arms, elbows and
+## wrists bend to hold it.
+func _lock_to_bat(sk: Skeleton3D) -> void:
+	var top_side := "l" if lefty else "r"
+	var bottom_side := "r" if lefty else "l"
+	var bottom := _grip_point(sk, bottom_side)
+	var top := _grip_point(sk, top_side)
+	var spread := not one_hand and bottom.distance_to(top) > SPREAD_HANDS
+	var d := _fist_axis(sk, top_side if not one_hand else bottom_side)
+	if spread:
+		d = (top - bottom).normalized()
+		if d.dot(_fist_axis(sk, bottom_side)) < 0.0:
+			d = -d
+	elif not one_hand:
+		d = (d + _fist_axis(sk, bottom_side)).normalized()
+	var mid := (bottom + top) * 0.5 if not one_hand else bottom
+	# The way the fingers wrap the handle: the top hand's (it holds right).
+	var wrap_side := top_side if not one_hand else bottom_side
+	var fingers := sk.get_bone_global_pose(sk.find_bone("hand_" + wrap_side)).basis.y.normalized()
+	var apart := bottom.distance_to(top) if spread else HANDS_STACKED
+	var spots := {bottom_side: mid - d * apart * 0.5, top_side: mid + d * apart * 0.5}
+	if one_hand:
+		spots = {bottom_side: mid}
+	for side: String in spots:
+		_grip(sk, side, spots[side], d, fingers, LOCKED_EXTENSION)
+	var xf := sk.global_transform
+	var world_d := (xf.basis * d).normalized()
+	var up := Vector3.UP if absf(world_d.dot(Vector3.UP)) < 0.98 else Vector3.FORWARD
+	bat.global_transform = Transform3D(Basis.looking_at(world_d, up), xf * (spots[bottom_side] as Vector3) - world_d * (choke + KNOB_ROOM))
 
 
 ## The bat along the captured hands: through the middle of both grips,
@@ -153,7 +194,7 @@ func _grip_point(sk: Skeleton3D, side: String) -> Vector3:
 ## along d: works out the hand's turn (thumb side up the bat, fingers
 ## across it, carrying on from the forearm), reaches the arm so the palm
 ## lands there, then sets the hand and curls the fingers.
-func _grip(sk: Skeleton3D, side: String, on_axis: Vector3, d: Vector3) -> void:
+func _grip(sk: Skeleton3D, side: String, on_axis: Vector3, d: Vector3, fingers: Vector3 = Vector3.ZERO, extension: float = EXTENSION) -> void:
 	var hand := sk.find_bone("hand_" + side)
 	var lower := sk.find_bone("lowerarm_" + side)
 	# This hand's own sides (the skeleton mirrors left and right).
@@ -161,15 +202,24 @@ func _grip(sk: Skeleton3D, side: String, on_axis: Vector3, d: Vector3) -> void:
 	var palm_side := signf(sk.get_bone_rest(sk.find_bone("thumb_01_" + side)).origin.x)
 	var forearm := (sk.get_bone_global_pose(hand).origin - sk.get_bone_global_pose(lower).origin).normalized()
 	var y := (forearm - d * forearm.dot(d))
+	if fingers != Vector3.ZERO:
+		# Locked to the bat: the fingers wrap the given way round it, the
+		# handle crossing them on the diagonal (index base up the bat, the
+		# heel of the hand toward the knob), as a real grip holds it.
+		y = fingers - d * fingers.dot(d)
 	if y.length() < 0.01:
 		y = d.cross(Vector3.UP)
 	y = y.normalized()
+	if fingers != Vector3.ZERO:
+		var g := deg_to_rad(GRIP_DIAGONAL)
+		y = (y * cos(g) + d * sin(g)).normalized()
 	var z := d * index_side
+	z = (z - y * z.dot(y)).normalized()
 	var x := y.cross(z).normalized()
 	# Cock the wrist back: the fingers tip away from the palm side, about
 	# the handle's own line (so the hand stays square to the bat).
 	var palm_normal := x * palm_side
-	var e := deg_to_rad(EXTENSION)
+	var e := deg_to_rad(extension)
 	y = (y * cos(e) - palm_normal * sin(e)).normalized()
 	x = y.cross(z).normalized()
 	var basis := Basis(x, y, z).orthonormalized()
