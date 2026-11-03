@@ -67,6 +67,7 @@ static func bake(name: String, target: Skeleton3D, from: float = 0.0, to: float 
 	var hips := src.find_bone("mixamorig_Hips")
 	var scale := target.get_bone_global_rest(pelvis).origin.y / maxf(src.get_bone_global_rest(hips).origin.y, 0.001)
 	var frames := int(ceil(anim.length * FPS))
+	var arms := _arm_chains(src, target, mirror)
 	for f in frames + 1:
 		var t := minf(from + f / FPS, to)
 		_sample(clip, src, t)
@@ -85,7 +86,6 @@ static func bake(name: String, target: Skeleton3D, from: float = 0.0, to: float 
 					# Reflected across the X = 0 plane.
 					turn = Quaternion(turn.x, -turn.y, -turn.z, turn.w)
 				g = (turn * (pair[1] as Quaternion)).normalized()
-				anim.rotation_track_insert_key(tracks[i], f / FPS, (parent_g.inverse() * g).normalized())
 			else:
 				g = parent_g * target.get_bone_rest(i).basis.get_rotation_quaternion()
 			globals[i] = g
@@ -93,9 +93,97 @@ static func bake(name: String, target: Skeleton3D, from: float = 0.0, to: float 
 		if mirror:
 			moved.x = -moved.x
 		var root_g := target.get_bone_global_rest(target.get_bone_parent(pelvis))
-		anim.position_track_insert_key(pos, f / FPS, root_g.affine_inverse() * (target.get_bone_global_rest(pelvis).origin + moved))
+		var pelvis_local := root_g.affine_inverse() * (target.get_bone_global_rest(pelvis).origin + moved)
+		# Hands where the performer's are (from his shoulders, scaled to
+		# our arms): copied joint turns alone put them apart, the players'
+		# shoulders being wider and higher than his.
+		_place_hands(target, src, src_g, globals, pelvis, pelvis_local, arms, spin, mirror)
+		for i: int in tracks:
+			var parent := target.get_bone_parent(i)
+			var parent_g: Quaternion = globals[parent] if parent >= 0 else Quaternion()
+			anim.rotation_track_insert_key(tracks[i], f / FPS, (parent_g.inverse() * (globals[i] as Quaternion)).normalized())
+		anim.position_track_insert_key(pos, f / FPS, pelvis_local)
 	scene.free()
 	return anim
+
+
+## Each side's arm: [target upperarm, lowerarm, hand, source shoulder,
+## source wrist, our arm length / the performer's] (mirrored: the source's
+## other side).
+static func _arm_chains(src: Skeleton3D, target: Skeleton3D, mirror: bool) -> Array:
+	var out := []
+	for side: String in ["l", "r"]:
+		var src_side := ("Right" if side == "l" else "Left") if mirror else ("Left" if side == "l" else "Right")
+		var up := target.find_bone("upperarm_" + side)
+		var lo := target.find_bone("lowerarm_" + side)
+		var hand := target.find_bone("hand_" + side)
+		var s_up := src.find_bone("mixamorig_%sArm" % src_side)
+		var s_lo := src.find_bone("mixamorig_%sForeArm" % src_side)
+		var s_hand := src.find_bone("mixamorig_%sHand" % src_side)
+		if up < 0 or lo < 0 or hand < 0 or s_up < 0 or s_hand < 0:
+			continue
+		var ours := target.get_bone_global_rest(up).origin.distance_to(target.get_bone_global_rest(lo).origin) + target.get_bone_global_rest(lo).origin.distance_to(target.get_bone_global_rest(hand).origin)
+		var his := src.get_bone_global_rest(s_up).origin.distance_to(src.get_bone_global_rest(s_lo).origin) + src.get_bone_global_rest(s_lo).origin.distance_to(src.get_bone_global_rest(s_hand).origin)
+		out.append([up, lo, hand, s_up, s_hand, ours / maxf(his, 0.0001)])
+	return out
+
+
+## Global positions of every bone from global turns (rests' offsets), the
+## pelvis at its keyed spot.
+static func _positions(target: Skeleton3D, globals: Dictionary, pelvis: int, pelvis_local: Vector3) -> Dictionary:
+	var out := {}
+	for i in target.get_bone_count():
+		var parent := target.get_bone_parent(i)
+		var offset := pelvis_local if i == pelvis else target.get_bone_rest(i).origin
+		if parent < 0:
+			out[i] = offset
+		else:
+			out[i] = (out[parent] as Vector3) + (globals[parent] as Quaternion) * offset
+	return out
+
+
+## Reaches each arm (two-bone, elbow on the side the copied turns put it)
+## so its wrist sits where the performer's does relative to his shoulders'
+## midpoint, scaled to our arms; the hand keeps its captured turn.
+static func _place_hands(target: Skeleton3D, src: Skeleton3D, src_g: Dictionary, globals: Dictionary, pelvis: int, pelvis_local: Vector3, arms: Array, spin: Quaternion, mirror: bool) -> void:
+	if arms.size() < 2:
+		return
+	var p := _positions(target, globals, pelvis, pelvis_local)
+	var ours_mid := ((p[arms[0][0]] as Vector3) + (p[arms[1][0]] as Vector3)) * 0.5
+	var his_mid := ((src_g[arms[0][3]] as Transform3D).origin + (src_g[arms[1][3]] as Transform3D).origin) * 0.5
+	for arm: Array in arms:
+		var up: int = arm[0]
+		var lo: int = arm[1]
+		var hand: int = arm[2]
+		var v := spin * ((src_g[arm[4]] as Transform3D).origin - his_mid)
+		if mirror:
+			v.x = -v.x
+		var goal := ours_mid + v * float(arm[5])
+		var s: Vector3 = p[up]
+		var e: Vector3 = p[lo]
+		var w: Vector3 = p[hand]
+		var a := s.distance_to(e)
+		var b := e.distance_to(w)
+		var to_goal := goal - s
+		var d := clampf(to_goal.length(), absf(a - b) + 0.001, a + b - 0.001)
+		var dir := to_goal.normalized()
+		# The elbow's side: where the copied turns put it, off the line.
+		var pole := (e - s) - dir * (e - s).dot(dir)
+		if pole.length() < 0.001:
+			pole = Vector3.DOWN - dir * Vector3.DOWN.dot(dir)
+		pole = pole.normalized()
+		var along := (a * a - b * b + d * d) / (2.0 * d)
+		var elbow := s + dir * along + pole * sqrt(maxf(a * a - along * along, 0.0))
+		var wrist := s + dir * d
+		var hand_g: Quaternion = globals[hand]
+		var r1 := Quaternion((e - s).normalized(), (elbow - s).normalized())
+		globals[up] = (r1 * (globals[up] as Quaternion)).normalized()
+		var lower_g := (r1 * (globals[lo] as Quaternion)).normalized()
+		var fore_now := (r1 * (w - e)).normalized()
+		var r2 := Quaternion(fore_now, (wrist - elbow).normalized())
+		globals[lo] = (r2 * lower_g).normalized()
+		# The hand (and so its fingers) keeps its captured turn.
+		globals[hand] = hand_g
 
 
 ## Target bone -> [source bone, rest alignment * target global rest].

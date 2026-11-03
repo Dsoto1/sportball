@@ -42,7 +42,14 @@ var cocked := 0.0
 ## already bends it (the wrist only moves onto the handle), so it can't
 ## flip or fold into the body.
 var follow_elbows := false
+## The hands are motion capture and already together on a (captured) bat:
+## nothing moves the arms or turns the hands; the bat is fitted to them,
+## along the line through both grips, and only the fingers close round it.
+var from_hands := false
 
+## Hands farther apart than this (m) are spread along the bat (a bunt):
+## the bat runs through both, not along the fists.
+const SPREAD_HANDS := 0.18
 ## Where the handle crosses the palm, in the hand bone's frame (fingers
 ## along +Y, the index side +Z for the right hand): the base of the
 ## fingers, a little out from the palm.
@@ -69,6 +76,9 @@ func _process_modification_with_delta(_delta: float) -> void:
 	var sk := get_skeleton()
 	if sk == null or bat == null or direction.length() < 0.001:
 		return
+	if from_hands:
+		_fit_to_hands(sk)
+		return
 	var top_side := "l" if lefty else "r"
 	var bottom_side := "r" if lefty else "l"
 	var xf := sk.global_transform
@@ -87,6 +97,56 @@ func _process_modification_with_delta(_delta: float) -> void:
 	var up := Vector3.UP if absf(direction.normalized().dot(Vector3.UP)) < 0.98 else Vector3.FORWARD
 	# The knob just below the bottom hand (its palm is centered on the axis).
 	bat.global_transform = Transform3D(Basis.looking_at(direction, up), xf * bottom_target - direction.normalized() * (choke + KNOB_ROOM))
+
+
+## The bat along the captured hands: through the middle of both grips,
+## the knob below the bottom hand; then the fingers close round it.
+func _fit_to_hands(sk: Skeleton3D) -> void:
+	var top_side := "l" if lefty else "r"
+	var bottom_side := "r" if lefty else "l"
+	var bottom := _grip_point(sk, bottom_side)
+	var top := _grip_point(sk, top_side)
+	# A fist holds the handle across its knuckles (pinky side to index
+	# side): the bat runs along both fists' own axis, toward the barrel.
+	var d := _fist_axis(sk, bottom_side)
+	if not one_hand and bottom.distance_to(top) > SPREAD_HANDS:
+		# Hands spread (a bunt, the top hand up the barrel): along them.
+		d = (top - bottom).normalized()
+		if d.dot(_fist_axis(sk, bottom_side)) < 0.0:
+			d = -d
+	elif not one_hand:
+		d = (d + _fist_axis(sk, top_side)).normalized()
+		# Through the middle of both grips.
+		var mid := (bottom + top) * 0.5
+		bottom = mid - d * d.dot(mid - bottom)
+	d = d.normalized()
+	var xf := sk.global_transform
+	for side: String in ([bottom_side] if one_hand else [bottom_side, top_side]):
+		var at := _grip_point(sk, side)
+		var on_axis := bottom + d * d.dot(at - bottom)
+		for finger: String in FINGERS:
+			for j in 3:
+				_wrap(sk, "%s_%02d_%s" % [finger, j + 1, side], "%s_%02d%s_%s" % [finger, j + 2, "_leaf" if j == 2 else "", side], on_axis, d, Vector3(1, 0, 0), 0.0, MAX_BEND[j])
+		for j in 3:
+			_wrap(sk, "thumb_%02d_%s" % [j + 1, side], "thumb_%02d%s_%s" % [j + 2, "_leaf" if j == 2 else "", side], on_axis, d, Vector3.ZERO, -80.0, 80.0, 1.2)
+	var world_d := (xf.basis * d).normalized()
+	var up := Vector3.UP if absf(world_d.dot(Vector3.UP)) < 0.98 else Vector3.FORWARD
+	bat.global_transform = Transform3D(Basis.looking_at(world_d, up), xf * bottom - world_d * (choke + KNOB_ROOM))
+
+
+## A hand's fist axis, pinky side to index side (skeleton space).
+func _fist_axis(sk: Skeleton3D, side: String) -> Vector3:
+	var basis := sk.get_bone_global_pose(sk.find_bone("hand_" + side)).basis
+	var index_side := signf(sk.get_bone_rest(sk.find_bone("index_01_" + side)).origin.z)
+	return (basis.z * index_side).normalized()
+
+
+## Where a hand holds the handle (skeleton space): the base of its
+## fingers, out from the palm, as the hand is posed.
+func _grip_point(sk: Skeleton3D, side: String) -> Vector3:
+	var hand := sk.get_bone_global_pose(sk.find_bone("hand_" + side))
+	var palm_side := signf(sk.get_bone_rest(sk.find_bone("thumb_01_" + side)).origin.x)
+	return hand * (PALM + Vector3(PALM_DEPTH * palm_side, 0.0, 0.0))
 
 
 ## One hand round the handle at `on_axis` (skeleton space), the handle

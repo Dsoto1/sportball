@@ -362,6 +362,7 @@ func grip_bat(bat: Node3D, direction: Vector3 = Vector3.FORWARD, gap: float = 0.
 	_grip_ik.set_up = 0.0 if BaseballMoves.has_mocap() else set_up
 	_grip_ik.cocked = cocked
 	_grip_ik.follow_elbows = BaseballMoves.has_mocap()
+	_grip_ik.from_hands = BaseballMoves.has_mocap()
 
 
 ## Crouching roles (catcher) idle in a crouch.

@@ -2413,3 +2413,25 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
     `walkup` is passed, and frames the grip with `swing ... hands`;
     `tools/playtest_bot.gd ... home windup` shoots the user's first
     pitch.
+- **Back to basics: the capture's own hands hold the bat (2026-11-03,
+  owner):** the batter's bends and wrist twists came from our grip layer,
+  not the capture. Copying the performer's joint turns onto the players'
+  wider, higher shoulders (0.42 vs 0.29 hip-heights across, 0.57 vs 0.38
+  above the hips) put the hands 0.30 m apart (his: 0.13), and `BatGrip`
+  then dragged both wrists onto the handle and rebuilt each hand's turn
+  (squared to the bat, cocked 28 degrees), which wrung the wrists.
+  Now:
+  - `MixamoRetarget` places each wrist where the performer's is relative
+    to his shoulders' midpoint, scaled to our arm length, with a
+    two-bone reach that keeps the copied elbow side; the hand keeps its
+    captured turn. The hands come out together, as captured (0.12 m).
+  - `BatGrip.from_hands` (with the captured clips): nothing moves the
+    arms or turns the hands. The bat is fitted to the fists (along both
+    fists' knuckle axis, through the middle of the grips; along the line
+    between the hands when they're spread, as in a bunt), and only the
+    fingers close round it.
+  - So the hand-made stance and grip work no longer shapes the captured
+    batter: the per-style bat angles (`BattingStyles` stance/approach
+    bats), the swing path's aim, the grip gap, `set_up` / `cocked` and
+    the forearm roll only apply without the captures. The swing's height
+    is the capture's, not aimed at the pitch.
