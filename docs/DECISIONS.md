@@ -2375,3 +2375,15 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   (`MatchView.batter_busy()`). It spans the reset between pitches (the
   new batter actor catches up to the reaction's time).
   `tools/batter_closeup.gd ... strike` shows it.
+- **Clean playtest log (2026-11-03):** two long-standing log floods fixed.
+  (1) "Lambda capture at index 0 was freed" (~15 per 90 s): MatchFX's
+  4 s backup timer captured the effect node, which its `finished`
+  signal had usually freed already; it now captures the node's
+  instance id. (2) 57 "invalid UID" warnings with backtraces: the
+  Binbun VFX scenes reference their scripts and shaders by the author's
+  UIDs, but the `.uid` files beside them had been regenerated with new
+  ones; the 19 `.uid` files now hold the scenes' UIDs. (After changing a
+  `.uid` file by hand, delete `.godot/uid_cache.bin` and
+  `.godot/editor/filesystem_cache*` and re-import, or Godot keeps the
+  old mapping.) What remains is one exit-time warning when the bot quits
+  mid-sound (a crowd AudioStream still playing), not a game issue.

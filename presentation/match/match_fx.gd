@@ -167,9 +167,13 @@ func _spawn(path: String, at: Vector3, size: float) -> Node3D:
 	# Freed once done (the controllers emit finished; a timer backs it up).
 	if fx.has_signal("finished"):
 		fx.connect("finished", fx.queue_free)
+	# (By id, not the node: a lambda holding a node that `finished` already
+	# freed errors when called, before any validity check inside it runs.)
+	var id := fx.get_instance_id()
 	get_tree().create_timer(4.0, false).timeout.connect(func() -> void:
-		if is_instance_valid(fx):
-			fx.queue_free())
+		var node := instance_from_id(id) as Node
+		if node != null and is_instance_valid(node):
+			node.queue_free())
 	return fx
 
 
