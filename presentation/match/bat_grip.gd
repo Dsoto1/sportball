@@ -63,6 +63,8 @@ const STANCE_BAT := Vector2(0.75, 0.3)
 const STANCE_REACH := 0.82
 ## The back elbow's direction in the stance: x out to his side, y down,
 ## z behind him.
+## How far the front elbow is pushed out in front of the chest.
+const STANCE_FRONT_FORWARD := 1.6
 const STANCE_BACK_ELBOW := Vector3(0.5, 0.85, 0.15)
 ## Locked grip: the handle's angle across the fingers off square (deg),
 ## the wrists' cock back (deg), the hands' spots apart on the handle (m).
@@ -437,6 +439,10 @@ func _reach(sk: Skeleton3D, side: String, target: Vector3, hand_basis: Basis = B
 			# goes where the forearm runs straight into the hand on the bat:
 			# below and in front of the hands, the forearm angled up.
 			var straight := target - hand_basis.y.normalized() * b - s
+			straight -= line * straight.dot(line)
+			# Out in front of the chest, so the forearm crosses in front of
+			# it, not through it.
+			straight = straight.normalized() + front * STANCE_FRONT_FORWARD
 			straight -= line * straight.dot(line)
 			if straight.length() > 0.01:
 				pole = pole.slerp(straight.normalized(), clampf(stance, 0.0, 1.0)).normalized()

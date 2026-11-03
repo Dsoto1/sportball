@@ -2506,3 +2506,10 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   points down and back (`STANCE_BACK_ELBOW`). Wrists: front 17, back 43
   deg (a normal cocked back wrist). `GRIP_PROBE=1` prints elbow/wrist
   positions and bends in the stance.
+- **Front elbow in front of the chest (2026-11-03, owner: "left
+  elbow?"):** the front elbow sat 8 cm in front of its shoulder, so the
+  forearm crossing to the back-shoulder grip went through the torso and
+  the arm vanished. Pushed forward (`STANCE_FRONT_FORWARD`): now 27 cm in
+  front, wrist bend 8 deg. Note: the raw capture (no grip layer) already
+  holds the hands up by the back shoulder; the transfer onto our wider
+  shoulders and the grip corrections are what moved them.
