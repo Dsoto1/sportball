@@ -2497,3 +2497,12 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   arm into the body. In the stance its elbow now points down and out in
   front (`STANCE_FRONT_ELBOW`, blended by `stance`), and the grip sits
   30 cm in front of the back shoulder (was 24) for clearance.
+- **Elbows in the stance, not inverted (2026-11-03, owner):** measured,
+  the front wrist was bent 106 deg and the back 87-91 deg, the back
+  elbow up at shoulder height with the forearm running down along the
+  bat. Now in the stance each hand wraps the handle the way its own
+  forearm comes in (blended by `stance`, settled twice), the front elbow
+  goes where its forearm runs straight into the hand, and the back elbow
+  points down and back (`STANCE_BACK_ELBOW`). Wrists: front 17, back 43
+  deg (a normal cocked back wrist). `GRIP_PROBE=1` prints elbow/wrist
+  positions and bends in the stance.

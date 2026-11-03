@@ -58,12 +58,12 @@ var _have_rest := false
 ## z in front; and the bat's tilt (per unit up): x back over the shoulder,
 ## y behind the head.
 const STANCE_HANDS := Vector3(0.06, -0.04, 0.3)
-## The front elbow's direction in the stance: x in front, y down, z out
-## toward the pitcher.
-const STANCE_FRONT_ELBOW := Vector3(0.75, 0.6, 0.15)
 const STANCE_BAT := Vector2(0.75, 0.3)
 ## The stance grip stays within this share of each arm's length.
 const STANCE_REACH := 0.82
+## The back elbow's direction in the stance: x out to his side, y down,
+## z behind him.
+const STANCE_BACK_ELBOW := Vector3(0.5, 0.85, 0.15)
 ## Locked grip: the handle's angle across the fingers off square (deg),
 ## the wrists' cock back (deg), the hands' spots apart on the handle (m).
 const GRIP_DIAGONAL := 35.0
@@ -153,12 +153,50 @@ func _lock_to_bat(sk: Skeleton3D) -> void:
 	var spots := {bottom_side: mid - d * apart * 0.5, top_side: mid + d * apart * 0.5}
 	if one_hand:
 		spots = {bottom_side: mid}
-	for side: String in spots:
-		_grip(sk, side, spots[side], d, fingers, LOCKED_EXTENSION)
+	# In the stance each hand wraps the handle the way its own forearm comes
+	# in (the shared wrap left both wrists bent square there); settle twice,
+	# as each reach moves its forearm a little.
+	for pass_i in (2 if stance > 0.0 else 1):
+		for side: String in spots:
+			var own := fingers
+			if stance > 0.0:
+				var hand := sk.find_bone("hand_" + side)
+				var forearm := (sk.get_bone_global_pose(hand).origin - sk.get_bone_global_pose(sk.find_bone("lowerarm_" + side)).origin).normalized()
+				var a := (fingers - d * fingers.dot(d)).normalized()
+				var b := (forearm - d * forearm.dot(d)).normalized()
+				# (Opposite ways round, a blend has no direction: take the forearm's.)
+				own = a.slerp(b, clampf(stance, 0.0, 1.0)) if a.dot(b) > -0.95 else (b if stance > 0.5 else a)
+			_grip(sk, side, spots[side], d, own, LOCKED_EXTENSION)
 	var xf := sk.global_transform
 	var world_d := (xf.basis * d).normalized()
 	var up := Vector3.UP if absf(world_d.dot(Vector3.UP)) < 0.98 else Vector3.FORWARD
 	bat.global_transform = Transform3D(Basis.looking_at(world_d, up), xf * (spots[bottom_side] as Vector3) - world_d * (choke + KNOB_ROOM))
+	if OS.has_environment("GRIP_PROBE") and stance > 0.99:
+		_probe(sk, d)
+
+
+func _probe(sk: Skeleton3D, d: Vector3) -> void:
+	var rs := "l" if lefty else "r"
+	var fs := "r" if lefty else "l"
+	var spine := sk.get_bone_global_pose(sk.find_bone("spine_01")).origin
+	var neck := sk.get_bone_global_pose(sk.find_bone("neck_01")).origin
+	var up := (neck - spine).normalized()
+	var rsh := sk.get_bone_global_pose(sk.find_bone("upperarm_" + rs)).origin
+	var fsh := sk.get_bone_global_pose(sk.find_bone("upperarm_" + fs)).origin
+	var rear := (rsh - fsh).normalized()
+	var front := rear.cross(up).normalized()
+	if front.z < 0.0:
+		front = -front
+	var line := "PROBE bat(rear,up,front) %s" % Vector3(d.dot(rear), d.dot(up), d.dot(front)).snapped(Vector3.ONE * 0.01)
+	for side: String in [fs, rs]:
+		var sh := sk.get_bone_global_pose(sk.find_bone("upperarm_" + side)).origin
+		var el := sk.get_bone_global_pose(sk.find_bone("lowerarm_" + side)).origin
+		var hb := sk.get_bone_global_pose(sk.find_bone("hand_" + side))
+		var f := func(v: Vector3) -> Vector3: return Vector3((v - sh).dot(rear), (v - sh).dot(up), (v - sh).dot(front)).snapped(Vector3.ONE * 0.01)
+		var fore := (hb.origin - el).normalized()
+		var bend := rad_to_deg(fore.angle_to(hb.basis.y.normalized()))
+		line += " | %s elbow %s wrist %s bend %.0f" % ["front" if side == fs else "rear", f.call(el), f.call(hb.origin), bend]
+	print(line)
 
 
 ## The hitter's stance (VanSuch): hands up by the back shoulder, a hand's
@@ -282,7 +320,7 @@ func _grip(sk: Skeleton3D, side: String, on_axis: Vector3, d: Vector3, fingers: 
 	x = y.cross(z).normalized()
 	var basis := Basis(x, y, z).orthonormalized()
 	var palm := basis * (PALM + Vector3(PALM_DEPTH * palm_side, 0.0, 0.0))
-	_reach(sk, side, on_axis - palm)
+	_reach(sk, side, on_axis - palm, basis)
 	var parent_g := sk.get_bone_global_pose(lower)
 	# The hand's roll about the forearm goes mostly to the forearm itself
 	# (turning about its own length, so the wrist stays put): this rig has
@@ -348,7 +386,7 @@ func _wrap(sk: Skeleton3D, bone_name: String, child_name: String, on_axis: Vecto
 
 
 ## Two-bone IK for one arm: the wrist lands on target, elbow bent down and out.
-func _reach(sk: Skeleton3D, side: String, target: Vector3) -> void:
+func _reach(sk: Skeleton3D, side: String, target: Vector3, hand_basis: Basis = Basis()) -> void:
 	var upper := sk.find_bone("upperarm_" + side)
 	var lower := sk.find_bone("lowerarm_" + side)
 	var hand := sk.find_bone("hand_" + side)
@@ -386,13 +424,22 @@ func _reach(sk: Skeleton3D, side: String, target: Vector3) -> void:
 		off -= line * off.dot(line)
 		if off.length() > 0.01:
 			pole = off.normalized()
-		if stance > 0.0 and not rear:
+		if stance > 0.0 and rear:
+			# The back elbow in the stance: down and back, below the hands, so
+			# the forearm rises into the handle (captured, it sits at shoulder
+			# height and the forearm runs down along the bat).
+			var back_pole := (out * STANCE_BACK_ELBOW.x - up * STANCE_BACK_ELBOW.y - front * STANCE_BACK_ELBOW.z).normalized()
+			pole = pole.slerp(back_pole, clampf(stance, 0.0, 1.0)).normalized()
+		if stance > 0.0 and not rear and hand_basis != Basis():
 			# In the stance the front arm reaches across the chest to the back
-			# shoulder: its elbow points down and out in front of him (the
-			# captured elbow, set for hands at the chest, folds it into the
-			# body).
-			var front_pole := (front * STANCE_FRONT_ELBOW.x - up * STANCE_FRONT_ELBOW.y + out * STANCE_FRONT_ELBOW.z).normalized()
-			pole = pole.slerp(front_pole, clampf(stance, 0.0, 1.0)).normalized()
+			# shoulder. The captured elbow (set for hands at the chest) hangs
+			# it at his side with the wrist bent square; instead the elbow
+			# goes where the forearm runs straight into the hand on the bat:
+			# below and in front of the hands, the forearm angled up.
+			var straight := target - hand_basis.y.normalized() * b - s
+			straight -= line * straight.dot(line)
+			if straight.length() > 0.01:
+				pole = pole.slerp(straight.normalized(), clampf(stance, 0.0, 1.0)).normalized()
 	var elbow := PoseBaker.bend(s, target, a, b, pole, [spine, neck, across, front])
 	var parent_g := sk.get_bone_global_pose(sk.get_bone_parent(upper))
 	var new_upper := Basis(Quaternion((gl.origin - s).normalized(), (elbow - s).normalized())) * gu.basis
