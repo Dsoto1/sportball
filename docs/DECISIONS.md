@@ -2346,3 +2346,15 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   connector caps files at 10 MB); `tools/glb_shrink_textures.py` brings
   the 27.6 MB file to 2.2 MB. `tools/batter_closeup.gd ... umpire`
   shows his set and call.
+- **On-deck batter and dugout players (2026-11-03):** the batting club's
+  next hitter warms up in its on-deck circle (37 ft from home toward its
+  dugout, as drawn) with the `Batter_On_Deck` capture (stretches, then
+  practice swings; looped over its 37 s), a bat in his throwing hand
+  (`ActorView.carry_bat`). At each dugout's rail stand up to three of
+  the club's spare players (bench, then bullpen) with
+  `Baseball_Milling_Idle`, started at different points, its drift along
+  the ground taken out so they stay between the rail and the bench;
+  the batting club wears helmets, the fielding club caps
+  (`ActorView.set_headwear`). `ActorView.idle_move` names a captured
+  idle (umpire, on deck, milling). `tools/batter_closeup.gd ... sideline
+  [dugouts]` shows them.

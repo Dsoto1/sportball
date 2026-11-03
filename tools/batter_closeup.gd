@@ -9,6 +9,7 @@ extends SceneTree
 ## style argument's neighbour (swing <style> flip) to barrel it and watch
 ## the bat flip after contact, `pitcher` to watch from the mound, or
 ## `chest` or `rear` for the swing from the book's camera angles,
+## `sideline` for the on-deck batter and the dugouts,
 ## `umpire` for the home-plate umpire's set and strike call,
 ## `walkup` for the next batter walking into the box,
 ## `bunt` to square around and bunt instead of swinging,
@@ -151,6 +152,23 @@ func _swing_sequence(at: Vector3) -> bool:
 	_cam.look_at(at + Vector3(0, 1.05, 0))
 	if batter != null and _style != &"":
 		batter.style = _style
+	if OS.get_cmdline_user_args().has("sideline") and _view._on_deck != null:
+		# The on-deck batter warming up (four times, 3 s apart), then each
+		# dugout's rail.
+		var deck: ActorView = _view._on_deck
+		var shot := (_frames - 60) / 180 + (4 if OS.get_cmdline_user_args().has("dugouts") else 0)
+		if shot >= 6:
+			return true
+		if shot < 4:
+			_cam.position = deck.global_position + Vector3(0.0, 1.4, 0.0) - deck.global_position.normalized() * 3.6
+			_cam.look_at(deck.global_position + Vector3(0, 1.0, 0))
+		else:
+			var dug: Node3D = _view._stadium.find_children("Dugout_*", "", true, false)[shot - 4]
+			_cam.global_position = dug.global_transform * Vector3(0.0, 1.6, -7.5)
+			_cam.look_at(dug.global_transform * Vector3(0.0, 0.8, 0.8))
+		if (_frames - 60) % 180 == 170:
+			root.get_texture().get_image().save_png(_out.path_join("side_%d.png" % shot))
+		return false
 	if OS.get_cmdline_user_args().has("umpire") and _view._umpire != null:
 		# The umpire from the mound side and from first base: his set, then
 		# a called strike.

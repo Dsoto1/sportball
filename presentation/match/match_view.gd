@@ -45,6 +45,17 @@ var _walkup_until := -1.0
 ## and when his called-strike signal ends.
 var _umpire: ActorView
 var _ump_call_until := -1.0
+## The next batter, warming up in the batting club's on-deck circle.
+var _on_deck: ActorView
+## Bench players standing at each dugout's rail (club abbreviation ->
+## actors), dressed each pitch.
+var _dugout_crowd: Array[ActorView] = []
+## The on-deck circle: 37 ft from home toward each dugout (as drawn).
+const ON_DECK_SPRAY := 118.0
+const ON_DECK_FROM_HOME := 37.0 * 0.3048
+## Standing at the rail: across the opening, between the rail and the
+## bench (m).
+const DUGOUT_SPOTS := [Vector3(-4.2, -0.3, 0.45), Vector3(0.9, -0.3, 0.5), Vector3(4.6, -0.3, 0.4)]
 ## Behind the catcher, on the batter's side of him (m).
 const UMPIRE_BACK := 0.95
 const UMPIRE_INSIDE := 0.3
@@ -464,6 +475,7 @@ func reset_for_pitch(state: MatchState) -> void:
 	batter.position = _batter_spot()
 	batter.face(batter.position + (Vector3.LEFT if _bats_left else Vector3.RIGHT))  # square to the plate
 	_place_umpire()
+	_place_sideline(state, batting_color, batting_trim)
 	set_bat(true)
 	_pitch_u = -1.0
 	_contact_tier = 0
@@ -514,7 +526,92 @@ func _build_umpire() -> void:
 	_umpire.set_glove_visible(false)
 	_umpire.set_body(&"umpire")
 	_umpire.set_tag_visible(false)
-	_umpire.umpire = true
+	_umpire.idle_move = "Knees_Mocap"
+
+
+func _build_on_deck() -> void:
+	_on_deck = ActorView.new()
+	_on_deck.name = "OnDeck"
+	add_child(_on_deck)
+	_on_deck.setup(HOME_COLOR, "")
+	_on_deck.set_glove_visible(false)
+	_on_deck.set_tag_visible(false)
+	_on_deck.carry_bat(true)
+	_on_deck.idle_move = "OnDeck_Mocap"
+
+
+## Dresses and places the on-deck batter (the one after the current
+## batter) and the bench players at both dugout rails.
+func _place_sideline(state: MatchState, batting_color: Color, batting_trim: Color) -> void:
+	if not BaseballMoves.has_mocap() or _roster == null:
+		return
+	if _on_deck == null:
+		_build_on_deck()
+	var team := state.batting_team()
+	var order: Array = state.lineups[team]
+	var next_id: StringName = order[(state.lineup_index[team] + 1) % order.size()]
+	var p := _roster.player(next_id)
+	_on_deck.set_look(batting_color, "", batting_trim, _batting_home)
+	_on_deck.set_player(String(next_id), p.number if p != null else -1, p.body if p != null else &"")
+	_on_deck.set_lefty(p != null and p.bats_left())
+	var side := 1.0 if team == MatchState.HOME else -1.0
+	_on_deck.position = FieldLayout.direction_for_spray(side * ON_DECK_SPRAY) * ON_DECK_FROM_HOME
+	_on_deck.face(Vector3.ZERO)
+	_on_deck.visible = true
+	_place_dugouts(state)
+
+
+func _place_dugouts(state: MatchState) -> void:
+	if _stadium == null:
+		return
+	var k := 0
+	for t: int in [MatchState.AWAY, MatchState.HOME]:
+		var club: TeamDef = _roster.teams[t]
+		var dugout: Node3D = _stadium.find_child("Dugout_%s" % club.abbreviation, true, false)
+		if dugout == null:
+			continue
+		var bench := _bench(state, t, club)
+		var at_bat := t == state.batting_team()
+		for i in mini(DUGOUT_SPOTS.size(), bench.size()):
+			if k >= _dugout_crowd.size():
+				var a := ActorView.new()
+				a.name = "Dugout%d" % k
+				add_child(a)
+				a.setup(HOME_COLOR, "")
+				a.set_glove_visible(false)
+				a.set_tag_visible(false)
+				a.idle_move = "Milling_Mocap"
+				a.idle_from(7.3 * k)
+				_dugout_crowd.append(a)
+			var actor := _dugout_crowd[k]
+			var pd: PlayerDef = bench[i]
+			actor.set_look(club.primary_color, "", club.secondary_color, t == MatchState.HOME)
+			actor.set_player(String(pd.id), pd.number, pd.body)
+			# The batting club in helmets, the fielding club in caps.
+			actor.set_headwear(at_bat)
+			actor.global_position = dugout.global_transform * (DUGOUT_SPOTS[i] as Vector3)
+			actor.face(actor.global_position - dugout.global_transform.basis.z)
+			actor.visible = true
+			k += 1
+	for j in range(k, _dugout_crowd.size()):
+		_dugout_crowd[j].visible = false
+
+
+## A club's players not on the field or in the lineup (the bench, then the
+## bullpen), up to the dugout's spots.
+func _bench(state: MatchState, team: int, club: TeamDef) -> Array:
+	var out := []
+	var busy: Array = state.lineups[team].duplicate()
+	busy.append(state.pitcher(team))
+	for pd: PlayerDef in club.roster:
+		if not pd.id in busy and not pd.id in club.bullpen:
+			out.append(pd)
+	for pd: PlayerDef in club.roster:
+		if out.size() >= DUGOUT_SPOTS.size():
+			break
+		if pd.id in club.bullpen and not pd.id in busy:
+			out.append(pd)
+	return out.slice(0, DUGOUT_SPOTS.size())
 
 
 ## Stands the umpire in the slot behind the catcher, inside toward the

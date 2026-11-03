@@ -34,6 +34,10 @@ const CROWN := Vector3(0.0, 1.68, 0.0)
 const BLEND := 0.12
 ## The bunt capture plays this much faster than captured (squared in ~0.4 s).
 const BUNT_SPEED := 2.4
+## The carried bat in the hand bone: how far along the fingers and its
+## turn (its barrel out past the thumb).
+const CARRY_GRIP := 0.08
+const CARRY_TURN := Vector3(0.0, 0.0, 90.0)
 ## The umpire's called strike, a little quicker than captured (~1.7 s).
 const UMP_CALL_SPEED := 1.3
 ## Hands off the knees into the ready crouch.
@@ -92,8 +96,15 @@ var relaxed := false:
 		relaxed = value
 		if _pose == -1 or _pose == Pose.IDLE:
 			_play(_idle_clip(), 1.0, READY_BLEND)
-## The home-plate umpire: idles in his hands-on-knees set.
-var umpire := false
+## A captured clip (BaseballMoves) to idle in instead of the usual one:
+## the umpire's set, the on-deck batter's warm-up, the dugout's milling.
+var idle_move := "":
+	set(value):
+		idle_move = value
+		if _player != null and (_pose == -1 or _pose == Pose.IDLE):
+			_play(_idle_clip(), 1.0, 0.0)
+## A bat in the throwing hand (the on-deck batter's).
+var _carried_bat: Node3D
 ## The pitcher winds up (bases empty) instead of pitching from the stretch.
 var full_windup := false
 var _pose := -1
@@ -178,6 +189,13 @@ func set_tag_visible(value: bool) -> void:
 	_tag.visible = value
 
 
+## Off the field, gloveless: a helmet (the batting club) or a cap.
+func set_headwear(helmet: bool) -> void:
+	set_glove_visible(not helmet)
+	_glove.visible = false
+	_mitt.visible = false
+
+
 ## Fielders wear a glove and a cap; batters and runners wear batting
 ## gloves and a helmet.
 func set_glove_visible(value: bool) -> void:
@@ -203,6 +221,32 @@ func set_lefty(value: bool) -> void:
 	_helmet.get_node("FlapRight").visible = value
 	_clip = &""
 	_play(_idle_clip(), 1.0, 0.0)
+
+
+## Carries a bat in the throwing hand (gripped across the palm), or puts
+## it away.
+func carry_bat(on: bool) -> void:
+	if on and _carried_bat == null:
+		_carried_bat = Node3D.new()
+		_carried_bat.name = "CarriedBat"
+		# Bone space: +Y runs toward the fingers; the bat crosses the palm.
+		_carried_bat.position = Vector3(0.0, CARRY_GRIP, 0.0)
+		_carried_bat.rotation_degrees = CARRY_TURN
+		var mesh := MeshInstance3D.new()
+		mesh.mesh = BatMesh.build()  # along -Z
+		mesh.position = Vector3(0.0, 0.0, 0.06)
+		mesh.material_override = BatMesh.material()
+		_carried_bat.add_child(mesh)
+		_grip.add_child(_carried_bat)
+	if _carried_bat != null:
+		_carried_bat.visible = on
+
+
+## Seeks the idle clip to `t` seconds (players standing about start at
+## different points of the same capture).
+func idle_from(t: float) -> void:
+	if _player.is_playing():
+		_player.seek(fmod(t, maxf(_player.current_animation_length, 0.01)), true)
 
 
 ## Where the batter's hands hold the bat (and a thrower holds the ball).
@@ -576,8 +620,8 @@ static func _swing_time(p: float, contact: float, length: float) -> float:
 func _idle_clip() -> StringName:
 	if _crouched:
 		return BaseballMoves.clip("Catcher_Mocap" if BaseballMoves.has_mocap() else "Catcher", _lefty)
-	if umpire and BaseballMoves.has_mocap():
-		return BaseballMoves.clip("Knees_Mocap")
+	if idle_move != "" and BaseballMoves.has_mocap():
+		return BaseballMoves.clip(idle_move, _lefty)
 	if _glove != null and _glove.visible:
 		if relaxed and BaseballMoves.has_mocap():
 			return BaseballMoves.clip("Knees_Mocap", _lefty)

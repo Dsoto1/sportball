@@ -47,6 +47,9 @@ static func library(skeleton: Skeleton3D, player: AnimationPlayer) -> AnimationL
 				# He walks into his stance spot: the walk ends where the
 				# stance's hips stand.
 				_end_at(anim, _library.get_animation(StringName("Bat_Stance" + ("_L" if lefty else ""))))
+			if anim != null and String(spec[0]) == "Milling_Mocap":
+				# Standing about on one spot (at the dugout rail): no drift.
+				_in_place(anim)
 			if anim != null:
 				_library.add_animation(StringName(String(spec[0]) + ("_L" if lefty else "")), anim)
 	return _library
@@ -103,6 +106,11 @@ static func _mocap_specs() -> Array:
 		# The home-plate umpire's called strike: from his set, the punch
 		# out and back to the set.
 		["Ump_Call", "Baseball_Umpire", 0.45, -1.0, false, 0.0],
+		# The next batter in the on-deck circle: stretching with the bat,
+		# practice swings (loops over its whole 37 s).
+		["OnDeck_Mocap", "Batter_On_Deck", 0.0, -1.0, true, BAT_YAW],
+		# Players standing about at the dugout rail.
+		["Milling_Mocap", "Baseball_Milling_Idle", 0.0, -1.0, true, BAT_YAW],
 		# The next batter walking up into the box (after Bat_Stance, which
 		# it ends on).
 		["Bat_WalkUp", "Baseball_Walk_In", WALKUP_FROM, WALKUP_TO, false, BAT_YAW]]
@@ -127,6 +135,18 @@ static func _end_at(anim: Animation, to: Animation) -> void:
 	var shift: Vector3 = to.track_get_key_value(b, 0) - last
 	for k in anim.track_get_key_count(a):
 		anim.track_set_key_value(a, k, (anim.track_get_key_value(a, k) as Vector3) + shift)
+
+
+## Keeps a clip's hips over their first spot (their height still moves).
+static func _in_place(anim: Animation) -> void:
+	var a := _pelvis_track(anim)
+	if a < 0 or anim.track_get_key_count(a) == 0:
+		return
+	var first: Vector3 = anim.track_get_key_value(a, 0)
+	for k in anim.track_get_key_count(a):
+		var v: Vector3 = anim.track_get_key_value(a, k)
+		# (The root bone's frame is Z-up: x and y run along the ground.)
+		anim.track_set_key_value(a, k, Vector3(first.x, first.y, v.z))
 
 
 static func _pelvis_track(anim: Animation) -> int:
