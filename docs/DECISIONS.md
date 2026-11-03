@@ -2358,3 +2358,10 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   (`ActorView.set_headwear`). `ActorView.idle_move` names a captured
   idle (umpire, on deck, milling). `tools/batter_closeup.gd ... sideline
   [dugouts]` shows them.
+- **Umpire in a powder-blue shirt (2026-11-03, owner):** the model's black
+  shirt read as a dark shape behind the catcher from the mound.
+  `tools/umpire_shirt.py` recolors it in the base-color texture (the
+  texels under triangles skinned to the spine, shoulders and upper arms
+  that are dark, keeping their shading); collar, belt, mask, skin and
+  slacks keep their colors. Rebuild: umpire_shirt.py on the rigged GLB,
+  then glb_shrink_textures.py.
