@@ -2435,3 +2435,23 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
     bats), the swing path's aim, the grip gap, `set_up` / `cocked` and
     the forearm roll only apply without the captures. The swing's height
     is the capture's, not aimed at the pitch.
+- **The batter's wrists, round two (2026-11-03, owner: "the right
+  arm/wrist is upside down"):** measured, the two captured hands keep one
+  fixed relationship through the whole swing, and it is off: their palms
+  are about a quarter turn apart (dot -0.22) where a grip's face each
+  other, the top hand rolled over the handle. The capture's hand data,
+  not the transfer (each hand's rest matches the performer's within 5
+  degrees). What changed:
+  - The reach (`MixamoRetarget._reach`) aims the elbow so the forearm
+    runs into the hand the way the performer's did (the hands keep their
+    captured turn, so both stay on one bat line), and the forearm takes
+    85% of the hand's roll about it (`FOREARM_ROLL`): the capture rig puts
+    pronation on the hand bone, which wrings our mesh's wrist.
+  - Tried and dropped: keeping each wrist's captured bend on our
+    re-aimed forearms (the hands then disagree on the bat's line and it
+    breaks sideways); squaring the hands to the handle at runtime (they
+    leave the bat's line); turning the top hand round the handle to face
+    the bottom one (the fists tangle).
+  - Left: the top hand still rolls over the handle as captured. Fixing it
+    well needs a better-gripped capture or a hand-posed top hand.
+  - `tools/mocap_check.gd ... hands` shows the raw captured hands.

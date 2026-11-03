@@ -2,7 +2,7 @@ extends SceneTree
 ## A Mixamo clip baked onto a player (MixamoRetarget), seen from his chest
 ## side (top row) and from the pitcher (bottom row) at evenly spaced
 ## times; prints where his hands are. Needs a display:
-##   godot --path . --resolution 1800x700 -s res://tools/mocap_check.gd -- out.png Baseball_Hit [frames=8] [yaw:<deg>]
+##   godot --path . --resolution 1800x700 -s res://tools/mocap_check.gd -- out.png Baseball_Hit [frames=8] [yaw:<deg>] [hands]
 var _frames := 0
 var _out := ""
 var _actors: Array = []
@@ -77,6 +77,11 @@ func _process(_d: float) -> bool:
 		cam.look_at_from_position(Vector3(0, 1.1, -4.2), Vector3(0, 0.95, 0))
 	else:
 		cam.look_at_from_position(Vector3(-4.2, 1.1, 0), Vector3(0, 0.95, 0))
+	if OS.get_cmdline_user_args().has("hands"):
+		# Tight on the raw captured hands (no bat, no grip).
+		var skh: Skeleton3D = a._skeleton
+		var mid := skh.global_transform * ((skh.get_bone_global_pose(skh.find_bone("hand_l")).origin + skh.get_bone_global_pose(skh.find_bone("hand_r")).origin) * 0.5)
+		cam.look_at_from_position(mid + (Vector3(0, 0.1, -0.9) if view == 0 else Vector3(-0.9, 0.1, 0)), mid)
 	if _frames % 3 != 0:
 		return false
 	var sk: Skeleton3D = a._skeleton

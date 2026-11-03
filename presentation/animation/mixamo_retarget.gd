@@ -11,6 +11,8 @@ extends RefCounted
 
 const DIR := "res://assets/third_party/mixamo/"
 const FPS := 30.0
+## How much of the hand's roll about the forearm the forearm takes.
+const FOREARM_ROLL := 0.85
 
 ## Player (UAL) bone -> Mixamo bone (without the "mixamorig_" prefix).
 const MAP := {
@@ -108,8 +110,8 @@ static func bake(name: String, target: Skeleton3D, from: float = 0.0, to: float 
 
 
 ## Each side's arm: [target upperarm, lowerarm, hand, source shoulder,
-## source wrist, our arm length / the performer's] (mirrored: the source's
-## other side).
+## source wrist, our arm length / the performer's, the bones below the
+## hand] (mirrored: the source's other side).
 static func _arm_chains(src: Skeleton3D, target: Skeleton3D, mirror: bool) -> Array:
 	var out := []
 	for side: String in ["l", "r"]:
@@ -124,7 +126,14 @@ static func _arm_chains(src: Skeleton3D, target: Skeleton3D, mirror: bool) -> Ar
 			continue
 		var ours := target.get_bone_global_rest(up).origin.distance_to(target.get_bone_global_rest(lo).origin) + target.get_bone_global_rest(lo).origin.distance_to(target.get_bone_global_rest(hand).origin)
 		var his := src.get_bone_global_rest(s_up).origin.distance_to(src.get_bone_global_rest(s_lo).origin) + src.get_bone_global_rest(s_lo).origin.distance_to(src.get_bone_global_rest(s_hand).origin)
-		out.append([up, lo, hand, s_up, s_hand, ours / maxf(his, 0.0001)])
+		var below := []
+		for i in target.get_bone_count():
+			var p := target.get_bone_parent(i)
+			while p >= 0 and p != hand:
+				p = target.get_bone_parent(p)
+			if p == hand:
+				below.append(i)
+		out.append([up, lo, hand, s_up, s_hand, ours / maxf(his, 0.0001), below])
 	return out
 
 
@@ -152,38 +161,69 @@ static func _place_hands(target: Skeleton3D, src: Skeleton3D, src_g: Dictionary,
 	var ours_mid := ((p[arms[0][0]] as Vector3) + (p[arms[1][0]] as Vector3)) * 0.5
 	var his_mid := ((src_g[arms[0][3]] as Transform3D).origin + (src_g[arms[1][3]] as Transform3D).origin) * 0.5
 	for arm: Array in arms:
-		var up: int = arm[0]
-		var lo: int = arm[1]
-		var hand: int = arm[2]
 		var v := spin * ((src_g[arm[4]] as Transform3D).origin - his_mid)
 		if mirror:
 			v.x = -v.x
-		var goal := ours_mid + v * float(arm[5])
-		var s: Vector3 = p[up]
-		var e: Vector3 = p[lo]
-		var w: Vector3 = p[hand]
-		var a := s.distance_to(e)
-		var b := e.distance_to(w)
-		var to_goal := goal - s
-		var d := clampf(to_goal.length(), absf(a - b) + 0.001, a + b - 0.001)
-		var dir := to_goal.normalized()
-		# The elbow's side: where the copied turns put it, off the line.
-		var pole := (e - s) - dir * (e - s).dot(dir)
-		if pole.length() < 0.001:
-			pole = Vector3.DOWN - dir * Vector3.DOWN.dot(dir)
-		pole = pole.normalized()
-		var along := (a * a - b * b + d * d) / (2.0 * d)
-		var elbow := s + dir * along + pole * sqrt(maxf(a * a - along * along, 0.0))
-		var wrist := s + dir * d
-		var hand_g: Quaternion = globals[hand]
-		var r1 := Quaternion((e - s).normalized(), (elbow - s).normalized())
-		globals[up] = (r1 * (globals[up] as Quaternion)).normalized()
-		var lower_g := (r1 * (globals[lo] as Quaternion)).normalized()
-		var fore_now := (r1 * (w - e)).normalized()
-		var r2 := Quaternion(fore_now, (wrist - elbow).normalized())
-		globals[lo] = (r2 * lower_g).normalized()
-		# The hand (and so its fingers) keeps its captured turn.
-		globals[hand] = hand_g
+		_reach(target, globals, p, arm, ours_mid + v * float(arm[5]))
+
+
+## One arm reaching its wrist to `goal` (two-bone; see _place_hands); the
+## hand keeps its turn, the forearm takes most of its roll.
+static func _reach(target: Skeleton3D, globals: Dictionary, p: Dictionary, arm: Array, goal: Vector3) -> void:
+	var up: int = arm[0]
+	var lo: int = arm[1]
+	var hand: int = arm[2]
+	var s: Vector3 = p[up]
+	var e: Vector3 = p[lo]
+	var w: Vector3 = p[hand]
+	var a := s.distance_to(e)
+	var b := e.distance_to(w)
+	var to_goal := goal - s
+	var d := clampf(to_goal.length(), absf(a - b) + 0.001, a + b - 0.001)
+	var dir := to_goal.normalized()
+	var wrist := s + dir * d
+	var hand_g: Quaternion = globals[hand]
+	# Where the performer's forearm ran into this hand (its captured bend
+	# undone): put the elbow as near the end of such a forearm as the
+	# arm allows, so the hand (which keeps its captured turn: both hands
+	# stay on one bat) sits at the end of a forearm aimed at it.
+	var bone_axis := target.get_bone_rest(hand).origin.normalized()
+	var wrist_local := (globals[lo] as Quaternion).inverse() * hand_g
+	var fore_wanted := (hand_g * wrist_local.inverse()) * bone_axis
+	var want_elbow := wrist - fore_wanted.normalized() * b
+	var pole := (want_elbow - s) - dir * (want_elbow - s).dot(dir)
+	if pole.length() < 0.001:
+		pole = (e - s) - dir * (e - s).dot(dir)
+	if pole.length() < 0.001:
+		pole = Vector3.DOWN - dir * Vector3.DOWN.dot(dir)
+	pole = pole.normalized()
+	var along := (a * a - b * b + d * d) / (2.0 * d)
+	var elbow := s + dir * along + pole * sqrt(maxf(a * a - along * along, 0.0))
+	var r1 := Quaternion((e - s).normalized(), (elbow - s).normalized())
+	globals[up] = (r1 * (globals[up] as Quaternion)).normalized()
+	var lower_g := (r1 * (globals[lo] as Quaternion)).normalized()
+	var fore_now := (r1 * (w - e)).normalized()
+	var r2 := Quaternion(fore_now, (wrist - elbow).normalized())
+	lower_g = (r2 * lower_g).normalized()
+	# The forearm turns the palm (pronation), not the wrist: the capture
+	# rig puts that turn on the hand bone, which on the players' mesh
+	# wrings the wrist. Most of the hand's roll about the forearm goes
+	# to the forearm (turning about its own length, so the wrist stays
+	# put); the hand's world turn is unchanged by it.
+	var roll := MixamoRetarget._twist_about(lower_g.inverse() * hand_g, bone_axis)
+	lower_g = (lower_g * Quaternion.IDENTITY.slerp(roll, FOREARM_ROLL)).normalized()
+	globals[lo] = lower_g
+	globals[hand] = hand_g
+
+
+## The part of rotation q that turns about `axis` (swing-twist split).
+static func _twist_about(q: Quaternion, axis: Vector3) -> Quaternion:
+	var v := Vector3(q.x, q.y, q.z)
+	var p := axis * v.dot(axis)
+	var t := Quaternion(p.x, p.y, p.z, q.w)
+	if t.length_squared() < 1e-9:
+		return Quaternion()
+	return t.normalized()
 
 
 ## Target bone -> [source bone, rest alignment * target global rest].
