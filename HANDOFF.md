@@ -1,7 +1,7 @@
 # Handoff
 
 State of the project and how to keep working on it, for the next agent
-(or a later session of the same one). Last updated 2026-11-01.
+(or a later session of the same one). Last updated 2026-11-04.
 
 Read this first, then `docs/00_AGENT_START_HERE.md` for the vision and the
 full doc order. `docs/DECISIONS.md` is the running log of every decision,
@@ -12,14 +12,15 @@ newest at the bottom: read its last few sections before touching a system.
 A retro-futurist arcade baseball game in **Godot 4.7.2 (GDScript)**:
 18 original clubs, 18 parks each built from a reference sheet, a
 deterministic rules/physics core (`baseball/`) with presentation on top
-(`presentation/`, `ui/`, `app/`). 216 headless tests.
+(`presentation/`, `ui/`, `app/`). 219 headless tests.
 
 ## Owner's standing rules (do not break these)
 
 - **Branches:** work on `claude/new-session-c2j0fm` and mirror every push to
-  `main`:
-  `git push -q origin claude/new-session-c2j0fm && git push -q origin HEAD:main`
-  (retry with backoff if GitHub returns a server error).
+  `main` (both are at the same commit on 2026-11-04):
+  `git push -q origin HEAD:claude/new-session-c2j0fm && git push -q origin HEAD:main`
+  (retry with backoff if GitHub returns a server error). Start a new session
+  from `origin/main`.
 - **Commits** end with the session's attribution lines (the harness gives
   them); never put model names or IDs in commits, PRs or code.
 - **No pull requests** unless the owner asks.
@@ -27,8 +28,12 @@ deterministic rules/physics core (`baseball/`) with presentation on top
   price, and get an explicit yes before every generation. Log every spend in
   `docs/ARTLIST_CREDITS.md` and every asset in `docs/13_ASSET_MANIFEST.md`.
   Never ask the owner to paste API keys. No AI-generated reference images.
-  Meshy balance on 2026-11-01: **5,048 credits** (30 per text-to-3D
-  model, 5 per remesh, 5 per rig).
+  Meshy balance on 2026-11-02: **4,475 credits** (30 per text-to-3D
+  model, 5 per remesh, 5 per rig; the owner also spends from it).
+- **Owner's Drive** (`models/` folder) holds their Mixamo clips, Meshy
+  models and FX packs. Files over 10 MB don't come through the Drive
+  connector: download them with
+  `curl -L "https://drive.usercontent.google.com/download?id=<id>&export=download&confirm=t"`.
 - **Branding:** take layout and feel from the inspiration games, never their
   names, logos or art.
 - **Before calling anything done:** render it and look at the render, and run
@@ -75,6 +80,18 @@ Pitching camera view for comparisons: `cam:-0.9,2.35,-25.8,0.35,1,0 fov:23`.
 Wide mound view: `cam:0.6,2.6,-21,0,6,0 fov:62`. Reference sheets are in
 `docs/stadium_refs/` (panel 3 is the pitcher's view, panel 4 the home dugout).
 
+More tools added 2026-11-02..04:
+
+| Tool | What it does |
+|---|---|
+| `mocap_check.gd -- out.png <Mixamo clip> [frames] [from to] [yaw:<deg>] [hands]` | A Mixamo clip baked onto a player, raw (no bat or grip). |
+| `batter_closeup.gd ... swing <style> [chest\|rear\|pitcher] [hands] [bunt\|strike\|walkup\|umpire\|sideline [dugouts]]` | The batter's swing close-ups, plus bunt, called-strike step-out, walk-up, umpire and on-deck/dugout views. `GRIP_PROBE=1` prints grip offsets. |
+| `playtest_bot.gd -- <secs> [shot_dir] [home] [windup] [fx]` | Plays a match; `windup` shoots the user's first pitch, `fx` the meter press/flash and every call. `RELEASE_PROBE=1` logs ball-vs-hand at release. |
+| `headwear_fit.gd -- out.png` | Helmet and cap close up, front, side, behind. |
+| `pitch_motion_shot.gd -- out.png [lefty] [windup]` | The delivery from the side; `windup` = bases-empty windup. |
+| `bat_from_meshy.py in.glb out.glb [faces] [length]` | A Meshy bat into the game's bat (welded, simplified, along -Z). |
+| `glb_shrink_textures.py`, `umpire_shirt.py` | Shrink a Meshy GLB's textures; recolour the umpire's shirt. |
+
 ## Where things live
 
 - `baseball/`: rules and physics, deterministic, tested. Ball flight
@@ -94,6 +111,32 @@ Wide mound view: `cam:0.6,2.6,-21,0,6,0 fov:62`. Reference sheets are in
 - `ui/hud/match_hud.gd`: broadcast HUD. `app/match_director.gd`: the match loop.
 
 ## Recent work (newest first; details in DECISIONS.md)
+
+- **2026-11-02..04: motion capture, playtest fixes, arcade feedback.**
+  - Every player moves from the owner's 18 Mixamo clips
+    (`assets/third_party/mixamo/`, baked by `MixamoRetarget` in
+    `BaseballMoves.library()`): stance, three swings by style, bunt,
+    windup and stretch, catcher's squat, fielders' hands-on-knees, walk-up,
+    called-strike step-out, on-deck warm-up, dugout milling, umpire.
+  - **Batter = raw capture.** After many grip/stance layers that each
+    patched the last, the batter was stripped back to the capture. What
+    stays: wrists placed relative to the shoulders on transfer (our
+    shoulders are wider), forearm takes the hand's roll, bottom hand turned
+    onto the grip, then at runtime each wrist moves the few cm onto the bat
+    and the fingers close (`BatGrip._fit_to_hands`). Don't add stance or
+    elbow corrections on top again; if hands look wrong, check the raw clip
+    first (`mocap_check.gd ... hands`).
+  - Owner's Meshy assets in game: umpire (powder-blue shirt), futuristic
+    bat (`assets/generated/meshy/bat/`), robot player.
+  - Pitcher holds the ball in his palm and releases it on the capture's
+    release frame; your pitch winds up with the meter.
+  - Arcade feedback: meter glow and release flash, release burst, EARLY /
+    PERFECT! / LATE, speed popup at the mitt, barrel flash + slow motion.
+  - Helmet and cap fitted to the head (`HELMET_*`, `CAP_*` in
+    `actor_view.gd`; helmet tilt is positive = front down, about the back
+    of its rim).
+  - Log cleaned: freed-lambda errors (MatchFx timer) and VFX-pack UID
+    warnings fixed.
 
 - **Alley distances** on every wall (five real numbers: poles, alleys, center), art moved out
   of the alleys, and nothing (landmarks, gates) standing in front of any wall.
@@ -143,6 +186,13 @@ Wide mound view: `cam:0.6,2.6,-21,0,6,0 fov:62`. Reference sheets are in
 
 ## Open work
 
+0. **Next (owner agreed):** more arcade FX from the unused Drive FX packs:
+   pitch-type ball trails, a strikeout moment (stamp "K", slow beat), hit
+   streak flames. The barrel slow motion hasn't been seen in a render yet.
+   Owner to playtest: walk-up (~2.4 s) and step-out (~3.6 s) pacing, the
+   swing height (the capture's, no longer aimed at the pitch), the bat
+   angle per style (no longer per style).
+
 1. **Atmosphere:** skies are in; fog and post-processing per park still
    need a screenshot from the owner's machine (Forward+ renders differently).
 2. **Outfield walls:** done against all 18 sheets (rusted Foundry plates, Icebox icicles and
@@ -172,3 +222,14 @@ Wide mound view: `cam:0.6,2.6,-21,0,6,0 fov:62`. Reference sheets are in
   through the proxy; the fetch agent's DNS fails, and `mlbstatic.com`
   scripts (its visualizations) are blocked.
 - `pkill -f <pattern>` can match and kill your own shell command.
+- Mixamo batting clips face ~87 deg off our convention (`BAT_YAW`);
+  pitching/catching clips don't. Pelvis keys are in the root bone's Z-up frame.
+- A Meshy GLB split at UV seams opens holes when simplified: weld first
+  (`bat_from_meshy.py`).
+- After editing a `.uid` file by hand, delete `.godot/uid_cache.bin` and
+  `.godot/editor/filesystem_cache*`, then re-import.
+- Running from the editor embeds the game in the Game tab, so full screen
+  only enlarges the editor: turn off "Embed Game on Next Play" or run
+  `godot --path .`.
+- Renders of short effects (flashes) can miss them: this container renders
+  only a few frames a second.
