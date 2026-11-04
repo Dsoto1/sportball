@@ -14,7 +14,7 @@ var _out := ""
 var _kinds: Array = []
 var _director: Node
 var _frames := 0
-var _queue: Array = []  # [frames to wait, Callable]
+var _queue: Array = []  # [frames to wait after it, Callable]
 var _wait := 0
 var _ready_at := -1
 var _only: PackedStringArray = []
@@ -109,8 +109,8 @@ func _plan() -> void:
 			var at: int = i
 			_then(at if at == 0 else 2, func() -> void: pass)
 			_shot("k_swinging_%02d" % at)
-		_then(60, func() -> void: hud.show_strikeout(true, Color(0.4, 0.75, 1.0), Color.WHITE))
-		_then(8, func() -> void: pass)
+		_then(60, func() -> void: pass)
+		_then(12, func() -> void: hud.show_strikeout(true, Color(0.4, 0.75, 1.0), Color.WHITE))
 		_shot("k_looking")
 	if "flames" in _kinds:
 		for streak in [2, 3]:
