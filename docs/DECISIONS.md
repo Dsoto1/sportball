@@ -2593,3 +2593,8 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   Now top 1.815 m, 2 mm further back (`HELMET_FORWARD` 0.005) and 13 deg
   front-down: the shell covers the back of the head, the brim tips over
   the brow. `tools/headwear_fit.gd` adds a view from behind.
+- **Helmet tilt corrected (2026-11-04, owner: "tilt brim down, parallel
+  with brow line"):** the earlier tilts had the sign backwards (negative
+  raised the brim). Now 10 deg front-down about the back of the rim
+  (`TILT_PIVOT`, so the back doesn't lift), top 1.833 m, 2 cm forward:
+  brim parallel with the brow, back over the head, no skin through.
