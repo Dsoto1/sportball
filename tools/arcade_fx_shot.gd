@@ -7,7 +7,8 @@ extends SceneTree
 ## k:      the strikeout stamp swinging and looking, through its slam;
 ## flames: the batter's bat on fire (2 and 3 straight hits), from the
 ##         pitcher's view and the batter's, and mid-swing.
-## With no kind given, all three.
+## With no kind given, all three. `only:slider,curveball` limits the trails
+## to those pitches.
 
 var _out := ""
 var _kinds: Array = []
@@ -16,12 +17,16 @@ var _frames := 0
 var _queue: Array = []  # [frames to wait, Callable]
 var _wait := 0
 var _ready_at := -1
+var _only: PackedStringArray = []
 
 
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	_out = args[0]
 	DirAccess.make_dir_recursive_absolute(_out)
+	for a: String in args:
+		if a.begins_with("only:"):
+			_only = a.substr(5).split(",")
 	for k in ["trails", "k", "flames"]:
 		if args.has(k):
 			_kinds.append(k)
@@ -80,6 +85,8 @@ func _plan() -> void:
 	var content: ContentLibrary = _director.content
 	if "trails" in _kinds:
 		for family: PitchFamilyDef in content.pitches:
+			if not _only.is_empty() and not String(family.id) in _only:
+				continue
 			for mode in [MatchView.CameraMode.BAT, MatchView.CameraMode.PITCH]:
 				var f := family
 				var m: int = mode

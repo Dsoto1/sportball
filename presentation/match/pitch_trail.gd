@@ -16,7 +16,7 @@ const STYLE_OFFSPEED := &"offspeed"
 const STYLE_SIGNATURE := &"signature"
 ## Seconds of flight behind the ball, per ghost ball of the tell.
 const SECONDS_PER_TELL := 0.028
-const MIN_SECONDS := 0.06
+const MIN_SECONDS := 0.08
 const SAMPLES := 18
 ## Ribbon half width in ball radii (grown with the ball, so it reads from
 ## the box and from the mound alike).
@@ -46,14 +46,23 @@ func _init() -> void:
 	_sparks.local_coords = false
 	_sparks.direction = Vector3.UP
 	_sparks.spread = 180.0
-	_sparks.initial_velocity_min = 0.4
-	_sparks.initial_velocity_max = 1.6
+	_sparks.initial_velocity_min = 0.2
+	_sparks.initial_velocity_max = 0.8
 	_sparks.gravity = Vector3(0, -3.0, 0)
 	_sparks.scale_amount_min = 0.5
 	_sparks.scale_amount_max = 1.0
 	var bit := QuadMesh.new()
 	bit.size = Vector2(0.035, 0.035)
 	var bm := StandardMaterial3D.new()
+	var dot := GradientTexture2D.new()
+	dot.fill = GradientTexture2D.FILL_RADIAL
+	dot.fill_from = Vector2(0.5, 0.5)
+	dot.fill_to = Vector2(1.0, 0.5)
+	var dot_fade := Gradient.new()
+	dot_fade.set_color(0, Color(1, 1, 1, 1))
+	dot_fade.set_color(1, Color(1, 1, 1, 0))
+	dot.gradient = dot_fade
+	bm.albedo_texture = dot
 	bm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	bm.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 	bm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -116,11 +125,14 @@ func draw(pitch: PitchResult, t: float, ball: Vector3, ball_scale: float, color:
 	match style:
 		STYLE_BREAKING:
 			# Two strands winding round the path: the spin you can see.
-			var spin_rate := 26.0
+			# About two turns along the trail whatever its length, tight to
+			# the ball at the head, opening a little behind it.
+			var turns := 2.0 * TAU
 			for strand in 2:
 				_strip(points, eye, half, color, 0.85, func(i: int, side: Vector3, up: Vector3) -> Vector3:
-					var phase := spin_rate * (t - span * float(i) / SAMPLES) + PI * strand
-					return (side * cos(phase) + up * sin(phase)) * radius * 1.4)
+					var u := float(i) / SAMPLES
+					var phase := turns * u - t * 30.0 + PI * strand
+					return (side * cos(phase) + up * sin(phase)) * radius * lerpf(0.5, 0.9, u))
 			_strip(points, eye, half * 0.45, CORE, 0.5)
 		STYLE_OFFSPEED:
 			# Soft and wide, pulsing along its length (it floats in).
@@ -146,8 +158,8 @@ func _update_sparks(style: StringName, ball: Vector3, color: Color, radius: floa
 	if on:
 		_sparks.global_position = to_global(ball)
 		_sparks.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
-		_sparks.emission_sphere_radius = radius * 1.2
-		(_sparks.mesh as QuadMesh).size = Vector2.ONE * radius * 0.9
+		_sparks.emission_sphere_radius = radius * 0.8
+		(_sparks.mesh as QuadMesh).size = Vector2.ONE * radius * 0.55
 		_sparks.color = SPARK_GOLD.lerp(color, 0.3)
 	if on and not _sparks.emitting:
 		_sparks.restart()
