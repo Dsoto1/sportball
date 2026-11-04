@@ -32,6 +32,9 @@ const BACK_FONT := preload("res://assets/third_party/fonts/bungee/Bungee-Regular
 const BACK_NUMBER_AT := Vector3(0.0, 1.3, -0.2)
 const CROWN := Vector3(0.0, 1.68, 0.0)
 const BLEND := 0.12
+## The ball in the throwing hand (hand-bone space: x toward the palm, y
+## along the fingers, m).
+const BALL_IN_PALM := Vector3(0.04, 0.085, 0.0)
 ## The bunt capture plays this much faster than captured (squared in ~0.4 s).
 const BUNT_SPEED := 2.4
 ## The carried bat in the hand bone: how far along the fingers and its
@@ -249,9 +252,16 @@ func idle_from(t: float) -> void:
 		_player.seek(fmod(t, maxf(_player.current_animation_length, 0.01)), true)
 
 
-## Where the batter's hands hold the bat (and a thrower holds the ball).
+## Where the batter's hands hold the bat (the throwing hand's wrist).
 func grip_position() -> Vector3:
 	return _grip.global_position
+
+
+## Where a thrower holds the ball: in the palm at the base of the fingers
+## of the throwing hand (its wrist, grip_position, is behind the ball).
+func ball_position() -> Vector3:
+	var palm_side := signf(_skeleton.get_bone_rest(_skeleton.find_bone("thumb_01_" + _grip.bone_name.right(1))).origin.x)
+	return _grip.global_transform * Vector3(palm_side * BALL_IN_PALM.x, BALL_IN_PALM.y, BALL_IN_PALM.z)
 
 
 ## Turns the body about its feet (degrees, + = counterclockwise from above):

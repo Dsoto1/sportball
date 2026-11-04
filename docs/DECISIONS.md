@@ -2567,3 +2567,8 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
     0.55 real seconds at 0.3x speed, easing back (`SLOWMO_*`).
   - `tools/playtest_bot.gd ... fx` screenshots the meter press and flash
     and every call.
+- **Ball in the palm (2026-11-04, owner: "the ball is behind the hand"):**
+  the pitcher's ball sat on the throwing hand's wrist joint
+  (`grip_position`). `ActorView.ball_position()` puts it in the palm at
+  the base of the fingers (`BALL_IN_PALM`, hand-bone space), used for the
+  pitcher's hold, the release point and the drawn flight's start.

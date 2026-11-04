@@ -781,7 +781,7 @@ func show_windup(progress: float) -> void:
 		_follow_start = _view_clock
 		# Where his hand let go: the ball's drawn flight starts there.
 		var pi := tuning.fielder_ids.find(&"p")
-		_release_hand = _fielders[pi].grip_position() if pi >= 0 else Vector3.INF
+		_release_hand = _fielders[pi].ball_position() if pi >= 0 else Vector3.INF
 		_release_offset = Vector3.INF
 	_windup = progress
 
@@ -1390,7 +1390,7 @@ func _update_windup(delta: float) -> void:
 	actor.face(Vector3.ZERO)
 	actor.animate(ActorView.Pose.PITCH, delta, 0.0, false, _windup)
 	# The ball sits in the glove until his hands break.
-	_ball.position = actor.grip_position() if _windup > HANDS_BREAK else actor.hand_position()
+	_ball.position = actor.ball_position() if _windup > HANDS_BREAK else actor.hand_position()
 	_update_shadow()
 
 
