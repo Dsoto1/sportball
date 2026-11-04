@@ -2598,3 +2598,27 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   raised the brim). Now 10 deg front-down about the back of the rim
   (`TILT_PIVOT`, so the back doesn't lift), top 1.833 m, 2 cm forward:
   brim parallel with the brow, back over the head, no skin through.
+- **Arcade FX, second set (2026-11-04, the handoff's agreed next item):**
+  built from what is in the repo (the Drive's other FX packs don't come
+  through here); no paid generation.
+  - *Pitch-type trails* (`PitchTrail`): a camera-facing ribbon behind the
+    pitch in its tell colour, length from `tell_trail`, look by category:
+    fastball a long streak with a white-hot core; breaking two strands
+    twisting round the path (two turns along the trail); off-speed soft,
+    wide and pulsing; signature gold-edged and shedding soft sparks (the
+    knuckler's wobbles). The ghost balls stay (the count cue doesn't rely
+    on colour). It follows the ball out of the hand (`_release_lead`).
+  - *Strikeout moment:* a K stamped on the screen (`StrikeoutStamp`):
+    slams in from 2.6x, shockwave ring, landing shake, hold, fade (1.6 s);
+    backwards K for a called strike three (the scorekeeper's mark), in the
+    pitching club's colour; caption SWINGING/LOOKING and the pitcher's K
+    count from his second. Plus the hit pack's strike slashes at the mitt
+    (`MatchFx.strikeout`, off with Reduce flashes), a small camera punch
+    and 0.5 s at 0.45x (`K_SLOWMO_*`). Replaces the STRUCK OUT callout.
+  - *Hit-streak flames* (`StreakFlames`): from 2 hits in a row today
+    (`GameLines.hit_streak`: walks and sacrifices neither add nor end it)
+    the batter's barrel burns, left behind in the air as he swings, and
+    the ball he hits burns; 3+ burns white-hot ("BLAZING!"). Announced
+    the first pitch he sees ("ON FIRE!").
+  - `tools/arcade_fx_shot.gd` renders all three; pass Godot
+    `--fixed-fps 30` so short moments land in the shots.

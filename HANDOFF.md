@@ -12,7 +12,7 @@ newest at the bottom: read its last few sections before touching a system.
 A retro-futurist arcade baseball game in **Godot 4.7.2 (GDScript)**:
 18 original clubs, 18 parks each built from a reference sheet, a
 deterministic rules/physics core (`baseball/`) with presentation on top
-(`presentation/`, `ui/`, `app/`). 219 headless tests.
+(`presentation/`, `ui/`, `app/`). 222 headless tests.
 
 ## Owner's standing rules (do not break these)
 
@@ -91,6 +91,7 @@ More tools added 2026-11-02..04:
 | `pitch_motion_shot.gd -- out.png [lefty] [windup]` | The delivery from the side; `windup` = bases-empty windup. |
 | `bat_from_meshy.py in.glb out.glb [faces] [length]` | A Meshy bat into the game's bat (welded, simplified, along -Z). |
 | `glb_shrink_textures.py`, `umpire_shirt.py` | Shrink a Meshy GLB's textures; recolour the umpire's shirt. |
+| `arcade_fx_shot.gd -- <dir> [trails] [k] [flames] [only:slider,...]` | Every pitch's trail from both cameras, the K stamp, the streak flames. Run with `--fixed-fps 30`. |
 
 ## Where things live
 
@@ -186,9 +187,11 @@ More tools added 2026-11-02..04:
 
 ## Open work
 
-0. **Next (owner agreed):** more arcade FX from the unused Drive FX packs:
-   pitch-type ball trails, a strikeout moment (stamp "K", slow beat), hit
-   streak flames. The barrel slow motion hasn't been seen in a render yet.
+0. **Arcade FX second set is in (2026-11-04):** pitch-type trails, the
+   strikeout K stamp + slow beat, hit-streak flames (see DECISIONS). Built
+   from in-repo packs; the Drive's other FX packs weren't reachable from
+   the cloud session. Owner to playtest how they feel at speed. The barrel
+   slow motion still hasn't been seen in a render.
    Owner to playtest: walk-up (~2.4 s) and step-out (~3.6 s) pacing, the
    swing height (the capture's, no longer aimed at the pitch), the bat
    angle per style (no longer per style).
