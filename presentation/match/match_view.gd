@@ -156,6 +156,12 @@ var _toss_spin := Vector3.ZERO
 var _view_clock := 0.0
 var _timing_ring: MeshInstance3D
 var _windup := -1.0
+## The pitcher's hand at the release, and its gap to the pitch's release
+## point (eased out of the drawn flight).
+var _release_hand := Vector3.INF
+var _release_offset := Vector3.INF
+const RELEASE_BLEND := 0.12
+const RELEASE_MAX_GAP := 0.8
 ## Before the pitch the pitcher stands in his set on the rubber, the ball
 ## in his glove (until the windup starts, or a play takes him off it).
 var _pitcher_set := false
@@ -494,6 +500,7 @@ func reset_for_pitch(state: MatchState) -> void:
 	_swing_profile = PlayerSwing.for_player(hitter, batter.style)
 	set_aim_preview(false)
 	_windup = -1.0
+	_release_hand = Vector3.INF
 	_pitcher_set = true
 	_follow_start = -1.0
 	_pitch_spin = []
@@ -766,6 +773,10 @@ func show_windup(progress: float) -> void:
 			f.relaxed = false
 	if progress < 0.0 and _windup >= 0.0:
 		_follow_start = _view_clock
+		# Where his hand let go: the ball's drawn flight starts there.
+		var pi := tuning.fielder_ids.find(&"p")
+		_release_hand = _fielders[pi].grip_position() if pi >= 0 else Vector3.INF
+		_release_offset = Vector3.INF
 	_windup = progress
 
 
@@ -786,6 +797,17 @@ func show_pitch(pitch: PitchResult, t: float, tell_color: Color = Color.WHITE, t
 	_pitch_u = t / maxf(pitch.travel_time, 0.01)
 	_pitch_spin = PitchSpin.for_family(family) if family != null else []
 	_ball.position = pitch.position_at(t)
+	# Out of the pitcher's hand: the gap to the pitch's release point closes
+	# over the first RELEASE_BLEND s (presentation only; the pitch itself
+	# is unchanged).
+	if _release_hand != Vector3.INF:
+		if _release_offset == Vector3.INF:
+			_release_offset = _release_hand - pitch.position_at(0.0)
+			if _release_offset.length() > RELEASE_MAX_GAP:
+				_release_offset = Vector3.ZERO
+		_ball.position += _release_offset * (1.0 - smoothstep(0.0, RELEASE_BLEND, t))
+	if OS.has_environment("RELEASE_PROBE") and t < 0.2 and _release_hand != Vector3.INF:
+		print("RELEASE t=%.3f ball-hand %.2f m, ball-path %.2f m" % [t, _ball.position.distance_to(_release_hand), _ball.position.distance_to(pitch.position_at(t))])
 	_update_shadow()
 	for i in _trail.size():
 		var ghost := _trail[i]

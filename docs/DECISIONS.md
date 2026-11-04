@@ -2540,3 +2540,13 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   that far onto the bat's line (the arm reaches, elbow on the captured
   side; the hand keeps its captured turn). Probe (`GRIP_PROBE=1`): 0.000
   m off for both hands, 6-8 cm apart along the handle.
+- **The ball leaves the pitcher's hand (2026-11-04):** measured on the
+  release frame, the hand was 1.05 m (stretch) / 1.17 m (full windup)
+  from where the pitch started: the release frames were late, after the
+  hand had come down and across. `MOCAP_RELEASE` 1.63 -> 1.46 s and
+  `WINDUP_RELEASE` 2.1 -> 1.89 s, where the hand passes the release point
+  (high, arm side, out in front): now 0.32 / 0.26 m off, nearly all of it
+  height (the hand is higher than `release_height`, a gameplay value left
+  as is). The drawn ball now starts in the hand and eases onto the
+  pitch's path over its first 0.12 s (`MatchView.RELEASE_BLEND`;
+  presentation only, the pitch is unchanged). `RELEASE_PROBE=1` logs it.

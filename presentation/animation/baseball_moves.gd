@@ -75,7 +75,7 @@ const STYLE_SWING := {&"classic": &"hit", &"crouch": &"hit", &"open": &"hit", &"
 const BUNT_FROM := 0.4
 const BUNT_TO := 1.35
 ## The full windup (bases empty; Baseball_Pitching): release and end.
-const WINDUP_RELEASE := 2.1
+const WINDUP_RELEASE := 1.89
 const WINDUP_END := 2.9
 ## The next batter's walk-up (Baseball_Walk_In): about a metre from
 ## outside the box into his stance, hands up; played WALKUP_SPEED times
@@ -94,7 +94,7 @@ const STRIKE_SPEED := 1.8
 const STRIKE_TIME := STRIKE_TO / STRIKE_SPEED
 ## Captured clips: [name, Mixamo file, from s, to s, loop, yaw, pingpong].
 static var MOCAP := _mocap_specs()
-const MOCAP_RELEASE := 1.63
+const MOCAP_RELEASE := 1.46
 const MOCAP_PITCH := 2.43
 
 

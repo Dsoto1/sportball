@@ -131,7 +131,7 @@ func _drive() -> void:
 			if entered:
 				_planned_pitch = pitch
 				_swing_offset = _rng.randfn(0.0, 0.05)
-				if _shots_taken < 3:
+				if _shots_taken < 3 or OS.get_cmdline_user_args().has("windup"):
 					_screenshot("pitch")
 			if batting and pitch != null:
 				if _rng.randf() < 0.5:
