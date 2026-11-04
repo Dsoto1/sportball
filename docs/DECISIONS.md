@@ -2533,3 +2533,10 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   with the texture: 16k triangles, 0 open edges, the original texture at
   2048 px. (Tried and dropped: baking the texture onto a fresh atlas,
   which came out speckled.)
+- **Both hands on the handle again (2026-11-04, owner: "i thought this
+  was fixed? the grip?"):** after the strip-back the bat ran along the
+  fists between them, and the captured fists sit side by side, so each
+  was 3-4.5 cm off the bat. `_fit_to_hands` now moves each wrist just
+  that far onto the bat's line (the arm reaches, elbow on the captured
+  side; the hand keeps its captured turn). Probe (`GRIP_PROBE=1`): 0.000
+  m off for both hands, 6-8 cm apart along the handle.

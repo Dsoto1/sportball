@@ -120,6 +120,25 @@ func _fit_to_hands(sk: Skeleton3D) -> void:
 		bottom = mid - d * d.dot(mid - bottom)
 	d = d.normalized()
 	var xf := sk.global_transform
+	# Onto the bat: the captured fists sit side by side, a few cm either
+	# side of it; each wrist moves just that far (the arm reaches, its
+	# elbow on the captured side) and the hand keeps its captured turn.
+	if not one_hand:
+		for side: String in [bottom_side, top_side]:
+			var hand := sk.find_bone("hand_" + side)
+			var at := _grip_point(sk, side)
+			var off := (at - bottom) - d * d.dot(at - bottom)
+			if off.length() < 0.002:
+				continue
+			var hand_g := sk.get_bone_global_pose(hand).basis
+			_reach(sk, side, sk.get_bone_global_pose(hand).origin - off)
+			var parent_g := sk.get_bone_global_pose(sk.find_bone("lowerarm_" + side))
+			sk.set_bone_pose_rotation(hand, (parent_g.basis.inverse() * hand_g).get_rotation_quaternion())
+	if OS.has_environment("GRIP_PROBE"):
+		var gb := _grip_point(sk, bottom_side)
+		var gt := _grip_point(sk, top_side)
+		var dist := func(q: Vector3) -> float: return ((q - bottom) - d * d.dot(q - bottom)).length()
+		print("GRIP off bottom %.3f top %.3f along %.3f" % [dist.call(gb), dist.call(gt), d.dot(gt - gb)])
 	for side: String in ([bottom_side] if one_hand else [bottom_side, top_side]):
 		var at := _grip_point(sk, side)
 		var on_axis := bottom + d * d.dot(at - bottom)
