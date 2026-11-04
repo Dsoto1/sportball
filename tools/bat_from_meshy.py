@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Turns a Meshy bat (image-to-3D GLB: hundreds of thousands of triangles,
 4K textures, lying along its Y) into the game's bat: simplified with its
-UVs kept (pymeshlab), laid along -Z with the knob at the origin and
+its shape kept closed, the texture baked onto a fresh atlas (pymeshlab), laid along -Z with the knob at the origin and
 BatMesh.LENGTH long (BatMesh's own convention, so it drops in for the
 lathe bat), the base-color texture as one 1024 px JPEG. Usage:
 
@@ -9,12 +9,17 @@ lathe bat), the base-color texture as one 1024 px JPEG. Usage:
 """
 import io
 import json
+import os
 import struct
 import sys
+import tempfile
 
 import numpy as np
 import pymeshlab
 from PIL import Image
+
+# The baked texture (px).
+TEX = 2048
 
 
 def read_glb(path):
@@ -89,57 +94,81 @@ def main():
     faces = int(sys.argv[3]) if len(sys.argv) > 3 else 12000
     length = float(sys.argv[4]) if len(sys.argv) > 4 else 0.95
     pos, uv, tri, image = read_glb(src)
+    # Welded first (the source splits its vertices at UV seams; simplified
+    # split, each seam's two sides move apart and the bat shows holes), the
+    # UVs kept per triangle corner, then simplified keeping its own texture.
+    _, first, inverse = np.unique(np.round(pos, 6), axis=0, return_index=True, return_inverse=True)
+    welded = pos[first]
+    wtri = inverse.reshape(-1)[tri]
+    wedge_uv = uv[tri.reshape(-1)]
+    # (Through an OBJ with its texture, so every face carries one.)
+    tex_dir = tempfile.mkdtemp()
+    image.save(os.path.join(tex_dir, "src.png"))
+    with open(os.path.join(tex_dir, "src.mtl"), "w") as m:
+        m.write("newmtl bat\nKd 1 1 1\nmap_Kd src.png\n")
+    with open(os.path.join(tex_dir, "src.obj"), "w") as o:
+        o.write("mtllib src.mtl\nusemtl bat\n")
+        o.write("".join("v %.6f %.6f %.6f\n" % tuple(p) for p in welded))
+        o.write("".join("vt %.6f %.6f\n" % (t[0], 1.0 - t[1]) for t in wedge_uv))
+        o.write("".join("f %d/%d %d/%d %d/%d\n" % (a + 1, 3 * k + 1, b + 1, 3 * k + 2, c + 1, 3 * k + 3) for k, (a, b, c) in enumerate(wtri)))
     ms = pymeshlab.MeshSet()
-    m = pymeshlab.Mesh(vertex_matrix=pos, face_matrix=tri, v_tex_coords_matrix=uv)
-    ms.add_mesh(m)
-    ms.apply_filter("compute_texcoord_transfer_vertex_to_wedge")
-    ms.apply_filter("meshing_decimation_quadric_edge_collapse_with_texture", targetfacenum=faces, preservenormal=True)
+    ms.load_new_mesh(os.path.join(tex_dir, "src.obj"))
+    ms.apply_filter("meshing_decimation_quadric_edge_collapse_with_texture", targetfacenum=faces, preservenormal=True, preserveboundary=True)
+    baked = image if max(image.size) <= TEX else image.resize((TEX, TEX), Image.LANCZOS)
     out = ms.current_mesh()
-    # Back to one UV per vertex: split vertices by their wedge UVs.
     v = out.vertex_matrix()
     f = out.face_matrix()
-    w = out.wedge_tex_coord_matrix().reshape(-1, 2)
-    corner_pos = v[f.reshape(-1)]
-    key = np.round(np.hstack([corner_pos, w]), 6)
-    uniq, inverse = np.unique(key, axis=0, return_inverse=True)
-    pos2 = uniq[:, :3]
-    uv2 = uniq[:, 3:]
-    tri2 = inverse.reshape(-1, 3)
+    wuv = out.wedge_tex_coord_matrix().reshape(-1, 2).copy()
+    wuv[:, 1] = 1.0 - wuv[:, 1]  # (back from the OBJ's flipped V)
+    # One UV per GPU vertex: split by (position index, UV); positions stay
+    # shared, so nothing opens.
+    corner_v = f.reshape(-1)
+    key = np.hstack([corner_v[:, None].astype(np.float64), np.round(wuv, 6)])
+    uniq, inv = np.unique(key, axis=0, return_inverse=True)
+    vid = uniq[:, 0].astype(int)
+    pos2 = v[vid]
+    uv2 = uniq[:, 1:]
+    tri2 = inv.reshape(-1, 3)
     # Lay it along -Z, the knob (the thin end) at the origin, at length.
-    axis = int(np.argmax(pos2.max(0) - pos2.min(0)))
-    lo, hi = pos2[:, axis].min(), pos2[:, axis].max()
+    axis = int(np.argmax(v.max(0) - v.min(0)))
+    lo, hi = v[:, axis].min(), v[:, axis].max()
     span = hi - lo
     others = [i for i in range(3) if i != axis]
-    center = (pos2[:, others].max(0) + pos2[:, others].min(0)) * 0.5
-    radius = np.linalg.norm(pos2[:, others] - center, axis=1)
-    near_lo = radius[pos2[:, axis] < lo + span * 0.15].mean()
-    near_hi = radius[pos2[:, axis] > hi - span * 0.15].mean()
+    center = (v[:, others].max(0) + v[:, others].min(0)) * 0.5
+    radius = np.linalg.norm(v[:, others] - center, axis=1)
+    near_lo = radius[v[:, axis] < lo + span * 0.15].mean()
+    near_hi = radius[v[:, axis] > hi - span * 0.15].mean()
     knob_at_lo = near_lo < near_hi
-    t = (pos2[:, axis] - lo) / span if knob_at_lo else (hi - pos2[:, axis]) / span
     scale = length / span
-    out_pos = np.zeros_like(pos2)
-    out_pos[:, 0] = (pos2[:, others[0]] - center[0]) * scale
-    out_pos[:, 1] = (pos2[:, others[1]] - center[1]) * scale
-    out_pos[:, 2] = -t * length
-    if not knob_at_lo:
-        # Mirrored by the flip of the long axis: undo with one side axis.
-        out_pos[:, 0] = -out_pos[:, 0]
-    # Normals from the faces, smoothed per vertex.
-    fn = np.cross(out_pos[tri2[:, 1]] - out_pos[tri2[:, 0]], out_pos[tri2[:, 2]] - out_pos[tri2[:, 0]])
-    vn = np.zeros_like(out_pos)
+
+    def lay(p):
+        t = (p[:, axis] - lo) / span if knob_at_lo else (hi - p[:, axis]) / span
+        o = np.zeros_like(p)
+        o[:, 0] = (p[:, others[0]] - center[0]) * scale * (1.0 if knob_at_lo else -1.0)
+        o[:, 1] = (p[:, others[1]] - center[1]) * scale
+        o[:, 2] = -t * length
+        return o
+
+    out_v = lay(v)
+    out_pos = out_v[vid]
+    # Smooth normals over the shared positions (no shading seams).
+    fn = np.cross(out_v[f[:, 1]] - out_v[f[:, 0]], out_v[f[:, 2]] - out_v[f[:, 0]])
+    vn = np.zeros_like(out_v)
     for k in range(3):
-        np.add.at(vn, tri2[:, k], fn)
-    vn /= np.maximum(np.linalg.norm(vn, axis=1, keepdims=True), 1e-9)
-    # Keep the winding facing out (normals away from the bat's axis).
-    radial = out_pos.copy()
+        np.add.at(vn, f[:, k], fn)
+    radial = out_v.copy()
     radial[:, 2] = 0.0
     if (vn * radial).sum() < 0.0:
         tri2 = tri2[:, [0, 2, 1]]
         vn = -vn
+    vn /= np.maximum(np.linalg.norm(vn, axis=1, keepdims=True), 1e-9)
     buf = io.BytesIO()
-    image.resize((1024, 1024), Image.LANCZOS).save(buf, "JPEG", quality=88)
-    write_glb(dst, out_pos, vn, uv2, tri2, buf.getvalue())
-    print("faces %d -> %d, verts %d, knob at %s end, radius knob/barrel %.3f/%.3f m" % (len(tri), len(tri2), len(out_pos), "low" if knob_at_lo else "high", min(near_lo, near_hi) * scale, max(near_lo, near_hi) * scale))
+    baked.save(buf, "JPEG", quality=90)
+    write_glb(dst, out_pos, vn[vid], uv2, tri2, buf.getvalue())
+    # Closed? (edges shared by exactly two faces, over the positions)
+    e = np.sort(np.vstack([f[:, [0, 1]], f[:, [1, 2]], f[:, [2, 0]]]), 1)
+    _, cnt = np.unique(e, axis=0, return_counts=True)
+    print("faces %d -> %d, open edges %d, knob at %s end, radius knob/barrel %.3f/%.3f m" % (len(tri), len(f), int((cnt == 1).sum()), "low" if knob_at_lo else "high", min(near_lo, near_hi) * scale, max(near_lo, near_hi) * scale))
 
 
 if __name__ == "__main__":

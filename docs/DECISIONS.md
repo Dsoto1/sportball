@@ -2525,3 +2525,11 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   the forearm taking the hand's roll, and the bottom hand turned onto the
   grip. Rendered side by side with the raw capture, the stance and swing
   match.
+- **Bat had holes (2026-11-04, owner: "is the bat see through?"):** the
+  source mesh is closed, but it splits its vertices at UV seams; simplified
+  that way, each seam's two sides moved apart (9,587 open edges) and the
+  background showed through as "shards". `tools/bat_from_meshy.py` now
+  welds the vertices first (UVs kept per triangle corner) and simplifies
+  with the texture: 16k triangles, 0 open edges, the original texture at
+  2048 px. (Tried and dropped: baking the texture onto a fresh atlas,
+  which came out speckled.)
