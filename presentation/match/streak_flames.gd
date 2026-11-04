@@ -12,7 +12,7 @@ const BLAZING_FROM := 3
 var level := 0
 var _fire: CPUParticles3D
 var _embers: CPUParticles3D
-static var _puff: QuadMesh
+static var _puffs := {}
 
 
 func _init() -> void:
@@ -63,7 +63,7 @@ func _particles(amount: int, lifetime: float) -> CPUParticles3D:
 	p.gravity = Vector3(0, 2.2, 0)  # flames rise
 	p.damping_min = 0.5
 	p.damping_max = 1.5
-	p.mesh = _puff_mesh()
+	p.mesh = _puff_mesh(lifetime < 0.5)
 	var shrink := Curve.new()
 	shrink.add_point(Vector2(0, 0.6))
 	shrink.add_point(Vector2(0.25, 1.0))
@@ -88,25 +88,28 @@ static func _ramp(blazing: bool) -> Gradient:
 	return g
 
 
-## A soft round additive billboard.
-static func _puff_mesh() -> QuadMesh:
-	if _puff == null:
-		var tex := GradientTexture2D.new()
-		tex.fill = GradientTexture2D.FILL_RADIAL
-		tex.fill_from = Vector2(0.5, 0.5)
-		tex.fill_to = Vector2(1.0, 0.5)
-		var g := Gradient.new()
-		g.set_color(0, Color(1, 1, 1, 1))
-		g.set_color(1, Color(1, 1, 1, 0))
-		tex.gradient = g
-		var m := StandardMaterial3D.new()
-		m.albedo_texture = tex
-		m.vertex_color_use_as_albedo = true
-		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
-		m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		_puff = QuadMesh.new()
-		_puff.size = Vector2(0.12, 0.12)
-		_puff.material = m
-	return _puff
+## A soft round billboard: `solid` blends normally (the flame body, so it
+## shows against bright stands and sky), else adds light (embers).
+static func _puff_mesh(solid: bool) -> QuadMesh:
+	if _puffs.has(solid):
+		return _puffs[solid]
+	var tex := GradientTexture2D.new()
+	tex.fill = GradientTexture2D.FILL_RADIAL
+	tex.fill_from = Vector2(0.5, 0.5)
+	tex.fill_to = Vector2(1.0, 0.5)
+	var g := Gradient.new()
+	g.set_color(0, Color(1, 1, 1, 1))
+	g.set_color(1, Color(1, 1, 1, 0))
+	tex.gradient = g
+	var m := StandardMaterial3D.new()
+	m.albedo_texture = tex
+	m.vertex_color_use_as_albedo = true
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.blend_mode = BaseMaterial3D.BLEND_MODE_MIX if solid else BaseMaterial3D.BLEND_MODE_ADD
+	m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	var q := QuadMesh.new()
+	q.size = Vector2(0.12, 0.12)
+	q.material = m
+	_puffs[solid] = q
+	return q
