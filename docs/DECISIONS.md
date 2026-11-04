@@ -2572,3 +2572,9 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   (`grip_position`). `ActorView.ball_position()` puts it in the palm at
   the base of the fingers (`BALL_IN_PALM`, hand-bone space), used for the
   pitcher's hold, the release point and the drawn flight's start.
+- **Helmet and cap fitted (2026-11-04, owner: "slightly too large"):**
+  the head is 18 cm wide with its top at 1.81 m (rest pose); the helmet
+  was 25 cm wide topping 1.86, the cap 20.5 cm topping 1.845. Now helmet
+  21.8 cm / 1.84, cap 19 cm / 1.83 with its crown squashed to 82%
+  (`HELMET_*`, `CAP_*`; `_gear` takes a vertical squash).
+  `tools/headwear_fit.gd` renders both front and side.

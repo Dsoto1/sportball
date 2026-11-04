@@ -32,6 +32,13 @@ const BACK_FONT := preload("res://assets/third_party/fonts/bungee/Bungee-Regular
 const BACK_NUMBER_AT := Vector3(0.0, 1.3, -0.2)
 const CROWN := Vector3(0.0, 1.68, 0.0)
 const BLEND := 0.12
+## Headwear fit on the head (18 cm wide, its top at 1.81 m in the rest
+## pose): width across (m), the top's height, the cap's crown squashed.
+const HELMET_WIDTH := 0.218
+const HELMET_TOP := 1.84
+const CAP_WIDTH := 0.19
+const CAP_TOP := 1.83
+const CAP_SQUASH := 0.82
 ## The ball in the throwing hand (hand-bone space: x toward the palm, y
 ## along the fingers, m).
 const BALL_IN_PALM := Vector3(0.04, 0.085, 0.0)
@@ -532,14 +539,14 @@ func _attach(skeleton: Skeleton3D, bone: String, node: Node3D, at: Transform3D) 
 ## protector, shin guards and mitt are shown only on the catcher.
 func _build_headwear(skeleton: Skeleton3D) -> void:
 	# The head is a narrow egg: about 0.17 m wide, 0.23 deep, top at 1.83.
-	_helmet = _gear(skeleton, "batting_helmet", "Head", 0.25, Vector3(0, 1.86, -0.02), &"top", "main")
+	_helmet = _gear(skeleton, "batting_helmet", "Head", HELMET_WIDTH, Vector3(0, HELMET_TOP, -0.02), &"top", "main")
 	_helmet.name = "Helmet"
 	# The sculpted helmet has a flap either side; these stay for callers.
 	for flap in ["FlapLeft", "FlapRight"]:
 		var n := Node3D.new()
 		n.name = flap
 		_helmet.add_child(n)
-	_cap = _gear(skeleton, "cap", "Head", 0.205, Vector3(0, 1.845, 0.0), &"top", "main", 0.39)
+	_cap = _gear(skeleton, "cap", "Head", CAP_WIDTH, Vector3(0, CAP_TOP, 0.0), &"top", "main", 0.39, CAP_SQUASH)
 	_cap.name = "Cap"
 	_cap.visible = false
 	_mask = _gear(skeleton, "catcher_mask", "Head", 0.25, Vector3(0, 1.87, 0.0), &"top", "main", 0.22)
@@ -569,7 +576,7 @@ func set_catcher(value: bool) -> void:
 ## A gear model on a bone: `width` m across, its `anchor` (its top) at a
 ## rest-pose spot (skeleton space). `back` shifts it forward by that share
 ## of its depth (a brim reaches out in front of the crown it sits on).
-func _gear(skeleton: Skeleton3D, model: String, bone: String, width: float, at: Vector3, anchor: StringName, part: String, back: float = 0.0) -> Node3D:
+func _gear(skeleton: Skeleton3D, model: String, bone: String, width: float, at: Vector3, anchor: StringName, part: String, back: float = 0.0, squash: float = 1.0) -> Node3D:
 	var node: Node3D = (load(GEAR_DIR + model + ".glb") as PackedScene).instantiate()
 	var box := ModelKit._aabb(node)
 	var k := width / maxf(box.size.x, 0.001)
@@ -578,7 +585,8 @@ func _gear(skeleton: Skeleton3D, model: String, bone: String, width: float, at: 
 	var holder := Node3D.new()
 	holder.name = model
 	holder.add_child(node)
-	node.transform = Transform3D(Basis.from_scale(Vector3.ONE * k), -Vector3(center.x, top, center.z - back * box.size.z * 0.5) * k)
+	var scale := Vector3(k, k * squash, k)
+	node.transform = Transform3D(Basis.from_scale(scale), -Vector3(center.x, top, center.z - back * box.size.z * 0.5) * scale)
 	for mi: MeshInstance3D in node.find_children("*", "MeshInstance3D", true, false):
 		mi.set_meta("gear_part", part)
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
