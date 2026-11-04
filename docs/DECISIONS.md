@@ -2578,3 +2578,9 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   21.8 cm / 1.84, cap 19 cm / 1.83 with its crown squashed to 82%
   (`HELMET_*`, `CAP_*`; `_gear` takes a vertical squash).
   `tools/headwear_fit.gd` renders both front and side.
+- **Headwear front to back (2026-11-04, owner's reference photos):** the
+  cap's crown sat out in front of the forehead (shifted 0.39 of its half
+  depth forward); now 0.2 (`CAP_FORWARD`), so the crown's front meets the
+  hairline and only the brim reaches out. The helmet sat 2 cm back,
+  leaving a gap behind the neck; now 2 cm forward (`HELMET_FORWARD`), its
+  back against the head and the flap over the ear.

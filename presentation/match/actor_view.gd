@@ -39,6 +39,11 @@ const HELMET_TOP := 1.84
 const CAP_WIDTH := 0.19
 const CAP_TOP := 1.83
 const CAP_SQUASH := 0.82
+## Front to back: the helmet's centre (m, + toward the face), and how far
+## the cap is shifted forward (share of its half depth: its brim's reach,
+## with the crown's front at the forehead's hairline).
+const HELMET_FORWARD := 0.02
+const CAP_FORWARD := 0.2
 ## The ball in the throwing hand (hand-bone space: x toward the palm, y
 ## along the fingers, m).
 const BALL_IN_PALM := Vector3(0.04, 0.085, 0.0)
@@ -539,14 +544,14 @@ func _attach(skeleton: Skeleton3D, bone: String, node: Node3D, at: Transform3D) 
 ## protector, shin guards and mitt are shown only on the catcher.
 func _build_headwear(skeleton: Skeleton3D) -> void:
 	# The head is a narrow egg: about 0.17 m wide, 0.23 deep, top at 1.83.
-	_helmet = _gear(skeleton, "batting_helmet", "Head", HELMET_WIDTH, Vector3(0, HELMET_TOP, -0.02), &"top", "main")
+	_helmet = _gear(skeleton, "batting_helmet", "Head", HELMET_WIDTH, Vector3(0, HELMET_TOP, HELMET_FORWARD), &"top", "main")
 	_helmet.name = "Helmet"
 	# The sculpted helmet has a flap either side; these stay for callers.
 	for flap in ["FlapLeft", "FlapRight"]:
 		var n := Node3D.new()
 		n.name = flap
 		_helmet.add_child(n)
-	_cap = _gear(skeleton, "cap", "Head", CAP_WIDTH, Vector3(0, CAP_TOP, 0.0), &"top", "main", 0.39, CAP_SQUASH)
+	_cap = _gear(skeleton, "cap", "Head", CAP_WIDTH, Vector3(0, CAP_TOP, 0.0), &"top", "main", CAP_FORWARD, CAP_SQUASH)
 	_cap.name = "Cap"
 	_cap.visible = false
 	_mask = _gear(skeleton, "catcher_mask", "Head", 0.25, Vector3(0, 1.87, 0.0), &"top", "main", 0.22)
