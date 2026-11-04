@@ -64,6 +64,8 @@ var _speed: Label
 var _speed_left := 0.0
 var _meter_hide_in := 0.0
 var _timing: Label
+## The strikeout moment's stamped K.
+var _k_stamp: StrikeoutStamp
 var _timing_left := 0.0
 const SPEED_TIME := 1.1
 ## No full-screen flashes (GameSettings "reduce_flashes").
@@ -176,6 +178,8 @@ func _ready() -> void:
 	_timing.add_theme_constant_override("outline_size", 12)
 	_timing.add_theme_color_override("font_outline_color", Color(0.05, 0.07, 0.14))
 	_timing.modulate.a = 0.0
+	_k_stamp = StrikeoutStamp.new()
+	add_child(_k_stamp)
 	_meter = PitchMeter.new()
 	_meter.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	_meter.size = Vector2(360, 22)
@@ -743,6 +747,16 @@ func show_timing(word: String, perfect: bool) -> void:
 	_timing.text = word
 	_timing_left = SPEED_TIME
 	_timing.add_theme_color_override("font_color", MenuStyle.GOLD if perfect else Color(0.75, 0.88, 1.0))
+
+
+## The strikeout moment: a K stamped on the screen (backwards when
+## `looking`), in `color` (the pitching club's) edged with `rim`.
+func show_strikeout(looking: bool, color: Color = MenuStyle.GOLD, rim: Color = Color.WHITE, caption: String = "") -> void:
+	_k_stamp.stamp(looking, color, rim, caption)
+
+
+func strikeout_showing() -> bool:
+	return _k_stamp.playing()
 
 
 ## The pitch's speed popping up by the zone as it reaches the mitt.

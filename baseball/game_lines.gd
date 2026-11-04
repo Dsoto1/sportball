@@ -46,3 +46,20 @@ static func batter(state: MatchState, batter_id: StringName) -> Dictionary:
 		if result in [PlayOutcome.KIND_HOME_RUN, PlayOutcome.KIND_INSIDE_PARK_HR]:
 			line["hr"] += 1
 	return line
+
+
+## Hits in a row for a batter today: his plate appearances ending in a hit,
+## counted back from the latest; walks and sacrifices neither add to it nor
+## end it, anything else ends it.
+static func hit_streak(state: MatchState, batter_id: StringName) -> int:
+	var streak := 0
+	for i in range(state.events.size() - 1, -1, -1):
+		var e: DomainEvent = state.events[i]
+		if e.type != DomainEvent.PLATE_APPEARANCE_ENDED or e.data.get("batter", &"") != batter_id:
+			continue
+		var result: StringName = e.data.get("result", &"")
+		if result in HITS:
+			streak += 1
+		elif not result in NOT_AT_BATS:
+			break
+	return streak

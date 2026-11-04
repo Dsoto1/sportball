@@ -22,6 +22,8 @@ const CONTACT := [
 ## as shells bursting: rays, a flash, a ring), with a burst explosion now
 ## and then for a bang.
 const FIREWORKS := [HIT + "big_impact/vfx_big_impact_01.tscn", HIT + "big_impact/vfx_big_impact_03.tscn", HIT + "big_impact/vfx_big_impact_05.tscn", HIT + "big_impact/vfx_big_impact_07.tscn", BOOM + "burst/vfx_burst_explosion_01.tscn"]
+## Strike three: the hit pack's strike slashes at the mitt.
+const STRIKEOUT := [HIT + "strike/vfx_strike_01.tscn", HIT + "strike/vfx_strike_03.tscn"]
 ## Firework colors cycle through the batting club's own and gold.
 const GOLD := Color(1.0, 0.82, 0.3)
 
@@ -49,6 +51,7 @@ func warm_up(camera: Camera3D) -> void:
 	for spec: Array in CONTACT:
 		paths.append(spec[0])
 	paths.append_array(FIREWORKS)
+	paths.append_array(STRIKEOUT)
 	var spot := camera.global_transform * Vector3(0, 0, -1.5)
 	for path: String in paths:
 		var fx := _spawn(path, spot, 0.002)
@@ -79,6 +82,19 @@ func release(at: Vector3, color: Color, strength: float) -> void:
 	var fx := _spawn(spec[0], at, float(spec[1]) * lerpf(0.35, 0.75, strength))
 	if fx != null:
 		_tint(fx, color.lightened(0.5), color)
+
+
+## Strike three into the mitt at `at`: a slash and a ring in `color` (the
+## pitching club's) over white.
+func strikeout(at: Vector3, color: Color) -> void:
+	if reduce_flashes:
+		return
+	var fx := _spawn(STRIKEOUT[0], at, 0.45)
+	if fx != null:
+		_tint(fx, Color(1, 1, 1), color)
+	fx = _spawn(STRIKEOUT[1], at, 0.3)
+	if fx != null:
+		_tint(fx, GOLD, color)
 
 
 ## A home run's fireworks: `count` bursts over the outfield stands (round

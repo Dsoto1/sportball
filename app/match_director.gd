@@ -18,6 +18,9 @@ const CLEAN_RELEASE := 0.08
 const SLOWMO_TIME := 0.55
 const SLOWMO_SCALE := 0.3
 const SLOWMO_EASE := 0.2
+## The strikeout's beat: a short slow-down as the K lands.
+const K_SLOWMO_TIME := 0.5
+const K_SLOWMO_SCALE := 0.45
 const MPH := 2.23694
 ## After an early meter press, the rest of the windup takes this share of
 ## WINDUP_TIME per full windup (so at most ~0.2 s).
@@ -65,6 +68,14 @@ var _phase := Phase.PRE_PITCH
 var _user_windup := 0.0
 ## Real seconds of the barrel's slow motion left.
 var _slowmo_left := 0.0
+var _slowmo_scale := SLOWMO_SCALE
+## The last pitch call and the club in the field when it was made (the
+## strikeout moment reads them; the half may have ended by then).
+var _last_call := -1
+var _call_team := MatchState.HOME
+## The batter the streak flames were last set for (announced once each
+## time he comes up hot).
+var _streak_batter: StringName = &""
 var _meter_intent: PitchIntent
 var _phase_time := 0.0
 ## Hit pause: the play clock holds for this long after solid contact.
@@ -134,6 +145,7 @@ func setup(p_content: ContentLibrary, view: MatchView, hud: MatchHud, debug: Deb
 ## (the first two in the library to begin with), away at home.
 func start_match(seed_value: int) -> void:
 	_slowmo_left = 0.0
+	_streak_batter = &""
 	Engine.time_scale = 1.0
 	_seed = seed_value
 	rng = MatchRng.new(seed_value)
@@ -311,7 +323,7 @@ func _process(delta: float) -> void:
 	if _slowmo_left > 0.0:
 		# Counted in real seconds (delta is slowed with the engine).
 		_slowmo_left -= delta / maxf(Engine.time_scale, 0.01)
-		Engine.time_scale = SLOWMO_SCALE if _slowmo_left > SLOWMO_EASE else lerpf(1.0, SLOWMO_SCALE, clampf(_slowmo_left / SLOWMO_EASE, 0.0, 1.0))
+		Engine.time_scale = _slowmo_scale if _slowmo_left > SLOWMO_EASE else lerpf(1.0, _slowmo_scale, clampf(_slowmo_left / SLOWMO_EASE, 0.0, 1.0))
 		if _slowmo_left <= 0.0:
 			Engine.time_scale = 1.0
 	if state == null:
@@ -390,6 +402,7 @@ func _enter_pre_pitch() -> void:
 	_ai_pitching_change()
 	_announce_whos_on_first()
 	_view.reset_for_pitch(state)
+	_show_streak()
 	if user_is_batting():
 		# The AI pitcher may throw over to keep a runner honest.
 		_ai_pickoff_base = AiManager.pickoff_choice(state, roster, tuning, rng)
@@ -629,8 +642,14 @@ func _show_contact_feedback(call_text: String) -> void:
 		if f["tier"] == ContactFeedback.Tier.SWEET:
 			# The barrel: a white flash and a beat of slow motion off the bat.
 			_hud.screen_flash(Color(1.0, 0.96, 0.8), 0.22)
-			_slowmo_left = SLOWMO_TIME
-			Engine.time_scale = SLOWMO_SCALE
+			_slow_motion(SLOWMO_TIME, SLOWMO_SCALE)
+
+
+## `seconds` (real time) at `scale` speed, easing back to full speed.
+func _slow_motion(seconds: float, scale: float) -> void:
+	_slowmo_left = seconds
+	_slowmo_scale = scale
+	Engine.time_scale = scale
 
 
 func _resolve_swing(swing: SwingIntent) -> void:
@@ -659,6 +678,8 @@ func _apply_call() -> String:
 	var batter_before := state.current_batter()
 	if call == MatchState.PitchCall.CALLED_STRIKE:
 		_view.umpire_call_strike()
+	_last_call = call
+	_call_team = state.fielding_team()
 	state.apply_pitch_call(call)
 	# Still up after a called strike (not strike three): he steps out.
 	if call == MatchState.PitchCall.CALLED_STRIKE and state.current_batter() == batter_before:
@@ -875,8 +896,7 @@ func _drain_events() -> void:
 			DomainEvent.PLATE_APPEARANCE_ENDED:
 				_view.cheer(CROWD.get(event.data["result"], 0.0))
 				if event.data["result"] == &"strikeout":
-					_hud.show_callout("STRUCK OUT", _timing_detail())
-					_view.board_moment(&"strikeout", {"team": roster.teams[state.fielding_team()]})
+					_strikeout_moment()
 				elif event.data["result"] == &"walk":
 					_hud.show_callout("WALK")
 			DomainEvent.RUN_SCORED:
@@ -896,6 +916,33 @@ func _drain_events() -> void:
 				_log({"sub": event.data["in"], "for": event.data["out"]})
 			DomainEvent.RUNNER_PLACED:
 				_hud.show_callout("EXTRA INNINGS", "%s starts on second" % _name(event.data["runner"]), 2.0)
+
+
+## Strike three: the K stamped on the screen (backwards when he took it),
+## a burst at the mitt, a beat of slow motion, the pitcher's count today.
+func _strikeout_moment() -> void:
+	var club: TeamDef = roster.teams[_call_team]
+	var looking := _last_call == MatchState.PitchCall.CALLED_STRIKE
+	var ks: int = GameLines.pitcher(state, state.pitcher(_call_team))["k"]
+	var caption := "%s · %d K TODAY" % ["LOOKING" if looking else "SWINGING", ks] if ks > 1 else ("STRUCK OUT LOOKING" if looking else "STRUCK OUT SWINGING")
+	_hud.show_strikeout(looking, club.primary_color.lerp(MenuStyle.GOLD, 0.35), club.secondary_color.lerp(Color.WHITE, 0.5), caption)
+	_hud.show_callout("STRIKE THREE", _timing_detail(), 1.4)
+	_view.strikeout_moment(_pitch.location if _pitch != null else Vector2(0, 0.8), club.primary_color)
+	_view.board_moment(&"strikeout", {"team": club})
+	_slow_motion(K_SLOWMO_TIME, K_SLOWMO_SCALE)
+
+
+## The batter's streak: his bat on fire from StreakFlames.HOT_FROM hits in
+## a row, announced the first pitch he sees.
+func _show_streak() -> void:
+	var batter := state.current_batter()
+	var streak := GameLines.hit_streak(state, batter)
+	_view.set_hot_streak(streak)
+	if batter == _streak_batter:
+		return
+	_streak_batter = batter
+	if streak >= StreakFlames.HOT_FROM:
+		_hud.show_callout("ON FIRE!" if streak < StreakFlames.BLAZING_FROM else "BLAZING!", "%s · %d hits in a row" % [_name(batter), streak], 2.0)
 
 
 func _update_debug() -> void:

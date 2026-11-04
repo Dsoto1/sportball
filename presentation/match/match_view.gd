@@ -182,6 +182,12 @@ var _contact_sound: ContactSound
 ## Sound effects and the crowd.
 var sfx: Sfx
 var _trail: Array[MeshInstance3D] = []
+## The pitch's streak in its tell colour, styled by pitch kind.
+var _pitch_trail: PitchTrail
+## A hitter on a streak: fire on the barrel, and on the ball he hits.
+var _bat_flames: StreakFlames
+var _ball_flames: StreakFlames
+var _hot_streak := 0
 var _punch_start := -10.0
 var _punch_strength := 0.0
 var _shake_rng := RandomNumberGenerator.new()
@@ -496,6 +502,8 @@ func reset_for_pitch(state: MatchState) -> void:
 	set_bat(true)
 	_pitch_u = -1.0
 	_contact_tier = 0
+	_ball_flames.set_level(0)
+	_pitch_trail.hide_trail()
 	batter.style = BattingStyles.for_player(hitter)
 	_swing_profile = PlayerSwing.for_player(hitter, batter.style)
 	set_aim_preview(false)
@@ -653,6 +661,14 @@ func release_burst(color: Color, strength: float) -> void:
 
 
 ## A called strike: the umpire punches it out.
+## Strike three: the burst at the mitt where the pitch crossed
+## (`location` in the plate plane), in the pitching club's `color`.
+func strikeout_moment(location: Vector2, color: Color) -> void:
+	fx.strikeout(Vector3(location.x, location.y, 0.25), color)
+	_punch_start = _view_clock
+	_punch_strength = 0.35 * (0.25 if reduce_shake else 1.0)
+
+
 func umpire_call_strike() -> void:
 	if _umpire != null and BaseballMoves.has_mocap():
 		_ump_call_until = _view_clock + BaseballMoves.UMP_CALL_TIME
@@ -733,6 +749,8 @@ func set_aim_preview(show: bool, spray_deg: float = 0.0, lift: float = 0.0) -> v
 ## Contact feedback at the plate: a burst (solid contact and better) and
 ## the crack of the bat. tier: ContactFeedback.Tier.
 func contact_feedback(location: Vector2, tier: int) -> void:
+	if _hot_streak >= StreakFlames.HOT_FROM and tier > ContactFeedback.Tier.MISS:
+		_ball_flames.set_level(_hot_streak, 0.0, 1.6)
 	_contact_sound.play_tier(tier)
 	if tier != ContactFeedback.Tier.MISS:
 		# Wood under the synthesized crack: fuller the better the contact.
@@ -825,6 +843,22 @@ func show_pitch(pitch: PitchResult, t: float, tell_color: Color = Color.WHITE, t
 		# Same distance-based growth as the ball, so the tell reads from the box.
 		ghost.scale = _ball.scale * (0.9 * fade + 0.35)
 		(ghost.material_override as StandardMaterial3D).albedo_color = Color(tell_color, 0.35 + 0.6 * fade)
+	_pitch_trail.draw(pitch, t, _ball.position, _ball.scale.x, tell_color, tell_trail, family, _camera, _release_lead)
+
+
+## The batter's hits in a row today: from StreakFlames.HOT_FROM his bat
+## burns (and the ball he hits).
+func set_hot_streak(streak: int) -> void:
+	_hot_streak = streak
+	_bat_flames.set_level(streak, BatMesh.LENGTH * 0.22)
+
+
+## The drawn ball's gap to the pitch's path at flight time `at` (eased out
+## of the first RELEASE_BLEND s), so the trail leaves the hand with it.
+func _release_lead(at: float) -> Vector3:
+	if _release_offset == Vector3.INF:
+		return Vector3.ZERO
+	return _release_offset * (1.0 - smoothstep(0.0, RELEASE_BLEND, at))
 
 
 func show_pitch_marker(pitch: PitchResult) -> void:
@@ -869,6 +903,7 @@ func show_play(bip: BallInPlay, t: float, play: LivePlay, outcome: PlayOutcome, 
 	_aim.visible = false
 	for ghost in _trail:
 		ghost.visible = false
+	_pitch_trail.hide_trail()
 	_timing_ring.visible = false
 	_windup = -1.0
 	_follow_start = -1.0
@@ -1038,6 +1073,8 @@ func _process(delta: float) -> void:
 		return
 	_view_clock += delta
 	_size_ball()
+	if _ball_flames.lit():
+		_ball_flames.position = _ball.position
 	var flash_age := _view_clock - _flash_start
 	_flash.visible = flash_age < 0.18
 	if _flash.visible:
@@ -1209,8 +1246,10 @@ func _update_bat() -> void:
 		batter.grip_bat(null)
 		batter.carry_bat(true)
 		bat_mesh.visible = false
+		_bat_flames.visible = false
 		return
 	bat_mesh.visible = true
+	_bat_flames.visible = true
 	if batter != null:
 		batter.carry_bat(false)
 	var style: StringName = batter.style if batter != null else &"classic"
@@ -1419,6 +1458,9 @@ func _build_aim_and_flash() -> void:
 		var ghost := _sphere(BALL_RADIUS, Color(1, 1, 1, 0.5), false)
 		ghost.visible = false
 		_trail.append(ghost)
+	_pitch_trail = PitchTrail.new()
+	_pitch_trail.name = "PitchTrail"
+	add_child(_pitch_trail)
 	_flash = _sphere(1.0, Color(1, 1, 1, 0.8), false)
 	_flash.visible = false
 	_contact_sound = ContactSound.new()
@@ -1440,6 +1482,14 @@ func _build_bat() -> void:
 	bat.position = Vector3(0.0, 0.0, 0.06)
 	bat.material_override = BatMesh.material()
 	_bat_pivot.add_child(bat)
+	_bat_flames = StreakFlames.new()
+	_bat_flames.name = "BatFlames"
+	# Over the barrel (its outer 45%).
+	_bat_flames.position = Vector3(0.0, 0.0, -BatMesh.LENGTH * 0.72)
+	_bat_pivot.add_child(_bat_flames)
+	_ball_flames = StreakFlames.new()
+	_ball_flames.name = "BallFlames"
+	add_child(_ball_flames)
 	var trail := MeshInstance3D.new()
 	trail.name = "BatTrail"
 	_trail_mesh = ImmediateMesh.new()
