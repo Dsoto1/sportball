@@ -2584,3 +2584,7 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   hairline and only the brim reaches out. The helmet sat 2 cm back,
   leaving a gap behind the neck; now 2 cm forward (`HELMET_FORWARD`), its
   back against the head and the flap over the ear.
+- **Helmet lower and level (2026-11-04, owner: "sits a little high and
+  tilted up"):** top 1.84 -> 1.825 m and pitched 9 deg front-down
+  (`HELMET_TILT`, `_gear` takes a tilt): the brim sits level just over
+  the eyebrows, the shell down over the back of the head and the ear.

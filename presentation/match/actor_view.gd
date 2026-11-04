@@ -35,7 +35,10 @@ const BLEND := 0.12
 ## Headwear fit on the head (18 cm wide, its top at 1.81 m in the rest
 ## pose): width across (m), the top's height, the cap's crown squashed.
 const HELMET_WIDTH := 0.218
-const HELMET_TOP := 1.84
+const HELMET_TOP := 1.825
+## The helmet pitched front-down (degrees; negative is front down on this
+## rig): its brim level over the eyes.
+const HELMET_TILT := -9.0
 const CAP_WIDTH := 0.19
 const CAP_TOP := 1.83
 const CAP_SQUASH := 0.82
@@ -544,7 +547,7 @@ func _attach(skeleton: Skeleton3D, bone: String, node: Node3D, at: Transform3D) 
 ## protector, shin guards and mitt are shown only on the catcher.
 func _build_headwear(skeleton: Skeleton3D) -> void:
 	# The head is a narrow egg: about 0.17 m wide, 0.23 deep, top at 1.83.
-	_helmet = _gear(skeleton, "batting_helmet", "Head", HELMET_WIDTH, Vector3(0, HELMET_TOP, HELMET_FORWARD), &"top", "main")
+	_helmet = _gear(skeleton, "batting_helmet", "Head", HELMET_WIDTH, Vector3(0, HELMET_TOP, HELMET_FORWARD), &"top", "main", 0.0, 1.0, HELMET_TILT)
 	_helmet.name = "Helmet"
 	# The sculpted helmet has a flap either side; these stay for callers.
 	for flap in ["FlapLeft", "FlapRight"]:
@@ -581,7 +584,7 @@ func set_catcher(value: bool) -> void:
 ## A gear model on a bone: `width` m across, its `anchor` (its top) at a
 ## rest-pose spot (skeleton space). `back` shifts it forward by that share
 ## of its depth (a brim reaches out in front of the crown it sits on).
-func _gear(skeleton: Skeleton3D, model: String, bone: String, width: float, at: Vector3, anchor: StringName, part: String, back: float = 0.0, squash: float = 1.0) -> Node3D:
+func _gear(skeleton: Skeleton3D, model: String, bone: String, width: float, at: Vector3, anchor: StringName, part: String, back: float = 0.0, squash: float = 1.0, tilt: float = 0.0) -> Node3D:
 	var node: Node3D = (load(GEAR_DIR + model + ".glb") as PackedScene).instantiate()
 	var box := ModelKit._aabb(node)
 	var k := width / maxf(box.size.x, 0.001)
@@ -595,7 +598,8 @@ func _gear(skeleton: Skeleton3D, model: String, bone: String, width: float, at: 
 	for mi: MeshInstance3D in node.find_children("*", "MeshInstance3D", true, false):
 		mi.set_meta("gear_part", part)
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-	_attach(skeleton, bone, holder, Transform3D(Basis.IDENTITY, at))
+	# `tilt` (degrees) pitches it about its top (negative: front down).
+	_attach(skeleton, bone, holder, Transform3D(Basis(Vector3.RIGHT, deg_to_rad(tilt)), at))
 	return holder
 
 
