@@ -33,7 +33,7 @@ func _process(_d: float) -> bool:
 		for i in 2:
 			_a[i].position = Vector3(i * 2.0, 0, 0)
 			_a[i].face(Vector3(i * 2.0, 0, 5))
-	var views := [[0, Vector3(0, 0.05, 1.3)], [0, Vector3(1.3, 0.05, 0)], [1, Vector3(0, 0.05, 1.3)], [1, Vector3(1.3, 0.05, 0)]]
+	var views := [[0, Vector3(0, 0.05, 1.3)], [0, Vector3(1.3, 0.05, 0)], [0, Vector3(0.6, 0.1, -1.2)], [1, Vector3(0, 0.05, 1.3)], [1, Vector3(1.3, 0.05, 0)]]
 	var k := (_f - 4) / 4
 	if _f >= 4 and k < views.size():
 		var a: ActorView = _a[views[k][0]]

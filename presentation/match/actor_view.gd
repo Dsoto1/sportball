@@ -35,17 +35,17 @@ const BLEND := 0.12
 ## Headwear fit on the head (18 cm wide, its top at 1.81 m in the rest
 ## pose): width across (m), the top's height, the cap's crown squashed.
 const HELMET_WIDTH := 0.218
-const HELMET_TOP := 1.825
+const HELMET_TOP := 1.815
 ## The helmet pitched front-down (degrees; negative is front down on this
 ## rig): its brim level over the eyes.
-const HELMET_TILT := -9.0
+const HELMET_TILT := -13.0
 const CAP_WIDTH := 0.19
 const CAP_TOP := 1.83
 const CAP_SQUASH := 0.82
 ## Front to back: the helmet's centre (m, + toward the face), and how far
 ## the cap is shifted forward (share of its half depth: its brim's reach,
 ## with the crown's front at the forehead's hairline).
-const HELMET_FORWARD := 0.02
+const HELMET_FORWARD := 0.005
 const CAP_FORWARD := 0.2
 ## The ball in the throwing hand (hand-bone space: x toward the palm, y
 ## along the fingers, m).

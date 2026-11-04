@@ -2588,3 +2588,8 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   tilted up"):** top 1.84 -> 1.825 m and pitched 9 deg front-down
   (`HELMET_TILT`, `_gear` takes a tilt): the brim sits level just over
   the eyebrows, the shell down over the back of the head and the ear.
+- **Helmet: back down over the hair, front tipped (2026-11-04, owner):**
+  tilting about the helmet's top lifts its back, so hair showed below it.
+  Now top 1.815 m, 2 mm further back (`HELMET_FORWARD` 0.005) and 13 deg
+  front-down: the shell covers the back of the head, the brim tips over
+  the brow. `tools/headwear_fit.gd` adds a view from behind.
