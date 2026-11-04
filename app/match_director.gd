@@ -11,6 +11,14 @@ enum Phase { PREGAME, PRE_PITCH, METER, PITCH_FLIGHT, CALL, BALL_IN_PLAY, GAME_O
 const AI_PRE_PITCH_DELAY := 1.8
 # The last part of the pre-pitch is the pitcher's visible windup.
 const WINDUP_TIME := 0.7
+## Arcade feedback: a clean release (meter error under this), the
+## barrel's slow motion (real s, its time scale, the ease back), and
+## m/s -> mph.
+const CLEAN_RELEASE := 0.08
+const SLOWMO_TIME := 0.55
+const SLOWMO_SCALE := 0.3
+const SLOWMO_EASE := 0.2
+const MPH := 2.23694
 ## After an early meter press, the rest of the windup takes this share of
 ## WINDUP_TIME per full windup (so at most ~0.2 s).
 const WINDUP_FINISH_SHARE := 0.3
@@ -55,6 +63,8 @@ var _phase := Phase.PRE_PITCH
 ## The user's pitch: the windup progress driven by the meter, and the
 ## pitch locked in by the press while the windup finishes.
 var _user_windup := 0.0
+## Real seconds of the barrel's slow motion left.
+var _slowmo_left := 0.0
 var _meter_intent: PitchIntent
 var _phase_time := 0.0
 ## Hit pause: the play clock holds for this long after solid contact.
@@ -123,6 +133,8 @@ func setup(p_content: ContentLibrary, view: MatchView, hud: MatchHud, debug: Deb
 ## A 6-inning exhibition between the clubs picked on the matchup card
 ## (the first two in the library to begin with), away at home.
 func start_match(seed_value: int) -> void:
+	_slowmo_left = 0.0
+	Engine.time_scale = 1.0
 	_seed = seed_value
 	rng = MatchRng.new(seed_value)
 	roster = MatchRoster.new(content.teams[_away_index], content.teams[_home_index])
@@ -296,6 +308,12 @@ func _input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
+	if _slowmo_left > 0.0:
+		# Counted in real seconds (delta is slowed with the engine).
+		_slowmo_left -= delta / maxf(Engine.time_scale, 0.01)
+		Engine.time_scale = SLOWMO_SCALE if _slowmo_left > SLOWMO_EASE else lerpf(1.0, SLOWMO_SCALE, clampf(_slowmo_left / SLOWMO_EASE, 0.0, 1.0))
+		if _slowmo_left <= 0.0:
+			Engine.time_scale = 1.0
 	if state == null:
 		return
 	_tick_clock(delta)
@@ -469,8 +487,6 @@ func _process_pre_pitch(delta: float) -> void:
 func _process_meter(delta: float) -> void:
 	_move_cursor(delta)
 	_view.set_cursor(_cursor, 0.07, 0.0, Color(0.3, 0.95, 1.0))
-	_meter = minf(_meter + delta / tuning.pitch_meter_sweep_time, 1.0)
-	_hud.set_meter(_meter, tuning.pitch_meter_sweet_spot)
 	if _meter_intent != null:
 		# Pressed: the rest of his windup plays quickly, then the release.
 		_user_windup = minf(_user_windup + delta / (WINDUP_TIME * WINDUP_FINISH_SHARE), 1.0)
@@ -480,6 +496,9 @@ func _process_meter(delta: float) -> void:
 			_meter_intent = null
 			_throw_pitch(intent)
 		return
+	# (The fill stops where it was pressed.)
+	_meter = minf(_meter + delta / tuning.pitch_meter_sweep_time, 1.0)
+	_hud.set_meter(_meter, tuning.pitch_meter_sweet_spot)
 	# He winds up as the meter sweeps: the sweet spot is his release frame.
 	_user_windup = clampf(_meter / tuning.pitch_meter_sweet_spot, 0.0, 1.0)
 	_view.show_windup(minf(_user_windup, 0.999))
@@ -489,6 +508,9 @@ func _process_meter(delta: float) -> void:
 		var intent := PitchIntent.new(family.id, _cursor, error)
 		intent.slide_step = _slide_step
 		_meter_intent = intent
+		_hud.meter_release(error)
+		if error < CLEAN_RELEASE:
+			_view.sfx.play(&"ui_confirm", -4.0, 1.25)
 
 
 func _throw_pitch(intent: PitchIntent) -> void:
@@ -508,6 +530,7 @@ func _throw_pitch(intent: PitchIntent) -> void:
 	_pending_swing = SwingIntent.Type.NONE
 	_pitch_release_usec = _now_usec()
 	_view.show_windup(-1.0)
+	_view.release_burst(family.tell_color, 1.0 - clampf(intent.meter_error * 2.0, 0.0, 1.0))
 	_set_phase(Phase.PITCH_FLIGHT)
 
 
@@ -555,6 +578,7 @@ func _process_pitch_flight(_delta: float) -> void:
 				_fly_foul()
 			else:
 				_view.sfx.play(&"glove", 2.0 if _pitch.speed > 38.0 else 0.0)
+				_hud.show_speed(_pitch.speed * MPH)
 		if _contact.swing_type != SwingIntent.Type.NONE:
 			_show_contact_feedback(call_text)
 		if _contact.outcome != ContactResult.Outcome.IN_PLAY and _contact.outcome != ContactResult.Outcome.FOUL:
@@ -596,9 +620,17 @@ func _show_contact_feedback(call_text: String) -> void:
 	if not readout.is_empty() and _contact.swing_type != SwingIntent.Type.BUNT and _contact.outcome in [ContactResult.Outcome.IN_PLAY, ContactResult.Outcome.FOUL]:
 		detail += " · bat %d mph, %d° attack" % [roundi(readout["bat_speed"]), roundi(readout["attack_angle"])]
 	_hud.show_callout(head, detail, 2.2)
+	if _contact.swing_type != SwingIntent.Type.BUNT:
+		var perfect := absf(_contact.timing_norm) < ContactFeedback.PERFECT_NORM
+		_hud.show_timing("PERFECT!" if perfect else ("EARLY" if _contact.timing_offset < 0.0 else "LATE"), perfect)
 	_view.contact_feedback(_pitch.location, f["tier"])
 	if _phase == Phase.BALL_IN_PLAY:
 		_hit_stop = HIT_STOP.get(f["tier"], 0.0)
+		if f["tier"] == ContactFeedback.Tier.SWEET:
+			# The barrel: a white flash and a beat of slow motion off the bat.
+			_hud.screen_flash(Color(1.0, 0.96, 0.8), 0.22)
+			_slowmo_left = SLOWMO_TIME
+			Engine.time_scale = SLOWMO_SCALE
 
 
 func _resolve_swing(swing: SwingIntent) -> void:

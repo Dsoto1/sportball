@@ -70,6 +70,17 @@ func contact(at: Vector3, tier: int, color: Color) -> void:
 		_tint(fx, Color(1, 1, 1), GOLD.lerp(color, 0.35))
 
 
+## The pitch leaving the hand: a small burst in the pitch's colour, bigger
+## and brighter the cleaner the release (`strength` 0..1).
+func release(at: Vector3, color: Color, strength: float) -> void:
+	if reduce_flashes or strength < 0.2:
+		return
+	var spec: Array = CONTACT[0]
+	var fx := _spawn(spec[0], at, float(spec[1]) * lerpf(0.35, 0.75, strength))
+	if fx != null:
+		_tint(fx, color.lightened(0.5), color)
+
+
 ## A home run's fireworks: `count` bursts over the outfield stands (round
 ## `center`, `radius` m out, `height` up), over `seconds`, in the batting
 ## club's colors and gold.

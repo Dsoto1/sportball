@@ -2550,3 +2550,20 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   as is). The drawn ball now starts in the hand and eases onto the
   pitch's path over its first 0.12 s (`MatchView.RELEASE_BLEND`;
   presentation only, the pitch is unchanged). `RELEASE_PROBE=1` logs it.
+- **Arcade feedback, first set (2026-11-04, owner):**
+  - *Meter:* the white band glows as the fill closes on it; on the press
+    the fill stops, the bar flashes and a ring bursts off it, gold on a
+    clean release fading to red the further off (`PitchMeter.release`),
+    with a click on a clean one (meter error < `CLEAN_RELEASE`). The
+    meter stays up 0.45 s so the flash plays out.
+  - *Release burst:* a small hit-pack burst at the pitcher's hand in the
+    pitch's tell colour, sized by how clean the release was
+    (`MatchFx.release`).
+  - *Timing word:* every swing (not bunts) pops EARLY / PERFECT! / LATE
+    by the zone (perfect: `ContactFeedback.PERFECT_NORM`, gold).
+  - *Speed at the mitt:* "94 MPH" pops by the zone when a pitch reaches
+    the catcher (gold from 95).
+  - *The barrel:* a white screen flash (HUD; off with Reduce flashes) and
+    0.55 real seconds at 0.3x speed, easing back (`SLOWMO_*`).
+  - `tools/playtest_bot.gd ... fx` screenshots the meter press and flash
+    and every call.

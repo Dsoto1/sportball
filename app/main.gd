@@ -104,6 +104,7 @@ func _resume() -> void:
 func _apply_gameplay_settings() -> void:
 	_view.reduce_shake = bool(GameSettings.get_value("reduce_shake"))
 	_view.reduce_flashes = bool(GameSettings.get_value("reduce_flashes"))
+	_hud.reduce_flashes = bool(GameSettings.get_value("reduce_flashes"))
 	if _director.tuning != null:
 		_director.tuning.rookie_assist = bool(GameSettings.get_value("rookie_assist"))
 

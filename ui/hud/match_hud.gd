@@ -56,6 +56,18 @@ var _prompt: RichTextLabel
 var _prompt_text := ""
 var _callout_timer := 0.0
 var _meter: PitchMeter
+## The screen flash and the pitch-speed popup.
+var _flash_rect: ColorRect
+var _flash_left := 0.0
+var _flash_time := 0.0
+var _speed: Label
+var _speed_left := 0.0
+var _meter_hide_in := 0.0
+var _timing: Label
+var _timing_left := 0.0
+const SPEED_TIME := 1.1
+## No full-screen flashes (GameSettings "reduce_flashes").
+var reduce_flashes := false
 
 # Scorebug and cards.
 var _bug: ScoreBug
@@ -145,6 +157,25 @@ func _ready() -> void:
 	_prompt.offset_top = -90.0
 	_prompt.offset_bottom = -12.0
 
+	_flash_rect = ColorRect.new()
+	_flash_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_flash_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_flash_rect.color = Color(1, 1, 1, 0)
+	add_child(_flash_rect)
+	_speed = _label(self, 46)
+	_speed.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	_speed.position += Vector2(150, -40)
+	_speed.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_speed.add_theme_constant_override("outline_size", 10)
+	_speed.add_theme_color_override("font_outline_color", Color(0.05, 0.07, 0.14))
+	_speed.modulate.a = 0.0
+	_timing = _label(self, 52)
+	_timing.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	_timing.position += Vector2(-260, -40)
+	_timing.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_timing.add_theme_constant_override("outline_size", 12)
+	_timing.add_theme_color_override("font_outline_color", Color(0.05, 0.07, 0.14))
+	_timing.modulate.a = 0.0
 	_meter = PitchMeter.new()
 	_meter.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	_meter.size = Vector2(360, 22)
@@ -621,6 +652,12 @@ func show_pitching(visible_now: bool, families: Array[PitchFamilyDef] = [], sele
 	_slide_step = slide_step
 	for node: CanvasItem in [_pitch_info["box"], _controls, _options_box, _meter]:
 		node.visible = visible_now
+	if not visible_now and _meter.flashing():
+		# The release flash plays out before the meter goes.
+		_meter.visible = true
+		_meter_hide_in = 0.45
+	elif visible_now:
+		_meter_hide_in = 0.0
 	_pitch_list.visible = visible_now or _batting
 	# The panels carry the pitching and batting controls; the prompt line
 	# stays for the rest.
@@ -685,6 +722,35 @@ func _refresh_pitches() -> void:
 	_options.text = "%s  PITCHING CHANGE\n%s  PICKOFF\n%s  SLIDE STEP: %s" % [
 		PromptIcons.icons(&"open_subs", pad, 28), PromptIcons.icons(&"pickoff", pad, 28),
 		PromptIcons.icons(&"slide_step", pad, 28), "ON" if _slide_step else "OFF"]
+
+
+func meter_release(error: float) -> void:
+	_meter.release(error)
+
+
+## A whole-screen flash (the barrel), fading over `seconds`.
+func screen_flash(color: Color, seconds: float = 0.18) -> void:
+	if reduce_flashes:
+		return
+	_flash_rect.color = color
+	_flash_left = seconds
+	_flash_time = seconds
+
+
+## The swing's timing word popping up by the zone: PERFECT (gold),
+## EARLY or LATE.
+func show_timing(word: String, perfect: bool) -> void:
+	_timing.text = word
+	_timing_left = SPEED_TIME
+	_timing.add_theme_color_override("font_color", MenuStyle.GOLD if perfect else Color(0.75, 0.88, 1.0))
+
+
+## The pitch's speed popping up by the zone as it reaches the mitt.
+func show_speed(mph: float) -> void:
+	_speed.text = "%d MPH" % roundi(mph)
+	_speed_left = SPEED_TIME
+	# Hotter the faster: white, gold from 95.
+	_speed.add_theme_color_override("font_color", MenuStyle.GOLD if mph >= 95.0 else Color.WHITE)
 
 
 func set_meter(value: float, sweet_spot: float) -> void:
@@ -816,6 +882,26 @@ func set_gamepad(value: bool) -> void:
 
 
 func _process(delta: float) -> void:
+	if _meter_hide_in > 0.0:
+		_meter_hide_in -= delta
+		if _meter_hide_in <= 0.0 and not _pitching:
+			_meter.visible = false
+	if _flash_left > 0.0:
+		_flash_left = maxf(_flash_left - delta, 0.0)
+		_flash_rect.color.a = 0.55 * _flash_left / maxf(_flash_time, 0.001)
+	if _timing_left > 0.0:
+		_timing_left = maxf(_timing_left - delta, 0.0)
+		var v := 1.0 - _timing_left / SPEED_TIME
+		_timing.pivot_offset = _timing.size * 0.5
+		_timing.scale = Vector2.ONE * (1.0 + 0.6 * (1.0 - smoothstep(0.0, 0.15, v)))
+		_timing.modulate.a = 1.0 - smoothstep(0.7, 1.0, v)
+	if _speed_left > 0.0:
+		_speed_left = maxf(_speed_left - delta, 0.0)
+		var u := 1.0 - _speed_left / SPEED_TIME
+		# Pops in big, settles, fades.
+		_speed.scale = Vector2.ONE * (1.0 + 0.5 * (1.0 - smoothstep(0.0, 0.15, u)))
+		_speed.pivot_offset = _speed.size * 0.5
+		_speed.modulate.a = 1.0 - smoothstep(0.7, 1.0, u)
 	if _callout_timer > 0.0:
 		_callout_timer -= delta
 		_callout_box.modulate.a = clampf(_callout_timer / 0.4, 0.0, 1.0)

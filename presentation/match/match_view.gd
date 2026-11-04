@@ -646,6 +646,12 @@ func _place_umpire() -> void:
 	_umpire.reset_pose()
 
 
+## The release burst at the pitcher's hand (call right after the release).
+func release_burst(color: Color, strength: float) -> void:
+	if _release_hand != Vector3.INF:
+		fx.release(_release_hand, color, strength)
+
+
 ## A called strike: the umpire punches it out.
 func umpire_call_strike() -> void:
 	if _umpire != null and BaseballMoves.has_mocap():

@@ -5,7 +5,8 @@ extends SceneTree
 ##   godot --path . -s res://tools/playtest_bot.gd -- [seconds] [screenshot_dir] [home]
 ## Pass `home` to control the home team (field first). With `windup` (and a
 ## screenshot dir) it shoots the user's first pitch: the pitcher's set,
-## then every few frames through the meter and his windup.
+## then every few frames through the meter and his windup. `fx` also
+## shoots each call (the speed popup, the timing readout).
 ## Headless works for logic; screenshots need a rendering display.
 
 const FRAME := 1.0 / 60.0
@@ -17,6 +18,8 @@ var _sim_seconds := 120.0
 var _shot_dir := ""
 var _shots_taken := 0
 var _windup_frames := 0
+var _call_shot_at := 0
+var _meter_shot_frames := 0
 var _elapsed := 0.0
 var _swing_offset := 0.0
 var _planned_pitch: PitchResult
@@ -75,8 +78,18 @@ func _drive() -> void:
 		_bunt_shot -= 1
 		if _bunt_shot == 0:
 			_screenshot("bunt")
+	if _meter_shot_frames > 0:
+		_meter_shot_frames -= 1
+		if _meter_shot_frames == 0:
+			_screenshot("meter_flash")
 	var phase := _director.current_phase()
 	var entered := phase != _last_phase
+	if entered and OS.get_cmdline_user_args().has("fx") and phase == MatchDirector.Phase.CALL:
+		# Just after the ball reaches the mitt (the speed popup) or the bat.
+		_call_shot_at = Time.get_ticks_msec() + 120
+	if _call_shot_at > 0 and Time.get_ticks_msec() >= _call_shot_at:
+		_call_shot_at = 0
+		_screenshot("call")
 	_last_phase = phase
 	var batting := _director.user_is_batting()
 	if _waiting_clock and phase != MatchDirector.Phase.PRE_PITCH:
@@ -125,6 +138,9 @@ func _drive() -> void:
 				if _windup_frames % 6 == 1:
 					_screenshot("windup")
 			if absf(_director.meter_value() - _director.tuning.pitch_meter_sweet_spot) < 0.03 + _rng.randf() * 0.05:
+				if OS.get_cmdline_user_args().has("fx") and _director.state.pitch_count == 0:
+					_screenshot("meter_press")
+					_meter_shot_frames = 2
 				_press(&"pitch_primary")
 		MatchDirector.Phase.PITCH_FLIGHT:
 			var pitch := _director.current_pitch()
