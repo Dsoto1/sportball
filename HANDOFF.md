@@ -231,8 +231,14 @@ More tools added 2026-11-02..04:
   (`bat_from_meshy.py`).
 - After editing a `.uid` file by hand, delete `.godot/uid_cache.bin` and
   `.godot/editor/filesystem_cache*`, then re-import.
-- Running from the editor embeds the game in the Game tab, so full screen
-  only enlarges the editor: turn off "Embed Game on Next Play" or run
-  `godot --path .`.
+- Running from the editor used to embed the game in the Game tab, where
+  full screen only enlarged the editor (owner: "Godot goes full screen but
+  the game does not; F11 does nothing"). `project.godot` now sets
+  `window/size/mode.editor_hint=3`: only the editor sees "starts full
+  screen", so it won't embed and Play opens the game in its own window
+  (GameSettings then applies the saved full screen; F11 / Alt+Enter
+  toggle). Tools and exports don't have `editor_hint`, so renders keep
+  their `--resolution`. Don't set `window/size/mode` itself: under xvfb
+  the renders come out at the screen's size.
 - Renders of short effects (flashes) can miss them: this container renders
   only a few frames a second.
