@@ -15,6 +15,9 @@ var _backdrop: MenuBackdrop
 var _paused_at := 0
 
 
+const EMBEDDED_NOTICE := "Running inside the editor's Game tab, so full screen can't work here.\nRestart the Godot editor (it reads the project's window settings at start-up), or in the Game tab's  ⋮  menu\nturn off \"Embed Game on Next Play\", then press Play again. Or run:  godot --path ."
+
+
 func _ready() -> void:
 	GameSettings.load_saved()
 	GameSettings.ensure_buses()
@@ -45,6 +48,13 @@ func _ready() -> void:
 		GameSettings.apply()
 		_build_menus(ui)
 		_open_menu()
+		if Engine.is_embedded_in_editor():
+			# project.godot keeps the editor from embedding the game
+			# (window/size/mode.editor_hint); if it still did (an editor
+			# opened before that setting, or embedding forced on in the
+			# editor settings), say how to get a real window up front: the
+			# editor may take F11 before the game sees it.
+			_notice(EMBEDDED_NOTICE, 12.0)
 	else:
 		_director.start_match(_seed_from_args())
 
@@ -114,7 +124,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"toggle_fullscreen") or alt_enter:
 		get_viewport().set_input_as_handled()
 		if Engine.is_embedded_in_editor():
-			_notice("Full screen needs the game in its own window: in the editor's Game tab, turn off\n\"Embed Game on Next Play\" (the  ⋮  menu), then press Play again. Or run:  godot --path .")
+			_notice(EMBEDDED_NOTICE, 12.0)
 			return
 		GameSettings.toggle_fullscreen()
 		return
@@ -126,7 +136,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 ## A short note across the top of the screen for a few seconds.
-func _notice(text: String) -> void:
+func _notice(text: String, seconds: float = 6.0) -> void:
 	var ui := get_node("UI")
 	var old := ui.get_node_or_null("Notice")
 	if old != null:
@@ -143,7 +153,7 @@ func _notice(text: String) -> void:
 	label.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	label.offset_top = 24.0
 	ui.add_child(label)
-	get_tree().create_timer(6.0).timeout.connect(func() -> void:
+	get_tree().create_timer(seconds).timeout.connect(func() -> void:
 		if is_instance_valid(label):
 			label.queue_free())
 
