@@ -2632,3 +2632,7 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
   its preview was paid for). `tools/meshy_prop.py` welds, simplifies and
   repacks any Meshy prop. The owner's chosen community ball (CC0) couldn't
   be fetched from the cloud session (Cloudflare check on meshy.ai).
+- **The ball is the owner's community Meshy baseball (2026-11-16, CC0):**
+  `MatchView._wear_ball_model` puts it inside the ball node (sized to
+  `BALL_RADIUS`), so the distance growth, shadow and trails are as before;
+  the shader-stitched sphere is the fallback when the model is absent.

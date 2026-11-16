@@ -113,6 +113,7 @@ const TRAIL_LENGTH := 10
 const SWING_GRIP := 0.09
 const BUNT_GRIP := 0.3
 const BALL_SHADER := preload("res://presentation/props/baseball.gdshader")
+const BALL_MODEL := "res://assets/generated/meshy/field/ball.glb"
 ## How fast the ball tumbles (radians per meter travelled), so its seams spin.
 const BALL_SPIN := 9.0
 const BALL_RADIUS := 0.045
@@ -232,6 +233,7 @@ func setup(p_tuning: BaseballTuning) -> void:
 	var ball_mat := ShaderMaterial.new()
 	ball_mat.shader = BALL_SHADER
 	_ball.material_override = ball_mat
+	_wear_ball_model()
 	_ball_shadow = _disc(0.07, Color(0, 0, 0, 0.45))
 	for id in tuning.fielder_ids:
 		var actor := ActorView.new()
@@ -1739,6 +1741,26 @@ func _ring(color: Color) -> MeshInstance3D:
 	ring.rotation_degrees.x = 90.0
 	ring.material_override = _unshaded(color)
 	return ring
+
+
+## The owner's chosen community baseball (Meshy, CC0) in place of the
+## shader-stitched sphere, sized to BALL_RADIUS; the sphere node stays (its
+## scale still grows the ball with distance).
+func _wear_ball_model() -> void:
+	if not ResourceLoader.exists(BALL_MODEL):
+		return
+	var scene: Node = (load(BALL_MODEL) as PackedScene).instantiate()
+	var src: MeshInstance3D = scene.find_children("*", "MeshInstance3D", true, false)[0]
+	var mesh := src.mesh
+	scene.free()
+	var box := mesh.get_aabb()
+	var k := BALL_RADIUS * 2.0 / maxf(box.size.y, 0.0001)
+	var model := MeshInstance3D.new()
+	model.name = "BallModel"
+	model.mesh = mesh
+	model.transform = Transform3D(Basis.from_scale(Vector3.ONE * k), -box.get_center() * k)
+	_ball.add_child(model)
+	_ball.mesh = null
 
 
 func _sphere(radius: float, color: Color, shaded: bool) -> MeshInstance3D:
