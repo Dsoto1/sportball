@@ -9,3 +9,4 @@ export_credentials.cfg
 
 # Project Control Center: per-session summary (sent by the session hook, never committed)
 .control-center/session-summary.json
+__pycache__/
