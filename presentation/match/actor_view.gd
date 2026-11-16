@@ -32,6 +32,12 @@ const BACK_FONT := preload("res://assets/third_party/fonts/bungee/Bungee-Regular
 const BACK_NUMBER_AT := Vector3(0.0, 1.3, -0.2)
 const CROWN := Vector3(0.0, 1.68, 0.0)
 const BLEND := 0.12
+## Cleats over the feet (the foot is 27 cm long, from z -0.14 to 0.13 at
+## rest): the shoe's length, its sole's height and its middle along Z.
+const CLEAT := "res://assets/generated/meshy/field/cleat.glb"
+const CLEAT_LENGTH := 0.3
+const CLEAT_SOLE := -0.012
+const CLEAT_Z := 0.016
 ## Headwear fit on the head (18 cm wide, its top at 1.81 m in the rest
 ## pose): width across (m), the top's height, the cap's crown squashed.
 const HELMET_WIDTH := 0.218
@@ -107,6 +113,7 @@ var _tag: Label3D
 var _clock := 0.0
 var _sway := 0.0
 var _crouched := false
+var _cleats: Array[Node3D] = []
 ## Fielders between pitches stand hands on knees, then drop into their
 ## ready crouch as the pitcher starts (MatchView clears it).
 var relaxed := false:
@@ -185,6 +192,7 @@ func setup(color: Color, tag: String) -> void:
 	skeleton.add_child(grip)
 	_grip = grip
 	_build_headwear(skeleton)
+	_build_cleats(skeleton)
 	_back = Label3D.new()
 	_back.font = BACK_FONT
 	_back.font_size = 72
@@ -352,6 +360,8 @@ func set_body(kind: StringName) -> void:
 	for mi in [_mesh, _cloth, _hair]:
 		if mi != null:
 			mi.visible = not robot
+	for c: Node3D in _cleats:
+		c.visible = not robot
 	if _beard != null and robot:
 		_beard.visible = false
 	if robot:
@@ -569,6 +579,25 @@ func _build_headwear(skeleton: Skeleton3D) -> void:
 	_mitt.position = Vector3(0.0, 0.95 * GLOVE_SCALE * 0.75, 0.0)
 	_hand.add_child(_mitt)
 	set_catcher(false)
+
+
+## Cleats (the owner's Meshy model) over each foot: CLEAT_LENGTH long, its
+## sole on the ground, its toe toward the foot's ball (+Z at rest).
+func _build_cleats(skeleton: Skeleton3D) -> void:
+	if not ResourceLoader.exists(CLEAT):
+		return
+	for side: String in ["l", "r"]:
+		var node: Node3D = (load(CLEAT) as PackedScene).instantiate()
+		var box := ModelKit._aabb(node)
+		var k := CLEAT_LENGTH / maxf(box.size.x, 0.001)
+		var holder := Node3D.new()
+		holder.name = "Cleat_" + side
+		holder.add_child(node)
+		# The model's toe runs along -X: turned to +Z.
+		node.transform = Transform3D(Basis(Vector3.UP, PI * 0.5) * Basis.from_scale(Vector3.ONE * k), Vector3.ZERO)
+		var foot := skeleton.get_bone_global_rest(skeleton.find_bone("foot_" + side)).origin
+		_attach(skeleton, "foot_" + side, holder, Transform3D(Basis.IDENTITY, Vector3(foot.x, CLEAT_SOLE, CLEAT_Z)))
+		_cleats.append(holder)
 
 
 ## Catchers wear the mask, chest protector, shin guards and mitt.

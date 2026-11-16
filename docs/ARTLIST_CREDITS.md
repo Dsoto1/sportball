@@ -162,3 +162,7 @@ The owner approved 11 models on 2026-10-23 (gear, dugout props, two waterfalls):
 | 2026-10-23 | Marble terraced cascade (Fountain Gardens) (text-to-3d) | preview + refine | 30 | 5,510 | preview 01a168b3-6302-73ed-989e-b6587cf1211e, refine 01a168b4-63db-7267-a865-d95b4aed22b7 |
 | 2026-11-01 | Robot player: remesh of the owner's image-to-3D robot (task 44b15a56-1172-5aeb-be1f-f537b4dbe05d) | remesh | 5 | | remesh 01a194c0-f7d6-751c-a865-9be0f3ced9a9 (came back untextured; not used) |
 | 2026-11-01 | Robot player: auto-rig (locally simplified 30k-triangle textured GLB) | rigging | 5 | 5,048 (incl. the owner's own use) | rigging 01a194c5-ad14-702b-b5af-2c4c4292635b |
+| 2026-11-16 | Baseball cleat (text-to-3d) | preview + refine | 30 | | preview 01a1e476-d8b6-775c-8ac5-13686686190c, refine 01a1e478-0c25-77b6-9820-146a4b0919af |
+| 2026-11-16 | Pitcher's rubber (text-to-3d) | preview + refine | 30 | | preview 01a1e476-f5f1-7124-b853-ad5d31cc5ff3, refine 01a1e478-1a72-7171-b0e8-b303712e1c05 |
+| 2026-11-16 | Base bag (text-to-3d) | preview + refine | 30 | | preview 01a1e477-01ed-708f-97aa-aa0745e11be2, refine 01a1e478-2658-76e3-9256-527dc0cc1091 |
+| 2026-11-16 | Home plate (text-to-3d) | preview | 20 | 3,898 (incl. the owner's own use) | preview 01a1e476-e7b1-7619-a57e-51409590ddb6 (came out an ornate octagon; not refined, not used: the procedural plate stays) |

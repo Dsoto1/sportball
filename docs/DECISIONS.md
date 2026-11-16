@@ -2622,3 +2622,13 @@ glow, cherry blossoms everywhere, the giant kitsune in right field):
     the first pitch he sees ("ON FIRE!").
   - `tools/arcade_fx_shot.gd` renders all three; pass Godot
     `--fixed-fps 30` so short moments land in the shots.
+- **Meshy field pieces and cleats (2026-11-16, owner; 110 credits):**
+  cleats on every player (`ActorView._build_cleats`, 30 cm, toe forward;
+  the body's feet are tucked inside by `UniformLook` FOOT_TUCK so no toes
+  poke through), the pitcher's rubber and the three bags
+  (`GrayboxField._wear_model` swaps each box for its model, stretched to
+  the rulebook size; the boxes' nodes and physics stay). Home plate came
+  out as an ornate octagon, so the procedural rulebook plate stays (only
+  its preview was paid for). `tools/meshy_prop.py` welds, simplifies and
+  repacks any Meshy prop. The owner's chosen community ball (CC0) couldn't
+  be fetched from the cloud session (Cloudflare check on meshy.ai).

@@ -24,6 +24,15 @@ static var _shell: ArrayMesh
 
 
 ## The region-painted copy of the mannequin mesh (same skinning).
+## The feet drawn smaller, inside the cleats (rest pose, m): below this
+## height, pulled toward the foot's middle by FOOT_TUCK.
+const FOOT_TUCK_BELOW := 0.15
+const FOOT_TUCK := 0.76
+const FOOT_X := 0.089
+const FOOT_MID_Y := 0.055
+const FOOT_MID_Z := -0.01
+
+
 static func mesh_for(source: MeshInstance3D) -> ArrayMesh:
 	if _mesh != null:
 		return _mesh
@@ -45,8 +54,15 @@ static func mesh_for(source: MeshInstance3D) -> ArrayMesh:
 			for k in per:
 				if weights[i * per + k] > weights[i * per + best]:
 					best = k
-			var region := region_for(names[bones[i * per + best]], verts[i])
+			var bone_name := names[bones[i * per + best]]
+			var region := region_for(bone_name, verts[i])
 			regions[i] = Vector2(float(region), 0.0)
+			if ResourceLoader.exists(ActorView.CLEAT) and (bone_name.begins_with("foot_") or bone_name.begins_with("ball_")) and verts[i].y < FOOT_TUCK_BELOW:
+				# Tucked inside the cleat that covers it (toes included).
+				var v := verts[i]
+				var centre := Vector3(signf(v.x) * FOOT_X, FOOT_MID_Y, FOOT_MID_Z)
+				verts[i] = centre + (v - centre) * FOOT_TUCK
+		arrays[Mesh.ARRAY_VERTEX] = verts
 		arrays[Mesh.ARRAY_TEX_UV2] = regions
 		_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	return _mesh

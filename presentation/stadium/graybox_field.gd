@@ -142,6 +142,12 @@ func _build_infield() -> void:
 		# A bag 15 in square and 4 in tall, standing on the dirt.
 		var bag := _add_box("Base%d" % base, Vector3(FieldLayout.BASE_SIZE, FieldLayout.BASE_HEIGHT, FieldLayout.BASE_SIZE), FieldLayout.base_position(base) + Vector3(0, FieldLayout.BASE_HEIGHT * 0.5, 0), CHALK)
 		bag.rotation_degrees.y = 45.0
+		_wear_model(bag, BASE_MODEL, Vector3(FieldLayout.BASE_SIZE, FieldLayout.BASE_HEIGHT, FieldLayout.BASE_SIZE), true)
+
+
+## The owner's Meshy bag and rubber (tools/meshy_prop.py).
+const BASE_MODEL := "res://assets/generated/meshy/field/base.glb"
+const RUBBER_MODEL := "res://assets/generated/meshy/field/pitching_rubber.glb"
 
 
 ## Home plate to the rulebook: a five-sided slab of whitened rubber, 17 in
@@ -247,6 +253,7 @@ func _build_field_marks() -> void:
 	# 60 ft 6 in from the plate's back point, on the mound's top.
 	var rubber := _add_box("PitchersRubber", Vector3(24 * 0.0254, 0.03, 6 * 0.0254), Vector3(0, FieldLayout.MOUND_HEIGHT + INFIELD_GRASS_TOP - 0.01, FieldLayout.RUBBER_FRONT_Z - 3 * 0.0254), CHALK)
 	rubber.name = "PitchersRubber"
+	_wear_model(rubber, RUBBER_MODEL, Vector3(24 * 0.0254, 0.03, 6 * 0.0254))
 	for side: float in [-1.0, 1.0]:
 		var along := FieldLayout.direction_for_spray(side * 45.0)
 		var out := Vector3(side * along.z * -1.0, 0.0, side * along.x) * -1.0
@@ -624,6 +631,34 @@ static func _surface(color: Color, tex: Texture2D, normal: Texture2D, mid: float
 	m.set_shader_parameter("tile", tile)
 	m.set_shader_parameter("stripe_strength", stripes)
 	return m
+
+
+## Swaps a box for the owner's Meshy model of it (when present): the model
+## stretched to the box's size and sitting where it sat. `flat`: the model
+## stands upright (its face along Z) and is laid down onto it.
+func _wear_model(mi: MeshInstance3D, path: String, size: Vector3, flat: bool = false) -> void:
+	if not ResourceLoader.exists(path):
+		return
+	var scene: Node = (load(path) as PackedScene).instantiate()
+	var src: MeshInstance3D = scene.find_children("*", "MeshInstance3D", true, false)[0]
+	var mesh := src.mesh
+	scene.free()
+	var turn := Basis(Vector3.RIGHT, -PI * 0.5) if flat else Basis.IDENTITY
+	var box := mesh.get_aabb()
+	# The model's extent once turned (axis-aligned).
+	var ext := (turn * box.size).abs()
+	var lo := turn * box.position
+	var hi := turn * box.end
+	var low := Vector3(minf(lo.x, hi.x), minf(lo.y, hi.y), minf(lo.z, hi.z))
+	var k := Vector3(size.x / maxf(ext.x, 0.0001), size.y / maxf(ext.y, 0.0001), size.z / maxf(ext.z, 0.0001))
+	var holder := MeshInstance3D.new()
+	holder.name = "Model"
+	holder.mesh = mesh
+	# Centred on the box, its base on the box's bottom.
+	var centre := (low + ext * 0.5) * k
+	holder.transform = Transform3D(Basis.from_scale(k) * turn, -Vector3(centre.x, low.y * k.y + size.y * 0.5, centre.z))
+	mi.add_child(holder)
+	mi.mesh = null
 
 
 func _add_box(node_name: String, size: Vector3, pos: Vector3, color: Color) -> MeshInstance3D:
